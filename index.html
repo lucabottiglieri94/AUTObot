@@ -98,12 +98,13 @@ fetch(NEWS_API)
     if(!r.ok) throw new Error("HTTP "+r.status);
     return r.json();
   })
-  .then(data=>{
-    if(!data.items || !data.items.length) throw new Error("Nessuna news");
-    newsEl.innerHTML = data.items.slice(0,6).map(n=>`
+.then(data=>{
+  const items = data.news;
+  if(!items || !items.length) throw new Error("Nessuna news");
+  newsEl.innerHTML = items.slice(0,6).map(n=>`
       <a class="news-card" href="${n.url}" target="_blank">
-        <div class="news-title">${esc(n.title)}</div>
-        <div class="news-meta">Motorisumotori.it</div>
+       <div class="news-title">${esc(n.title)}</div>
+<div class="news-meta">${esc(n.date || "")}</div>
       </a>
     `).join("");
     statusEl.textContent = "stato: aggiornato (cache 12h)";
