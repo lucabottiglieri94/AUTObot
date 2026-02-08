@@ -14,6 +14,7 @@
   --muted:#9ca3af;
   --accent:#3b82f6;
   --ai:#22c55e;
+  --danger:#ef4444;
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -41,28 +42,48 @@ header{
   display:flex;
   align-items:center;
   justify-content:space-between;
+  gap:14px;
 }
 
 .logo{
   font-weight:700;
   letter-spacing:.5px;
+  white-space:nowrap;
 }
 
 .menu{
   display:flex;
-  gap:18px;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
 }
 
 .menu button{
-  background:none;
-  border:none;
+  background:transparent;
+  border:1px solid transparent;
   color:var(--muted);
-  font-size:14px;
+  font-size:13px;
   cursor:pointer;
+  padding:8px 10px;
+  border-radius:12px;
+  transition:.15s ease;
 }
 
 .menu button:hover{
   color:var(--text);
+  border-color:var(--line);
+  background:rgba(255,255,255,.03);
+}
+
+.menu button.active{
+  color:var(--text);
+  border-color:rgba(59,130,246,.55);
+  background:rgba(59,130,246,.10);
+}
+
+.menu button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
 }
 
 main{
@@ -88,6 +109,26 @@ p{
   margin-bottom:24px;
 }
 
+.meta{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.badge{
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  color:var(--muted);
+  background:rgba(255,255,255,.02);
+}
+
+.badge.ok{ color:#bbf7d0; border-color:rgba(34,197,94,.25); background:rgba(34,197,94,.06); }
+.badge.err{ color:#fecaca; border-color:rgba(239,68,68,.25); background:rgba(239,68,68,.06); }
+
 .brand{
   padding:14px 0;
   border-bottom:1px solid var(--line);
@@ -97,6 +138,28 @@ p{
 
 .brand strong{
   color:var(--accent);
+}
+
+.modelsWrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px;
+}
+
+.chip{
+  border:1px solid var(--line);
+  background:rgba(2,6,23,.55);
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:13px;
+  color:var(--text);
+}
+
+.small{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:10px;
 }
 
 /* ORB */
@@ -140,6 +203,15 @@ p{
   border-bottom:1px solid var(--line);
   font-weight:600;
   color:var(--accent);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+#chatstatus{
+  font-size:12px;
+  color:var(--muted);
 }
 
 #messages{
@@ -154,6 +226,7 @@ p{
 .msg{
   font-size:14px;
   line-height:1.4;
+  white-space:pre-wrap;
 }
 
 .ai{color:var(--ai)}
@@ -182,6 +255,12 @@ p{
   background:var(--accent);
   color:white;
   font-weight:600;
+  cursor:pointer;
+}
+
+#inputArea button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
 }
 
 @media(max-width:900px){
@@ -195,13 +274,9 @@ p{
 <header>
   <div class="nav">
     <div class="logo">ProgettoAutoAI</div>
-    <div class="menu">
-      <button>FIAT</button>
-      <button>MAZDA</button>
-      <button>MG</button>
-      <button>ALFA ROMEO</button>
-      <button>LANCIA</button>
-      <button>AIXAM</button>
+    <div class="menu" id="brandMenu">
+      <!-- Popolato via API -->
+      <button disabled>Carico...</button>
     </div>
   </div>
 </header>
@@ -209,40 +284,60 @@ p{
 <main>
   <div class="section">
     <h1>Agente AI per la vendita auto</h1>
-    <p>Assistente intelligente che conosce modelli, prezzi, punti di forza e trattative.</p>
+    <p>Assistente intelligente che conosce modelli, punti di forza e trattative. Clicca un marchio: i modelli arrivano dal backend.</p>
 
-    <div class="brand"><strong>FIAT</strong> · 500 · Panda · Tipo · 500X</div>
-    <div class="brand"><strong>MAZDA</strong> · Mazda 2 · Mazda 3 · CX-30</div>
-    <div class="brand"><strong>MG</strong> · MG4 · ZS · HS</div>
-    <div class="brand"><strong>ALFA ROMEO</strong> · Giulia · Stelvio · Tonale</div>
-    <div class="brand"><strong>LANCIA</strong> · Ypsilon</div>
-    <div class="brand"><strong>AIXAM</strong> · City · Crossline</div>
+    <div class="meta">
+      <span class="badge" id="apiBadge">API: non testata</span>
+      <span class="badge" id="brandBadge">Brand: -</span>
+    </div>
+
+    <div class="brand" id="brandBlock">
+      <strong id="brandTitle">Seleziona un marchio</strong>
+      <div class="modelsWrap" id="modelsWrap"></div>
+      <div class="small" id="sourceInfo"></div>
+    </div>
   </div>
 </main>
 
 <div id="orb">●</div>
 
 <div id="chatbox">
-  <div id="chatheader">Agente AI Vendite</div>
+  <div id="chatheader">
+    <span>Agente AI Vendite</span>
+    <span id="chatstatus">Online</span>
+  </div>
   <div id="messages"></div>
   <div id="inputArea">
-    <input id="input" placeholder="Scrivi una domanda">
+    <input id="input" placeholder="Scrivi una domanda (es: 'modelli fiat')">
     <button id="send">Invia</button>
   </div>
 </div>
 
 <script>
+/* ========= CONFIG ========= */
+const API_BASE = "https://auto-backend-three.vercel.app";
+
+/* ========= UI ELEMENTS ========= */
+const brandMenu = document.getElementById("brandMenu");
+const apiBadge = document.getElementById("apiBadge");
+const brandBadge = document.getElementById("brandBadge");
+const brandTitle = document.getElementById("brandTitle");
+const modelsWrap = document.getElementById("modelsWrap");
+const sourceInfo = document.getElementById("sourceInfo");
+
+/* ========= CHAT ========= */
 const orb = document.getElementById("orb");
 const chat = document.getElementById("chatbox");
 const messages = document.getElementById("messages");
 const input = document.getElementById("input");
 const send = document.getElementById("send");
+const chatstatus = document.getElementById("chatstatus");
 
 orb.onclick = () => {
   chat.style.display = chat.style.display === "flex" ? "none" : "flex";
 };
 
-function add(text, cls){
+function addMsg(text, cls){
   const d = document.createElement("div");
   d.className = "msg " + cls;
   d.textContent = text;
@@ -250,25 +345,224 @@ function add(text, cls){
   messages.scrollTop = messages.scrollHeight;
 }
 
-add("Sono il tuo agente AI. Dimmi cosa vuoi vendere o confrontare.","ai");
+function setApiBadge(ok, text){
+  apiBadge.className = "badge " + (ok ? "ok" : "err");
+  apiBadge.textContent = text;
+}
 
-send.onclick = () => {
+/* ========= DATA + CACHE ========= */
+let BRANDS = [];
+const MODELS_CACHE = new Map(); // brandId -> payload
+
+function normalize(s){
+  return String(s || "").trim().toLowerCase();
+}
+
+function pickBrandFromText(text){
+  const t = normalize(text);
+  for(const b of BRANDS){
+    const name = normalize(b.name);
+    const id = normalize(b.id);
+    if(t.includes(name) || t.includes(id)) return b;
+  }
+  return null;
+}
+
+async function fetchJson(url){
+  const r = await fetch(url, { headers: { "Accept": "application/json" } });
+  if(!r.ok) throw new Error("HTTP " + r.status);
+  return await r.json();
+}
+
+/* ========= RENDER ========= */
+function renderMenu(brands){
+  brandMenu.innerHTML = "";
+  brands.forEach((b, idx) => {
+    const btn = document.createElement("button");
+    btn.textContent = b.name.toUpperCase();
+    btn.dataset.brand = b.id;
+    btn.onclick = () => loadModelsAndRender(b.id, true);
+    if(idx === 0) btn.classList.add("active");
+    brandMenu.appendChild(btn);
+  });
+}
+
+function setActiveMenu(brandId){
+  const btns = [...brandMenu.querySelectorAll("button")];
+  btns.forEach(btn => btn.classList.toggle("active", btn.dataset.brand === brandId));
+}
+
+function renderModels(payload){
+  const brandName = payload?.brand?.name || payload?.brand?.id || "Brand";
+  const brandId = payload?.brand?.id || "-";
+
+  brandBadge.textContent = "Brand: " + brandName;
+  brandTitle.textContent = brandName.toUpperCase();
+
+  modelsWrap.innerHTML = "";
+  const list = payload?.models || [];
+
+  if(!list.length){
+    const empty = document.createElement("div");
+    empty.className = "small";
+    empty.textContent = "Nessun modello trovato.";
+    modelsWrap.appendChild(empty);
+  } else {
+    list.forEach(m => {
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      chip.textContent = m;
+      modelsWrap.appendChild(chip);
+    });
+  }
+
+  const usedUrl = payload?.source?.usedUrl || "";
+  const braveEnabled = payload?.source?.braveEnabled;
+  const note = payload?.source?.note || "";
+  sourceInfo.textContent =
+    "Fonte: " + (usedUrl ? usedUrl : "fallback") +
+    " · Brave: " + (braveEnabled ? "ON" : "OFF") +
+    (note ? " · " + note : "");
+
+  setActiveMenu(brandId);
+}
+
+/* ========= LOADERS ========= */
+async function loadBrands(){
+  try{
+    setApiBadge(true, "API: controllo...");
+    const data = await fetchJson(`${API_BASE}/api/brands`);
+    if(!data?.ok || !Array.isArray(data.brands)) throw new Error("Risposta API non valida");
+
+    BRANDS = data.brands;
+    renderMenu(BRANDS);
+    setApiBadge(true, "API: online");
+    chatstatus.textContent = "Online";
+
+    // Auto-load primo brand
+    if(BRANDS[0]?.id){
+      await loadModelsAndRender(BRANDS[0].id, false);
+    }
+  } catch(e){
+    setApiBadge(false, "API: errore");
+    chatstatus.textContent = "API KO";
+    brandMenu.innerHTML = `<button disabled>API non raggiungibile</button>`;
+    brandBadge.textContent = "Brand: -";
+    brandTitle.textContent = "Errore API";
+    modelsWrap.innerHTML = "";
+    sourceInfo.textContent = "Controlla URL backend e che /api/brands risponda.";
+  }
+}
+
+async function loadModels(brandId){
+  const key = normalize(brandId);
+  if(MODELS_CACHE.has(key)) return MODELS_CACHE.get(key);
+
+  const payload = await fetchJson(`${API_BASE}/api/models?brand=${encodeURIComponent(key)}`);
+  MODELS_CACHE.set(key, payload);
+  return payload;
+}
+
+async function loadModelsAndRender(brandId, alsoChatHint){
+  try{
+    brandTitle.textContent = "Carico modelli...";
+    modelsWrap.innerHTML = "";
+    sourceInfo.textContent = "";
+
+    const payload = await loadModels(brandId);
+    renderModels(payload);
+
+    if(alsoChatHint){
+      const b = BRANDS.find(x => normalize(x.id) === normalize(brandId));
+      if(b) addMsg(`Ho caricato i modelli ${b.name}. Vuoi confronto o argomenti vendita?`, "ai");
+    }
+  } catch(e){
+    brandTitle.textContent = "Errore caricamento modelli";
+    modelsWrap.innerHTML = "";
+    sourceInfo.textContent = "Errore: " + String(e.message || e);
+  }
+}
+
+/* ========= CHAT AI (con API) ========= */
+addMsg("Sono il tuo agente AI. Prova: 'modelli fiat' oppure 'confronto' oppure 'obiezioni prezzo'.", "ai");
+
+async function aiReply(q){
+  const t = normalize(q);
+
+  // Se chiede modelli di un brand supportato → prendi dal backend
+  if(t.includes("modelli") || t.includes("modello") || t.includes("gamma")){
+    const b = pickBrandFromText(t);
+    if(b){
+      try{
+        const payload = await loadModels(b.id);
+        const list = (payload.models || []).slice(0, 30);
+        if(!list.length) return `Non ho trovato modelli per ${b.name}.`;
+        return `Modelli ${b.name}: ${list.join(", ")}.`;
+      } catch {
+        return `Non riesco a caricare i modelli ${b.name} adesso.`;
+      }
+    }
+    return "Dimmi il marchio (es: 'modelli fiat', 'modelli jeep').";
+  }
+
+  if(t.includes("confronto")){
+    return "Scrivi due modelli, tipo: 'confronto 600 vs Avenger'. Ti preparo punti forza, obiezioni e proposta.";
+  }
+
+  // Mini playbook vendita
+  if(t.includes("prezzo") || t.includes("sconto") || t.includes("trattativa")){
+    return "Trattativa: 1) valore (uso/benefici), 2) costo totale (consumi/garanzia), 3) urgenza (consegna/offerta), 4) alternativa (allestimento/finanziamento). Dimmi modello e budget.";
+  }
+
+  // Brand-specific generico (solo se presente)
+  const b = pickBrandFromText(t);
+  if(b){
+    if(normalize(b.id) === "fiat") return "Fiat: costi bassi, rete assistenza ampia, perfetta per uso quotidiano. Se mi dici budget e utilizzo, ti preparo la proposta.";
+    if(normalize(b.id) === "jeep") return "Jeep: immagine forte, posizione guida alta, SUV molto richiesti. Dimmi se il cliente vuole urbano o off-road.";
+    return `${b.name}: dimmi il modello e ti preparo argomenti vendita e gestione obiezioni.`;
+  }
+
+  return "Posso aiutarti su modelli, obiezioni, trattativa e chiusura. Scrivi marchio/modello e cosa vuole il cliente.";
+}
+
+async function handleSend(){
   const q = input.value.trim();
   if(!q) return;
-  add(q,"user");
-  input.value="";
-  setTimeout(()=>add(ai(q),"ai"),350);
-};
 
-function ai(q){
-  q = q.toLowerCase();
-  if(q.includes("fiat")) return "Fiat: costi bassi, alta rivendibilità, ideale per uso quotidiano.";
-  if(q.includes("alfa")) return "Alfa Romeo: guida sportiva, design emotivo, cliente passionale.";
-  if(q.includes("mg")) return "MG: ottimo rapporto qualità prezzo, forte su elettrico.";
-  if(q.includes("aixam")) return "Aixam: mobilità urbana senza patente, target molto specifico.";
-  if(q.includes("confronto")) return "Dimmi i modelli e preparo il confronto per il cliente.";
-  return "Posso aiutarti su modelli, obiezioni, trattativa e chiusura vendita.";
+  addMsg(q, "user");
+  input.value = "";
+
+  send.disabled = true;
+  input.disabled = true;
+
+  // typing
+  const typing = document.createElement("div");
+  typing.className = "msg ai";
+  typing.textContent = "Sto rispondendo...";
+  messages.appendChild(typing);
+  messages.scrollTop = messages.scrollHeight;
+
+  try{
+    const reply = await aiReply(q);
+    typing.textContent = reply;
+
+    // Se ha citato un brand, aggiorna anche la UI modelli
+    const b = pickBrandFromText(q);
+    if(b) await loadModelsAndRender(b.id, false);
+  } finally {
+    send.disabled = false;
+    input.disabled = false;
+    input.focus();
+  }
 }
+
+send.onclick = handleSend;
+input.addEventListener("keydown", (e) => {
+  if(e.key === "Enter") handleSend();
+});
+
+/* ========= START ========= */
+loadBrands();
 </script>
 
 </body>
