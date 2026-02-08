@@ -128,6 +128,75 @@ async function renderNews(){
 renderNews();
 </script>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+  // 🔹 Firebase config (il tuo)
+  const firebaseConfig = {
+    apiKey: "AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
+    authDomain: "auto-1af60.firebaseapp.com",
+    projectId: "auto-1af60",
+    storageBucket: "auto-1af60.firebasestorage.app",
+    messagingSenderId: "498320258984",
+    appId: "1:498320258984:web:bac67d7634273d10464f9d",
+    measurementId: "G-WYM78KQWQJ"
+  };
+
+  // 🔹 Init Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  // 🔹 Login Google
+  document.getElementById("loginBtn").onclick = async () => {
+    await signInWithPopup(auth, provider);
+  };
+
+  // 🔹 Stato login
+  onAuthStateChanged(auth, async (user) => {
+    const status = document.getElementById("status");
+
+    if (!user) {
+      status.textContent = "non loggato";
+      return;
+    }
+
+    status.textContent = "loggato: " + user.email;
+
+    // 🔐 Token Firebase
+    const token = await user.getIdToken();
+
+    // 👉 chiamata API news protetta
+    const r = await fetch("https://TUO-BACKEND.vercel.app/api/news", {
+      headers: {
+        Authorization: "Bearer " + token
+      },
+      cache: "no-store"
+    });
+
+    const data = await r.json();
+    console.log("NEWS:", data);
+  });
+</script>
+<div id="loginBox">
+  <div id="lock">
+    <div class="shackle"></div>
+    <div class="body"></div>
+  </div>
+
+  <button id="loginBtn">
+    <span class="key">🔑</span>
+    <span class="text">Login Google</span>
+  </button>
+
+  <div id="status">non loggato</div>
+</div>
 
 </body>
 </html>
