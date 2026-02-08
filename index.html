@@ -84,36 +84,50 @@ h1{font-size:26px}
 </main>
 
 <script>
-const NEWS_API = "https://auto-backend-ifg8h2kcw-lucas-projects-93ba30e7.vercel.app"; // ← CAMBIA QUI
+const API = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app";
 
-const newsEl = document.getElementById("news");
-const statusEl = document.getElementById("status");
-
-function esc(s){
-  return s.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+async function loadNews(){
+  const r = await fetch(API + "/api/news", { cache: "no-store" });
+  const data = await r.json();
+  return data.items || [];
 }
 
-fetch(NEWS_API)
-  .then(r=>{
-    if(!r.ok) throw new Error("HTTP "+r.status);
-    return r.json();
-  })
-.then(data=>{
-  const items = data.news;
-  if(!items || !items.length) throw new Error("Nessuna news");
-  newsEl.innerHTML = items.slice(0,6).map(n=>`
-      <a class="news-card" href="${n.url}" target="_blank">
-       <div class="news-title">${esc(n.title)}</div>
-<div class="news-meta">${esc(n.date || "")}</div>
-      </a>
-    `).join("");
-    statusEl.textContent = "stato: aggiornato (cache 12h)";
-  })
-  .catch(e=>{
-    statusEl.textContent = "errore caricamento news";
-    statusEl.classList.add("err");
-  });
+async function renderNews(){
+  const box = document.getElementById("news");
+  const status = document.getElementById("status");
+
+  box.innerHTML = "";
+  status.textContent = "stato: caricamento news…";
+
+  try {
+    const items = await loadNews();
+
+    if (!items.length){
+      box.innerHTML = "<div class='news-card'>Nessuna news trovata</div>";
+      status.textContent = "stato: nessuna news";
+      return;
+    }
+
+    for (const n of items){
+      const card = document.createElement("a");
+      card.className = "news-card";
+      card.href = n.url;
+      card.target = "_blank";
+      card.rel = "noopener";
+      card.textContent = n.title;
+      box.appendChild(card);
+    }
+
+    status.textContent = "stato: news caricate";
+  } catch (e){
+    box.innerHTML = "<div class='news-card'>Errore caricamento</div>";
+    status.textContent = "stato: errore";
+  }
+}
+
+renderNews();
 </script>
+
 
 </body>
 </html>
