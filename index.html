@@ -18,12 +18,14 @@
     *{margin:0;padding:0;box-sizing:border-box}
     body{
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial;
-      background:radial-gradient(1200px 600px at 20% -10%, rgba(59,130,246,.25), transparent 55%),
-                 radial-gradient(1000px 600px at 120% 10%, rgba(34,197,94,.18), transparent 55%),
-                 var(--bg);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(59,130,246,.25), transparent 55%),
+        radial-gradient(1000px 600px at 120% 10%, rgba(34,197,94,.18), transparent 55%),
+        var(--bg);
       color:var(--text);
       min-height:100vh;
     }
+
     header{
       position:sticky; top:0; z-index:10;
       background:rgba(11,15,26,.92);
@@ -52,7 +54,12 @@
       text-decoration:none;
       display:inline-flex; align-items:center; gap:8px;
     }
-    .brand-btn:hover{transform:translateY(-1px); border-color:rgba(59,130,246,.6); background:rgba(17,24,39,.9)}
+    .brand-btn:hover{
+      transform:translateY(-1px);
+      border-color:rgba(59,130,246,.6);
+      background:rgba(17,24,39,.9)
+    }
+
     .pill{
       border:1px solid var(--line);
       border-radius:999px;
@@ -62,7 +69,13 @@
       display:inline-flex; align-items:center; gap:8px;
       white-space:nowrap;
     }
-    .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+    .dot{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--ok);
+      display:inline-block;
+      box-shadow:0 0 0 3px rgba(34,197,94,.15)
+    }
+
     main{max-width:1200px;margin:0 auto;padding:26px 16px 42px}
     .hero{
       background:linear-gradient(180deg, rgba(17,24,39,.85), rgba(17,24,39,.55));
@@ -72,48 +85,86 @@
       box-shadow:0 18px 60px rgba(0,0,0,.35);
     }
     h1{font-size:28px;letter-spacing:-.02em}
-    p{color:var(--muted);margin-top:8px;line-height:1.5}
-    .grid{
+    .sub{color:var(--muted);margin-top:8px;line-height:1.5}
+
+    .section-head{
       margin-top:16px;
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:14px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; flex-wrap:wrap;
     }
-    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
-    .card{
-      background:rgba(17,24,39,.6);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:14px;
+    .section-title{
+      font-size:16px;
+      font-weight:750;
     }
-    .card h2{font-size:15px;margin-bottom:8px}
-    .news-item{
-      padding:12px 10px;
-      border-radius:12px;
-      border:1px solid rgba(31,41,55,.9);
-      background:rgba(11,15,26,.35);
-      margin-bottom:10px;
-    }
-    .news-item:last-child{margin-bottom:0}
-    .news-title{font-weight:700}
-    .news-meta{color:var(--muted);font-size:12px;margin-top:4px}
-    .hint{
+    .mini{
       font-size:12px;
       color:var(--muted);
-      margin-top:10px;
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
     }
-    .cta{
-      display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;
-    }
-    .cta a{
-      text-decoration:none;
-      border-radius:12px;
-      padding:10px 12px;
+    .mini code{
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:11px;
+      padding:2px 6px;
       border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(11,15,26,.35);
       color:var(--text);
-      background:rgba(59,130,246,.12);
     }
-    .cta a:hover{border-color:rgba(59,130,246,.6)}
+
+    .news-grid{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:12px;
+    }
+    @media (max-width:1000px){ .news-grid{grid-template-columns: repeat(2, minmax(0, 1fr));} }
+    @media (max-width:620px){ .news-grid{grid-template-columns: 1fr;} }
+
+    .news-card{
+      display:block;
+      text-decoration:none;
+      border:1px solid rgba(31,41,55,.9);
+      background:rgba(11,15,26,.35);
+      border-radius:16px;
+      padding:14px 14px 12px;
+      transition:.15s transform ease, .15s border-color ease, .15s background ease;
+      min-height:110px;
+    }
+    .news-card:hover{
+      transform:translateY(-1px);
+      border-color:rgba(59,130,246,.6);
+      background:rgba(11,15,26,.5);
+    }
+    .news-title{
+      font-weight:800;
+      line-height:1.25;
+      margin-bottom:8px;
+      color:var(--text);
+    }
+    .news-meta{
+      color:var(--muted);
+      font-size:12px;
+      display:flex; gap:8px; flex-wrap:wrap;
+      align-items:center;
+    }
+    .badge{
+      display:inline-flex; align-items:center;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(17,24,39,.55);
+      color:var(--text);
+      font-size:11px;
+    }
+
+    .status{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .status strong{color:var(--text)}
+    .err{color:#fca5a5}
+
     footer{
       max-width:1200px; margin:0 auto; padding:18px 16px 30px;
       color:var(--muted); font-size:12px;
@@ -125,18 +176,13 @@
   <header>
     <div class="nav">
       <div class="brandbar" aria-label="Marchi">
-        <!-- CLIC: porta direttamente ai siti -->
-        <a class="brand-btn" href="https://www.jeep-official.it/" target="_blank" rel="noopener noreferrer">
-          JEEP
-        </a>
-        <a class="brand-btn" href="https://www.fiat.it/omni/configuratore" target="_blank" rel="noopener noreferrer">
-          FIAT
-        </a>
+        <a class="brand-btn" href="https://www.jeep-official.it/" target="_blank" rel="noopener noreferrer">JEEP</a>
+        <a class="brand-btn" href="https://www.fiat.it/omni/configuratore" target="_blank" rel="noopener noreferrer">FIAT</a>
       </div>
 
       <div class="pill" title="Stato interfaccia">
         <span class="dot"></span>
-        Link diretti
+        News + link diretti
       </div>
     </div>
   </header>
@@ -144,52 +190,154 @@
   <main>
     <section class="hero">
       <h1>Agente AI per la vendita auto</h1>
-      <p>
-        Home = solo news. In alto clicchi il marchio e vai direttamente al sito ufficiale / configuratore.
-      </p>
+      <div class="sub">Ultime news e rumors di internet sulle automotive.</div>
 
-      <div class="grid">
-        <div class="card">
-          <h2>News auto</h2>
-
-          <!-- Sostituisci con le tue news reali -->
-          <div class="news-item">
-            <div class="news-title">Esempio news #1</div>
-            <div class="news-meta">Data • Fonte</div>
-          </div>
-
-          <div class="news-item">
-            <div class="news-title">Esempio news #2</div>
-            <div class="news-meta">Data • Fonte</div>
-          </div>
-
-          <div class="news-item">
-            <div class="news-title">Esempio news #3</div>
-            <div class="news-meta">Data • Fonte</div>
-          </div>
-
-          <div class="hint">
-            Nota: niente caricamento modelli, niente API, niente fetch. Solo link diretti.
-          </div>
+      <div class="section-head">
+        <div class="section-title">Ultime news</div>
+        <div class="mini">
+          Cache: <code>12h</code>
+          Fonte: <code>motorisumotori.it/news</code>
         </div>
+      </div>
 
-        <div class="card">
-          <h2>Azioni rapide</h2>
-          <p>Apri subito i configuratori e vai al sodo.</p>
-          <div class="cta">
-            <a href="https://www.jeep-official.it/" target="_blank" rel="noopener noreferrer">Apri Jeep</a>
-            <a href="https://www.fiat.it/omni/configuratore" target="_blank" rel="noopener noreferrer">Apri Configuratore Fiat</a>
-          </div>
-          <div class="hint">
-            Se vuoi, dopo rimettiamo la lista modelli ma via backend (no scraping dal browser).
-          </div>
-        </div>
+      <div id="newsGrid" class="news-grid" aria-live="polite">
+        <!-- skeleton -->
+        <a class="news-card" href="#" onclick="return false;">
+          <div class="news-title">Caricamento…</div>
+          <div class="news-meta"><span class="badge">News</span><span>—</span></div>
+        </a>
+        <a class="news-card" href="#" onclick="return false;">
+          <div class="news-title">Caricamento…</div>
+          <div class="news-meta"><span class="badge">News</span><span>—</span></div>
+        </a>
+        <a class="news-card" href="#" onclick="return false;">
+          <div class="news-title">Caricamento…</div>
+          <div class="news-meta"><span class="badge">News</span><span>—</span></div>
+        </a>
+        <a class="news-card" href="#" onclick="return false;">
+          <div class="news-title">Caricamento…</div>
+          <div class="news-meta"><span class="badge">News</span><span>—</span></div>
+        </a>
+        <a class="news-card" href="#" onclick="return false;">
+          <div class="news-title">Caricamento…</div>
+          <div class="news-meta"><span class="badge">News</span><span>—</span></div>
+        </a>
+        <a class="news-card" href="#" onclick="return false;">
+          <div class="news-title">Caricamento…</div>
+          <div class="news-meta"><span class="badge">News</span><span>—</span></div>
+        </a>
+      </div>
+
+      <div id="status" class="status">
+        Stato: <strong id="statusText">inizializzazione…</strong>
       </div>
     </section>
   </main>
 
-  <footer>
-    © Progetto Auto AI • Home news + link diretti ai marchi
-  </footer>
+  <footer>© Progetto Auto AI • Ultime news + link diretti ai marchi</footer>
+
+  <script>
+    const NEWS_API = "/api/news";
+    const CACHE_KEY = "autoai_news_cache_v1";
+    const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12h
+
+    const newsGrid = document.getElementById("newsGrid");
+    const statusText = document.getElementById("statusText");
+
+    function fmtDate(isoOrText){
+      if (!isoOrText) return "";
+      const d = new Date(isoOrText);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString("it-IT", { day:"2-digit", month:"short", year:"numeric" });
+      }
+      return String(isoOrText);
+    }
+
+    function setStatus(text, isErr=false){
+      statusText.textContent = text;
+      statusText.className = isErr ? "err" : "";
+    }
+
+    function render(items){
+      const src = "MotorisuMotori.it";
+      newsGrid.innerHTML = items.map(it => {
+        const title = (it.title || "").trim() || "News";
+        const url = it.url || "#";
+        const date = fmtDate(it.date);
+        const meta = [date, src].filter(Boolean).join(" • ") || src;
+
+        return `
+          <a class="news-card" href="${url}" target="_blank" rel="noopener noreferrer">
+            <div class="news-title">${escapeHtml(title)}</div>
+            <div class="news-meta">
+              <span class="badge">News</span>
+              <span>${escapeHtml(meta)}</span>
+            </div>
+          </a>
+        `;
+      }).join("");
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function loadCache(){
+      try{
+        const raw = localStorage.getItem(CACHE_KEY);
+        if(!raw) return null;
+        const data = JSON.parse(raw);
+        if(!data || !Array.isArray(data.items) || !data.ts) return null;
+        return data;
+      }catch{ return null; }
+    }
+
+    function saveCache(items){
+      try{
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), items }));
+      }catch{}
+    }
+
+    async function fetchNews(){
+      const r = await fetch(NEWS_API, { cache: "no-store" });
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      const data = await r.json();
+      if(!data || !Array.isArray(data.items)) throw new Error("Risposta non valida");
+      return data.items.slice(0,6);
+    }
+
+    async function init(){
+      const cached = loadCache();
+      const isFresh = cached && (Date.now() - cached.ts) < CACHE_TTL_MS;
+
+      if(isFresh){
+        render(cached.items.slice(0,6));
+        const ageMin = Math.round((Date.now() - cached.ts)/60000);
+        setStatus("cache locale (" + ageMin + " min fa)");
+      } else {
+        setStatus("download news…");
+      }
+
+      try{
+        const items = await fetchNews();
+        render(items);
+        saveCache(items);
+        setStatus("aggiornato ora (auto refresh: 12h)");
+      }catch(e){
+        if(!isFresh){
+          setStatus("errore caricamento news: " + (e?.message || "sconosciuto"), true);
+        } else {
+          setStatus("offline: mostro cache (auto refresh: 12h)", false);
+        }
+      }
+    }
+
+    init();
+  </script>
 </body>
 </html>
