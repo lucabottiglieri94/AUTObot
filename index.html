@@ -1,590 +1,195 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Progetto Auto AI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agente AI per la vendita auto</title>
 
-<style>
-:root{
-  --bg:#0b0f1a;
-  --panel:#111827;
-  --line:#1f2937;
-  --text:#e5e7eb;
-  --muted:#9ca3af;
-  --accent:#3b82f6;
-  --ai:#22c55e;
-  --danger:#ef4444;
-}
-
-*{margin:0;padding:0;box-sizing:border-box}
-
-body{
-  font-family:system-ui,-apple-system,BlinkMacSystemFont;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-}
-
-header{
-  position:sticky;
-  top:0;
-  z-index:10;
-  background:rgba(11,15,26,.9);
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--line);
-}
-
-.nav{
-  max-width:1200px;
-  margin:auto;
-  padding:16px 20px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
-}
-
-.logo{
-  font-weight:700;
-  letter-spacing:.5px;
-  white-space:nowrap;
-}
-
-.menu{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
-
-.menu button{
-  background:transparent;
-  border:1px solid transparent;
-  color:var(--muted);
-  font-size:13px;
-  cursor:pointer;
-  padding:8px 10px;
-  border-radius:12px;
-  transition:.15s ease;
-}
-
-.menu button:hover{
-  color:var(--text);
-  border-color:var(--line);
-  background:rgba(255,255,255,.03);
-}
-
-.menu button.active{
-  color:var(--text);
-  border-color:rgba(59,130,246,.55);
-  background:rgba(59,130,246,.10);
-}
-
-.menu button:disabled{
-  opacity:.45;
-  cursor:not-allowed;
-}
-
-main{
-  max-width:1200px;
-  margin:auto;
-  padding:48px 20px;
-}
-
-.section{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:28px;
-}
-
-h1{
-  font-size:28px;
-  margin-bottom:10px;
-}
-
-p{
-  color:var(--muted);
-  margin-bottom:24px;
-}
-
-.meta{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-  margin-bottom:18px;
-}
-
-.badge{
-  font-size:12px;
-  padding:6px 10px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  color:var(--muted);
-  background:rgba(255,255,255,.02);
-}
-
-.badge.ok{ color:#bbf7d0; border-color:rgba(34,197,94,.25); background:rgba(34,197,94,.06); }
-.badge.err{ color:#fecaca; border-color:rgba(239,68,68,.25); background:rgba(239,68,68,.06); }
-
-.brand{
-  padding:14px 0;
-  border-bottom:1px solid var(--line);
-}
-
-.brand:last-child{border:none}
-
-.brand strong{
-  color:var(--accent);
-}
-
-.modelsWrap{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:10px;
-}
-
-.chip{
-  border:1px solid var(--line);
-  background:rgba(2,6,23,.55);
-  padding:7px 10px;
-  border-radius:999px;
-  font-size:13px;
-  color:var(--text);
-  text-decoration:none;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  cursor:pointer;
-}
-
-.chip:hover{
-  border-color: rgba(59,130,246,.55);
-  background: rgba(59,130,246,.10);
-}
-
-.chip.disabled{
-  opacity:.55;
-  cursor:not-allowed;
-  pointer-events:none;
-}
-
-.small{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:10px;
-}
-
-/* ORB */
-#orb{
-  position:fixed;
-  bottom:24px;
-  right:24px;
-  width:70px;
-  height:70px;
-  border-radius:50%;
-  background:radial-gradient(circle at top left,#60a5fa,var(--accent));
-  box-shadow:0 10px 30px rgba(0,0,0,.4);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:30px;
-  color:white;
-  cursor:pointer;
-  z-index:1000;
-}
-
-/* CHAT */
-#chatbox{
-  position:fixed;
-  bottom:110px;
-  right:24px;
-  width:360px;
-  max-width:90vw;
-  height:520px;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:18px;
-  box-shadow:0 12px 40px rgba(0,0,0,.5);
-  display:none;
-  flex-direction:column;
-  z-index:1000;
-}
-
-#chatheader{
-  padding:14px 16px;
-  border-bottom:1px solid var(--line);
-  font-weight:600;
-  color:var(--accent);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
-
-#chatstatus{
-  font-size:12px;
-  color:var(--muted);
-}
-
-#messages{
-  flex:1;
-  padding:14px;
-  overflow-y:auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.msg{
-  font-size:14px;
-  line-height:1.4;
-  white-space:pre-wrap;
-}
-
-.ai{color:var(--ai)}
-.user{text-align:right;color:var(--accent)}
-
-#inputArea{
-  display:flex;
-  gap:8px;
-  padding:12px;
-  border-top:1px solid var(--line);
-}
-
-#inputArea input{
-  flex:1;
-  padding:10px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background:#020617;
-  color:var(--text);
-}
-
-#inputArea button{
-  padding:10px 16px;
-  border-radius:12px;
-  border:none;
-  background:var(--accent);
-  color:white;
-  font-weight:600;
-  cursor:pointer;
-}
-
-#inputArea button:disabled{
-  opacity:.6;
-  cursor:not-allowed;
-}
-
-@media(max-width:900px){
-  .menu{display:none}
-}
-</style>
+  <style>
+    :root{
+      --bg:#0b0f1a;
+      --panel:#111827;
+      --line:#1f2937;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#3b82f6;
+      --ok:#22c55e;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial;
+      background:radial-gradient(1200px 600px at 20% -10%, rgba(59,130,246,.25), transparent 55%),
+                 radial-gradient(1000px 600px at 120% 10%, rgba(34,197,94,.18), transparent 55%),
+                 var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      background:rgba(11,15,26,.92);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .nav{
+      max-width:1200px;
+      margin:0 auto;
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brandbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .brand-btn{
+      appearance:none; border:1px solid var(--line);
+      background:rgba(17,24,39,.7);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:999px;
+      font-weight:650;
+      cursor:pointer;
+      transition:.15s transform ease, .15s border-color ease, .15s background ease;
+      text-decoration:none;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .brand-btn:hover{transform:translateY(-1px); border-color:rgba(59,130,246,.6); background:rgba(17,24,39,.9)}
+    .pill{
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 10px;
+      color:var(--muted);
+      font-size:12px;
+      display:inline-flex; align-items:center; gap:8px;
+      white-space:nowrap;
+    }
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+    main{max-width:1200px;margin:0 auto;padding:26px 16px 42px}
+    .hero{
+      background:linear-gradient(180deg, rgba(17,24,39,.85), rgba(17,24,39,.55));
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:22px 18px;
+      box-shadow:0 18px 60px rgba(0,0,0,.35);
+    }
+    h1{font-size:28px;letter-spacing:-.02em}
+    p{color:var(--muted);margin-top:8px;line-height:1.5}
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+    }
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+    .card{
+      background:rgba(17,24,39,.6);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+    }
+    .card h2{font-size:15px;margin-bottom:8px}
+    .news-item{
+      padding:12px 10px;
+      border-radius:12px;
+      border:1px solid rgba(31,41,55,.9);
+      background:rgba(11,15,26,.35);
+      margin-bottom:10px;
+    }
+    .news-item:last-child{margin-bottom:0}
+    .news-title{font-weight:700}
+    .news-meta{color:var(--muted);font-size:12px;margin-top:4px}
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:10px;
+    }
+    .cta{
+      display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;
+    }
+    .cta a{
+      text-decoration:none;
+      border-radius:12px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      color:var(--text);
+      background:rgba(59,130,246,.12);
+    }
+    .cta a:hover{border-color:rgba(59,130,246,.6)}
+    footer{
+      max-width:1200px; margin:0 auto; padding:18px 16px 30px;
+      color:var(--muted); font-size:12px;
+    }
+  </style>
 </head>
 
 <body>
+  <header>
+    <div class="nav">
+      <div class="brandbar" aria-label="Marchi">
+        <!-- CLIC: porta direttamente ai siti -->
+        <a class="brand-btn" href="https://www.jeep-official.it/" target="_blank" rel="noopener noreferrer">
+          JEEP
+        </a>
+        <a class="brand-btn" href="https://www.fiat.it/omni/configuratore" target="_blank" rel="noopener noreferrer">
+          FIAT
+        </a>
+      </div>
 
-<header>
-  <div class="nav">
-    <div class="logo">ProgettoAutoAI</div>
-    <div class="menu" id="brandMenu">
-      <button disabled>Carico...</button>
+      <div class="pill" title="Stato interfaccia">
+        <span class="dot"></span>
+        Link diretti
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<main>
-  <div class="section">
-    <h1>Agente AI per la vendita auto</h1>
-    <p>Assistente intelligente che conosce modelli, punti di forza e trattative. Clicca un marchio: i modelli arrivano dal backend.</p>
+  <main>
+    <section class="hero">
+      <h1>Agente AI per la vendita auto</h1>
+      <p>
+        Home = solo news. In alto clicchi il marchio e vai direttamente al sito ufficiale / configuratore.
+      </p>
 
-    <div class="meta">
-      <span class="badge" id="apiBadge">API: non testata</span>
-      <span class="badge" id="brandBadge">Brand: -</span>
-    </div>
+      <div class="grid">
+        <div class="card">
+          <h2>News auto</h2>
 
-    <div class="brand" id="brandBlock">
-      <strong id="brandTitle">Seleziona un marchio</strong>
-      <div class="modelsWrap" id="modelsWrap"></div>
-      <div class="small" id="sourceInfo"></div>
-    </div>
-  </div>
-</main>
+          <!-- Sostituisci con le tue news reali -->
+          <div class="news-item">
+            <div class="news-title">Esempio news #1</div>
+            <div class="news-meta">Data • Fonte</div>
+          </div>
 
-<div id="orb">●</div>
+          <div class="news-item">
+            <div class="news-title">Esempio news #2</div>
+            <div class="news-meta">Data • Fonte</div>
+          </div>
 
-<div id="chatbox">
-  <div id="chatheader">
-    <span>Agente AI Vendite</span>
-    <span id="chatstatus">Online</span>
-  </div>
-  <div id="messages"></div>
-  <div id="inputArea">
-    <input id="input" placeholder="Scrivi una domanda (es: 'modelli fiat')">
-    <button id="send">Invia</button>
-  </div>
-</div>
+          <div class="news-item">
+            <div class="news-title">Esempio news #3</div>
+            <div class="news-meta">Data • Fonte</div>
+          </div>
 
-<script>
-/* ========= CONFIG ========= */
-const API_BASE = "https://auto-backend-three.vercel.app";
+          <div class="hint">
+            Nota: niente caricamento modelli, niente API, niente fetch. Solo link diretti.
+          </div>
+        </div>
 
-/* ========= UI ELEMENTS ========= */
-const brandMenu = document.getElementById("brandMenu");
-const apiBadge = document.getElementById("apiBadge");
-const brandBadge = document.getElementById("brandBadge");
-const brandTitle = document.getElementById("brandTitle");
-const modelsWrap = document.getElementById("modelsWrap");
-const sourceInfo = document.getElementById("sourceInfo");
+        <div class="card">
+          <h2>Azioni rapide</h2>
+          <p>Apri subito i configuratori e vai al sodo.</p>
+          <div class="cta">
+            <a href="https://www.jeep-official.it/" target="_blank" rel="noopener noreferrer">Apri Jeep</a>
+            <a href="https://www.fiat.it/omni/configuratore" target="_blank" rel="noopener noreferrer">Apri Configuratore Fiat</a>
+          </div>
+          <div class="hint">
+            Se vuoi, dopo rimettiamo la lista modelli ma via backend (no scraping dal browser).
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-/* ========= CHAT ========= */
-const orb = document.getElementById("orb");
-const chat = document.getElementById("chatbox");
-const messages = document.getElementById("messages");
-const input = document.getElementById("input");
-const send = document.getElementById("send");
-const chatstatus = document.getElementById("chatstatus");
-
-orb.onclick = () => {
-  chat.style.display = chat.style.display === "flex" ? "none" : "flex";
-};
-
-function addMsg(text, cls){
-  const d = document.createElement("div");
-  d.className = "msg " + cls;
-  d.textContent = text;
-  messages.appendChild(d);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-function setApiBadge(ok, text){
-  apiBadge.className = "badge " + (ok ? "ok" : "err");
-  apiBadge.textContent = text;
-}
-
-/* ========= DATA + CACHE ========= */
-let BRANDS = [];
-const MODELS_CACHE = new Map(); // brandId -> payload
-
-function normalize(s){
-  return String(s || "").trim().toLowerCase();
-}
-
-function pickBrandFromText(text){
-  const t = normalize(text);
-  for(const b of BRANDS){
-    const name = normalize(b.name);
-    const id = normalize(b.id);
-    if(t.includes(name) || t.includes(id)) return b;
-  }
-  return null;
-}
-
-async function fetchJson(url){
-  const r = await fetch(url, { headers: { "Accept": "application/json" } });
-  if(!r.ok) throw new Error("HTTP " + r.status);
-  return await r.json();
-}
-
-/* ========= RENDER ========= */
-function renderMenu(brands){
-  brandMenu.innerHTML = "";
-  brands.forEach((b, idx) => {
-    const btn = document.createElement("button");
-    btn.textContent = b.name.toUpperCase();
-    btn.dataset.brand = b.id;
-    btn.onclick = () => loadModelsAndRender(b.id, true);
-    if(idx === 0) btn.classList.add("active");
-    brandMenu.appendChild(btn);
-  });
-}
-
-function setActiveMenu(brandId){
-  const btns = [...brandMenu.querySelectorAll("button")];
-  btns.forEach(btn => btn.classList.toggle("active", btn.dataset.brand === brandId));
-}
-
-/* === FIX MODELLI: nomi + click === */
-function renderModels(payload){
-  const brandName = payload?.brand?.name || payload?.brand?.id || "Brand";
-  const brandId = payload?.brand?.id || payload?.brand?.name || "-";
-
-  brandBadge.textContent = "Brand: " + brandName;
-  brandTitle.textContent = brandName.toUpperCase();
-
-  modelsWrap.innerHTML = "";
-  const list = Array.isArray(payload?.models) ? payload.models : [];
-
-  if(!list.length){
-    const empty = document.createElement("div");
-    empty.className = "small";
-    empty.textContent = "Nessun modello trovato.";
-    modelsWrap.appendChild(empty);
-  } else {
-    list.forEach(m => {
-      // supporta: stringhe ("Panda") oppure oggetti ({name,url})
-      const name = (typeof m === "string") ? m : (m?.name || m?.title || "");
-      const url  = (typeof m === "object" && m) ? (m.url || m.href || m.link || "") : "";
-
-      // chip cliccabile se c'è url, altrimenti disabilitato
-      const a = document.createElement("a");
-      a.className = "chip" + (url ? "" : " disabled");
-      a.textContent = name || "Modello";
-      a.href = url || "#";
-      a.target = "_blank";
-      a.rel = "noopener";
-
-      modelsWrap.appendChild(a);
-    });
-  }
-
-  const usedUrl = payload?.source?.usedUrl || "";
-  const braveEnabled = payload?.source?.braveEnabled;
-  const note = payload?.source?.note || "";
-  sourceInfo.textContent =
-    "Fonte: " + (usedUrl ? usedUrl : "fallback") +
-    " · Brave: " + (braveEnabled ? "ON" : "OFF") +
-    (note ? " · " + note : "");
-
-  setActiveMenu(normalize(brandId));
-}
-
-/* ========= LOADERS ========= */
-async function loadBrands(){
-  try{
-    setApiBadge(true, "API: controllo...");
-    const data = await fetchJson(`${API_BASE}/api/brands`);
-    if(!data?.ok || !Array.isArray(data.brands)) throw new Error("Risposta API non valida");
-
-    BRANDS = data.brands;
-    renderMenu(BRANDS);
-    setApiBadge(true, "API: online");
-    chatstatus.textContent = "Online";
-
-    if(BRANDS[0]?.id){
-      await loadModelsAndRender(BRANDS[0].id, false);
-    }
-  } catch(e){
-    setApiBadge(false, "API: errore");
-    chatstatus.textContent = "API KO";
-    brandMenu.innerHTML = `<button disabled>API non raggiungibile</button>`;
-    brandBadge.textContent = "Brand: -";
-    brandTitle.textContent = "Errore API";
-    modelsWrap.innerHTML = "";
-    sourceInfo.textContent = "Controlla URL backend e che /api/brands risponda.";
-  }
-}
-
-async function loadModels(brandId){
-  const key = normalize(brandId);
-  if(MODELS_CACHE.has(key)) return MODELS_CACHE.get(key);
-
-  const payload = await fetchJson(`${API_BASE}/api/models?brand=${encodeURIComponent(key)}`);
-  MODELS_CACHE.set(key, payload);
-  return payload;
-}
-
-async function loadModelsAndRender(brandId, alsoChatHint){
-  try{
-    brandTitle.textContent = "Carico modelli...";
-    modelsWrap.innerHTML = "";
-    sourceInfo.textContent = "";
-
-    const payload = await loadModels(brandId);
-    renderModels(payload);
-
-    if(alsoChatHint){
-      const b = BRANDS.find(x => normalize(x.id) === normalize(brandId));
-      if(b) addMsg(`Ho caricato i modelli ${b.name}. Vuoi confronto o argomenti vendita?`, "ai");
-    }
-  } catch(e){
-    brandTitle.textContent = "Errore caricamento modelli";
-    modelsWrap.innerHTML = "";
-    sourceInfo.textContent = "Errore: " + String(e.message || e);
-  }
-}
-
-/* ========= CHAT AI (con API) ========= */
-addMsg("Sono il tuo agente AI. Prova: 'modelli fiat' oppure 'confronto' oppure 'obiezioni prezzo'.", "ai");
-
-async function aiReply(q){
-  const t = normalize(q);
-
-  if(t.includes("modelli") || t.includes("modello") || t.includes("gamma")){
-    const b = pickBrandFromText(t);
-    if(b){
-      try{
-        const payload = await loadModels(b.id);
-        const list = Array.isArray(payload?.models) ? payload.models : [];
-        const names = list.slice(0, 30).map(m => (typeof m === "string" ? m : (m?.name || m?.title || "Modello")));
-        if(!names.length) return `Non ho trovato modelli per ${b.name}.`;
-        return `Modelli ${b.name}: ${names.join(", ")}.`;
-      } catch {
-        return `Non riesco a caricare i modelli ${b.name} adesso.`;
-      }
-    }
-    return "Dimmi il marchio (es: 'modelli fiat', 'modelli jeep').";
-  }
-
-  if(t.includes("confronto")){
-    return "Scrivi due modelli, tipo: 'confronto 600 vs Avenger'. Ti preparo punti forza, obiezioni e proposta.";
-  }
-
-  if(t.includes("prezzo") || t.includes("sconto") || t.includes("trattativa")){
-    return "Trattativa: 1) valore, 2) costo totale, 3) urgenza, 4) alternativa (allestimento/finanziamento). Dimmi modello e budget.";
-  }
-
-  const b = pickBrandFromText(t);
-  if(b){
-    if(normalize(b.id) === "fiat") return "Fiat: costi bassi, rete assistenza ampia. Dimmi budget e utilizzo e ti preparo la proposta.";
-    if(normalize(b.id) === "jeep") return "Jeep: immagine forte, posizione guida alta, SUV richiesti. Dimmi se urbano o off-road.";
-    return `${b.name}: dimmi il modello e ti preparo argomenti vendita e gestione obiezioni.`;
-  }
-
-  return "Posso aiutarti su modelli, obiezioni, trattativa e chiusura. Scrivi marchio/modello e cosa vuole il cliente.";
-}
-
-async function handleSend(){
-  const q = input.value.trim();
-  if(!q) return;
-
-  addMsg(q, "user");
-  input.value = "";
-
-  send.disabled = true;
-  input.disabled = true;
-
-  const typing = document.createElement("div");
-  typing.className = "msg ai";
-  typing.textContent = "Sto rispondendo...";
-  messages.appendChild(typing);
-  messages.scrollTop = messages.scrollHeight;
-
-  try{
-    const reply = await aiReply(q);
-    typing.textContent = reply;
-
-    const b = pickBrandFromText(q);
-    if(b) await loadModelsAndRender(b.id, false);
-  } finally {
-    send.disabled = false;
-    input.disabled = false;
-    input.focus();
-  }
-}
-
-send.onclick = handleSend;
-input.addEventListener("keydown", (e) => {
-  if(e.key === "Enter") handleSend();
-});
-
-/* ========= START ========= */
-loadBrands();
-</script>
-
+  <footer>
+    © Progetto Auto AI • Home news + link diretti ai marchi
+  </footer>
 </body>
 </html>
-
