@@ -148,15 +148,12 @@ p{
 }
 
 .chip{
-  
   border:1px solid var(--line);
   background:rgba(2,6,23,.55);
   padding:7px 10px;
   border-radius:999px;
   font-size:13px;
   color:var(--text);
-}
-  .chip{
   text-decoration:none;
   display:inline-flex;
   align-items:center;
@@ -169,6 +166,11 @@ p{
   background: rgba(59,130,246,.10);
 }
 
+.chip.disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  pointer-events:none;
+}
 
 .small{
   font-size:12px;
@@ -289,7 +291,6 @@ p{
   <div class="nav">
     <div class="logo">ProgettoAutoAI</div>
     <div class="menu" id="brandMenu">
-      <!-- Popolato via API -->
       <button disabled>Carico...</button>
     </div>
   </div>
@@ -406,15 +407,16 @@ function setActiveMenu(brandId){
   btns.forEach(btn => btn.classList.toggle("active", btn.dataset.brand === brandId));
 }
 
+/* === FIX MODELLI: nomi + click === */
 function renderModels(payload){
   const brandName = payload?.brand?.name || payload?.brand?.id || "Brand";
-  const brandId = payload?.brand?.id || "-";
+  const brandId = payload?.brand?.id || payload?.brand?.name || "-";
 
   brandBadge.textContent = "Brand: " + brandName;
   brandTitle.textContent = brandName.toUpperCase();
 
   modelsWrap.innerHTML = "";
-  const list = payload?.models || [];
+  const list = Array.isArray(payload?.models) ? payload.models : [];
 
   if(!list.length){
     const empty = document.createElement("div");
@@ -423,10 +425,19 @@ function renderModels(payload){
     modelsWrap.appendChild(empty);
   } else {
     list.forEach(m => {
-      const chip = document.createElement("span");
-      chip.className = "chip";
-      chip.textContent = m;
-      modelsWrap.appendChild(chip);
+      // supporta: stringhe ("Panda") oppure oggetti ({name,url})
+      const name = (typeof m === "string") ? m : (m?.name || m?.title || "");
+      const url  = (typeof m === "object" && m) ? (m.url || m.href || m.link || "") : "";
+
+      // chip cliccabile se c'è url, altrimenti disabilitato
+      const a = document.createElement("a");
+      a.className = "chip" + (url ? "" : " disabled");
+      a.textContent = name || "Modello";
+      a.href = url || "#";
+      a.target = "_blank";
+      a.rel = "noopener";
+
+      modelsWrap.appendChild(a);
     });
   }
 
@@ -438,7 +449,7 @@ function renderModels(payload){
     " · Brave: " + (braveEnabled ? "ON" : "OFF") +
     (note ? " · " + note : "");
 
-  setActiveMenu(brandId);
+  setActiveMenu(normalize(brandId));
 }
 
 /* ========= LOADERS ========= */
@@ -453,7 +464,6 @@ async function loadBrands(){
     setApiBadge(true, "API: online");
     chatstatus.textContent = "Online";
 
-    // Auto-load primo brand
     if(BRANDS[0]?.id){
       await loadModelsAndRender(BRANDS[0].id, false);
     }
@@ -503,15 +513,15 @@ addMsg("Sono il tuo agente AI. Prova: 'modelli fiat' oppure 'confronto' oppure '
 async function aiReply(q){
   const t = normalize(q);
 
-  // Se chiede modelli di un brand supportato → prendi dal backend
   if(t.includes("modelli") || t.includes("modello") || t.includes("gamma")){
     const b = pickBrandFromText(t);
     if(b){
       try{
         const payload = await loadModels(b.id);
-        const list = (payload.models || []).slice(0, 30);
-        if(!list.length) return `Non ho trovato modelli per ${b.name}.`;
-        return `Modelli ${b.name}: ${list.join(", ")}.`;
+        const list = Array.isArray(payload?.models) ? payload.models : [];
+        const names = list.slice(0, 30).map(m => (typeof m === "string" ? m : (m?.name || m?.title || "Modello")));
+        if(!names.length) return `Non ho trovato modelli per ${b.name}.`;
+        return `Modelli ${b.name}: ${names.join(", ")}.`;
       } catch {
         return `Non riesco a caricare i modelli ${b.name} adesso.`;
       }
@@ -523,16 +533,14 @@ async function aiReply(q){
     return "Scrivi due modelli, tipo: 'confronto 600 vs Avenger'. Ti preparo punti forza, obiezioni e proposta.";
   }
 
-  // Mini playbook vendita
   if(t.includes("prezzo") || t.includes("sconto") || t.includes("trattativa")){
-    return "Trattativa: 1) valore (uso/benefici), 2) costo totale (consumi/garanzia), 3) urgenza (consegna/offerta), 4) alternativa (allestimento/finanziamento). Dimmi modello e budget.";
+    return "Trattativa: 1) valore, 2) costo totale, 3) urgenza, 4) alternativa (allestimento/finanziamento). Dimmi modello e budget.";
   }
 
-  // Brand-specific generico (solo se presente)
   const b = pickBrandFromText(t);
   if(b){
-    if(normalize(b.id) === "fiat") return "Fiat: costi bassi, rete assistenza ampia, perfetta per uso quotidiano. Se mi dici budget e utilizzo, ti preparo la proposta.";
-    if(normalize(b.id) === "jeep") return "Jeep: immagine forte, posizione guida alta, SUV molto richiesti. Dimmi se il cliente vuole urbano o off-road.";
+    if(normalize(b.id) === "fiat") return "Fiat: costi bassi, rete assistenza ampia. Dimmi budget e utilizzo e ti preparo la proposta.";
+    if(normalize(b.id) === "jeep") return "Jeep: immagine forte, posizione guida alta, SUV richiesti. Dimmi se urbano o off-road.";
     return `${b.name}: dimmi il modello e ti preparo argomenti vendita e gestione obiezioni.`;
   }
 
@@ -549,7 +557,6 @@ async function handleSend(){
   send.disabled = true;
   input.disabled = true;
 
-  // typing
   const typing = document.createElement("div");
   typing.className = "msg ai";
   typing.textContent = "Sto rispondendo...";
@@ -560,7 +567,6 @@ async function handleSend(){
     const reply = await aiReply(q);
     typing.textContent = reply;
 
-    // Se ha citato un brand, aggiorna anche la UI modelli
     const b = pickBrandFromText(q);
     if(b) await loadModelsAndRender(b.id, false);
   } finally {
@@ -581,3 +587,4 @@ loadBrands();
 
 </body>
 </html>
+
