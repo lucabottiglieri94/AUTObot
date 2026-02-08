@@ -148,6 +148,7 @@ p{
 }
 
 .chip{
+  
   border:1px solid var(--line);
   background:rgba(2,6,23,.55);
   padding:7px 10px;
@@ -155,6 +156,19 @@ p{
   font-size:13px;
   color:var(--text);
 }
+  .chip{
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+}
+
+.chip:hover{
+  border-color: rgba(59,130,246,.55);
+  background: rgba(59,130,246,.10);
+}
+
 
 .small{
   font-size:12px;
