@@ -55,44 +55,49 @@
     </section>
   </main>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import {
-    getAuth,
-    GoogleAuthProvider,
-    signInWithPopup,
-    signOut,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-  const BACKEND_API = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app/api/news";
+    // ================== CONFIG ==================
+    const BACKEND_API = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app/api/news";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
-    authDomain: "auto-1af60.firebaseapp.com",
-    projectId: "auto-1af60",
-    storageBucket: "auto-1af60.firebasestorage.app",
-    messagingSenderId: "498320258984",
-    appId: "1:498320258984:web:bac67d7634273d10464f9d",
-    measurementId: "G-WYM78KQWQJ"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
+      authDomain: "auto-1af60.firebaseapp.com",
+      projectId: "auto-1af60",
+      storageBucket: "auto-1af60.firebasestorage.app",
+      messagingSenderId: "498320258984",
+      appId: "1:498320258984:web:bac67d7634273d10464f9d",
+      measurementId: "G-WYM78KQWQJ"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
+    // ================== INIT ==================
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
 
-  // esempio login
-  document.getElementById("loginBtn")?.addEventListener("click", () => {
-    signInWithPopup(auth, provider).catch(console.error);
-  });
-</script>
-
-
- // ====== 3) UI HELPERS ======
+    // ================== UI HELPERS ==================
     const $ = (id) => document.getElementById(id);
 
     function setStatus(t){ $("status").textContent = t; }
-    function escapeHtml(s=""){ return s.replace(/[&<>"']/g,c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+
+    function escapeHtml(s=""){
+      return s.replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+
+    function safeHost(url){
+      try { return new URL(url).hostname; } catch { return ""; }
+    }
 
     function renderItems(items){
       const box = $("newsList");
@@ -101,16 +106,18 @@
         setStatus("Nessuna news trovata.");
         return;
       }
+
       box.innerHTML = items.map(n => `
         <a class="newsItem" href="${n.url}" target="_blank" rel="noopener">
-          <div class="newsTitle">${escapeHtml(n.title)}</div>
-          <div class="newsMeta">${new URL(n.url).hostname}</div>
+          <div class="newsTitle">${escapeHtml(n.title || "")}</div>
+          <div class="newsMeta">${escapeHtml(safeHost(n.url || ""))}</div>
         </a>
       `).join("");
+
       setStatus("Ultimo aggiornamento: " + new Date().toLocaleString());
     }
 
-    // ====== 4) NEWS FETCH CON TOKEN ======
+    // ================== NEWS FETCH CON TOKEN ==================
     async function loadNews(){
       const user = auth.currentUser;
       if (!user){
@@ -127,7 +134,7 @@
       const r = await fetch(BACKEND_API, {
         method: "GET",
         headers: { Authorization: "Bearer " + token },
-        cache: "no-store",
+        cache: "no-store"
       });
 
       if (!r.ok){
@@ -140,13 +147,14 @@
       $("refreshBtn").disabled = false;
     }
 
-    // ====== 5) EVENTI ======
+    // ================== EVENTI ==================
     $("loginBtn").addEventListener("click", async () => {
       try{
+        setStatus("Apro login Google...");
         await signInWithPopup(auth, provider);
       }catch(e){
         console.error(e);
-        setStatus("Login fallito.");
+        setStatus("Login fallito: " + (e.code || e.message || e));
       }
     });
 
@@ -157,7 +165,7 @@
     $("refreshBtn").addEventListener("click", () => {
       loadNews().catch(err => {
         console.error(err);
-        setStatus("Errore caricamento news.");
+        setStatus("Errore caricamento news: " + (err.message || err));
         $("refreshBtn").disabled = false;
       });
     });
@@ -171,7 +179,7 @@
 
         loadNews().catch(err => {
           console.error(err);
-          setStatus("Errore caricamento news.");
+          setStatus("Errore caricamento news: " + (err.message || err));
           $("refreshBtn").disabled = false;
         });
       } else {
