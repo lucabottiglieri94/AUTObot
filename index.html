@@ -88,7 +88,9 @@
         </div>
 
         <div class="row" style="gap:10px">
+          <!-- qui vedi stato utente -->
           <span id="userPill" class="pill muted">Non autenticato</span>
+          <!-- login e logout vicini -->
           <button id="loginBtn" class="btn primary">Login Google</button>
           <button id="logoutBtn" class="btn" style="display:none">Logout</button>
         </div>
@@ -106,6 +108,7 @@
         <button id="refreshBtn" class="btn" disabled>Aggiorna</button>
       </div>
 
+      <!-- qui vedrai “Login riuscito” oppure errori -->
       <div id="status" class="muted" style="margin-top:12px">
         Effettua il login per caricare le news.
       </div>
@@ -126,7 +129,7 @@
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-    // ================== COSTANTI BASE ==================
+    // ================== COSTANTI ==================
     const BACKEND_NEWS = "/api/news";
 
     const BRAND_LINKS = {
@@ -191,6 +194,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
+    // persistenza (rimani loggato tra i refresh)
     try {
       await setPersistence(auth, browserLocalPersistence);
     } catch (e) {
@@ -202,6 +206,7 @@
     provider.setCustomParameters({ prompt: "select_account" });
 
     // ================== RISULTATO REDIRECT ==================
+    // Viene chiamato SOLO al ritorno dal login Google
     try {
       const res = await getRedirectResult(auth);
       if (res?.user) {
