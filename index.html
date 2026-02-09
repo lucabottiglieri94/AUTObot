@@ -62,19 +62,19 @@
   </main>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
-      getAuth,
-      setPersistence,
-      browserLocalPersistence,
-      GoogleAuthProvider,
-      signInWithRedirect,
-      getRedirectResult,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import {
+    getAuth,
+    setPersistence,
+    browserLocalPersistence,
+    GoogleAuthProvider,
+    signInWithRedirect,
+    getRedirectResult,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-    // ================== CONFIG ==================
+  (async () => {
     const BACKEND_NEWS = "/api/news";
 
     const BRAND_LINKS = {
@@ -92,37 +92,21 @@
       measurementId: "G-WYM78KQWQJ"
     };
 
-    // ================== INIT ==================
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // ✅ FIX: persistenza (altrimenti sembra che "non salva")
-    await setPersistence(auth, browserLocalPersistence);
-
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account" });
-
-    // ================== UI HELPERS ==================
     const $ = (id) => document.getElementById(id);
-    function setStatus(t){ $("status").textContent = t; }
+    const setStatus = (t) => { $("status").textContent = t; };
 
     function escapeHtml(s=""){
       return String(s ?? "").replace(/[&<>"']/g, c => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
       }[c]));
     }
-
-    function safeHost(url){
-      try { return new URL(url).hostname; } catch { return ""; }
-    }
-
+    function safeHost(url){ try { return new URL(url).hostname; } catch { return ""; } }
     function fmtDate(d){
       if (!d) return "";
       const dt = new Date(d);
       if (Number.isNaN(dt.getTime())) return String(d);
       return dt.toLocaleString("it-IT");
     }
-
     function renderItems(items){
       const box = $("newsList");
       if (!items || !items.length){
@@ -130,12 +114,10 @@
         setStatus("Nessuna news trovata.");
         return;
       }
-
       box.innerHTML = items.map(n => {
         const link = n.url || n.link || "";
         const title = n.title || "";
         const date = fmtDate(n.date || n.pubDate || "");
-
         return `
           <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener">
             <div class="newsTitle">${escapeHtml(title)}</div>
@@ -144,9 +126,106 @@
           </a>
         `;
       }).join("");
-
       setStatus("Ultimo aggiornamento: " + new Date().toLocaleString("it-IT"));
     }
+
+    async function loadNews(){
+      if (!auth.currentUser){
+        $("newsList").innerHTML = "";
+        setStatus("Effettua il login per caricare le news.");
+        return;
+      }
+      setStatus("Caricamento news...");
+      $("refreshBtn").disabled = true;
+
+      try{
+        const r = await fetch(BACKEND_NEWS, { method: "GET", cache: "no-store" });
+        if (!r.ok){
+          const txt = await r.text().catch(()=> "");
+          throw new Error("HTTP " + r.status + (txt ? " - " + txt : ""));
+        }
+        const data = await r.json();
+        renderItems(data.items || []);
+      }catch(err){
+        console.error(err);
+        setStatus("Errore caricamento news: " + (err?.message || err));
+      }finally{
+        $("refreshBtn").disabled = !auth.currentUser;
+      }
+    }
+
+    // INIT Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // FIX: persistenza
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+    } catch (e) {
+      console.error("PERSISTENCE ERROR:", e);
+      setStatus("Errore persistenza login: " + (e.code || e.message || e));
+    }
+
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+
+    // FIX: completa redirect (se non lo fai bene, sembra che “non prende”)
+    try{
+      const res = await getRedirectResult(auth);
+      if (res?.user) console.log("REDIRECT OK:", res.user.email);
+    }catch(e){
+      console.error("REDIRECT ERROR:", e);
+      setStatus("Login fallito: " + (e.code || e.message || e));
+    }
+
+    // Click login
+    $("loginBtn").addEventListener("click", async () => {
+      try{
+        setStatus("Apro login Google...");
+        await signInWithRedirect(auth, provider);
+      }catch(e){
+        console.error("LOGIN ERROR:", e);
+        setStatus("Login fallito: " + (e.code || e.message || e));
+      }
+    });
+
+    // Logout (VERO)
+    $("logoutBtn").addEventListener("click", async () => {
+      try{
+        await signOut(auth);
+        $("newsList").innerHTML = "";
+        setStatus("Logout effettuato.");
+      }catch(e){
+        console.error("LOGOUT ERROR:", e);
+        setStatus("Logout fallito: " + (e.code || e.message || e));
+      }
+    });
+
+    $("refreshBtn").addEventListener("click", () => loadNews());
+
+    $("fiatBtn").addEventListener("click", () => window.open(BRAND_LINKS.Fiat, "_blank", "noopener"));
+    $("jeepBtn").addEventListener("click", () => window.open(BRAND_LINKS.Jeep, "_blank", "noopener"));
+
+    onAuthStateChanged(auth, (user) => {
+      console.log("AUTH STATE:", user ? user.email : "NO USER");
+      if (user){
+        $("userPill").textContent = "Loggato: " + (user.email || "utente");
+        $("loginBtn").style.display = "none";
+        $("logoutBtn").style.display = "inline-block";
+        $("refreshBtn").disabled = false;
+        loadNews();
+      } else {
+        $("userPill").textContent = "Non autenticato";
+        $("loginBtn").style.display = "inline-block";
+        $("logoutBtn").style.display = "none";
+        $("refreshBtn").disabled = true;
+        $("newsList").innerHTML = "";
+        setStatus("Effettua il login per caricare le news.");
+      }
+    });
+  })();
+</script>
+
 
     // ================== NEWS FETCH ==================
     async function loadNews(){
