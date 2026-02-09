@@ -58,28 +58,22 @@
   <script type="module">
     // ====== 1) CONFIG: METTI I TUOI DATI ======
     const BACKEND_API = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app/api/news";
-
+  };
     const firebaseConfig = {
-      apiKey: "METTI_API_KEY",
-      authDomain: "METTI_PROJECT_ID.firebaseapp.com",
-      projectId: "METTI_PROJECT_ID",
-    };
+  apiKey: "AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
+  authDomain: "auto-1af60.firebaseapp.com",
+  projectId: "auto-1af60",
+  storageBucket: "auto-1af60.firebasestorage.app",
+  messagingSenderId: "498320258984",
+  appId: "1:498320258984:web:bac67d7634273d10464f9d",
+  measurementId: "G-WYM78KQWQJ"
+};
 
-    // ====== 2) FIREBASE AUTH (Google) ======
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithPopup,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    // ====== 3) UI HELPERS ======
+ // ====== 3) UI HELPERS ======
     const $ = (id) => document.getElementById(id);
 
     function setStatus(t){ $("status").textContent = t; }
