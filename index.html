@@ -67,16 +67,17 @@
     import {
       getAuth,
       GoogleAuthProvider,
-      signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult,
       signOut,
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
     // ================== CONFIG ==================
-    // ✅ Backend (Vercel Function) — NO Authorization header (evita CORS preflight)
-  const BACKEND_NEWS = "/api/news";
+    // Stai usando Vercel (stesso dominio) => OK
+    const BACKEND_NEWS = "/api/news";
 
-    // ✅ Link configuratori
+    // ✅ Link configuratori richiesti
     const BRAND_LINKS = {
       Fiat: "https://www.fiat.it/omni/configuratore/#/",
       Jeep: "https://www.jeep-official.it/omni/configuratore"
@@ -177,10 +178,19 @@
     }
 
     // ================== EVENTI ==================
+
+    // Gestisce il ritorno dal redirect Google (silenzioso, ma se fallisce mostra errore)
+    getRedirectResult(auth).catch((e) => {
+      if (e) {
+        console.error(e);
+        setStatus("Login fallito: " + (e.code || e.message || e));
+      }
+    });
+
     $("loginBtn").addEventListener("click", async () => {
       try{
         setStatus("Apro login Google...");
-        await signInWithPopup(auth, provider);
+        await signInWithRedirect(auth, provider);
       }catch(e){
         console.error(e);
         setStatus("Login fallito: " + (e.code || e.message || e));
@@ -221,4 +231,3 @@
   </script>
 </body>
 </html>
-
