@@ -19,22 +19,12 @@
     .muted{color:var(--muted)}
     .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(17,24,39,.35);font-size:12px}
 
-    /* News */
     #newsList{display:grid;gap:12px;margin-top:12px}
     .newsItem{display:block;padding:14px;border:1px solid var(--line);border-radius:14px;text-decoration:none;color:inherit;background:rgba(17,24,39,.35)}
     .newsItem:hover{border-color:rgba(59,130,246,.6)}
     .newsTitle{font-weight:800}
-    .newsMeta{opacity:.75;font-size:12px;margin-top:6px;display:flex;gap:10px;flex-wrap:wrap}
-    .newsSum{opacity:.9;font-size:13px;margin-top:8px;line-height:1.35}
-    .newsThumb{width:100%;max-height:160px;object-fit:cover;border-radius:12px;border:1px solid var(--line);margin-top:10px;background:#0b0f1a}
-
-    /* Modelli (Fiat/Jeep) */
-    #modelsBox{display:none;margin-top:16px}
-    #modelsHeader{display:flex;gap:10px;align-items:baseline;justify-content:space-between;flex-wrap:wrap}
-    #modelsList{display:grid;gap:10px;margin-top:10px}
-    .modelItem{padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(17,24,39,.35)}
-    .modelTitle{font-weight:800}
-    .modelMeta{opacity:.75;font-size:12px;margin-top:6px}
+    .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
+    .newsDate{opacity:.75;font-size:12px;margin-top:6px}
   </style>
 </head>
 
@@ -44,8 +34,6 @@
       <div class="row">
         <div class="brand">
           <span>Auto News</span>
-
-          <!-- Marchi: mantieni click Fiat e Jeep -->
           <button id="fiatBtn" class="btn">Fiat</button>
           <button id="jeepBtn" class="btn">Jeep</button>
         </div>
@@ -71,19 +59,6 @@
 
       <div id="status" class="muted" style="margin-top:12px">Effettua il login per caricare le news.</div>
       <div id="newsList"></div>
-
-      <!-- Sezione Modelli (Fiat/Jeep) -->
-      <div id="modelsBox">
-        <div id="modelsHeader">
-          <div>
-            <div style="font-weight:800;font-size:16px">Modelli</div>
-            <div id="modelsBrand" class="muted" style="margin-top:6px"></div>
-          </div>
-          <button id="closeModelsBtn" class="btn">Chiudi</button>
-        </div>
-        <div id="modelsStatus" class="muted" style="margin-top:12px"></div>
-        <div id="modelsList"></div>
-      </div>
     </section>
   </main>
 
@@ -98,12 +73,14 @@
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
     // ================== CONFIG ==================
-    // Backend RSS pulito: deve rispondere /api/news
+    // ✅ Backend (Vercel Function) — NO Authorization header (evita CORS preflight)
     const BACKEND_NEWS = "https://auto-backend-git-main-lucas-projects-93ba30e7.vercel.app/api/news";
 
-    // Se hai anche endpoint modelli nel backend, mettilo qui (opzionale).
-    // Se non lo hai, questi click restano e mostrano solo un messaggio.
-    const BACKEND_MODELS = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app/api/models";
+    // ✅ Link configuratori
+    const BRAND_LINKS = {
+      Fiat: "https://www.fiat.it/omni/configuratore/#/",
+      Jeep: "https://www.jeep-official.it/omni/configuratore"
+    };
 
     const firebaseConfig = {
       apiKey: "AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
@@ -136,15 +113,14 @@
       try { return new URL(url).hostname; } catch { return ""; }
     }
 
-    function fmtDate(iso){
-      if(!iso) return "";
-      const d = new Date(iso);
-      if (Number.isNaN(d.getTime())) return "";
-      return d.toLocaleDateString("it-IT", { year:"numeric", month:"short", day:"2-digit" });
+    function fmtDate(d){
+      if (!d) return "";
+      const dt = new Date(d);
+      if (Number.isNaN(dt.getTime())) return String(d);
+      return dt.toLocaleString("it-IT");
     }
 
-    // ================== RENDER NEWS (RSS PULITO) ==================
-    function renderItems(items, meta){
+    function renderItems(items){
       const box = $("newsList");
 
       if (!items || !items.length){
@@ -154,31 +130,23 @@
       }
 
       box.innerHTML = items.map(n => {
-        const link = n.link || n.url || "";
+        const link = n.url || n.link || "";
         const title = n.title || "";
-        const source = n.source || safeHost(link);
-        const date = fmtDate(n.date);
-        const sum = (n.summary || "").trim();
-        const img = n.image ? `<img class="newsThumb" src="${escapeHtml(n.image)}" alt="">` : "";
+        const date = fmtDate(n.date || "");
 
         return `
           <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener">
             <div class="newsTitle">${escapeHtml(title)}</div>
-            <div class="newsMeta">
-              <span>${escapeHtml(source)}</span>
-              <span>${escapeHtml(date)}</span>
-            </div>
-            ${sum ? `<div class="newsSum">${escapeHtml(sum)}</div>` : ""}
-            ${img}
+            <div class="newsMeta">${escapeHtml(safeHost(link))}</div>
+            ${date ? `<div class="newsDate">${escapeHtml(date)}</div>` : ""}
           </a>
         `;
       }).join("");
 
-      const upd = meta?.updatedAt ? new Date(meta.updatedAt).toLocaleString("it-IT") : new Date().toLocaleString("it-IT");
-      setStatus("Ultimo aggiornamento: " + upd);
+      setStatus("Ultimo aggiornamento: " + new Date().toLocaleString("it-IT"));
     }
 
-    // ================== NEWS FETCH (mantiene login + token) ==================
+    // ================== NEWS FETCH (NO TOKEN, NO AUTH HEADER) ==================
     async function loadNews(){
       const user = auth.currentUser;
       if (!user){
@@ -190,78 +158,8 @@
       setStatus("Caricamento news...");
       $("refreshBtn").disabled = true;
 
-      const token = await user.getIdToken();
-
-      const r = await fetch(BACKEND_NEWS, {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + token
-        },
-        cache: "no-store"
-      });
-
-      if (!r.ok){
-        const txt = await r.text().catch(()=> "");
-        throw new Error("HTTP " + r.status + (txt ? " - " + txt : ""));
-      }
-
-      const data = await r.json();
-      renderItems(Array.isArray(data.items) ? data.items : [], data);
-      $("refreshBtn").disabled = false;
-    }
-
-    // ================== MODELLI (Fiat/Jeep) ==================
-    function showModelsUI(brand){
-      $("modelsBox").style.display = "block";
-      $("modelsBrand").textContent = "Marchio: " + brand;
-      $("modelsStatus").textContent = "";
-      $("modelsList").innerHTML = "";
-    }
-
-    function hideModelsUI(){
-      $("modelsBox").style.display = "none";
-      $("modelsBrand").textContent = "";
-      $("modelsStatus").textContent = "";
-      $("modelsList").innerHTML = "";
-    }
-
-    function renderModels(items){
-      const box = $("modelsList");
-      if (!items || !items.length){
-        box.innerHTML = "";
-        $("modelsStatus").textContent = "Nessun modello trovato.";
-        return;
-      }
-      box.innerHTML = items.map(m => `
-        <div class="modelItem">
-          <div class="modelTitle">${escapeHtml(m.name || m.title || "")}</div>
-          <div class="modelMeta">${escapeHtml(m.url ? safeHost(m.url) : (m.note || ""))}</div>
-        </div>
-      `).join("");
-      $("modelsStatus").textContent = "Caricati: " + items.length;
-    }
-
-    async function loadModels(brand){
-      showModelsUI(brand);
-
-      const user = auth.currentUser;
-      if (!user){
-        $("modelsStatus").textContent = "Fai login per vedere i modelli.";
-        return;
-      }
-
-      $("modelsStatus").textContent = "Caricamento modelli...";
-      const token = await user.getIdToken();
-
       try{
-        const url = new URL(BACKEND_MODELS);
-        url.searchParams.set("brand", brand.toLowerCase());
-
-        const r = await fetch(url.toString(), {
-          method: "GET",
-          headers: { Authorization: "Bearer " + token },
-          cache: "no-store"
-        });
+        const r = await fetch(BACKEND_NEWS, { method: "GET", cache: "no-store" });
 
         if (!r.ok){
           const txt = await r.text().catch(()=> "");
@@ -269,14 +167,16 @@
         }
 
         const data = await r.json();
-        renderModels(Array.isArray(data.items) ? data.items : []);
-      }catch(e){
-        // Se non hai ancora l’endpoint modelli, non rompe nulla.
-        $("modelsStatus").textContent = "Endpoint modelli non attivo: " + (e.message || e);
+        renderItems(data.items || []);
+        $("refreshBtn").disabled = false;
+      }catch(err){
+        console.error(err);
+        setStatus("Errore caricamento news: " + (err.message || err));
+        $("refreshBtn").disabled = false;
       }
     }
 
-    // ================== EVENTI LOGIN (come prima) ==================
+    // ================== EVENTI ==================
     $("loginBtn").addEventListener("click", async () => {
       try{
         setStatus("Apro login Google...");
@@ -289,59 +189,36 @@
 
     $("logoutBtn").addEventListener("click", async () => {
       await signOut(auth);
-      hideModelsUI();
     });
 
-    $("refreshBtn").addEventListener("click", () => {
-      loadNews().catch(err => {
-        console.error(err);
-        setStatus("Errore caricamento news: " + (err.message || err));
-        $("refreshBtn").disabled = false;
-      });
+    $("refreshBtn").addEventListener("click", () => loadNews());
+
+    // ✅ Click marchi -> configuratori
+    $("fiatBtn").addEventListener("click", () => {
+      window.open(BRAND_LINKS.Fiat, "_blank", "noopener");
     });
 
-    // ================== CLICK FIAT / JEEP (rimangono) ==================
-const BRAND_SITES = {
-  Fiat: "https://www.fiat.it/",
-  Jeep: "https://www.jeep.it/"
-};
+    $("jeepBtn").addEventListener("click", () => {
+      window.open(BRAND_LINKS.Jeep, "_blank", "noopener");
+    });
 
-$("fiatBtn").addEventListener("click", () => {
-  window.open(BRAND_SITES.Fiat, "_blank", "noopener");
-  loadModels("Fiat");
-});
-
-$("jeepBtn").addEventListener("click", () => {
-  window.open(BRAND_SITES.Jeep, "_blank", "noopener");
-  loadModels("Jeep");
-});
-
-$("closeModelsBtn").addEventListener("click", hideModelsUI);
-
-
-    // ================== AUTH STATE (come prima) ==================
     onAuthStateChanged(auth, (user) => {
       if (user){
         $("userPill").textContent = "Loggato: " + (user.email || "utente");
         $("loginBtn").style.display = "none";
         $("logoutBtn").style.display = "inline-block";
         $("refreshBtn").disabled = false;
-
-        loadNews().catch(err => {
-          console.error(err);
-          setStatus("Errore caricamento news: " + (err.message || err));
-          $("refreshBtn").disabled = false;
-        });
+        loadNews();
       } else {
         $("userPill").textContent = "Non autenticato";
         $("loginBtn").style.display = "inline-block";
         $("logoutBtn").style.display = "none";
         $("refreshBtn").disabled = true;
         $("newsList").innerHTML = "";
-        hideModelsUI();
         setStatus("Effettua il login per caricare le news.");
       }
     });
   </script>
 </body>
 </html>
+
