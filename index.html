@@ -18,7 +18,6 @@
     main .card{margin-top:16px;background:rgba(17,24,39,.75);border:1px solid var(--line);border-radius:16px;padding:16px}
     .muted{color:var(--muted)}
     .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(17,24,39,.35);font-size:12px}
-
     #newsList{display:grid;gap:12px;margin-top:12px}
     .newsItem{display:block;padding:14px;border:1px solid var(--line);border-radius:14px;text-decoration:none;color:inherit;background:rgba(17,24,39,.35)}
     .newsItem:hover{border-color:rgba(59,130,246,.6)}
@@ -66,6 +65,8 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
       getAuth,
+      setPersistence,
+      browserLocalPersistence,
       GoogleAuthProvider,
       signInWithRedirect,
       getRedirectResult,
@@ -74,10 +75,8 @@
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
     // ================== CONFIG ==================
-    // Stai usando Vercel (stesso dominio) => OK
     const BACKEND_NEWS = "/api/news";
 
-    // ✅ Link configuratori richiesti
     const BRAND_LINKS = {
       Fiat: "https://www.fiat.it/omni/configuratore/#/",
       Jeep: "https://www.jeep-official.it/omni/configuratore"
@@ -96,12 +95,15 @@
     // ================== INIT ==================
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+
+    // ✅ FIX: persistenza (altrimenti sembra che "non salva")
+    await setPersistence(auth, browserLocalPersistence);
+
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
     // ================== UI HELPERS ==================
     const $ = (id) => document.getElementById(id);
-
     function setStatus(t){ $("status").textContent = t; }
 
     function escapeHtml(s=""){
@@ -123,7 +125,6 @@
 
     function renderItems(items){
       const box = $("newsList");
-
       if (!items || !items.length){
         box.innerHTML = "";
         setStatus("Nessuna news trovata.");
@@ -133,7 +134,7 @@
       box.innerHTML = items.map(n => {
         const link = n.url || n.link || "";
         const title = n.title || "";
-        const date = fmtDate(n.date || "");
+        const date = fmtDate(n.date || n.pubDate || "");
 
         return `
           <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener">
@@ -147,7 +148,7 @@
       setStatus("Ultimo aggiornamento: " + new Date().toLocaleString("it-IT"));
     }
 
-    // ================== NEWS FETCH (NO TOKEN, NO AUTH HEADER) ==================
+    // ================== NEWS FETCH ==================
     async function loadNews(){
       const user = auth.currentUser;
       if (!user){
@@ -161,49 +162,53 @@
 
       try{
         const r = await fetch(BACKEND_NEWS, { method: "GET", cache: "no-store" });
-
         if (!r.ok){
           const txt = await r.text().catch(()=> "");
           throw new Error("HTTP " + r.status + (txt ? " - " + txt : ""));
         }
-
         const data = await r.json();
         renderItems(data.items || []);
-        $("refreshBtn").disabled = false;
       }catch(err){
         console.error(err);
-        setStatus("Errore caricamento news: " + (err.message || err));
-        $("refreshBtn").disabled = false;
+        setStatus("Errore caricamento news: " + (err?.message || err));
+      }finally{
+        $("refreshBtn").disabled = !auth.currentUser;
       }
     }
 
-    // ================== EVENTI ==================
-
-    // Gestisce il ritorno dal redirect Google (silenzioso, ma se fallisce mostra errore)
-    getRedirectResult(auth).catch((e) => {
-      if (e) {
-        console.error(e);
-        setStatus("Login fallito: " + (e.code || e.message || e));
-      }
-    });
+    // ================== AUTH (REDIRECT) ==================
+    // ✅ FIX: gestisce il ritorno dal redirect (utile per vedere errori veri)
+    try{
+      const res = await getRedirectResult(auth);
+      if (res?.user) console.log("REDIRECT OK:", res.user.email);
+    }catch(e){
+      console.error("REDIRECT ERROR:", e);
+      setStatus("Login fallito: " + (e.code || e.message || e));
+    }
 
     $("loginBtn").addEventListener("click", async () => {
       try{
         setStatus("Apro login Google...");
         await signInWithRedirect(auth, provider);
       }catch(e){
-        console.error(e);
+        console.error("LOGIN ERROR:", e);
         setStatus("Login fallito: " + (e.code || e.message || e));
       }
     });
 
+    // ✅ Logout (con UI + status)
     $("logoutBtn").addEventListener("click", async () => {
-      await signOut(auth);
+      try{
+        await signOut(auth);
+        setStatus("Logout effettuato.");
+      }catch(e){
+        console.error("LOGOUT ERROR:", e);
+        setStatus("Logout fallito: " + (e.code || e.message || e));
+      }
     });
 
     $("refreshBtn").addEventListener("click", () => loadNews());
 
-    // ✅ Click marchi -> configuratori
     $("fiatBtn").addEventListener("click", () => {
       window.open(BRAND_LINKS.Fiat, "_blank", "noopener");
     });
