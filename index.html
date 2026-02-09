@@ -11,18 +11,30 @@
     header{position:sticky;top:0;background:rgba(11,15,26,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:10}
     .wrap{max-width:1100px;margin:0 auto;padding:16px}
     .row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .brand{font-weight:800;letter-spacing:.2px}
+    .brand{font-weight:800;letter-spacing:.2px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .btn{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 12px;border-radius:12px;cursor:pointer}
     .btn.primary{border-color:rgba(59,130,246,.5)}
     .btn:disabled{opacity:.6;cursor:not-allowed}
     main .card{margin-top:16px;background:rgba(17,24,39,.75);border:1px solid var(--line);border-radius:16px;padding:16px}
     .muted{color:var(--muted)}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(17,24,39,.35);font-size:12px}
+
+    /* News */
     #newsList{display:grid;gap:12px;margin-top:12px}
     .newsItem{display:block;padding:14px;border:1px solid var(--line);border-radius:14px;text-decoration:none;color:inherit;background:rgba(17,24,39,.35)}
     .newsItem:hover{border-color:rgba(59,130,246,.6)}
     .newsTitle{font-weight:800}
-    .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(17,24,39,.35);font-size:12px}
+    .newsMeta{opacity:.75;font-size:12px;margin-top:6px;display:flex;gap:10px;flex-wrap:wrap}
+    .newsSum{opacity:.9;font-size:13px;margin-top:8px;line-height:1.35}
+    .newsThumb{width:100%;max-height:160px;object-fit:cover;border-radius:12px;border:1px solid var(--line);margin-top:10px;background:#0b0f1a}
+
+    /* Modelli (Fiat/Jeep) */
+    #modelsBox{display:none;margin-top:16px}
+    #modelsHeader{display:flex;gap:10px;align-items:baseline;justify-content:space-between;flex-wrap:wrap}
+    #modelsList{display:grid;gap:10px;margin-top:10px}
+    .modelItem{padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(17,24,39,.35)}
+    .modelTitle{font-weight:800}
+    .modelMeta{opacity:.75;font-size:12px;margin-top:6px}
   </style>
 </head>
 
@@ -30,7 +42,14 @@
   <header>
     <div class="wrap">
       <div class="row">
-        <div class="brand">Auto News</div>
+        <div class="brand">
+          <span>Auto News</span>
+
+          <!-- Marchi: mantieni click Fiat e Jeep -->
+          <button id="fiatBtn" class="btn">Fiat</button>
+          <button id="jeepBtn" class="btn">Jeep</button>
+        </div>
+
         <div class="row" style="gap:10px">
           <span id="userPill" class="pill muted">Non autenticato</span>
           <button id="loginBtn" class="btn primary">Login Google</button>
@@ -52,6 +71,19 @@
 
       <div id="status" class="muted" style="margin-top:12px">Effettua il login per caricare le news.</div>
       <div id="newsList"></div>
+
+      <!-- Sezione Modelli (Fiat/Jeep) -->
+      <div id="modelsBox">
+        <div id="modelsHeader">
+          <div>
+            <div style="font-weight:800;font-size:16px">Modelli</div>
+            <div id="modelsBrand" class="muted" style="margin-top:6px"></div>
+          </div>
+          <button id="closeModelsBtn" class="btn">Chiudi</button>
+        </div>
+        <div id="modelsStatus" class="muted" style="margin-top:12px"></div>
+        <div id="modelsList"></div>
+      </div>
     </section>
   </main>
 
@@ -66,7 +98,12 @@
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
     // ================== CONFIG ==================
-    const BACKEND_API = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app/api/news";
+    // Backend RSS pulito: deve rispondere /api/news
+    const BACKEND_NEWS = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app/api/news";
+
+    // Se hai anche endpoint modelli nel backend, mettilo qui (opzionale).
+    // Se non lo hai, questi click restano e mostrano solo un messaggio.
+    const BACKEND_MODELS = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app/api/models";
 
     const firebaseConfig = {
       apiKey: "AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
@@ -90,7 +127,7 @@
     function setStatus(t){ $("status").textContent = t; }
 
     function escapeHtml(s=""){
-      return s.replace(/[&<>"']/g, c => ({
+      return String(s ?? "").replace(/[&<>"']/g, c => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
       }[c]));
     }
@@ -99,25 +136,49 @@
       try { return new URL(url).hostname; } catch { return ""; }
     }
 
-    function renderItems(items){
+    function fmtDate(iso){
+      if(!iso) return "";
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return "";
+      return d.toLocaleDateString("it-IT", { year:"numeric", month:"short", day:"2-digit" });
+    }
+
+    // ================== RENDER NEWS (RSS PULITO) ==================
+    function renderItems(items, meta){
       const box = $("newsList");
+
       if (!items || !items.length){
         box.innerHTML = "";
         setStatus("Nessuna news trovata.");
         return;
       }
 
-      box.innerHTML = items.map(n => `
-        <a class="newsItem" href="${n.url}" target="_blank" rel="noopener">
-          <div class="newsTitle">${escapeHtml(n.title || "")}</div>
-          <div class="newsMeta">${escapeHtml(safeHost(n.url || ""))}</div>
-        </a>
-      `).join("");
+      box.innerHTML = items.map(n => {
+        const link = n.link || n.url || "";
+        const title = n.title || "";
+        const source = n.source || safeHost(link);
+        const date = fmtDate(n.date);
+        const sum = (n.summary || "").trim();
+        const img = n.image ? `<img class="newsThumb" src="${escapeHtml(n.image)}" alt="">` : "";
 
-      setStatus("Ultimo aggiornamento: " + new Date().toLocaleString());
+        return `
+          <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener">
+            <div class="newsTitle">${escapeHtml(title)}</div>
+            <div class="newsMeta">
+              <span>${escapeHtml(source)}</span>
+              <span>${escapeHtml(date)}</span>
+            </div>
+            ${sum ? `<div class="newsSum">${escapeHtml(sum)}</div>` : ""}
+            ${img}
+          </a>
+        `;
+      }).join("");
+
+      const upd = meta?.updatedAt ? new Date(meta.updatedAt).toLocaleString("it-IT") : new Date().toLocaleString("it-IT");
+      setStatus("Ultimo aggiornamento: " + upd);
     }
 
-    // ================== NEWS FETCH CON TOKEN ==================
+    // ================== NEWS FETCH (mantiene login + token) ==================
     async function loadNews(){
       const user = auth.currentUser;
       if (!user){
@@ -131,23 +192,91 @@
 
       const token = await user.getIdToken();
 
-      const r = await fetch(BACKEND_API, {
+      const r = await fetch(BACKEND_NEWS, {
         method: "GET",
-        headers: { Authorization: "Bearer " + token },
+        headers: {
+          Authorization: "Bearer " + token
+        },
         cache: "no-store"
       });
 
       if (!r.ok){
         const txt = await r.text().catch(()=> "");
-        throw new Error("HTTP " + r.status + " " + txt);
+        throw new Error("HTTP " + r.status + (txt ? " - " + txt : ""));
       }
 
       const data = await r.json();
-      renderItems(data.items || []);
+      renderItems(Array.isArray(data.items) ? data.items : [], data);
       $("refreshBtn").disabled = false;
     }
 
-    // ================== EVENTI ==================
+    // ================== MODELLI (Fiat/Jeep) ==================
+    function showModelsUI(brand){
+      $("modelsBox").style.display = "block";
+      $("modelsBrand").textContent = "Marchio: " + brand;
+      $("modelsStatus").textContent = "";
+      $("modelsList").innerHTML = "";
+    }
+
+    function hideModelsUI(){
+      $("modelsBox").style.display = "none";
+      $("modelsBrand").textContent = "";
+      $("modelsStatus").textContent = "";
+      $("modelsList").innerHTML = "";
+    }
+
+    function renderModels(items){
+      const box = $("modelsList");
+      if (!items || !items.length){
+        box.innerHTML = "";
+        $("modelsStatus").textContent = "Nessun modello trovato.";
+        return;
+      }
+      box.innerHTML = items.map(m => `
+        <div class="modelItem">
+          <div class="modelTitle">${escapeHtml(m.name || m.title || "")}</div>
+          <div class="modelMeta">${escapeHtml(m.url ? safeHost(m.url) : (m.note || ""))}</div>
+        </div>
+      `).join("");
+      $("modelsStatus").textContent = "Caricati: " + items.length;
+    }
+
+    async function loadModels(brand){
+      showModelsUI(brand);
+
+      const user = auth.currentUser;
+      if (!user){
+        $("modelsStatus").textContent = "Fai login per vedere i modelli.";
+        return;
+      }
+
+      $("modelsStatus").textContent = "Caricamento modelli...";
+      const token = await user.getIdToken();
+
+      try{
+        const url = new URL(BACKEND_MODELS);
+        url.searchParams.set("brand", brand.toLowerCase());
+
+        const r = await fetch(url.toString(), {
+          method: "GET",
+          headers: { Authorization: "Bearer " + token },
+          cache: "no-store"
+        });
+
+        if (!r.ok){
+          const txt = await r.text().catch(()=> "");
+          throw new Error("HTTP " + r.status + (txt ? " - " + txt : ""));
+        }
+
+        const data = await r.json();
+        renderModels(Array.isArray(data.items) ? data.items : []);
+      }catch(e){
+        // Se non hai ancora l’endpoint modelli, non rompe nulla.
+        $("modelsStatus").textContent = "Endpoint modelli non attivo: " + (e.message || e);
+      }
+    }
+
+    // ================== EVENTI LOGIN (come prima) ==================
     $("loginBtn").addEventListener("click", async () => {
       try{
         setStatus("Apro login Google...");
@@ -160,6 +289,7 @@
 
     $("logoutBtn").addEventListener("click", async () => {
       await signOut(auth);
+      hideModelsUI();
     });
 
     $("refreshBtn").addEventListener("click", () => {
@@ -170,6 +300,12 @@
       });
     });
 
+    // ================== CLICK FIAT / JEEP (rimangono) ==================
+    $("fiatBtn").addEventListener("click", () => loadModels("Fiat"));
+    $("jeepBtn").addEventListener("click", () => loadModels("Jeep"));
+    $("closeModelsBtn").addEventListener("click", hideModelsUI);
+
+    // ================== AUTH STATE (come prima) ==================
     onAuthStateChanged(auth, (user) => {
       if (user){
         $("userPill").textContent = "Loggato: " + (user.email || "utente");
@@ -188,6 +324,7 @@
         $("logoutBtn").style.display = "none";
         $("refreshBtn").disabled = true;
         $("newsList").innerHTML = "";
+        hideModelsUI();
         setStatus("Effettua il login per caricare le news.");
       }
     });
