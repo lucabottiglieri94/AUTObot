@@ -55,22 +55,38 @@
     </section>
   </main>
 
-  <script type="module">
-    // ====== 1) CONFIG: METTI I TUOI DATI ======
-    const BACKEND_API = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app/api/news";
-    const firebaseConfig = {
-  apiKey: "AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
-  authDomain: "auto-1af60.firebaseapp.com",
-  projectId: "auto-1af60",
-  storageBucket: "auto-1af60.firebasestorage.app",
-  messagingSenderId: "498320258984",
-  appId: "1:498320258984:web:bac67d7634273d10464f9d",
-  measurementId: "G-WYM78KQWQJ"
-};
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+  const BACKEND_API = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app/api/news";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
+    authDomain: "auto-1af60.firebaseapp.com",
+    projectId: "auto-1af60",
+    storageBucket: "auto-1af60.firebasestorage.app",
+    messagingSenderId: "498320258984",
+    appId: "1:498320258984:web:bac67d7634273d10464f9d",
+    measurementId: "G-WYM78KQWQJ"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  // esempio login
+  document.getElementById("loginBtn")?.addEventListener("click", () => {
+    signInWithPopup(auth, provider).catch(console.error);
+  });
+</script>
+
 
  // ====== 3) UI HELPERS ======
     const $ = (id) => document.getElementById(id);
