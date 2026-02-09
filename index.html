@@ -86,44 +86,40 @@ h1{font-size:26px}
 <script>
 const API = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app";
 
-async function loadNews(){
-  const r = await fetch(API + "/api/news", { cache: "no-store" });
+async function loadNews() {
+  const box = document.getElementById("newsList"); // crea questo div
+  if (box) box.innerHTML = "Carico news...";
+
+  const r = await fetch(API, { cache: "no-store" });
+  if (!r.ok) throw new Error("HTTP " + r.status);
   const data = await r.json();
-  return data.items || [];
-}
 
-async function renderNews(){
-  const box = document.getElementById("news");
-  const status = document.getElementById("status");
+  const items = data.items || [];
+  if (!box) return console.log(items);
 
-  box.innerHTML = "";
-  status.textContent = "stato: caricamento news…";
-
-  try {
-    const items = await loadNews();
-
-    if (!items.length){
-      box.innerHTML = "<div class='news-card'>Nessuna news trovata</div>";
-      status.textContent = "stato: nessuna news";
-      return;
-    }
-
-    for (const n of items){
-      const card = document.createElement("a");
-      card.className = "news-card";
-      card.href = n.url;
-      card.target = "_blank";
-      card.rel = "noopener";
-      card.textContent = n.title;
-      box.appendChild(card);
-    }
-
-    status.textContent = "stato: news caricate";
-  } catch (e){
-    box.innerHTML = "<div class='news-card'>Errore caricamento</div>";
-    status.textContent = "stato: errore";
+  if (!items.length) {
+    box.innerHTML = "Nessuna news trovata.";
+    return;
   }
+
+  box.innerHTML = items.map(n => `
+    <a class="newsItem" href="${n.url}" target="_blank" rel="noopener">
+      <div class="newsTitle">${escapeHtml(n.title)}</div>
+      <div class="newsMeta">${new URL(n.url).hostname}</div>
+    </a>
+  `).join("");
 }
+
+function escapeHtml(s="") {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadNews().catch(err => {
+    console.error(err);
+    const box = document.getElementById("newsList");
+    if (box) box.innerHTML = "Errore caricamento news.";
+  });
 
 renderNews();
 </script>
