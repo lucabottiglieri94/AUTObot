@@ -127,7 +127,7 @@
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
     // ================== COSTANTI BASE ==================
-    const BACKEND_NEWS = "/api/news"; // deve rispondere con { items:[ {title,url,date}, ... ] }
+    const BACKEND_NEWS = "/api/news";
 
     const BRAND_LINKS = {
       Fiat: "https://www.fiat.it/omni/configuratore/#/",
@@ -191,7 +191,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // persistenza locale (rimane loggato tra i refresh)
     try {
       await setPersistence(auth, browserLocalPersistence);
     } catch (e) {
@@ -202,12 +201,10 @@
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
-    // ================== GESTIONE RISULTATO REDIRECT ==================
-    // Viene eseguito una sola volta al caricamento pagina
+    // ================== RISULTATO REDIRECT ==================
     try {
       const res = await getRedirectResult(auth);
       if (res?.user) {
-        // login completato correttamente
         console.log("REDIRECT OK:", res.user.email);
         setStatus("Login riuscito. Benvenuto " + (res.user.email || ""));
       }
@@ -216,7 +213,7 @@
       setStatus("Login fallito: " + (e.code || e.message || e));
     }
 
-    // ================== FUNZIONE CARICAMENTO NEWS ==================
+    // ================== NEWS ==================
     async function loadNews() {
       const user = auth.currentUser;
       if (!user) {
@@ -252,7 +249,6 @@
       try {
         setStatus("Apro login Google...");
         await signInWithRedirect(auth, provider);
-        // da qui il controllo passa a Google, poi si ritorna e getRedirectResult gestisce l'esito
       } catch (e) {
         console.error("LOGIN ERROR:", e);
         setStatus("Login fallito: " + (e.code || e.message || e));
@@ -289,7 +285,6 @@
         $("loginBtn").style.display = "none";
         $("logoutBtn").style.display = "inline-block";
         $("refreshBtn").disabled = false;
-        // carica news automaticamente dopo login
         loadNews();
       } else {
         $("userPill").textContent = "Non autenticato";
@@ -304,3 +299,4 @@
   </script>
 </body>
 </html>
+
