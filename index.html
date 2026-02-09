@@ -121,7 +121,8 @@ window.addEventListener("DOMContentLoaded", () => {
     if (box) box.innerHTML = "Errore caricamento news.";
   });
 
-renderNews();
+  renderNews();
+});
 </script>
 
 <script type="module">
@@ -169,7 +170,7 @@ renderNews();
     const token = await user.getIdToken();
 
     // 👉 chiamata API news protetta
-    const r = await fetch("https://TUO-BACKEND.vercel.app/api/news", {
+    const r = await fetch("https://auto-backend-16xa61c8w-lucas-projects-93ba30e7vercel.app/api/news", {
       headers: {
         Authorization: "Bearer " + token
       },
