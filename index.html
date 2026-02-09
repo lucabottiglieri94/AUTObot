@@ -5,21 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Auto News</title>
   <style>
-    :root{--bg:#0b0f1a;--panel:#111827;--line:#1f2937;--text:#e5e7eb;--muted:#9ca3af;--accent:#3b82f6}
+    :root{
+      --bg:#0b0f1a;
+      --panel:#111827;
+      --line:#1f2937;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#3b82f6;
+    }
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);min-height:100vh}
-    header{position:sticky;top:0;background:rgba(11,15,26,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:10}
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    header{
+      position:sticky;
+      top:0;
+      background:rgba(11,15,26,.9);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+      z-index:10;
+    }
     .wrap{max-width:1100px;margin:0 auto;padding:16px}
     .row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
     .brand{font-weight:800;letter-spacing:.2px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .btn{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 12px;border-radius:12px;cursor:pointer}
-    .btn.primary{border-color:rgba(59,130,246,.5)}
+    .btn{
+      border:1px solid var(--line);
+      background:var(--panel);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .btn.primary{
+      border-color:rgba(59,130,246,.5);
+      background:rgba(37,99,235,.15);
+    }
     .btn:disabled{opacity:.6;cursor:not-allowed}
-    main .card{margin-top:16px;background:rgba(17,24,39,.75);border:1px solid var(--line);border-radius:16px;padding:16px}
+    main .card{
+      margin-top:16px;
+      background:rgba(17,24,39,.75);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+    }
     .muted{color:var(--muted)}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(17,24,39,.35);font-size:12px}
+    .pill{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(17,24,39,.35);
+      font-size:12px;
+    }
     #newsList{display:grid;gap:12px;margin-top:12px}
-    .newsItem{display:block;padding:14px;border:1px solid var(--line);border-radius:14px;text-decoration:none;color:inherit;background:rgba(17,24,39,.35)}
+    .newsItem{
+      display:block;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      text-decoration:none;
+      color:inherit;
+      background:rgba(17,24,39,.35);
+    }
     .newsItem:hover{border-color:rgba(59,130,246,.6)}
     .newsTitle{font-weight:800}
     .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
@@ -56,7 +106,9 @@
         <button id="refreshBtn" class="btn" disabled>Aggiorna</button>
       </div>
 
-      <div id="status" class="muted" style="margin-top:12px">Effettua il login per caricare le news.</div>
+      <div id="status" class="muted" style="margin-top:12px">
+        Effettua il login per caricare le news.
+      </div>
       <div id="newsList"></div>
     </section>
   </main>
@@ -74,8 +126,8 @@
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-    // ================== CONFIG ==================
-    const BACKEND_NEWS = "/api/news";
+    // ================== COSTANTI BASE ==================
+    const BACKEND_NEWS = "/api/news"; // deve rispondere con { items:[ {title,url,date}, ... ] }
 
     const BRAND_LINKS = {
       Fiat: "https://www.fiat.it/omni/configuratore/#/",
@@ -92,39 +144,30 @@
       measurementId: "G-WYM78KQWQJ"
     };
 
-    // ================== UI ==================
+    // ================== UTIL ==================
     const $ = (id) => document.getElementById(id);
     const setStatus = (t) => { $("status").textContent = t; };
 
-    function escapeHtml(s=""){
+    function escapeHtml(s = "") {
       return String(s ?? "").replace(/[&<>"']/g, c => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
       }[c]));
     }
-    function safeHost(url){ try { return new URL(url).hostname; } catch { return ""; } }
-    function fmtDate(d){
+
+    function safeHost(url) {
+      try { return new URL(url).hostname; } catch { return ""; }
+    }
+
+    function fmtDate(d) {
       if (!d) return "";
       const dt = new Date(d);
       if (Number.isNaN(dt.getTime())) return String(d);
       return dt.toLocaleString("it-IT");
     }
-    function setAuthedUI(user){
-      if (user){
-        $("userPill").textContent = "Loggato: " + (user.email || "utente");
-        $("loginBtn").style.display = "none";
-        $("logoutBtn").style.display = "inline-block";
-        $("refreshBtn").disabled = false;
-      } else {
-        $("userPill").textContent = "Non autenticato";
-        $("loginBtn").style.display = "inline-block";
-        $("logoutBtn").style.display = "none";
-        $("refreshBtn").disabled = true;
-        $("newsList").innerHTML = "";
-      }
-    }
-    function renderItems(items){
+
+    function renderItems(items) {
       const box = $("newsList");
-      if (!items || !items.length){
+      if (!items || !items.length) {
         box.innerHTML = "";
         setStatus("Nessuna news trovata.");
         return;
@@ -148,88 +191,113 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // FIX 1: persistenza (se fallisce, sembra “non prende il login”)
-    try{
+    // persistenza locale (rimane loggato tra i refresh)
+    try {
       await setPersistence(auth, browserLocalPersistence);
-    }catch(e){
+    } catch (e) {
       console.error("PERSISTENCE ERROR:", e);
-      setStatus("Errore persistenza: " + (e.code || e.message || e));
+      setStatus("Errore persistenza login: " + (e.code || e.message || e));
     }
 
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
-    // FIX 2: completa il redirect (se non va, vedi l’errore qui)
-    try{
+    // ================== GESTIONE RISULTATO REDIRECT ==================
+    // Viene eseguito una sola volta al caricamento pagina
+    try {
       const res = await getRedirectResult(auth);
-      if (res?.user) console.log("REDIRECT OK:", res.user.email);
-    }catch(e){
+      if (res?.user) {
+        // login completato correttamente
+        console.log("REDIRECT OK:", res.user.email);
+        setStatus("Login riuscito. Benvenuto " + (res.user.email || ""));
+      }
+    } catch (e) {
       console.error("REDIRECT ERROR:", e);
       setStatus("Login fallito: " + (e.code || e.message || e));
     }
 
-    // ================== NEWS FETCH ==================
-    async function loadNews(){
-      if (!auth.currentUser){
+    // ================== FUNZIONE CARICAMENTO NEWS ==================
+    async function loadNews() {
+      const user = auth.currentUser;
+      if (!user) {
         $("newsList").innerHTML = "";
         setStatus("Effettua il login per caricare le news.");
         return;
       }
+
       setStatus("Caricamento news...");
       $("refreshBtn").disabled = true;
 
-      try{
-        const r = await fetch(BACKEND_NEWS, { method: "GET", cache: "no-store" });
-        if (!r.ok){
-          const txt = await r.text().catch(()=> "");
+      try {
+        const r = await fetch(BACKEND_NEWS, {
+          method: "GET",
+          cache: "no-store"
+        });
+        if (!r.ok) {
+          const txt = await r.text().catch(() => "");
           throw new Error("HTTP " + r.status + (txt ? " - " + txt : ""));
         }
         const data = await r.json();
         renderItems(data.items || []);
-      }catch(err){
-        console.error("NEWS ERROR:", err);
-        setStatus("Errore news: " + (err?.message || err));
-      }finally{
+      } catch (err) {
+        console.error(err);
+        setStatus("Errore caricamento news: " + (err?.message || err));
+      } finally {
         $("refreshBtn").disabled = !auth.currentUser;
       }
     }
 
-    // ================== EVENTI ==================
+    // ================== EVENTI UI ==================
     $("loginBtn").addEventListener("click", async () => {
-      try{
+      try {
         setStatus("Apro login Google...");
         await signInWithRedirect(auth, provider);
-      }catch(e){
+        // da qui il controllo passa a Google, poi si ritorna e getRedirectResult gestisce l'esito
+      } catch (e) {
         console.error("LOGIN ERROR:", e);
         setStatus("Login fallito: " + (e.code || e.message || e));
       }
     });
 
     $("logoutBtn").addEventListener("click", async () => {
-      try{
+      try {
         await signOut(auth);
-        setAuthedUI(null);
+        $("newsList").innerHTML = "";
         setStatus("Logout effettuato.");
-      }catch(e){
+      } catch (e) {
         console.error("LOGOUT ERROR:", e);
         setStatus("Logout fallito: " + (e.code || e.message || e));
       }
     });
 
-    $("refreshBtn").addEventListener("click", loadNews);
+    $("refreshBtn").addEventListener("click", () => loadNews());
 
-    $("fiatBtn").addEventListener("click", () => window.open(BRAND_LINKS.Fiat, "_blank", "noopener"));
-    $("jeepBtn").addEventListener("click", () => window.open(BRAND_LINKS.Jeep, "_blank", "noopener"));
+    $("fiatBtn").addEventListener("click", () => {
+      window.open(BRAND_LINKS.Fiat, "_blank", "noopener");
+    });
 
-    // FIX 3: questa è la verità su login/logout
+    $("jeepBtn").addEventListener("click", () => {
+      window.open(BRAND_LINKS.Jeep, "_blank", "noopener");
+    });
+
+    // ================== STATO AUTH ==================
     onAuthStateChanged(auth, (user) => {
       console.log("AUTH STATE:", user ? user.email : "NO USER");
-      setAuthedUI(user);
-
-      if (user){
-        setStatus("Login ok. Carico le news...");
+      if (user) {
+        $("userPill").textContent = "Loggato: " + (user.email || "utente");
+        $("userPill").classList.remove("muted");
+        $("loginBtn").style.display = "none";
+        $("logoutBtn").style.display = "inline-block";
+        $("refreshBtn").disabled = false;
+        // carica news automaticamente dopo login
         loadNews();
       } else {
+        $("userPill").textContent = "Non autenticato";
+        $("userPill").classList.add("muted");
+        $("loginBtn").style.display = "inline-block";
+        $("logoutBtn").style.display = "none";
+        $("refreshBtn").disabled = true;
+        $("newsList").innerHTML = "";
         setStatus("Effettua il login per caricare le news.");
       }
     });
