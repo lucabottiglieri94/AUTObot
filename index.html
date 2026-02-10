@@ -579,9 +579,13 @@
       <!-- Messaggio di benvenuto -->
       <div class="message ai">
         <div class="messageBubble">
-          👋 Ciao! Sono l'assistente AI di AI BOTT Automotive. 
-          Posso aiutarti a trovare informazioni su Fiat, Jeep, Alfa Romeo e Lancia. 
-          Cosa vorresti sapere?
+          👋 Ciao! Sono l'assistente AI di AI BOTT Automotive.<br><br>
+          🔍 Posso cercare informazioni aggiornate su:<br>
+          • Listini e prezzi (Quattroruote.it)<br>
+          • Configuratori ufficiali (Fiat, Jeep, Alfa, Lancia)<br>
+          • Recensioni e prove su strada<br>
+          • Caratteristiche tecniche e consumi<br><br>
+          Cosa vorresti sapere? 🚗
         </div>
       </div>
     </div>
@@ -850,9 +854,13 @@
       chatMessages.innerHTML = `
         <div class="message ai">
           <div class="messageBubble">
-            👋 Ciao! Sono l'assistente AI di AI BOTT Automotive. 
-            Posso aiutarti a trovare informazioni su Fiat, Jeep, Alfa Romeo e Lancia. 
-            Cosa vorresti sapere?
+            👋 Ciao! Sono l'assistente AI di AI BOTT Automotive.<br><br>
+            🔍 Posso cercare informazioni aggiornate su:<br>
+            • Listini e prezzi (Quattroruote.it)<br>
+            • Configuratori ufficiali (Fiat, Jeep, Alfa, Lancia)<br>
+            • Recensioni e prove su strada<br>
+            • Caratteristiche tecniche e consumi<br><br>
+            Cosa vorresti sapere? 🚗
           </div>
         </div>
       `;
@@ -913,24 +921,54 @@
         'prezzo', 'costo', 'quanto costa', 'configurazione', 'allestimento',
         'modello', 'versione', 'motore', 'cavalli', 'consumi', 'autonomia',
         'dimensioni', 'colori', 'optional', 'equipaggiamento', 'disponibilità',
-        'caratteristiche', 'scheda tecnica', 'prestazioni', 'km/l'
+        'caratteristiche', 'scheda tecnica', 'prestazioni', 'km/l',
+        'listino', 'novità', 'recensione', 'confronto', 'opinioni',
+        'prova', 'test', 'foto', 'video', 'quando esce', 'uscita',
+        'ibrida', 'elettrica', 'diesel', 'benzina', 'gpl', 'metano',
+        'trazione', 'cambio', 'automatico', 'manuale', 'accelerazione',
+        'velocità', 'massa', 'peso', 'bagagliaio', 'portabagagli',
+        'sicurezza', 'airbag', 'adas', 'assistenza', 'garanzia'
       ];
       const lowerText = text.toLowerCase();
       return carKeywords.some(keyword => lowerText.includes(keyword));
     }
 
-    // Search using Brave API
+    // Search using Brave API - Multiple sources
     async function searchCarInfo(query) {
       try {
-        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(query)}`);
+        // Priorità ai siti ufficiali e Quattroruote
+        const prioritySites = [
+          'site:quattroruote.it/listino',
+          'site:fiat.it',
+          'site:jeep-official.it',
+          'site:alfaromeo.it',
+          'site:lancia.it',
+          'site:autoblog.it',
+          'site:motorbox.com',
+          'site:autoappassionati.it'
+        ];
+
+        // Prima ricerca: siti prioritari
+        const enhancedQuery = `${query} ${prioritySites.slice(0, 5).join(' OR ')}`;
+        
+        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(enhancedQuery)}`);
         if (!response.ok) throw new Error("Errore nella ricerca");
         
         const data = await response.json();
         
         if (data.results && data.results.length > 0) {
-          return data.results.map(r => 
-            `${r.title}\n${r.description}\nLink: ${r.url}`
-          ).join('\n\n');
+          // Filtra e dai priorità a Quattroruote
+          const sortedResults = data.results.sort((a, b) => {
+            const aIsQuattroruote = a.url.includes('quattroruote.it');
+            const bIsQuattroruote = b.url.includes('quattroruote.it');
+            if (aIsQuattroruote && !bIsQuattroruote) return -1;
+            if (!aIsQuattroruote && bIsQuattroruote) return 1;
+            return 0;
+          });
+
+          return sortedResults.map(r => 
+            `📌 ${r.title}\n${r.description}\n🔗 Fonte: ${r.url}`
+          ).join('\n\n---\n\n');
         }
         return null;
       } catch (err) {
