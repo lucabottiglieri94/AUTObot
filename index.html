@@ -65,17 +65,18 @@
       gap:10px;
       user-select:none;
     }
-  .brandLogo{
-  width:4cm;
-  height:4cm;
-  object-fit:contain;
-  background:transparent;
-  border:none;
-  outline:none;
-  filter:none;
-  mix-blend-mode: screen;
-}
+    .brandLogo{
+      width:4cm;
+      height:4cm;
+      object-fit:contain;
+      background:transparent;
+      border:none;
+      outline:none;
+      filter:none;
+      mix-blend-mode: screen;
+    }
 
+    .brandName{
       font-weight:950;
       letter-spacing:.2px;
       font-size:18px;
@@ -201,10 +202,263 @@
       background:rgba(0,0,0,.12);
     }
 
+    /* ========== CHATBOT STYLES ========== */
+    
+    /* Pulsante AI Agent (bottom-right) */
+    .chatTrigger{
+      position:fixed;
+      bottom:24px;
+      right:24px;
+      width:70px;
+      height:70px;
+      border-radius:50%;
+      background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      border:3px solid rgba(59,130,246,.4);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 8px 24px rgba(59,130,246,.35);
+      transition:all .3s ease;
+      z-index:1000;
+    }
+    .chatTrigger:hover{
+      transform:scale(1.1) rotate(5deg);
+      box-shadow:0 12px 32px rgba(59,130,246,.5);
+    }
+    .chatTrigger img{
+      width:50px;
+      height:50px;
+      object-fit:contain;
+      filter:brightness(1.1);
+    }
+
+    /* Chat Box Container */
+    .chatBox{
+      position:fixed;
+      bottom:24px;
+      right:24px;
+      width:420px;
+      max-width:calc(100vw - 32px);
+      height:600px;
+      max-height:calc(100vh - 48px);
+      background:rgba(17,24,39,.95);
+      border:1px solid var(--line);
+      border-radius:20px;
+      display:none;
+      flex-direction:column;
+      box-shadow:0 20px 60px rgba(0,0,0,.6);
+      z-index:1001;
+      overflow:hidden;
+      backdrop-filter:blur(20px);
+    }
+    .chatBox.open{display:flex}
+    .chatBox.minimized{
+      height:60px;
+      overflow:hidden;
+    }
+
+    /* Chat Header */
+    .chatHeader{
+      background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.15);
+    }
+    .chatHeaderLeft{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .chatHeaderLogo{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      background:rgba(255,255,255,.15);
+      padding:4px;
+    }
+    .chatHeaderTitle{
+      font-weight:700;
+      font-size:16px;
+      color:#fff;
+    }
+    .chatHeaderSub{
+      font-size:11px;
+      color:rgba(255,255,255,.75);
+      margin-top:2px;
+    }
+    .chatHeaderBtns{
+      display:flex;
+      gap:8px;
+    }
+    .chatHeaderBtn{
+      width:32px;
+      height:32px;
+      border-radius:8px;
+      background:rgba(255,255,255,.15);
+      border:none;
+      color:#fff;
+      cursor:pointer;
+      font-size:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all .2s;
+      font-weight:700;
+    }
+    .chatHeaderBtn:hover{
+      background:rgba(255,255,255,.25);
+      transform:scale(1.05);
+    }
+
+    /* Chat Messages Area */
+    .chatMessages{
+      flex:1;
+      overflow-y:auto;
+      padding:16px;
+      background:linear-gradient(180deg, 
+        rgba(26,29,35,.95) 0%, 
+        rgba(16,18,22,.95) 100%);
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .chatMessages::-webkit-scrollbar{width:8px}
+    .chatMessages::-webkit-scrollbar-thumb{
+      background:rgba(59,130,246,.3);
+      border-radius:999px;
+    }
+    .chatMessages::-webkit-scrollbar-track{background:rgba(0,0,0,.2)}
+
+    /* Message Bubbles */
+    .message{
+      display:flex;
+      gap:8px;
+      animation:slideIn .3s ease;
+    }
+    @keyframes slideIn{
+      from{opacity:0;transform:translateY(10px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    .message.user{
+      flex-direction:row-reverse;
+    }
+    .messageBubble{
+      max-width:75%;
+      padding:12px 16px;
+      border-radius:18px;
+      font-size:14px;
+      line-height:1.5;
+      word-wrap:break-word;
+    }
+    .message.ai .messageBubble{
+      background:linear-gradient(135deg, rgba(59,130,246,.85) 0%, rgba(96,165,250,.85) 100%);
+      color:#fff;
+      border-bottom-left-radius:4px;
+    }
+    .message.user .messageBubble{
+      background:rgba(255,255,255,.92);
+      color:#1a1d23;
+      border-bottom-right-radius:4px;
+    }
+
+    /* Typing Indicator */
+    .typingIndicator{
+      display:flex;
+      gap:8px;
+      padding:12px 16px;
+      background:linear-gradient(135deg, rgba(59,130,246,.85) 0%, rgba(96,165,250,.85) 100%);
+      border-radius:18px;
+      border-bottom-left-radius:4px;
+      max-width:75%;
+    }
+    .typingDot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:rgba(255,255,255,.9);
+      animation:bounce 1.4s infinite ease-in-out;
+    }
+    .typingDot:nth-child(1){animation-delay:0s}
+    .typingDot:nth-child(2){animation-delay:.2s}
+    .typingDot:nth-child(3){animation-delay:.4s}
+    @keyframes bounce{
+      0%,80%,100%{transform:scale(0)}
+      40%{transform:scale(1)}
+    }
+
+    /* Chat Input */
+    .chatInput{
+      padding:16px;
+      background:rgba(10,12,18,.95);
+      border-top:1px solid var(--line);
+      display:flex;
+      gap:10px;
+    }
+    .chatInputField{
+      flex:1;
+      background:rgba(31,41,55,.6);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 16px;
+      color:var(--text);
+      font-size:14px;
+      outline:none;
+      transition:all .2s;
+      font-family:inherit;
+    }
+    .chatInputField:focus{
+      border-color:var(--accent);
+      background:rgba(31,41,55,.8);
+    }
+    .chatInputField::placeholder{
+      color:var(--muted);
+    }
+    .chatSendBtn{
+      width:48px;
+      height:48px;
+      border-radius:12px;
+      background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      border:none;
+      color:#fff;
+      cursor:pointer;
+      font-size:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all .2s;
+    }
+    .chatSendBtn:hover:not(:disabled){
+      transform:scale(1.05);
+      box-shadow:0 4px 16px rgba(59,130,246,.4);
+    }
+    .chatSendBtn:disabled{
+      opacity:.5;
+      cursor:not-allowed;
+    }
+
     @media (max-width: 980px){
       .layout{grid-template-columns:1fr}
       .newsScroll{max-height: 60vh}
       .brand{min-width: unset}
+      .chatBox{
+        width:100%;
+        max-width:100%;
+        height:100vh;
+        max-height:100vh;
+        bottom:0;
+        right:0;
+        border-radius:0;
+      }
+      .chatTrigger{
+        bottom:16px;
+        right:16px;
+        width:60px;
+        height:60px;
+      }
     }
 
     @media (max-width: 768px){
@@ -267,14 +521,69 @@
 
       <!-- CONTENUTI A DESTRA -->
       <section class="rightSpace">
-        <div style="font-weight:950;font-size:18px">Area contenuti</div>
+        <div style="font-weight:950;font-size:18px">🚗 AI BOTT Assistant</div>
         <div class="muted" style="margin-top:8px;line-height:1.45">
-          Qui puoi mettere descrizione, KPI, link rapidi, o una mini chat AI.
-          Le news restano a sinistra, in riquadro scrollabile.
+          Clicca sul pulsante AI in basso a destra per chattare con l'assistente virtuale!<br>
+          Chiedi informazioni su modelli, configurazioni, prezzi e caratteristiche delle auto.
         </div>
       </section>
     </div>
   </main>
+
+  <!-- ========== CHATBOT UI ========== -->
+  
+  <!-- Pulsante trigger -->
+  <div class="chatTrigger" id="chatTrigger">
+    <img 
+      src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" 
+      alt="AI Agent"
+    />
+  </div>
+
+  <!-- Chat Box -->
+  <div class="chatBox" id="chatBox">
+    <div class="chatHeader">
+      <div class="chatHeaderLeft">
+        <img 
+          class="chatHeaderLogo" 
+          src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" 
+          alt="AI"
+        />
+        <div>
+          <div class="chatHeaderTitle">AI BOTT Assistant</div>
+          <div class="chatHeaderSub">Sempre pronto ad aiutarti</div>
+        </div>
+      </div>
+      <div class="chatHeaderBtns">
+        <button class="chatHeaderBtn" id="minimizeBtn" title="Minimizza">−</button>
+        <button class="chatHeaderBtn" id="closeBtn" title="Chiudi e cancella">×</button>
+      </div>
+    </div>
+
+    <div class="chatMessages" id="chatMessages">
+      <!-- Messaggio di benvenuto -->
+      <div class="message ai">
+        <div class="messageBubble">
+          👋 Ciao! Sono l'assistente AI di AI BOTT Automotive. 
+          Posso aiutarti a trovare informazioni su Fiat, Jeep, Alfa Romeo e Lancia. 
+          Cosa vorresti sapere?
+        </div>
+      </div>
+    </div>
+
+    <div class="chatInput">
+      <input 
+        type="text" 
+        class="chatInputField" 
+        id="chatInputField" 
+        placeholder="Scrivi la tua domanda..."
+        autocomplete="off"
+      />
+      <button class="chatSendBtn" id="chatSendBtn">
+        ➤
+      </button>
+    </div>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -292,6 +601,8 @@
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
     const BACKEND_NEWS = "/api/news";
+    const BACKEND_CHAT = "https://auto-backend-three.vercel.app/api/chat";
+    const BACKEND_SEARCH = "https://auto-backend-three.vercel.app/api/search";
 
     const BRAND_LINKS = {
       Fiat: "https://www.fiat.it/omni/configuratore/#/",
@@ -349,7 +660,7 @@
         return `
           <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">
             <div class="newsTitle">${escapeHtml(title)}</div>
-            ${host ? `<div class="newsMeta">📍 ${escapeHtml(host)}</div>` : ""}
+            ${host ? `<div class="newsMeta">🔗 ${escapeHtml(host)}</div>` : ""}
             ${date ? `<div class="newsDate">🕐 ${escapeHtml(date)}</div>` : ""}
           </a>
         `;
@@ -481,6 +792,197 @@
 
         $("newsList").innerHTML = "";
         setStatus("🔒 Effettua il login per caricare le news.");
+      }
+    });
+
+    // ========== CHATBOT LOGIC ==========
+    
+    let chatHistory = [];
+    let isMinimized = false;
+
+    const chatTrigger = $("chatTrigger");
+    const chatBox = $("chatBox");
+    const chatMessages = $("chatMessages");
+    const chatInputField = $("chatInputField");
+    const chatSendBtn = $("chatSendBtn");
+    const minimizeBtn = $("minimizeBtn");
+    const closeBtn = $("closeBtn");
+
+    // Toggle chat
+    chatTrigger.addEventListener("click", () => {
+      chatBox.classList.add("open");
+      chatBox.classList.remove("minimized");
+      chatTrigger.style.display = "none";
+      chatInputField.focus();
+    });
+
+    // Minimize
+    minimizeBtn.addEventListener("click", () => {
+      chatBox.classList.add("minimized");
+      isMinimized = true;
+    });
+
+    // Close & clear
+    closeBtn.addEventListener("click", () => {
+      chatBox.classList.remove("open");
+      chatBox.classList.remove("minimized");
+      chatTrigger.style.display = "flex";
+      
+      // Clear chat history
+      chatHistory = [];
+      chatMessages.innerHTML = `
+        <div class="message ai">
+          <div class="messageBubble">
+            👋 Ciao! Sono l'assistente AI di AI BOTT Automotive. 
+            Posso aiutarti a trovare informazioni su Fiat, Jeep, Alfa Romeo e Lancia. 
+            Cosa vorresti sapere?
+          </div>
+        </div>
+      `;
+    });
+
+    // Se minimizzata, click sull'header per riaprire
+    chatBox.querySelector(".chatHeader").addEventListener("click", (e) => {
+      if (isMinimized && !e.target.closest("button")) {
+        chatBox.classList.remove("minimized");
+        isMinimized = false;
+      }
+    });
+
+    // Add message to UI
+    function addMessage(text, sender) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}`;
+      messageDiv.innerHTML = `
+        <div class="messageBubble">${escapeHtml(text)}</div>
+      `;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Add typing indicator
+    function showTyping() {
+      const typingDiv = document.createElement("div");
+      typingDiv.className = "message ai";
+      typingDiv.id = "typingIndicator";
+      typingDiv.innerHTML = `
+        <div class="typingIndicator">
+          <div class="typingDot"></div>
+          <div class="typingDot"></div>
+          <div class="typingDot"></div>
+        </div>
+      `;
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideTyping() {
+      const typing = $("typingIndicator");
+      if (typing) typing.remove();
+    }
+
+    // Check if question is about cars (needs search)
+    function needsSearch(text) {
+      const carKeywords = [
+        'prezzo', 'costo', 'quanto costa', 'configurazione', 'allestimento',
+        'modello', 'versione', 'motore', 'cavalli', 'consumi', 'autonomia',
+        'dimensioni', 'colori', 'optional', 'equipaggiamento', 'disponibilità',
+        'caratteristiche', 'scheda tecnica', 'prestazioni', 'km/l'
+      ];
+      const lowerText = text.toLowerCase();
+      return carKeywords.some(keyword => lowerText.includes(keyword));
+    }
+
+    // Search using Brave API
+    async function searchCarInfo(query) {
+      try {
+        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error("Errore nella ricerca");
+        
+        const data = await response.json();
+        
+        if (data.results && data.results.length > 0) {
+          return data.results.map(r => 
+            `${r.title}\n${r.description}\nLink: ${r.url}`
+          ).join('\n\n');
+        }
+        return null;
+      } catch (err) {
+        console.error("Search error:", err);
+        return null;
+      }
+    }
+
+    // Send message to AI
+    async function sendMessage() {
+      const userMessage = chatInputField.value.trim();
+      if (!userMessage) return;
+
+      // Add user message to UI
+      addMessage(userMessage, "user");
+      chatInputField.value = "";
+      chatSendBtn.disabled = true;
+
+      // Add to history
+      chatHistory.push({ role: "user", content: userMessage });
+
+      // Show typing
+      showTyping();
+
+      try {
+        let searchResults = null;
+
+        // Check if we need to search
+        if (needsSearch(userMessage)) {
+          searchResults = await searchCarInfo(userMessage);
+        }
+
+        // Call chat API
+        const response = await fetch(BACKEND_CHAT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            messages: chatHistory,
+            searchResults: searchResults
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Errore ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        hideTyping();
+
+        const aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho capito.";
+        
+        // Add AI response to UI
+        addMessage(aiMessage, "ai");
+
+        // Add to history
+        chatHistory.push({ role: "assistant", content: aiMessage });
+
+      } catch (error) {
+        hideTyping();
+        console.error("Chat error:", error);
+        addMessage("❌ Si è verificato un errore. Riprova tra poco.", "ai");
+      } finally {
+        chatSendBtn.disabled = false;
+        chatInputField.focus();
+      }
+    }
+
+    // Send on button click
+    chatSendBtn.addEventListener("click", sendMessage);
+
+    // Send on Enter
+    chatInputField.addEventListener("keypress", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
       }
     });
   </script>
