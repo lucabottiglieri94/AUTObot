@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Auto News - Debug</title>
+  <title>Auto News</title>
   <style>
     :root{
       --bg:#0b0f1a;
@@ -86,32 +86,6 @@
     .newsTitle{font-weight:800;margin-bottom:8px}
     .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
     .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
-    
-    /* DEBUG PANEL */
-    #debugPanel{
-      position:fixed;
-      bottom:20px;
-      right:20px;
-      max-width:400px;
-      max-height:300px;
-      overflow-y:auto;
-      background:rgba(17,24,39,.95);
-      border:1px solid var(--accent);
-      border-radius:12px;
-      padding:12px;
-      font-size:11px;
-      font-family:monospace;
-      z-index:1000;
-    }
-    .debug-log{
-      margin:4px 0;
-      padding:4px;
-      border-left:2px solid #666;
-      padding-left:8px;
-    }
-    .debug-error{border-left-color:#ef4444;color:#fca5a5}
-    .debug-success{border-left-color:#22c55e;color:#86efac}
-    .debug-info{border-left-color:#3b82f6;color:#93c5fd}
   </style>
 </head>
 
@@ -135,12 +109,6 @@
   </header>
 
   <main class="wrap">
-    <!-- PANNELLO DEBUG -->
-    <div id="debugPanel">
-      <div style="font-weight:800;margin-bottom:8px;color:#3b82f6">🔍 Debug Log</div>
-      <div id="debugLog"></div>
-    </div>
-
     <section class="card">
       <div class="row">
         <div>
@@ -155,12 +123,6 @@
       </div>
       <div id="newsList"></div>
     </section>
-
-    <!-- INFO SISTEMA -->
-    <section class="card" style="margin-top:16px">
-      <div style="font-weight:800;margin-bottom:8px">🔧 Diagnostica Sistema</div>
-      <div id="systemInfo" style="font-size:12px;color:var(--muted)"></div>
-    </section>
   </main>
 
   <script type="module">
@@ -169,72 +131,14 @@
       getAuth,
       setPersistence,
       browserLocalPersistence,
+      browserSessionPersistence,
       GoogleAuthProvider,
+      signInWithPopup,
       signInWithRedirect,
       getRedirectResult,
       signOut,
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
-    // ================== DEBUG LOGGER ==================
-    const debugLog = [];
-    function log(msg, type = 'info') {
-      const timestamp = new Date().toLocaleTimeString('it-IT');
-      const entry = { msg, type, timestamp };
-      debugLog.push(entry);
-      
-      const logDiv = document.getElementById('debugLog');
-      const el = document.createElement('div');
-      el.className = `debug-log debug-${type}`;
-      el.textContent = `[${timestamp}] ${msg}`;
-      logDiv.appendChild(el);
-      logDiv.scrollTop = logDiv.scrollHeight;
-      
-      // Log anche nella console
-      const emoji = { error: '❌', success: '✅', info: '📘' }[type] || '📝';
-      console.log(`${emoji} [${timestamp}] ${msg}`);
-    }
-
-    // ================== SYSTEM INFO ==================
-    function checkSystemInfo() {
-      const info = [];
-      
-      // Check localStorage
-      try {
-        localStorage.setItem('test', 'test');
-        localStorage.removeItem('test');
-        info.push('✅ localStorage: Funzionante');
-        log('localStorage disponibile', 'success');
-      } catch(e) {
-        info.push('❌ localStorage: BLOCCATO - ' + e.message);
-        log('localStorage BLOCCATO: ' + e.message, 'error');
-      }
-      
-      // Check sessionStorage
-      try {
-        sessionStorage.setItem('test', 'test');
-        sessionStorage.removeItem('test');
-        info.push('✅ sessionStorage: Funzionante');
-        log('sessionStorage disponibile', 'success');
-      } catch(e) {
-        info.push('❌ sessionStorage: BLOCCATO');
-        log('sessionStorage BLOCCATO: ' + e.message, 'error');
-      }
-      
-      // Check cookies
-      const cookiesEnabled = navigator.cookieEnabled;
-      info.push(cookiesEnabled ? '✅ Cookies: Abilitati' : '❌ Cookies: DISABILITATI');
-      log(`Cookies: ${cookiesEnabled ? 'abilitati' : 'DISABILITATI'}`, cookiesEnabled ? 'success' : 'error');
-      
-      // Current URL
-      info.push('🌐 URL: ' + window.location.origin);
-      log('URL corrente: ' + window.location.origin, 'info');
-      
-      // Browser
-      info.push('🖥️ Browser: ' + navigator.userAgent.split(' ').slice(-2).join(' '));
-      
-      document.getElementById('systemInfo').innerHTML = info.join('<br>');
-    }
 
     // ================== CONFIGURAZIONE ==================
     const BACKEND_NEWS = "/api/news";
@@ -286,7 +190,6 @@
       if (!items || !items.length) {
         box.innerHTML = '<div class="muted" style="padding:20px;text-align:center">Nessuna news disponibile.</div>';
         setStatus("Nessuna news trovata.");
-        log('Nessuna news da visualizzare', 'info');
         return;
       }
       
@@ -306,58 +209,85 @@
       }).join("");
       
       setStatus(`✅ ${items.length} news caricate - ${new Date().toLocaleString("it-IT")}`);
-      log(`${items.length} news visualizzate`, 'success');
     }
 
     // ================== FIREBASE INITIALIZATION ==================
-    log('Inizializzazione Firebase...', 'info');
-    log('AuthDomain: ' + firebaseConfig.authDomain, 'info');
-    
+    console.log("🔥 Inizializzazione Firebase...");
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    
+    // Provider Google
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account" });
+    provider.setCustomParameters({ 
+      prompt: "select_account",
+      // Forza il popup su alcuni browser
+      display: 'popup'
+    });
 
-    log('Firebase inizializzato', 'success');
+    // Variabile per tracciare se stiamo usando popup o redirect
+    let usePopup = false;
 
     // ================== SETUP ASYNC ==================
     (async function initApp() {
-      // Check sistema
-      checkSystemInfo();
+      console.log("📱 URL corrente:", window.location.href);
       
+      // Test storage disponibilità
+      try {
+        localStorage.setItem('__test', 'test');
+        localStorage.removeItem('__test');
+        console.log("✅ localStorage disponibile");
+      } catch(e) {
+        console.error("❌ localStorage NON disponibile:", e);
+        alert("⚠️ Il browser sta bloccando localStorage. Controlla le impostazioni dei cookie/privacy.");
+      }
+
       // Imposta persistenza
-      log('Impostazione persistenza...', 'info');
       try {
         await setPersistence(auth, browserLocalPersistence);
-        log('Persistenza configurata: browserLocalPersistence', 'success');
+        console.log("✅ Persistenza configurata: LOCAL");
       } catch (e) {
-        log('ERRORE persistenza: ' + (e.code || e.message), 'error');
-        setStatus("⚠️ Errore configurazione: " + (e.code || e.message));
+        console.error("⚠️ Errore persistenza LOCAL, provo SESSION:", e);
+        try {
+          await setPersistence(auth, browserSessionPersistence);
+          console.log("✅ Persistenza configurata: SESSION");
+        } catch (e2) {
+          console.error("❌ Errore persistenza:", e2);
+          setStatus("⚠️ Login potrebbe non persistere: " + (e2.code || e2.message));
+        }
       }
 
       // Gestisci risultato redirect
-      log('Controllo redirect result...', 'info');
       try {
+        console.log("🔍 Controllo redirect result...");
         const result = await getRedirectResult(auth);
         if (result?.user) {
-          log('Login da redirect: ' + result.user.email, 'success');
-          log('User UID: ' + result.user.uid, 'info');
+          console.log("✅ Login completato da redirect:", result.user.email);
+          console.log("User UID:", result.user.uid);
           setStatus("✅ Login riuscito! Benvenuto " + result.user.email);
         } else {
-          log('Nessun redirect result', 'info');
+          console.log("ℹ️ Nessun redirect result (normale se non hai appena fatto login)");
         }
       } catch (e) {
-        log('ERRORE redirect: ' + (e.code || e.message), 'error');
+        console.error("❌ Errore redirect:", e);
+        console.error("Codice errore:", e.code);
+        console.error("Messaggio:", e.message);
         setStatus("❌ Errore login: " + (e.code || e.message));
+        
+        // Se errore è legato al redirect, prova con popup la prossima volta
+        if (e.code === 'auth/unauthorized-domain' || 
+            e.code === 'auth/operation-not-allowed' ||
+            e.code === 'auth/cancelled-popup-request') {
+          console.log("⚠️ Errore redirect, userò popup al prossimo tentativo");
+          usePopup = true;
+        }
       }
-      
-      // Check stato iniziale
-      log('Controllo stato autenticazione iniziale...', 'info');
+
+      // Controlla stato iniziale
       const currentUser = auth.currentUser;
       if (currentUser) {
-        log('Utente già loggato: ' + currentUser.email, 'success');
+        console.log("✅ Utente già autenticato:", currentUser.email);
       } else {
-        log('Nessun utente loggato', 'info');
+        console.log("ℹ️ Nessun utente autenticato");
       }
     })();
 
@@ -367,23 +297,21 @@
       if (!user) {
         $("newsList").innerHTML = "";
         setStatus("🔒 Effettua il login per vedere le news.");
-        log('Tentativo caricamento news senza autenticazione', 'error');
         return;
       }
 
-      log('Caricamento news per utente: ' + user.email, 'info');
+      console.log("📡 Caricamento news per:", user.email);
       setStatus("⏳ Caricamento news...");
       $("refreshBtn").disabled = true;
 
       try {
-        log('Fetch a: ' + BACKEND_NEWS, 'info');
         const response = await fetch(BACKEND_NEWS, {
           method: "GET",
           headers: { 'Cache-Control': 'no-cache' },
           cache: "no-store"
         });
 
-        log('Response status: ' + response.status, response.ok ? 'success' : 'error');
+        console.log("📡 Response status:", response.status);
 
         if (!response.ok) {
           const errorText = await response.text().catch(() => "");
@@ -391,20 +319,18 @@
         }
 
         const data = await response.json();
-        log('Dati ricevuti: ' + JSON.stringify(data).substring(0, 100) + '...', 'info');
+        console.log("✅ Dati ricevuti:", data);
         
         if (data.items && Array.isArray(data.items)) {
-          log('Trovati ' + data.items.length + ' items', 'success');
           renderItems(data.items);
         } else if (Array.isArray(data)) {
-          log('Trovati ' + data.length + ' items (array diretto)', 'success');
           renderItems(data);
         } else {
           throw new Error("Formato dati non valido");
         }
       } catch (err) {
-        log('ERRORE caricamento: ' + (err?.message || err), 'error');
-        $("newsList").innerHTML = '<div class="muted" style="padding:20px;text-align:center">❌ Errore caricamento</div>';
+        console.error("❌ Errore caricamento news:", err);
+        $("newsList").innerHTML = '<div class="muted" style="padding:20px;text-align:center">❌ Errore caricamento news</div>';
         setStatus("❌ Errore: " + (err?.message || err));
       } finally {
         $("refreshBtn").disabled = !auth.currentUser;
@@ -413,34 +339,65 @@
 
     // ================== EVENT LISTENERS ==================
     $("loginBtn").addEventListener("click", async () => {
-      log('Click su login button', 'info');
+      console.log("🔐 Tentativo login...");
+      
       try {
-        setStatus("🔐 Reindirizzamento a Google...");
-        log('Avvio signInWithRedirect...', 'info');
-        await signInWithRedirect(auth, provider);
-        log('Redirect avviato (la pagina verrà ricaricata)', 'info');
+        setStatus("🔐 Apertura login Google...");
+        
+        // PROVA PRIMA CON POPUP (più affidabile su alcuni browser)
+        try {
+          console.log("🪟 Tentativo con POPUP...");
+          const result = await signInWithPopup(auth, provider);
+          console.log("✅ Login popup riuscito:", result.user.email);
+          setStatus("✅ Login riuscito! Benvenuto " + result.user.email);
+        } catch (popupError) {
+          console.warn("⚠️ Popup fallito:", popupError.code);
+          
+          // Se il popup è bloccato o fallisce, usa redirect
+          if (popupError.code === 'auth/popup-blocked' || 
+              popupError.code === 'auth/popup-closed-by-user' ||
+              popupError.code === 'auth/cancelled-popup-request') {
+            console.log("🔄 Fallback a REDIRECT...");
+            setStatus("🔄 Reindirizzamento in corso...");
+            await signInWithRedirect(auth, provider);
+          } else {
+            throw popupError;
+          }
+        }
       } catch (e) {
-        log('ERRORE login: ' + (e.code || e.message), 'error');
-        setStatus("❌ Errore: " + (e.code || e.message));
+        console.error("❌ Errore login:", e);
+        console.error("Codice:", e.code);
+        console.error("Messaggio:", e.message);
+        
+        let errorMsg = "Errore sconosciuto";
+        if (e.code === 'auth/unauthorized-domain') {
+          errorMsg = "Dominio non autorizzato in Firebase Console";
+        } else if (e.code === 'auth/popup-blocked') {
+          errorMsg = "Popup bloccato dal browser";
+        } else {
+          errorMsg = e.code || e.message;
+        }
+        
+        setStatus("❌ " + errorMsg);
       }
     });
 
     $("logoutBtn").addEventListener("click", async () => {
-      log('Click su logout button', 'info');
+      console.log("👋 Logout...");
       try {
         const email = auth.currentUser?.email;
         await signOut(auth);
-        log('Logout completato per: ' + email, 'success');
+        console.log("✅ Logout completato:", email);
         $("newsList").innerHTML = "";
         setStatus("👋 Logout effettuato.");
       } catch (e) {
-        log('ERRORE logout: ' + (e.code || e.message), 'error');
+        console.error("❌ Errore logout:", e);
         setStatus("❌ Errore logout: " + (e.code || e.message));
       }
     });
 
     $("refreshBtn").addEventListener("click", () => {
-      log('Click su refresh', 'info');
+      console.log("🔄 Refresh manuale");
       loadNews();
     });
 
@@ -454,12 +411,13 @@
 
     // ================== GESTIONE STATO AUTENTICAZIONE ==================
     onAuthStateChanged(auth, (user) => {
-      log('🔔 onAuthStateChanged triggered', 'info');
+      console.log("🔔 Auth state changed:", user ? user.email : "NO USER");
       
       if (user) {
-        log('UTENTE LOGGATO: ' + user.email, 'success');
-        log('UID: ' + user.uid, 'info');
-        log('Provider: ' + (user.providerData[0]?.providerId || 'unknown'), 'info');
+        console.log("✅ UTENTE AUTENTICATO");
+        console.log("   Email:", user.email);
+        console.log("   UID:", user.uid);
+        console.log("   Provider:", user.providerData[0]?.providerId);
         
         $("userPill").textContent = "✅ " + (user.email || "Utente");
         $("userPill").classList.remove("muted");
@@ -470,10 +428,9 @@
         $("logoutBtn").style.display = "inline-block";
         $("refreshBtn").disabled = false;
         
-        log('Caricamento automatico news...', 'info');
         loadNews();
       } else {
-        log('NESSUN UTENTE LOGGATO', 'info');
+        console.log("ℹ️ Nessun utente autenticato");
         
         $("userPill").textContent = "🔒 Non autenticato";
         $("userPill").classList.add("muted");
@@ -488,7 +445,7 @@
       }
     });
 
-    log('✅ App inizializzata - in attesa di azioni utente', 'success');
+    console.log("✅ App inizializzata");
   </script>
 </body>
 </html>
