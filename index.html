@@ -3,260 +3,460 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI BOTT - Auto News</title>
+  <title>AI BOT Automotive</title>
 
   <style>
     :root{
-      --bg:#0b0f1a; --panel:#111827; --line:#1f2937;
-      --text:#e5e7eb; --muted:#9ca3af; --accent:#3b82f6;
-      --danger:#ef4444;
+      --bgTop:#0b0b0f;
+      --bgMid:#111318;
+      --bgBot:#1a1c22;
+
+      --panel: rgba(17,24,39,.78);
+      --line:#1f2937;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#3b82f6;
     }
+
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);min-height:100vh}
+
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:var(--text);
+      min-height:100vh;
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(59,130,246,.18), transparent 55%),
+        radial-gradient(900px 500px at 80% 10%, rgba(34,197,94,.10), transparent 55%),
+        linear-gradient(180deg, var(--bgTop) 0%, var(--bgMid) 45%, var(--bgBot) 100%);
+    }
 
     header{
-      position:sticky; top:0; z-index:10;
-      background:rgba(11,15,26,.9); backdrop-filter:blur(10px);
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:rgba(10,10,12,.75);
+      backdrop-filter:blur(10px);
       border-bottom:1px solid var(--line);
     }
-    .wrap{max-width:1100px;margin:0 auto;padding:16px}
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
-    /* LOGO più grande e leggibile */
-    .logo{
-      display:flex;align-items:baseline;gap:10px;
-      font-size:34px; font-weight:900; letter-spacing:1px;
-      line-height:1;
-    }
-    .logo .tag{
-      font-size:12px; font-weight:700;
-      color:var(--muted); border:1px solid var(--line);
-      padding:4px 8px; border-radius:999px; letter-spacing:.8px;
-    }
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
 
-    .brands{display:flex;gap:10px;flex-wrap:wrap}
-    .brand-btn{
-      display:inline-flex;align-items:center;gap:8px;
-      border:1px solid var(--line);
-      padding:8px 14px;border-radius:999px;
-      color:var(--text); text-decoration:none;
-      background:rgba(17,24,39,.6);
-      transition:.15s;
-    }
-    .brand-btn:hover{border-color:#334155; transform:translateY(-1px)}
-    main{max-width:1100px;margin:0 auto;padding:18px 16px 36px}
-    .panel{
-      border:1px solid var(--line);
-      background:rgba(17,24,39,.55);
-      border-radius:16px;
-      padding:16px;
-    }
-    .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .panel-title{display:flex;align-items:center;gap:10px;font-weight:800}
-    .panel-title .icon{font-size:18px}
-    .actions{display:flex;gap:10px;align-items:center}
-    button{
-      border:1px solid var(--line);
-      background:rgba(17,24,39,.7);
-      color:var(--text);
-      padding:9px 12px;border-radius:10px;
-      cursor:pointer;
-    }
-    button:hover{border-color:#334155}
-    button:disabled{opacity:.55;cursor:not-allowed}
-
-    .status{margin-top:10px;color:var(--muted);font-size:14px}
-
-    .news-grid{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
+    .row{
+      display:flex;
       gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
     }
-    @media (max-width: 920px){ .news-grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
-    @media (max-width: 640px){ .news-grid{grid-template-columns:1fr;} }
 
-    .card{
-      display:block;
+    .brand{
+      font-weight:800;
+      letter-spacing:.2px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      min-width: 280px;
+    }
+
+    .btn{
       border:1px solid var(--line);
-      background:rgba(15,23,42,.55);
-      border-radius:14px;
-      padding:12px;
-      text-decoration:none;
+      background:rgba(17,24,39,.75);
       color:var(--text);
-      min-height:120px;
-      transition:.15s;
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:14px;
+      transition:all .2s;
+      font-weight:600;
     }
-    .card:hover{border-color:#334155; transform:translateY(-1px)}
-    .card .t{font-weight:800;line-height:1.25;margin-bottom:6px}
-    .card .m{color:var(--muted);font-size:13px;line-height:1.35}
-    .meta{margin-top:10px;color:var(--muted);font-size:12px;display:flex;gap:10px;flex-wrap:wrap}
+    .btn:hover{
+      border-color:rgba(59,130,246,.6);
+      background:rgba(17,24,39,.92);
+      transform:translateY(-1px);
+    }
+    .btn.primary{
+      border-color:rgba(59,130,246,.5);
+      background:rgba(37,99,235,.15);
+    }
+    .btn.primary:hover{background:rgba(37,99,235,.25)}
+    .btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
 
-    .err{
-      margin-top:14px;
-      border:1px solid rgba(239,68,68,.4);
-      background:rgba(239,68,68,.08);
-      color:#fecaca;
-      border-radius:14px;
-      padding:12px;
-      display:flex;gap:10px;align-items:flex-start;
+    .btn.brand-fiat:hover{border-color:rgba(220,38,38,.6);background:rgba(220,38,38,.1)}
+    .btn.brand-jeep:hover{border-color:rgba(34,197,94,.6);background:rgba(34,197,94,.1)}
+    .btn.brand-alfa:hover{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)}
+    .btn.brand-lancia:hover{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.1)}
+
+    .pill{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(17,24,39,.35);
+      font-size:12px;
+      white-space:nowrap;
     }
-    .err b{color:#fff}
-    .err .x{color:var(--danger);font-weight:900}
-    code.inline{background:rgba(0,0,0,.25);padding:2px 6px;border-radius:8px;border:1px solid var(--line)}
+    .muted{color:var(--muted)}
+
+    /* LOGO IN ALTO A DESTRA */
+    .logoTopRight{
+      width:56px;
+      height:56px;
+      object-fit:contain;
+      filter: drop-shadow(0 10px 24px rgba(0,0,0,.45));
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+
+    /* LAYOUT: news in riquadro a destra */
+    .layout{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:16px;
+      align-items:start;
+    }
+
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+    }
+
+    .panelHeader{
+      padding:14px 14px 10px 14px;
+      border-bottom:1px solid rgba(31,41,55,.75);
+      background:rgba(10,12,18,.35);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .panelTitle{font-weight:900;font-size:18px}
+    .panelSub{margin-top:6px}
+
+    /* news scroll interno */
+    .newsScroll{
+      max-height: calc(100vh - 140px);
+      overflow:auto;
+      padding:12px;
+    }
+
+    #status{margin:10px 0 0 0}
+
+    #newsList{display:grid;gap:12px}
+
+    .newsItem{
+      display:block;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      text-decoration:none;
+      color:inherit;
+      background:rgba(17,24,39,.35);
+      transition:all .2s;
+    }
+    .newsItem:hover{
+      border-color:rgba(59,130,246,.6);
+      background:rgba(17,24,39,.55);
+      transform:translateX(4px);
+    }
+    .newsTitle{font-weight:800;margin-bottom:8px}
+    .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
+    .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
+
+    /* placeholder sinistra */
+    .leftSpace{
+      padding:18px;
+      border:1px dashed rgba(31,41,55,.7);
+      border-radius:16px;
+      background:rgba(0,0,0,.12);
+    }
+
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+      .newsScroll{max-height: 60vh}
+    }
+
+    @media (max-width: 768px){
+      .btn{padding:8px 10px;font-size:13px}
+      .logoTopRight{width:48px;height:48px}
+    }
   </style>
 </head>
 
 <body>
   <header>
     <div class="wrap">
-      <div class="topbar">
-        <div class="logo">
-          AI BOTT <span class="tag">AUTO NEWS</span>
+      <div class="row">
+        <div class="brand">
+          <span style="display:flex;align-items:center;gap:8px">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2" stroke="#3b82f6"/>
+              <path d="M9 9h6M9 12h6M9 15h4" stroke="#3b82f6" stroke-linecap="round"/>
+              <path d="M7 16h10M8 16v2M16 16v2" stroke="#10b981" stroke-linecap="round"/>
+              <circle cx="9" cy="18" r="1" fill="#10b981"/>
+              <circle cx="15" cy="18" r="1" fill="#10b981"/>
+            </svg>
+            <span style="background:linear-gradient(135deg, #3b82f6 0%, #10b981 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">
+              AI BOT
+            </span>
+            <span style="opacity:.7">Automotive</span>
+          </span>
+
+          <button id="fiatBtn" class="btn brand-fiat">Fiat</button>
+          <button id="jeepBtn" class="btn brand-jeep">Jeep</button>
+          <button id="alfaBtn" class="btn brand-alfa">Alfa Romeo</button>
+          <button id="lanciaBtn" class="btn brand-lancia">Lancia</button>
         </div>
 
-        <nav class="brands">
-          <a class="brand-btn" href="https://www.fiat.it/omni/configuratore" target="_blank" rel="noopener">FIAT</a>
-          <a class="brand-btn" href="https://www.jeep-official.it/" target="_blank" rel="noopener">JEEP</a>
-        </nav>
+        <div class="row" style="gap:10px">
+          <span id="userPill" class="pill muted">Non autenticato</span>
+          <button id="loginBtn" class="btn primary">Login Google</button>
+          <button id="logoutBtn" class="btn" style="display:none">Logout</button>
+
+          <!-- METTI IL FILE DEL LOGO QUI: stessa cartella di index.html, nome consigliato: ai-bott-logo.png -->
+          <img class="logoTopRight" src="ai-bott-logo.png" alt="AI BOTT logo" />
+        </div>
       </div>
     </div>
   </header>
 
-  <main>
-    <section class="panel">
-      <div class="panel-head">
-        <div class="panel-title"><span class="icon">📰</span> Ultime News</div>
-        <div class="actions">
-          <button id="refreshBtn" type="button">Aggiorna</button>
+  <main class="wrap">
+    <div class="layout">
+      <section class="leftSpace">
+        <div style="font-weight:900;font-size:18px">Area contenuti</div>
+        <div class="muted" style="margin-top:8px;line-height:1.45">
+          Qui puoi mettere descrizione, KPI, link rapidi, o una mini chat AI.
+          Le news restano a destra, in riquadro scrollabile.
         </div>
-      </div>
+      </section>
 
-      <div id="status" class="status">Stato: pronto</div>
+      <aside class="panel">
+        <div class="panelHeader">
+          <div>
+            <div class="panelTitle">📰 Ultime News</div>
+            <div class="muted panelSub">Visibili solo dopo login.</div>
+            <div id="status" class="muted">Effettua il login per caricare le news.</div>
+          </div>
+          <button id="refreshBtn" class="btn" disabled>🔄</button>
+        </div>
 
-      <div id="errorBox" class="err" style="display:none"></div>
-      <div id="newsList" class="news-grid"></div>
-    </section>
+        <div class="newsScroll">
+          <div id="newsList"></div>
+        </div>
+      </aside>
+    </div>
   </main>
 
-  <script>
-    // ✅ METTI QUI IL TUO ENDPOINT GIUSTO (deve restituire JSON)
-    const BACKEND_NEWS = "https://auto-backend-16xa61c8w-lucas-projects-93ba30e7.vercel.app/api/news";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth,
+      setPersistence,
+      browserLocalPersistence,
+      browserSessionPersistence,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    const BACKEND_NEWS = "/api/news";
+
+    const BRAND_LINKS = {
+      Fiat: "https://www.fiat.it/omni/configuratore/#/",
+      Jeep: "https://www.jeep-official.it/omni/configuratore",
+      AlfaRomeo: "https://www.alfaromeo.it/omni/configuratore",
+      Lancia: "https://www.lancia.it/omni/configuratore"
+    };
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
+      authDomain: "auto-1af60.firebaseapp.com",
+      projectId: "auto-1af60",
+      storageBucket: "auto-1af60.firebasestorage.app",
+      messagingSenderId: "498320258984",
+      appId: "1:498320258984:web:bac67d7634273d10464f9d",
+      measurementId: "G-WYM78KQWQJ"
+    };
 
     const $ = (id) => document.getElementById(id);
+    const setStatus = (t) => { $("status").textContent = t; };
 
-    function setStatus(msg){ $("status").textContent = "Stato: " + msg; }
-
-    function showError(title, details){
-      const box = $("errorBox");
-      box.style.display = "flex";
-      box.innerHTML = `
-        <div class="x">✖</div>
-        <div>
-          <b>${escapeHtml(title)}</b><div style="height:6px"></div>
-          <div>${escapeHtml(details || "")}</div>
-        </div>
-      `;
-    }
-    function hideError(){
-      $("errorBox").style.display = "none";
-      $("errorBox").innerHTML = "";
+    function escapeHtml(s = "") {
+      return String(s ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
     }
 
-    function escapeHtml(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+    function safeHost(url) {
+      try { return new URL(url).hostname; } catch { return ""; }
     }
 
-    function renderItems(items){
-      const list = $("newsList");
-      list.innerHTML = "";
+    function fmtDate(d) {
+      if (!d) return "";
+      const dt = new Date(d);
+      if (Number.isNaN(dt.getTime())) return String(d);
+      return dt.toLocaleString("it-IT", {
+        day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit"
+      });
+    }
 
-      if (!items || !items.length){
-        list.innerHTML = `<div class="card" style="grid-column:1/-1">
-          <div class="t">Nessuna news trovata</div>
-          <div class="m">Controlla l'RSS nel backend o riprova più tardi.</div>
-        </div>`;
+    function renderItems(items) {
+      const box = $("newsList");
+      if (!items || !items.length) {
+        box.innerHTML = '<div class="muted" style="padding:20px;text-align:center">Nessuna news disponibile.</div>';
+        setStatus("Nessuna news trovata.");
         return;
       }
 
-      for (const n of items.slice(0, 6)){
-        const a = document.createElement("a");
-        a.className = "card";
-        a.href = n.url || "#";
-        a.target = "_blank";
-        a.rel = "noopener";
-
+      box.innerHTML = items.map(n => {
+        const link = n.url || n.link || "";
         const title = n.title || "Senza titolo";
-        const desc = (n.description || n.summary || "").trim();
-        const source = n.source || n.site || "";
-        const date = n.date || n.pubDate || "";
+        const date = fmtDate(n.date || n.pubDate || "");
+        const host = safeHost(link);
 
-        a.innerHTML = `
-          <div class="t">${escapeHtml(title)}</div>
-          <div class="m">${escapeHtml(desc || "Apri per leggere.")}</div>
-          <div class="meta">
-            ${source ? `<span>${escapeHtml(source)}</span>` : ""}
-            ${date ? `<span>${escapeHtml(date)}</span>` : ""}
-          </div>
+        return `
+          <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">
+            <div class="newsTitle">${escapeHtml(title)}</div>
+            ${host ? `<div class="newsMeta">📍 ${escapeHtml(host)}</div>` : ""}
+            ${date ? `<div class="newsDate">🕐 ${escapeHtml(date)}</div>` : ""}
+          </a>
         `;
+      }).join("");
 
-        list.appendChild(a);
-      }
+      setStatus(`✅ ${items.length} news caricate • ${new Date().toLocaleString("it-IT")}`);
     }
 
-    async function loadNews(){
-      hideError();
-      setStatus("caricamento news…");
-      $("refreshBtn").disabled = true;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt:"select_account", display:"popup" });
+
+    (async function initApp(){
+      try { await setPersistence(auth, browserLocalPersistence); }
+      catch {
+        try { await setPersistence(auth, browserSessionPersistence); } catch {}
+      }
 
       try{
-        const r = await fetch(BACKEND_NEWS, { method:"GET", cache:"no-store" });
+        const result = await getRedirectResult(auth);
+        if (result?.user) setStatus("✅ Login riuscito! Benvenuto " + result.user.email);
+      }catch(e){
+        setStatus("❌ Errore login: " + (e.code || e.message));
+      }
+    })();
 
-        // ✅ se 404/500 ecc: non provare a fare json()
-        if (!r.ok){
-          const txt = await r.text().catch(()=> "");
-          const hint = txt.includes("<!DOCTYPE html>")
-            ? "Il backend sta rispondendo con HTML (pagina errore), non JSON. URL /api/news sbagliato o deploy rotto."
-            : "Risposta non valida dal backend.";
-          throw new Error(`HTTP ${r.status}. ${hint}`);
-        }
-
-        // ✅ controlla che sia JSON e non HTML “mascherato”
-        const ct = (r.headers.get("content-type") || "").toLowerCase();
-        const raw = await r.text();
-
-        if (raw.trim().startsWith("<!DOCTYPE html") || raw.trim().startsWith("<html")){
-          throw new Error("Il backend ha restituito HTML invece di JSON. Controlla l'endpoint /api/news su Vercel.");
-        }
-
-        let data;
-        try{
-          data = JSON.parse(raw);
-        }catch{
-          throw new Error("JSON non valido dal backend. Controlla cosa ritorna /api/news.");
-        }
-
-        const items = data.items || data.news || [];
-        renderItems(items);
-        setStatus("ok");
-      }catch(err){
+    async function loadNews() {
+      const user = auth.currentUser;
+      if (!user) {
         $("newsList").innerHTML = "";
-        setStatus("errore caricamento news");
-        showError("Errore caricamento news", String(err.message || err));
-      }finally{
-        $("refreshBtn").disabled = false;
+        setStatus("🔒 Effettua il login per vedere le news.");
+        return;
+      }
+
+      setStatus("⏳ Caricamento news...");
+      $("refreshBtn").disabled = true;
+
+      try {
+        const response = await fetch(BACKEND_NEWS, {
+          method:"GET",
+          headers:{ "Cache-Control":"no-cache" },
+          cache:"no-store"
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => "");
+          throw new Error(`HTTP ${response.status}${errorText ? " - " + errorText : ""}`);
+        }
+
+        const data = await response.json();
+
+        if (data.items && Array.isArray(data.items)) renderItems(data.items);
+        else if (Array.isArray(data)) renderItems(data);
+        else throw new Error("Formato dati non valido");
+      } catch (err) {
+        $("newsList").innerHTML = '<div class="muted" style="padding:20px;text-align:center">❌ Errore caricamento news</div>';
+        setStatus("❌ Errore: " + (err?.message || err));
+      } finally {
+        $("refreshBtn").disabled = !auth.currentUser;
       }
     }
+
+    $("loginBtn").addEventListener("click", async () => {
+      try {
+        setStatus("🔐 Apertura login Google...");
+
+        try {
+          const result = await signInWithPopup(auth, provider);
+          setStatus("✅ Login riuscito! Benvenuto " + result.user.email);
+        } catch (popupError) {
+          if (popupError.code === "auth/popup-blocked" ||
+              popupError.code === "auth/popup-closed-by-user" ||
+              popupError.code === "auth/cancelled-popup-request") {
+            setStatus("🔄 Reindirizzamento in corso...");
+            await signInWithRedirect(auth, provider);
+          } else {
+            throw popupError;
+          }
+        }
+      } catch (e) {
+        let errorMsg = "Errore sconosciuto";
+        if (e.code === "auth/unauthorized-domain") errorMsg = "Dominio non autorizzato in Firebase Console";
+        else if (e.code === "auth/popup-blocked") errorMsg = "Popup bloccato dal browser";
+        else errorMsg = e.code || e.message;
+        setStatus("❌ " + errorMsg);
+      }
+    });
+
+    $("logoutBtn").addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        $("newsList").innerHTML = "";
+        setStatus("👋 Logout effettuato.");
+      } catch (e) {
+        setStatus("❌ Errore logout: " + (e.code || e.message));
+      }
+    });
 
     $("refreshBtn").addEventListener("click", loadNews);
 
-    // avvio
-    loadNews();
+    $("fiatBtn").addEventListener("click", () => window.open(BRAND_LINKS.Fiat, "_blank", "noopener,noreferrer"));
+    $("jeepBtn").addEventListener("click", () => window.open(BRAND_LINKS.Jeep, "_blank", "noopener,noreferrer"));
+    $("alfaBtn").addEventListener("click", () => window.open(BRAND_LINKS.AlfaRomeo, "_blank", "noopener,noreferrer"));
+    $("lanciaBtn").addEventListener("click", () => window.open(BRAND_LINKS.Lancia, "_blank", "noopener,noreferrer"));
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        $("userPill").textContent = "✅ " + (user.email || "Utente");
+        $("userPill").classList.remove("muted");
+        $("userPill").style.borderColor = "rgba(34,197,94,.5)";
+        $("userPill").style.background = "rgba(34,197,94,.1)";
+
+        $("loginBtn").style.display = "none";
+        $("logoutBtn").style.display = "inline-block";
+        $("refreshBtn").disabled = false;
+
+        loadNews();
+      } else {
+        $("userPill").textContent = "🔒 Non autenticato";
+        $("userPill").classList.add("muted");
+        $("userPill").style.borderColor = "";
+        $("userPill").style.background = "";
+
+        $("loginBtn").style.display = "inline-block";
+        $("logoutBtn").style.display = "none";
+        $("refreshBtn").disabled = true;
+
+        $("newsList").innerHTML = "";
+        setStatus("🔒 Effettua il login per caricare le news.");
+      }
+    });
   </script>
 </body>
 </html>
