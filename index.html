@@ -212,25 +212,24 @@
       width:70px;
       height:70px;
       border-radius:50%;
-      background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-      border:3px solid rgba(59,130,246,.4);
+      background:transparent;
+      border:none;
       cursor:pointer;
       display:flex;
       align-items:center;
       justify-content:center;
-      box-shadow:0 8px 24px rgba(59,130,246,.35);
+      box-shadow:0 8px 24px rgba(0,0,0,.3);
       transition:all .3s ease;
       z-index:1000;
     }
     .chatTrigger:hover{
-      transform:scale(1.1) rotate(5deg);
-      box-shadow:0 12px 32px rgba(59,130,246,.5);
+      transform:scale(1.1);
+      box-shadow:0 12px 32px rgba(0,0,0,.5);
     }
     .chatTrigger img{
-      width:50px;
-      height:50px;
+      width:70px;
+      height:70px;
       object-fit:contain;
-      filter:brightness(1.1);
     }
 
     /* Chat Box Container */
@@ -254,8 +253,17 @@
     }
     .chatBox.open{display:flex}
     .chatBox.minimized{
-      height:60px;
-      overflow:hidden;
+      width:70px;
+      height:70px;
+      background:transparent;
+      border:none;
+      border-radius:50%;
+      box-shadow:0 8px 24px rgba(0,0,0,.3);
+    }
+    .chatBox.minimized .chatHeader,
+    .chatBox.minimized .chatMessages,
+    .chatBox.minimized .chatInput{
+      display:none;
     }
 
     /* Chat Header */
@@ -521,10 +529,9 @@
 
       <!-- CONTENUTI A DESTRA -->
       <section class="rightSpace">
-        <div style="font-weight:950;font-size:18px">🚗 AI BOTT Assistant</div>
+        <div style="font-weight:950;font-size:18px">Area contenuti</div>
         <div class="muted" style="margin-top:8px;line-height:1.45">
-          Clicca sul pulsante AI in basso a destra per chattare con l'assistente virtuale!<br>
-          Chiedi informazioni su modelli, configurazioni, prezzi e caratteristiche delle auto.
+          Qui puoi mettere descrizione, KPI, link rapidi o altri contenuti.
         </div>
       </section>
     </div>
@@ -542,6 +549,14 @@
 
   <!-- Chat Box -->
   <div class="chatBox" id="chatBox">
+    <!-- Logo visibile quando minimizzato -->
+    <img 
+      id="chatMinimizedLogo"
+      src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" 
+      alt="AI Agent"
+      style="display:none; width:70px; height:70px; object-fit:contain; cursor:pointer;"
+    />
+    
     <div class="chatHeader">
       <div class="chatHeaderLeft">
         <img 
@@ -813,6 +828,7 @@
       chatBox.classList.add("open");
       chatBox.classList.remove("minimized");
       chatTrigger.style.display = "none";
+      $("chatMinimizedLogo").style.display = "none";
       chatInputField.focus();
     });
 
@@ -820,6 +836,7 @@
     minimizeBtn.addEventListener("click", () => {
       chatBox.classList.add("minimized");
       isMinimized = true;
+      $("chatMinimizedLogo").style.display = "block";
     });
 
     // Close & clear
@@ -841,12 +858,21 @@
       `;
     });
 
-    // Se minimizzata, click sull'header per riaprire
+    // Se minimizzata, click sull'header o sul logo per riaprire
     chatBox.querySelector(".chatHeader").addEventListener("click", (e) => {
       if (isMinimized && !e.target.closest("button")) {
         chatBox.classList.remove("minimized");
         isMinimized = false;
+        $("chatMinimizedLogo").style.display = "none";
       }
+    });
+
+    // Click sul logo minimizzato per riaprire
+    $("chatMinimizedLogo").addEventListener("click", () => {
+      chatBox.classList.remove("minimized");
+      isMinimized = false;
+      $("chatMinimizedLogo").style.display = "none";
+      chatInputField.focus();
     });
 
     // Add message to UI
