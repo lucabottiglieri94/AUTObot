@@ -39,10 +39,18 @@
       border-radius:12px;
       cursor:pointer;
       font-size:14px;
+      transition:all 0.2s;
+    }
+    .btn:hover{
+      border-color:rgba(59,130,246,.6);
+      background:rgba(17,24,39,.9);
     }
     .btn.primary{
       border-color:rgba(59,130,246,.5);
       background:rgba(37,99,235,.15);
+    }
+    .btn.primary:hover{
+      background:rgba(37,99,235,.25);
     }
     .btn:disabled{opacity:.6;cursor:not-allowed}
     main .card{
@@ -69,11 +77,15 @@
       text-decoration:none;
       color:inherit;
       background:rgba(17,24,39,.35);
+      transition:all 0.2s;
     }
-    .newsItem:hover{border-color:rgba(59,130,246,.6)}
-    .newsTitle{font-weight:800}
+    .newsItem:hover{
+      border-color:rgba(59,130,246,.6);
+      background:rgba(17,24,39,.55);
+    }
+    .newsTitle{font-weight:800;margin-bottom:8px}
     .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
-    .newsDate{opacity:.75;font-size:12px;margin-top:6px}
+    .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
   </style>
 </head>
 
@@ -82,15 +94,13 @@
     <div class="wrap">
       <div class="row">
         <div class="brand">
-          <span>Auto News</span>
+          <span>🚗 Auto News</span>
           <button id="fiatBtn" class="btn">Fiat</button>
           <button id="jeepBtn" class="btn">Jeep</button>
         </div>
 
         <div class="row" style="gap:10px">
-          <!-- qui vedi stato utente -->
           <span id="userPill" class="pill muted">Non autenticato</span>
-          <!-- login e logout vicini -->
           <button id="loginBtn" class="btn primary">Login Google</button>
           <button id="logoutBtn" class="btn" style="display:none">Logout</button>
         </div>
@@ -102,13 +112,12 @@
     <section class="card">
       <div class="row">
         <div>
-          <div style="font-weight:800;font-size:18px">News</div>
+          <div style="font-weight:800;font-size:18px">📰 Ultime News</div>
           <div class="muted" style="margin-top:6px">Visibili solo dopo login.</div>
         </div>
-        <button id="refreshBtn" class="btn" disabled>Aggiorna</button>
+        <button id="refreshBtn" class="btn" disabled>🔄 Aggiorna</button>
       </div>
 
-      <!-- qui vedrai “Login riuscito” oppure errori -->
       <div id="status" class="muted" style="margin-top:12px">
         Effettua il login per caricare le news.
       </div>
@@ -129,7 +138,7 @@
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-    // ================== COSTANTI ==================
+    // ================== CONFIGURAZIONE ==================
     const BACKEND_NEWS = "/api/news";
 
     const BRAND_LINKS = {
@@ -147,7 +156,7 @@
       measurementId: "G-WYM78KQWQJ"
     };
 
-    // ================== UTIL ==================
+    // ================== UTILITY FUNCTIONS ==================
     const $ = (id) => document.getElementById(id);
     const setStatus = (t) => { $("status").textContent = t; };
 
@@ -165,98 +174,126 @@
       if (!d) return "";
       const dt = new Date(d);
       if (Number.isNaN(dt.getTime())) return String(d);
-      return dt.toLocaleString("it-IT");
+      return dt.toLocaleString("it-IT", { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
     }
 
     function renderItems(items) {
       const box = $("newsList");
       if (!items || !items.length) {
-        box.innerHTML = "";
+        box.innerHTML = '<div class="muted" style="padding:20px;text-align:center">Nessuna news disponibile al momento.</div>';
         setStatus("Nessuna news trovata.");
         return;
       }
+      
       box.innerHTML = items.map(n => {
         const link = n.url || n.link || "";
-        const title = n.title || "";
+        const title = n.title || "Senza titolo";
         const date = fmtDate(n.date || n.pubDate || "");
+        const host = safeHost(link);
+        
         return `
-          <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener">
+          <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">
             <div class="newsTitle">${escapeHtml(title)}</div>
-            <div class="newsMeta">${escapeHtml(safeHost(link))}</div>
-            ${date ? `<div class="newsDate">${escapeHtml(date)}</div>` : ""}
+            ${host ? `<div class="newsMeta">📍 ${escapeHtml(host)}</div>` : ''}
+            ${date ? `<div class="newsDate">🕐 ${escapeHtml(date)}</div>` : ""}
           </a>
         `;
       }).join("");
-      setStatus("Ultimo aggiornamento: " + new Date().toLocaleString("it-IT"));
+      
+      setStatus(`✅ ${items.length} news caricate - Ultimo aggiornamento: ${new Date().toLocaleString("it-IT")}`);
     }
 
-    // ================== INIT FIREBASE ==================
+    // ================== FIREBASE INITIALIZATION ==================
+    console.log("🔥 Inizializzazione Firebase...");
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-
-    // persistenza (rimani loggato tra i refresh)
-    try {
-      await setPersistence(auth, browserLocalPersistence);
-    } catch (e) {
-      console.error("PERSISTENCE ERROR:", e);
-      setStatus("Errore persistenza login: " + (e.code || e.message || e));
-    }
-
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
-    // ================== RISULTATO REDIRECT ==================
-    // Viene chiamato SOLO al ritorno dal login Google
-    try {
-      const res = await getRedirectResult(auth);
-      if (res?.user) {
-        console.log("REDIRECT OK:", res.user.email);
-        setStatus("Login riuscito. Benvenuto " + (res.user.email || ""));
+    // ================== SETUP ASYNC ==================
+    (async function initApp() {
+      // Imposta persistenza
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+        console.log("✅ Persistenza login configurata");
+      } catch (e) {
+        console.error("❌ Errore persistenza:", e);
+        setStatus("⚠️ Errore configurazione login: " + (e.code || e.message));
       }
-    } catch (e) {
-      console.error("REDIRECT ERROR:", e);
-      setStatus("Login fallito: " + (e.code || e.message || e));
-    }
 
-    // ================== NEWS ==================
+      // Gestisci risultato redirect da Google
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          console.log("✅ Login completato:", result.user.email);
+          setStatus("✅ Login riuscito! Benvenuto " + (result.user.email || ""));
+        }
+      } catch (e) {
+        console.error("❌ Errore redirect login:", e);
+        setStatus("❌ Login fallito: " + (e.code || e.message));
+      }
+    })();
+
+    // ================== CARICAMENTO NEWS ==================
     async function loadNews() {
       const user = auth.currentUser;
       if (!user) {
         $("newsList").innerHTML = "";
-        setStatus("Effettua il login per caricare le news.");
+        setStatus("🔒 Effettua il login per vedere le news.");
         return;
       }
 
-      setStatus("Caricamento news...");
+      setStatus("⏳ Caricamento news in corso...");
       $("refreshBtn").disabled = true;
 
       try {
-        const r = await fetch(BACKEND_NEWS, {
+        console.log("📡 Richiesta news a:", BACKEND_NEWS);
+        const response = await fetch(BACKEND_NEWS, {
           method: "GET",
+          headers: {
+            'Cache-Control': 'no-cache'
+          },
           cache: "no-store"
         });
-        if (!r.ok) {
-          const txt = await r.text().catch(() => "");
-          throw new Error("HTTP " + r.status + (txt ? " - " + txt : ""));
+
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => "");
+          throw new Error(`HTTP ${response.status}${errorText ? ' - ' + errorText : ''}`);
         }
-        const data = await r.json();
-        renderItems(data.items || []);
+
+        const data = await response.json();
+        console.log("✅ News ricevute:", data);
+        
+        if (data.items && Array.isArray(data.items)) {
+          renderItems(data.items);
+        } else if (Array.isArray(data)) {
+          renderItems(data);
+        } else {
+          throw new Error("Formato dati non valido");
+        }
       } catch (err) {
-        console.error(err);
-        setStatus("Errore caricamento news: " + (err?.message || err));
+        console.error("❌ Errore caricamento news:", err);
+        $("newsList").innerHTML = '<div class="muted" style="padding:20px;text-align:center">❌ Errore nel caricamento delle news</div>';
+        setStatus("❌ Errore: " + (err?.message || err));
       } finally {
         $("refreshBtn").disabled = !auth.currentUser;
       }
     }
 
-    // ================== EVENTI UI ==================
+    // ================== EVENT LISTENERS ==================
     $("loginBtn").addEventListener("click", async () => {
       try {
-        setStatus("Apro login Google...");
+        setStatus("🔐 Apertura login Google...");
         await signInWithRedirect(auth, provider);
       } catch (e) {
-        console.error("LOGIN ERROR:", e);
-        setStatus("Login fallito: " + (e.code || e.message || e));
+        console.error("❌ Errore login:", e);
+        setStatus("❌ Errore login: " + (e.code || e.message));
       }
     });
 
@@ -264,44 +301,60 @@
       try {
         await signOut(auth);
         $("newsList").innerHTML = "";
-        setStatus("Logout effettuato.");
+        setStatus("👋 Logout effettuato con successo.");
+        console.log("✅ Logout completato");
       } catch (e) {
-        console.error("LOGOUT ERROR:", e);
-        setStatus("Logout fallito: " + (e.code || e.message || e));
+        console.error("❌ Errore logout:", e);
+        setStatus("❌ Errore logout: " + (e.code || e.message));
       }
     });
 
-    $("refreshBtn").addEventListener("click", () => loadNews());
+    $("refreshBtn").addEventListener("click", () => {
+      console.log("🔄 Ricarica news manuale");
+      loadNews();
+    });
 
     $("fiatBtn").addEventListener("click", () => {
-      window.open(BRAND_LINKS.Fiat, "_blank", "noopener");
+      window.open(BRAND_LINKS.Fiat, "_blank", "noopener,noreferrer");
     });
 
     $("jeepBtn").addEventListener("click", () => {
-      window.open(BRAND_LINKS.Jeep, "_blank", "noopener");
+      window.open(BRAND_LINKS.Jeep, "_blank", "noopener,noreferrer");
     });
 
-    // ================== STATO AUTH ==================
+    // ================== GESTIONE STATO AUTENTICAZIONE ==================
     onAuthStateChanged(auth, (user) => {
-      console.log("AUTH STATE:", user ? user.email : "NO USER");
+      console.log("🔐 Stato auth cambiato:", user ? user.email : "nessun utente");
+      
       if (user) {
-        $("userPill").textContent = "Loggato: " + (user.email || "utente");
+        // UTENTE LOGGATO
+        $("userPill").textContent = "✅ " + (user.email || "Utente loggato");
         $("userPill").classList.remove("muted");
+        $("userPill").style.borderColor = "rgba(34, 197, 94, 0.5)";
+        $("userPill").style.background = "rgba(34, 197, 94, 0.1)";
+        
         $("loginBtn").style.display = "none";
         $("logoutBtn").style.display = "inline-block";
         $("refreshBtn").disabled = false;
+        
+        // Carica le news automaticamente
         loadNews();
       } else {
-        $("userPill").textContent = "Non autenticato";
+        // UTENTE NON LOGGATO
+        $("userPill").textContent = "🔒 Non autenticato";
         $("userPill").classList.add("muted");
+        $("userPill").style.borderColor = "";
+        $("userPill").style.background = "";
+        
         $("loginBtn").style.display = "inline-block";
         $("logoutBtn").style.display = "none";
         $("refreshBtn").disabled = true;
         $("newsList").innerHTML = "";
-        setStatus("Effettua il login per caricare le news.");
+        setStatus("🔒 Effettua il login per caricare le news.");
       }
     });
+
+    console.log("✅ App inizializzata correttamente");
   </script>
 </body>
 </html>
-
