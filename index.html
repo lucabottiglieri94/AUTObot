@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Auto News</title>
+  <title>Auto News - Debug</title>
   <style>
     :root{
       --bg:#0b0f1a;
@@ -86,6 +86,32 @@
     .newsTitle{font-weight:800;margin-bottom:8px}
     .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
     .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
+    
+    /* DEBUG PANEL */
+    #debugPanel{
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      max-width:400px;
+      max-height:300px;
+      overflow-y:auto;
+      background:rgba(17,24,39,.95);
+      border:1px solid var(--accent);
+      border-radius:12px;
+      padding:12px;
+      font-size:11px;
+      font-family:monospace;
+      z-index:1000;
+    }
+    .debug-log{
+      margin:4px 0;
+      padding:4px;
+      border-left:2px solid #666;
+      padding-left:8px;
+    }
+    .debug-error{border-left-color:#ef4444;color:#fca5a5}
+    .debug-success{border-left-color:#22c55e;color:#86efac}
+    .debug-info{border-left-color:#3b82f6;color:#93c5fd}
   </style>
 </head>
 
@@ -109,6 +135,12 @@
   </header>
 
   <main class="wrap">
+    <!-- PANNELLO DEBUG -->
+    <div id="debugPanel">
+      <div style="font-weight:800;margin-bottom:8px;color:#3b82f6">🔍 Debug Log</div>
+      <div id="debugLog"></div>
+    </div>
+
     <section class="card">
       <div class="row">
         <div>
@@ -122,6 +154,12 @@
         Effettua il login per caricare le news.
       </div>
       <div id="newsList"></div>
+    </section>
+
+    <!-- INFO SISTEMA -->
+    <section class="card" style="margin-top:16px">
+      <div style="font-weight:800;margin-bottom:8px">🔧 Diagnostica Sistema</div>
+      <div id="systemInfo" style="font-size:12px;color:var(--muted)"></div>
     </section>
   </main>
 
@@ -137,6 +175,66 @@
       signOut,
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    // ================== DEBUG LOGGER ==================
+    const debugLog = [];
+    function log(msg, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString('it-IT');
+      const entry = { msg, type, timestamp };
+      debugLog.push(entry);
+      
+      const logDiv = document.getElementById('debugLog');
+      const el = document.createElement('div');
+      el.className = `debug-log debug-${type}`;
+      el.textContent = `[${timestamp}] ${msg}`;
+      logDiv.appendChild(el);
+      logDiv.scrollTop = logDiv.scrollHeight;
+      
+      // Log anche nella console
+      const emoji = { error: '❌', success: '✅', info: '📘' }[type] || '📝';
+      console.log(`${emoji} [${timestamp}] ${msg}`);
+    }
+
+    // ================== SYSTEM INFO ==================
+    function checkSystemInfo() {
+      const info = [];
+      
+      // Check localStorage
+      try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        info.push('✅ localStorage: Funzionante');
+        log('localStorage disponibile', 'success');
+      } catch(e) {
+        info.push('❌ localStorage: BLOCCATO - ' + e.message);
+        log('localStorage BLOCCATO: ' + e.message, 'error');
+      }
+      
+      // Check sessionStorage
+      try {
+        sessionStorage.setItem('test', 'test');
+        sessionStorage.removeItem('test');
+        info.push('✅ sessionStorage: Funzionante');
+        log('sessionStorage disponibile', 'success');
+      } catch(e) {
+        info.push('❌ sessionStorage: BLOCCATO');
+        log('sessionStorage BLOCCATO: ' + e.message, 'error');
+      }
+      
+      // Check cookies
+      const cookiesEnabled = navigator.cookieEnabled;
+      info.push(cookiesEnabled ? '✅ Cookies: Abilitati' : '❌ Cookies: DISABILITATI');
+      log(`Cookies: ${cookiesEnabled ? 'abilitati' : 'DISABILITATI'}`, cookiesEnabled ? 'success' : 'error');
+      
+      // Current URL
+      info.push('🌐 URL: ' + window.location.origin);
+      log('URL corrente: ' + window.location.origin, 'info');
+      
+      // Browser
+      info.push('🖥️ Browser: ' + navigator.userAgent.split(' ').slice(-2).join(' '));
+      
+      document.getElementById('systemInfo').innerHTML = info.join('<br>');
+    }
 
     // ================== CONFIGURAZIONE ==================
     const BACKEND_NEWS = "/api/news";
@@ -186,8 +284,9 @@
     function renderItems(items) {
       const box = $("newsList");
       if (!items || !items.length) {
-        box.innerHTML = '<div class="muted" style="padding:20px;text-align:center">Nessuna news disponibile al momento.</div>';
+        box.innerHTML = '<div class="muted" style="padding:20px;text-align:center">Nessuna news disponibile.</div>';
         setStatus("Nessuna news trovata.");
+        log('Nessuna news da visualizzare', 'info');
         return;
       }
       
@@ -206,37 +305,59 @@
         `;
       }).join("");
       
-      setStatus(`✅ ${items.length} news caricate - Ultimo aggiornamento: ${new Date().toLocaleString("it-IT")}`);
+      setStatus(`✅ ${items.length} news caricate - ${new Date().toLocaleString("it-IT")}`);
+      log(`${items.length} news visualizzate`, 'success');
     }
 
     // ================== FIREBASE INITIALIZATION ==================
-    console.log("🔥 Inizializzazione Firebase...");
+    log('Inizializzazione Firebase...', 'info');
+    log('AuthDomain: ' + firebaseConfig.authDomain, 'info');
+    
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
+    log('Firebase inizializzato', 'success');
+
     // ================== SETUP ASYNC ==================
     (async function initApp() {
+      // Check sistema
+      checkSystemInfo();
+      
       // Imposta persistenza
+      log('Impostazione persistenza...', 'info');
       try {
         await setPersistence(auth, browserLocalPersistence);
-        console.log("✅ Persistenza login configurata");
+        log('Persistenza configurata: browserLocalPersistence', 'success');
       } catch (e) {
-        console.error("❌ Errore persistenza:", e);
-        setStatus("⚠️ Errore configurazione login: " + (e.code || e.message));
+        log('ERRORE persistenza: ' + (e.code || e.message), 'error');
+        setStatus("⚠️ Errore configurazione: " + (e.code || e.message));
       }
 
-      // Gestisci risultato redirect da Google
+      // Gestisci risultato redirect
+      log('Controllo redirect result...', 'info');
       try {
         const result = await getRedirectResult(auth);
         if (result?.user) {
-          console.log("✅ Login completato:", result.user.email);
-          setStatus("✅ Login riuscito! Benvenuto " + (result.user.email || ""));
+          log('Login da redirect: ' + result.user.email, 'success');
+          log('User UID: ' + result.user.uid, 'info');
+          setStatus("✅ Login riuscito! Benvenuto " + result.user.email);
+        } else {
+          log('Nessun redirect result', 'info');
         }
       } catch (e) {
-        console.error("❌ Errore redirect login:", e);
-        setStatus("❌ Login fallito: " + (e.code || e.message));
+        log('ERRORE redirect: ' + (e.code || e.message), 'error');
+        setStatus("❌ Errore login: " + (e.code || e.message));
+      }
+      
+      // Check stato iniziale
+      log('Controllo stato autenticazione iniziale...', 'info');
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        log('Utente già loggato: ' + currentUser.email, 'success');
+      } else {
+        log('Nessun utente loggato', 'info');
       }
     })();
 
@@ -246,21 +367,23 @@
       if (!user) {
         $("newsList").innerHTML = "";
         setStatus("🔒 Effettua il login per vedere le news.");
+        log('Tentativo caricamento news senza autenticazione', 'error');
         return;
       }
 
-      setStatus("⏳ Caricamento news in corso...");
+      log('Caricamento news per utente: ' + user.email, 'info');
+      setStatus("⏳ Caricamento news...");
       $("refreshBtn").disabled = true;
 
       try {
-        console.log("📡 Richiesta news a:", BACKEND_NEWS);
+        log('Fetch a: ' + BACKEND_NEWS, 'info');
         const response = await fetch(BACKEND_NEWS, {
           method: "GET",
-          headers: {
-            'Cache-Control': 'no-cache'
-          },
+          headers: { 'Cache-Control': 'no-cache' },
           cache: "no-store"
         });
+
+        log('Response status: ' + response.status, response.ok ? 'success' : 'error');
 
         if (!response.ok) {
           const errorText = await response.text().catch(() => "");
@@ -268,18 +391,20 @@
         }
 
         const data = await response.json();
-        console.log("✅ News ricevute:", data);
+        log('Dati ricevuti: ' + JSON.stringify(data).substring(0, 100) + '...', 'info');
         
         if (data.items && Array.isArray(data.items)) {
+          log('Trovati ' + data.items.length + ' items', 'success');
           renderItems(data.items);
         } else if (Array.isArray(data)) {
+          log('Trovati ' + data.length + ' items (array diretto)', 'success');
           renderItems(data);
         } else {
           throw new Error("Formato dati non valido");
         }
       } catch (err) {
-        console.error("❌ Errore caricamento news:", err);
-        $("newsList").innerHTML = '<div class="muted" style="padding:20px;text-align:center">❌ Errore nel caricamento delle news</div>';
+        log('ERRORE caricamento: ' + (err?.message || err), 'error');
+        $("newsList").innerHTML = '<div class="muted" style="padding:20px;text-align:center">❌ Errore caricamento</div>';
         setStatus("❌ Errore: " + (err?.message || err));
       } finally {
         $("refreshBtn").disabled = !auth.currentUser;
@@ -288,29 +413,34 @@
 
     // ================== EVENT LISTENERS ==================
     $("loginBtn").addEventListener("click", async () => {
+      log('Click su login button', 'info');
       try {
-        setStatus("🔐 Apertura login Google...");
+        setStatus("🔐 Reindirizzamento a Google...");
+        log('Avvio signInWithRedirect...', 'info');
         await signInWithRedirect(auth, provider);
+        log('Redirect avviato (la pagina verrà ricaricata)', 'info');
       } catch (e) {
-        console.error("❌ Errore login:", e);
-        setStatus("❌ Errore login: " + (e.code || e.message));
+        log('ERRORE login: ' + (e.code || e.message), 'error');
+        setStatus("❌ Errore: " + (e.code || e.message));
       }
     });
 
     $("logoutBtn").addEventListener("click", async () => {
+      log('Click su logout button', 'info');
       try {
+        const email = auth.currentUser?.email;
         await signOut(auth);
+        log('Logout completato per: ' + email, 'success');
         $("newsList").innerHTML = "";
-        setStatus("👋 Logout effettuato con successo.");
-        console.log("✅ Logout completato");
+        setStatus("👋 Logout effettuato.");
       } catch (e) {
-        console.error("❌ Errore logout:", e);
+        log('ERRORE logout: ' + (e.code || e.message), 'error');
         setStatus("❌ Errore logout: " + (e.code || e.message));
       }
     });
 
     $("refreshBtn").addEventListener("click", () => {
-      console.log("🔄 Ricarica news manuale");
+      log('Click su refresh', 'info');
       loadNews();
     });
 
@@ -324,11 +454,14 @@
 
     // ================== GESTIONE STATO AUTENTICAZIONE ==================
     onAuthStateChanged(auth, (user) => {
-      console.log("🔐 Stato auth cambiato:", user ? user.email : "nessun utente");
+      log('🔔 onAuthStateChanged triggered', 'info');
       
       if (user) {
-        // UTENTE LOGGATO
-        $("userPill").textContent = "✅ " + (user.email || "Utente loggato");
+        log('UTENTE LOGGATO: ' + user.email, 'success');
+        log('UID: ' + user.uid, 'info');
+        log('Provider: ' + (user.providerData[0]?.providerId || 'unknown'), 'info');
+        
+        $("userPill").textContent = "✅ " + (user.email || "Utente");
         $("userPill").classList.remove("muted");
         $("userPill").style.borderColor = "rgba(34, 197, 94, 0.5)";
         $("userPill").style.background = "rgba(34, 197, 94, 0.1)";
@@ -337,10 +470,11 @@
         $("logoutBtn").style.display = "inline-block";
         $("refreshBtn").disabled = false;
         
-        // Carica le news automaticamente
+        log('Caricamento automatico news...', 'info');
         loadNews();
       } else {
-        // UTENTE NON LOGGATO
+        log('NESSUN UTENTE LOGGATO', 'info');
+        
         $("userPill").textContent = "🔒 Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor = "";
@@ -354,7 +488,7 @@
       }
     });
 
-    console.log("✅ App inizializzata correttamente");
+    log('✅ App inizializzata - in attesa di azioni utente', 'success');
   </script>
 </body>
 </html>
