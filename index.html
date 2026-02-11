@@ -119,6 +119,31 @@
     .btn.brand-alfa:hover{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)}
     .btn.brand-lancia:hover{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.1)}
 
+    /* CentroAuto Logo */
+    .centroAutoLink{
+      display:inline-flex;
+      align-items:center;
+      padding:6px 12px;
+      border:2px solid rgba(34,197,94,.4);
+      background:rgba(34,197,94,.08);
+      border-radius:12px;
+      transition:all .3s ease;
+      text-decoration:none;
+      box-shadow:0 2px 8px rgba(34,197,94,.15);
+    }
+    .centroAutoLink:hover{
+      border-color:rgba(34,197,94,.7);
+      background:rgba(34,197,94,.18);
+      transform:translateY(-2px);
+      box-shadow:0 4px 16px rgba(34,197,94,.3);
+    }
+    .centroAutoLogo{
+      height:42px;
+      width:auto;
+      object-fit:contain;
+      filter:drop-shadow(0 1px 3px rgba(0,0,0,.2));
+    }
+
     .pill{
       padding:6px 10px;
       border-radius:999px;
@@ -474,6 +499,8 @@
       .btn{padding:8px 10px;font-size:13px}
       .brandLogo{width:30px;height:30px}
       .brandName{font-size:16px}
+      .centroAutoLogo{height:36px}
+      .centroAutoLink{padding:4px 8px}
     }
   </style>
 </head>
@@ -499,6 +526,21 @@
           <button id="jeepBtn" class="btn brand-jeep">Jeep</button>
           <button id="alfaBtn" class="btn brand-alfa">Alfa Romeo</button>
           <button id="lanciaBtn" class="btn brand-lancia">Lancia</button>
+          
+          <!-- Logo CentroAuto -->
+          <a 
+            href="https://www.centroautovt.it/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="centroAutoLink"
+            title="Visita CentroAuto VT"
+          >
+            <img 
+              src="https://image2url.com/r2/default/images/1770805237740-1db65b1e-5553-4b5b-b28a-750e3520a0a2.png" 
+              alt="CentroAuto VT" 
+              class="centroAutoLogo"
+            />
+          </a>
         </div>
 
         <div class="row" style="gap:10px">
@@ -579,15 +621,21 @@
     <div class="chatMessages" id="chatMessages">
       <!-- Messaggio di benvenuto -->
       <div class="message ai">
-        <div class="messageBubble">👋 Ciao! Sono l'assistente AI BOTT specializzato in configurazioni auto.
+        <div class="messageBubble">👋 Ciao! Sono l'assistente AI BOTT specializzato in auto nuove e usate.
 
 🔍 Posso aiutarti con:
-• Allestimenti e versioni (confronti dettagliati)
-• Dotazioni e optional di serie
-• Motorizzazioni disponibili
-• Prezzi di listino aggiornati
 
-Chiedi pure! Esempio: "Confronta Panda City Life vs Panda Cross" 🚗</div>
+🆕 AUTO NUOVE (Fiat, Jeep, Alfa, Lancia)
+• Allestimenti e versioni
+• Dotazioni e optional
+• Motorizzazioni e prezzi
+
+🚗 AUTO USATE (CentroAuto VT)
+• Veicoli disponibili
+• Prezzi, km e anno
+• Accessori ed equipaggiamenti
+
+Scrivi "usato" per cercare tra le auto usate, oppure chiedi info su modelli nuovi! 💡</div>
       </div>
     </div>
 
@@ -596,7 +644,7 @@ Chiedi pure! Esempio: "Confronta Panda City Life vs Panda Cross" 🚗</div>
         type="text" 
         class="chatInputField" 
         id="chatInputField" 
-        placeholder="Es: differenza tra Jeep Compass Longitude e Limited"
+        placeholder="Es: auto usate disponibili oppure confronta Compass Longitude e Limited"
         autocomplete="off"
       />
       <button class="chatSendBtn" id="chatSendBtn">
@@ -906,6 +954,7 @@ Chiedi pure! Esempio: "Confronta Panda City Life vs Panda Cross" 🚗</div>
     // Verifica se la domanda riguarda auto
     function needsSearch(text) {
       const carKeywords = [
+        // Auto nuove
         'prezzo', 'costo', 'quanto costa', 'listino',
         'allestimento', 'versione', 'dotazione', 'equipaggiamento', 'optional', 'serie',
         'motore', 'motorizzazione', 'cavalli', 'cv', 'kw', 'cilindrata',
@@ -924,26 +973,50 @@ Chiedi pure! Esempio: "Confronta Panda City Life vs Panda Cross" 🚗</div>
         'panda', 'punto', '500', 'tipo', 'ducato', // Fiat
         'renegade', 'compass', 'wrangler', 'cherokee', 'avenger', // Jeep
         'giulia', 'stelvio', 'tonale', 'giulietta', // Alfa Romeo
-        'ypsilon', 'delta' // Lancia
+        'ypsilon', 'delta', // Lancia
+        // Auto usate
+        'usato', 'usata', 'usati', 'usate', 'seconda mano', 'km zero',
+        'chilometri', 'anno', 'immatricolazione', 'immatricolata',
+        'centroauto', 'centro auto', 'stock', 'disponibile',
+        'occasione', 'occasioni', 'pronta consegna'
       ];
       
       const lowerText = text.toLowerCase();
       return carKeywords.some(keyword => lowerText.includes(keyword));
     }
 
-    // RICERCA MIGLIORATA - Solo configuratori ufficiali
+    // RICERCA MIGLIORATA - Configuratori ufficiali + CentroAuto per usato
     async function searchCarInfo(query) {
       try {
-        // SOLO siti ufficiali configuratori
-        const officialSites = [
-          'site:fiat.it/configuratore OR site:fiat.it/gamma',
-          'site:jeep-official.it/configuratore OR site:jeep-official.it/gamma',
-          'site:alfaromeo.it/configuratore OR site:alfaromeo.it/gamma',
-          'site:lancia.it/configuratore OR site:lancia.it/gamma'
-        ];
+        const lowerQuery = query.toLowerCase();
+        const isUsedCar = lowerQuery.includes('usato') || 
+                         lowerQuery.includes('usata') || 
+                         lowerQuery.includes('usati') || 
+                         lowerQuery.includes('usate') ||
+                         lowerQuery.includes('seconda mano') ||
+                         lowerQuery.includes('km zero') ||
+                         lowerQuery.includes('centroauto') ||
+                         lowerQuery.includes('centro auto') ||
+                         lowerQuery.includes('occasione');
 
-        // Query mirata ai configuratori
-        const enhancedQuery = `${query} allestimenti versioni (${officialSites.join(' OR ')})`;
+        let enhancedQuery;
+        let allowedDomains;
+
+        if (isUsedCar) {
+          // CERCA SOLO su CentroAuto
+          enhancedQuery = `${query} site:centroautovt.it`;
+          allowedDomains = ['centroautovt.it'];
+        } else {
+          // CERCA SOLO configuratori ufficiali
+          const officialSites = [
+            'site:fiat.it/configuratore OR site:fiat.it/gamma',
+            'site:jeep-official.it/configuratore OR site:jeep-official.it/gamma',
+            'site:alfaromeo.it/configuratore OR site:alfaromeo.it/gamma',
+            'site:lancia.it/configuratore OR site:lancia.it/gamma'
+          ];
+          enhancedQuery = `${query} allestimenti versioni (${officialSites.join(' OR ')})`;
+          allowedDomains = ['fiat.it', 'jeep-official.it', 'alfaromeo.it', 'lancia.it'];
+        }
         
         const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(enhancedQuery)}`);
         if (!response.ok) throw new Error("Errore ricerca");
@@ -951,27 +1024,29 @@ Chiedi pure! Esempio: "Confronta Panda City Life vs Panda Cross" 🚗</div>
         const data = await response.json();
         
         if (data.results && data.results.length > 0) {
-          // Filtra SOLO risultati da configuratori ufficiali
-          const officialResults = data.results.filter(r => {
+          // Filtra solo risultati dai domini consentiti
+          const validResults = data.results.filter(r => {
             const url = r.url.toLowerCase();
-            return (
-              (url.includes('fiat.it') && (url.includes('configuratore') || url.includes('gamma'))) ||
-              (url.includes('jeep-official.it') && (url.includes('configuratore') || url.includes('gamma'))) ||
-              (url.includes('alfaromeo.it') && (url.includes('configuratore') || url.includes('gamma'))) ||
-              (url.includes('lancia.it') && (url.includes('configuratore') || url.includes('gamma')))
-            );
+            return allowedDomains.some(domain => url.includes(domain));
           });
 
-          if (officialResults.length === 0) return null;
+          if (validResults.length === 0) return null;
 
-          // Formatta i risultati in modo più strutturato
-          return officialResults.slice(0, 3).map(r => {
-            const brand = r.url.includes('fiat') ? 'Fiat' :
-                         r.url.includes('jeep') ? 'Jeep' :
-                         r.url.includes('alfa') ? 'Alfa Romeo' : 'Lancia';
-            
-            return `━━━ ${brand.toUpperCase()} ━━━\n${r.title}\n\n${r.description}\n\n🔗 ${r.url}`;
-          }).join('\n\n');
+          if (isUsedCar) {
+            // Formato per auto usate
+            return validResults.slice(0, 5).map(r => 
+              `🚗 ${r.title}\n${r.description}\n🔗 ${r.url}`
+            ).join('\n\n━━━━━━━━━━━━━━━━━━\n\n');
+          } else {
+            // Formato per auto nuove
+            return validResults.slice(0, 3).map(r => {
+              const brand = r.url.includes('fiat') ? 'Fiat' :
+                           r.url.includes('jeep') ? 'Jeep' :
+                           r.url.includes('alfa') ? 'Alfa Romeo' : 'Lancia';
+              
+              return `━━━ ${brand.toUpperCase()} ━━━\n${r.title}\n\n${r.description}\n\n🔗 ${r.url}`;
+            }).join('\n\n');
+          }
         }
         return null;
       } catch (err) {
@@ -981,23 +1056,29 @@ Chiedi pure! Esempio: "Confronta Panda City Life vs Panda Cross" 🚗</div>
     }
 
     // SISTEMA PROMPT MIGLIORATO
-    const SYSTEM_PROMPT = `Sei un assistente esperto di configurazioni auto dei marchi: Fiat, Jeep, Alfa Romeo e Lancia.
+    const SYSTEM_PROMPT = `Sei un assistente esperto di auto NUOVE e USATE.
 
-REGOLE FONDAMENTALI:
-1. Risposte SCHEMATICHE e CONCISE (max 8-10 righe)
+AUTO NUOVE: Fiat, Jeep, Alfa Romeo, Lancia (configuratori ufficiali)
+AUTO USATE: CentroAuto VT (https://www.centroautovt.it/)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 REGOLE FONDAMENTALI:
+1. Risposte SCHEMATICHE e CONCISE (max 10 righe)
 2. Usa ELENCHI PUNTATI per chiarezza
 3. Evidenzia solo INFO ESSENZIALI
-4. Per confronti: tabella comparativa o lista differenze chiave
-5. SEMPRE basati SOLO sui dati dei configuratori ufficiali forniti
-6. Se non hai info precise dai configuratori, dillo chiaramente
+4. SEMPRE basati SOLO sui dati forniti dai siti ufficiali
 
-FORMATO RISPOSTA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆕 FORMATO PER AUTO NUOVE:
+
 Per INFO GENERALI:
 ✓ Punto chiave 1
 ✓ Punto chiave 2
 ✓ Punto chiave 3
 
-Per CONFRONTI:
+Per CONFRONTI ALLESTIMENTI:
 🔴 ALLESTIMENTO 1
 • Caratteristica esclusiva 1
 • Caratteristica esclusiva 2
@@ -1008,11 +1089,33 @@ Per CONFRONTI:
 
 💡 CONSIGLIO: [suggerimento breve]
 
-IMPORTANTE:
-- NO informazioni generiche o da Wikipedia
-- NO lunghe descrizioni narrative
-- SÌ a dati concreti: prezzi, dotazioni, motori
-- SÌ a confronti diretti e tabellari`;
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚗 FORMATO PER AUTO USATE:
+
+Elenca le auto trovate così:
+━━━ MODELLO ━━━
+📅 Anno: XXXX
+🛣️ Km: XXX.XXX
+💰 Prezzo: €XX.XXX
+⚙️ Motore: [info motore]
+🎯 Accessori principali: [lista]
+🔗 Link: [url]
+
+IMPORTANTE per USATO:
+- Specifica SEMPRE: prezzo, km, anno
+- Elenca gli accessori/dotazioni principali
+- Max 3-4 auto per risposta
+- Se chiede confronto tra usate, fai tabella comparativa
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ IMPORTANTE:
+- NO informazioni generiche
+- NO lunghe descrizioni narrative  
+- SÌ a dati concreti e verificabili
+- Se non hai dati precisi, dillo chiaramente`;
+
 
     // Send message to AI
     async function sendMessage() {
