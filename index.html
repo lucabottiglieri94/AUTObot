@@ -631,11 +631,14 @@
 • Motorizzazioni e prezzi
 
 🚗 AUTO USATE (CentroAuto VT)
-• Veicoli disponibili
-• Prezzi, km e anno
-• Accessori ed equipaggiamenti
+• Ford, Jeep, Kia, Lancia, Land Rover
+• MAN, Mazda, MG, Opel, Peugeot
+• Renault, Seat, Smart, Suzuki, VW
+• Prezzi, km, anno, accessori
 
-Scrivi "usato" per cercare tra le auto usate, oppure chiedi info su modelli nuovi! 💡</div>
+Esempi:
+"Ford usate disponibili"
+"Confronta Compass Longitude e Limited" 💡</div>
       </div>
     </div>
 
@@ -954,7 +957,7 @@ Scrivi "usato" per cercare tra le auto usate, oppure chiedi info su modelli nuov
     // Verifica se la domanda riguarda auto
     function needsSearch(text) {
       const carKeywords = [
-        // Auto nuove
+        // Auto nuove (configuratori ufficiali)
         'prezzo', 'costo', 'quanto costa', 'listino',
         'allestimento', 'versione', 'dotazione', 'equipaggiamento', 'optional', 'serie',
         'motore', 'motorizzazione', 'cavalli', 'cv', 'kw', 'cilindrata',
@@ -970,15 +973,35 @@ Scrivi "usato" per cercare tra le auto usate, oppure chiedi info su modelli nuov
         'cambio', 'automatico', 'manuale', 'dct', 'cvt',
         'adas', 'assistenza', 'sicurezza', 'airbag', 'frenata automatica',
         'garanzia', 'manutenzione', 'tagliando',
+        // Modelli nuovi principali
         'panda', 'punto', '500', 'tipo', 'ducato', // Fiat
         'renegade', 'compass', 'wrangler', 'cherokee', 'avenger', // Jeep
         'giulia', 'stelvio', 'tonale', 'giulietta', // Alfa Romeo
         'ypsilon', 'delta', // Lancia
-        // Auto usate
+        // Auto usate - keyword generali
         'usato', 'usata', 'usati', 'usate', 'seconda mano', 'km zero',
         'chilometri', 'anno', 'immatricolazione', 'immatricolata',
         'centroauto', 'centro auto', 'stock', 'disponibile',
-        'occasione', 'occasioni', 'pronta consegna'
+        'occasione', 'occasioni', 'pronta consegna',
+        // Marche usato CentroAuto (da immagine)
+        'ford', 'kia', 'lancia', 'land rover', 'range rover',
+        'man', 'mazda', 'mg', 'opel', 'peugeot',
+        'renault', 'seat', 'smart', 'suzuki', 'volkswagen',
+        'audi', 'bmw', 'mercedes', 'volvo', 'toyota',
+        'honda', 'nissan', 'hyundai', 'citroen', 'dacia',
+        'skoda', 'mini', 'porsche', 'tesla', 'ds',
+        // Modelli popolari usato
+        'focus', 'fiesta', 'kuga', 'ecosport', // Ford
+        'sportage', 'picanto', 'rio', 'ceed', 'niro', // Kia
+        'defender', 'discovery', 'evoque', // Land Rover
+        'cx-5', 'mx-5', 'mazda2', 'mazda3', // Mazda
+        'corsa', 'astra', 'mokka', 'grandland', // Opel
+        '208', '308', '2008', '3008', '5008', // Peugeot
+        'clio', 'captur', 'megane', 'kadjar', // Renault
+        'ibiza', 'leon', 'arona', 'ateca', // Seat
+        'fortwo', 'forfour', // Smart
+        'vitara', 'swift', 'ignis', 'jimny', // Suzuki
+        'golf', 'polo', 'tiguan', 'passat', 't-roc', 'id.3', 'id.4' // Volkswagen
       ];
       
       const lowerText = text.toLowerCase();
@@ -989,6 +1012,16 @@ Scrivi "usato" per cercare tra le auto usate, oppure chiedi info su modelli nuov
     async function searchCarInfo(query) {
       try {
         const lowerQuery = query.toLowerCase();
+        
+        // Marche disponibili su CentroAuto
+        const usedCarBrands = [
+          'ford', 'jeep', 'kia', 'lancia', 'land rover', 'range rover',
+          'man', 'mazda', 'mg', 'opel', 'peugeot', 'renault', 
+          'seat', 'smart', 'suzuki', 'volkswagen', 'audi', 'bmw', 
+          'mercedes', 'volvo', 'toyota', 'honda', 'nissan', 
+          'hyundai', 'citroen', 'dacia', 'skoda', 'mini'
+        ];
+        
         const isUsedCar = lowerQuery.includes('usato') || 
                          lowerQuery.includes('usata') || 
                          lowerQuery.includes('usati') || 
@@ -997,14 +1030,23 @@ Scrivi "usato" per cercare tra le auto usate, oppure chiedi info su modelli nuov
                          lowerQuery.includes('km zero') ||
                          lowerQuery.includes('centroauto') ||
                          lowerQuery.includes('centro auto') ||
-                         lowerQuery.includes('occasione');
+                         lowerQuery.includes('occasione') ||
+                         usedCarBrands.some(brand => lowerQuery.includes(brand));
 
         let enhancedQuery;
         let allowedDomains;
 
         if (isUsedCar) {
-          // CERCA SOLO su CentroAuto
-          enhancedQuery = `${query} site:centroautovt.it`;
+          // CERCA SOLO su CentroAuto con parametri specifici
+          let searchQuery = query;
+          
+          // Se è stata menzionata una marca specifica, aggiungi alla query
+          const mentionedBrand = usedCarBrands.find(brand => lowerQuery.includes(brand));
+          if (mentionedBrand) {
+            searchQuery = `${mentionedBrand} ${query}`;
+          }
+          
+          enhancedQuery = `${searchQuery} site:centroautovt.it/ricerca-auto/usate`;
           allowedDomains = ['centroautovt.it'];
         } else {
           // CERCA SOLO configuratori ufficiali
@@ -1033,8 +1075,8 @@ Scrivi "usato" per cercare tra le auto usate, oppure chiedi info su modelli nuov
           if (validResults.length === 0) return null;
 
           if (isUsedCar) {
-            // Formato per auto usate
-            return validResults.slice(0, 5).map(r => 
+            // Formato per auto usate - più risultati
+            return validResults.slice(0, 6).map(r => 
               `🚗 ${r.title}\n${r.description}\n🔗 ${r.url}`
             ).join('\n\n━━━━━━━━━━━━━━━━━━\n\n');
           } else {
@@ -1060,6 +1102,11 @@ Scrivi "usato" per cercare tra le auto usate, oppure chiedi info su modelli nuov
 
 AUTO NUOVE: Fiat, Jeep, Alfa Romeo, Lancia (configuratori ufficiali)
 AUTO USATE: CentroAuto VT (https://www.centroautovt.it/)
+
+MARCHE USATO DISPONIBILI:
+Ford (9), Jeep (13), Kia (1), Lancia (4), Land Rover (1), 
+MAN (1), Mazda (2), MG (2), Opel (2), Peugeot (2), 
+Renault (3), Seat (1), Smart (1), Suzuki (1), Volkswagen (4)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -1094,7 +1141,7 @@ Per CONFRONTI ALLESTIMENTI:
 🚗 FORMATO PER AUTO USATE:
 
 Elenca le auto trovate così:
-━━━ MODELLO ━━━
+━━━ MARCA MODELLO ━━━
 📅 Anno: XXXX
 🛣️ Km: XXX.XXX
 💰 Prezzo: €XX.XXX
@@ -1103,10 +1150,11 @@ Elenca le auto trovate così:
 🔗 Link: [url]
 
 IMPORTANTE per USATO:
-- Specifica SEMPRE: prezzo, km, anno
+- Specifica SEMPRE: marca, modello, prezzo, km, anno
 - Elenca gli accessori/dotazioni principali
 - Max 3-4 auto per risposta
 - Se chiede confronto tra usate, fai tabella comparativa
+- Se chiede una marca specifica (Ford, Kia, Peugeot, ecc.), filtra solo quella
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
