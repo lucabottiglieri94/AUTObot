@@ -355,12 +355,13 @@
       flex-direction:row-reverse;
     }
     .messageBubble{
-      max-width:75%;
+      max-width:85%;
       padding:12px 16px;
       border-radius:18px;
       font-size:14px;
-      line-height:1.5;
+      line-height:1.6;
       word-wrap:break-word;
+      white-space:pre-line;
     }
     .message.ai .messageBubble{
       background:linear-gradient(135deg, rgba(59,130,246,.85) 0%, rgba(96,165,250,.85) 100%);
@@ -566,27 +567,27 @@
         />
         <div>
           <div class="chatHeaderTitle">AI BOTT Assistant</div>
-          <div class="chatHeaderSub">Sempre pronto ad aiutarti</div>
+          <div class="chatHeaderSub">Esperto configurazioni</div>
         </div>
       </div>
       <div class="chatHeaderBtns">
         <button class="chatHeaderBtn" id="minimizeBtn" title="Minimizza">−</button>
-        <button class="chatHeaderBtn" id="closeBtn" title="Chiudi e cancella">×</button>
+        <button class="chatHeaderBtn" id="closeBtn" title="Chiudi">×</button>
       </div>
     </div>
 
     <div class="chatMessages" id="chatMessages">
       <!-- Messaggio di benvenuto -->
       <div class="message ai">
-        <div class="messageBubble">
-          👋 Ciao! Sono l'assistente AI di AI BOTT Automotive.<br><br>
-          🔍 Posso cercare informazioni aggiornate su:<br>
-          • Listini e prezzi (Quattroruote.it)<br>
-          • Configuratori ufficiali (Fiat, Jeep, Alfa, Lancia)<br>
-          • Recensioni e prove su strada<br>
-          • Caratteristiche tecniche e consumi<br><br>
-          Cosa vorresti sapere? 🚗
-        </div>
+        <div class="messageBubble">👋 Ciao! Sono l'assistente AI BOTT specializzato in configurazioni auto.
+
+🔍 Posso aiutarti con:
+• Allestimenti e versioni (confronti dettagliati)
+• Dotazioni e optional di serie
+• Motorizzazioni disponibili
+• Prezzi di listino aggiornati
+
+Chiedi pure! Esempio: "Confronta Panda City Life vs Panda Cross" 🚗</div>
       </div>
     </div>
 
@@ -595,7 +596,7 @@
         type="text" 
         class="chatInputField" 
         id="chatInputField" 
-        placeholder="Scrivi la tua domanda..."
+        placeholder="Es: differenza tra Jeep Compass Longitude e Limited"
         autocomplete="off"
       />
       <button class="chatSendBtn" id="chatSendBtn">
@@ -814,7 +815,7 @@
       }
     });
 
-    // ========== CHATBOT LOGIC ==========
+    // ========== CHATBOT LOGIC - IMPROVED ========== 
     
     let chatHistory = [];
     let isMinimized = false;
@@ -843,30 +844,14 @@
       $("chatMinimizedLogo").style.display = "block";
     });
 
-    // Close & clear
+    // Close (senza cancellare la cronologia)
     closeBtn.addEventListener("click", () => {
       chatBox.classList.remove("open");
       chatBox.classList.remove("minimized");
       chatTrigger.style.display = "flex";
-      
-      // Clear chat history
-      chatHistory = [];
-      chatMessages.innerHTML = `
-        <div class="message ai">
-          <div class="messageBubble">
-            👋 Ciao! Sono l'assistente AI di AI BOTT Automotive.<br><br>
-            🔍 Posso cercare informazioni aggiornate su:<br>
-            • Listini e prezzi (Quattroruote.it)<br>
-            • Configuratori ufficiali (Fiat, Jeep, Alfa, Lancia)<br>
-            • Recensioni e prove su strada<br>
-            • Caratteristiche tecniche e consumi<br><br>
-            Cosa vorresti sapere? 🚗
-          </div>
-        </div>
-      `;
     });
 
-    // Se minimizzata, click sull'header o sul logo per riaprire
+    // Riapertura da header o logo minimizzato
     chatBox.querySelector(".chatHeader").addEventListener("click", (e) => {
       if (isMinimized && !e.target.closest("button")) {
         chatBox.classList.remove("minimized");
@@ -875,7 +860,6 @@
       }
     });
 
-    // Click sul logo minimizzato per riaprire
     $("chatMinimizedLogo").addEventListener("click", () => {
       chatBox.classList.remove("minimized");
       isMinimized = false;
@@ -887,8 +871,12 @@
     function addMessage(text, sender) {
       const messageDiv = document.createElement("div");
       messageDiv.className = `message ${sender}`;
+      
+      // Per AI: mantieni formattazione con \n
+      const content = sender === 'ai' ? text : escapeHtml(text);
+      
       messageDiv.innerHTML = `
-        <div class="messageBubble">${escapeHtml(text)}</div>
+        <div class="messageBubble">${content}</div>
       `;
       chatMessages.appendChild(messageDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -915,124 +903,179 @@
       if (typing) typing.remove();
     }
 
-    // Check if question is about cars (needs search)
+    // Verifica se la domanda riguarda auto
     function needsSearch(text) {
       const carKeywords = [
-        'prezzo', 'costo', 'quanto costa', 'configurazione', 'allestimento',
-        'modello', 'versione', 'motore', 'cavalli', 'consumi', 'autonomia',
-        'dimensioni', 'colori', 'optional', 'equipaggiamento', 'disponibilità',
-        'caratteristiche', 'scheda tecnica', 'prestazioni', 'km/l',
-        'listino', 'novità', 'recensione', 'confronto', 'opinioni',
-        'prova', 'test', 'foto', 'video', 'quando esce', 'uscita',
-        'ibrida', 'elettrica', 'diesel', 'benzina', 'gpl', 'metano',
-        'trazione', 'cambio', 'automatico', 'manuale', 'accelerazione',
-        'velocità', 'massa', 'peso', 'bagagliaio', 'portabagagli',
-        'sicurezza', 'airbag', 'adas', 'assistenza', 'garanzia'
+        'prezzo', 'costo', 'quanto costa', 'listino',
+        'allestimento', 'versione', 'dotazione', 'equipaggiamento', 'optional', 'serie',
+        'motore', 'motorizzazione', 'cavalli', 'cv', 'kw', 'cilindrata',
+        'consumi', 'autonomia', 'km/l', 'emissioni',
+        'dimensioni', 'lunghezza', 'larghezza', 'altezza', 'bagagliaio',
+        'colori', 'tinta', 'verniciatura',
+        'disponibilità', 'tempi consegna',
+        'caratteristiche', 'scheda tecnica', 'specifiche',
+        'confronto', 'differenza', 'meglio', 'vs', 'o',
+        'ibrida', 'elettrica', 'plug-in', 'mild hybrid', 'full hybrid',
+        'diesel', 'benzina', 'gpl', 'metano',
+        'trazione', 'integrale', '4x4', 'awd', 'anteriore', 'posteriore',
+        'cambio', 'automatico', 'manuale', 'dct', 'cvt',
+        'adas', 'assistenza', 'sicurezza', 'airbag', 'frenata automatica',
+        'garanzia', 'manutenzione', 'tagliando',
+        'panda', 'punto', '500', 'tipo', 'ducato', // Fiat
+        'renegade', 'compass', 'wrangler', 'cherokee', 'avenger', // Jeep
+        'giulia', 'stelvio', 'tonale', 'giulietta', // Alfa Romeo
+        'ypsilon', 'delta' // Lancia
       ];
+      
       const lowerText = text.toLowerCase();
       return carKeywords.some(keyword => lowerText.includes(keyword));
     }
 
-    // Search using Brave API - Multiple sources
+    // RICERCA MIGLIORATA - Solo configuratori ufficiali
     async function searchCarInfo(query) {
       try {
-        // Priorità ai siti ufficiali e Quattroruote
-        const prioritySites = [
-          'site:quattroruote.it/listino',
-          'site:fiat.it',
-          'site:jeep-official.it',
-          'site:alfaromeo.it',
-          'site:lancia.it',
-          'site:autoblog.it',
-          'site:motorbox.com',
-          'site:autoappassionati.it'
+        // SOLO siti ufficiali configuratori
+        const officialSites = [
+          'site:fiat.it/configuratore OR site:fiat.it/gamma',
+          'site:jeep-official.it/configuratore OR site:jeep-official.it/gamma',
+          'site:alfaromeo.it/configuratore OR site:alfaromeo.it/gamma',
+          'site:lancia.it/configuratore OR site:lancia.it/gamma'
         ];
 
-        // Prima ricerca: siti prioritari
-        const enhancedQuery = `${query} ${prioritySites.slice(0, 5).join(' OR ')}`;
+        // Query mirata ai configuratori
+        const enhancedQuery = `${query} allestimenti versioni (${officialSites.join(' OR ')})`;
         
         const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(enhancedQuery)}`);
-        if (!response.ok) throw new Error("Errore nella ricerca");
+        if (!response.ok) throw new Error("Errore ricerca");
         
         const data = await response.json();
         
         if (data.results && data.results.length > 0) {
-          // Filtra e dai priorità a Quattroruote
-          const sortedResults = data.results.sort((a, b) => {
-            const aIsQuattroruote = a.url.includes('quattroruote.it');
-            const bIsQuattroruote = b.url.includes('quattroruote.it');
-            if (aIsQuattroruote && !bIsQuattroruote) return -1;
-            if (!aIsQuattroruote && bIsQuattroruote) return 1;
-            return 0;
+          // Filtra SOLO risultati da configuratori ufficiali
+          const officialResults = data.results.filter(r => {
+            const url = r.url.toLowerCase();
+            return (
+              (url.includes('fiat.it') && (url.includes('configuratore') || url.includes('gamma'))) ||
+              (url.includes('jeep-official.it') && (url.includes('configuratore') || url.includes('gamma'))) ||
+              (url.includes('alfaromeo.it') && (url.includes('configuratore') || url.includes('gamma'))) ||
+              (url.includes('lancia.it') && (url.includes('configuratore') || url.includes('gamma')))
+            );
           });
 
-          return sortedResults.map(r => 
-            `📌 ${r.title}\n${r.description}\n🔗 Fonte: ${r.url}`
-          ).join('\n\n---\n\n');
+          if (officialResults.length === 0) return null;
+
+          // Formatta i risultati in modo più strutturato
+          return officialResults.slice(0, 3).map(r => {
+            const brand = r.url.includes('fiat') ? 'Fiat' :
+                         r.url.includes('jeep') ? 'Jeep' :
+                         r.url.includes('alfa') ? 'Alfa Romeo' : 'Lancia';
+            
+            return `━━━ ${brand.toUpperCase()} ━━━\n${r.title}\n\n${r.description}\n\n🔗 ${r.url}`;
+          }).join('\n\n');
         }
         return null;
       } catch (err) {
-        console.error("Search error:", err);
+        console.error("Errore ricerca:", err);
         return null;
       }
     }
+
+    // SISTEMA PROMPT MIGLIORATO
+    const SYSTEM_PROMPT = `Sei un assistente esperto di configurazioni auto dei marchi: Fiat, Jeep, Alfa Romeo e Lancia.
+
+REGOLE FONDAMENTALI:
+1. Risposte SCHEMATICHE e CONCISE (max 8-10 righe)
+2. Usa ELENCHI PUNTATI per chiarezza
+3. Evidenzia solo INFO ESSENZIALI
+4. Per confronti: tabella comparativa o lista differenze chiave
+5. SEMPRE basati SOLO sui dati dei configuratori ufficiali forniti
+6. Se non hai info precise dai configuratori, dillo chiaramente
+
+FORMATO RISPOSTA:
+Per INFO GENERALI:
+✓ Punto chiave 1
+✓ Punto chiave 2
+✓ Punto chiave 3
+
+Per CONFRONTI:
+🔴 ALLESTIMENTO 1
+• Caratteristica esclusiva 1
+• Caratteristica esclusiva 2
+
+🔵 ALLESTIMENTO 2  
+• Caratteristica esclusiva 1
+• Caratteristica esclusiva 2
+
+💡 CONSIGLIO: [suggerimento breve]
+
+IMPORTANTE:
+- NO informazioni generiche o da Wikipedia
+- NO lunghe descrizioni narrative
+- SÌ a dati concreti: prezzi, dotazioni, motori
+- SÌ a confronti diretti e tabellari`;
 
     // Send message to AI
     async function sendMessage() {
       const userMessage = chatInputField.value.trim();
       if (!userMessage) return;
 
-      // Add user message to UI
       addMessage(userMessage, "user");
       chatInputField.value = "";
       chatSendBtn.disabled = true;
 
-      // Add to history
       chatHistory.push({ role: "user", content: userMessage });
 
-      // Show typing
       showTyping();
 
       try {
         let searchResults = null;
 
-        // Check if we need to search
+        // Cerca solo se riguarda auto
         if (needsSearch(userMessage)) {
           searchResults = await searchCarInfo(userMessage);
         }
 
-        // Call chat API
+        // Prepara i messaggi per l'API
+        const messages = [
+          { role: "system", content: SYSTEM_PROMPT },
+          ...chatHistory
+        ];
+
+        // Se ci sono risultati di ricerca, aggiungili al contesto
+        if (searchResults) {
+          messages.push({
+            role: "system",
+            content: `DATI DAI CONFIGURATORI UFFICIALI:\n\n${searchResults}\n\nRispondi usando SOLO questi dati ufficiali in formato schematico.`
+          });
+        }
+
         const response = await fetch(BACKEND_CHAT, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            messages: chatHistory,
-            searchResults: searchResults
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages }),
         });
 
-        if (!response.ok) {
-          throw new Error(`Errore ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Errore ${response.status}`);
 
         const data = await response.json();
         
         hideTyping();
 
-        const aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho capito.";
+        let aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho capito.";
         
-        // Add AI response to UI
+        // Escape HTML ma mantieni i \n per la formattazione
+        aiMessage = aiMessage.replace(/[&<>"']/g, c => ({
+          "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+        }[c]));
+        
         addMessage(aiMessage, "ai");
 
-        // Add to history
         chatHistory.push({ role: "assistant", content: aiMessage });
 
       } catch (error) {
         hideTyping();
-        console.error("Chat error:", error);
-        addMessage("❌ Si è verificato un errore. Riprova tra poco.", "ai");
+        console.error("Errore chat:", error);
+        addMessage("❌ Errore di connessione. Riprova tra poco.", "ai");
       } finally {
         chatSendBtn.disabled = false;
         chatInputField.focus();
