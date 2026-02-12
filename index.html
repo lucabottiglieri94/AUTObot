@@ -951,60 +951,210 @@ Scrivi il modello che cerchi! 👇</div>
       if (typing) typing.remove();
     }
 
+    // DATABASE AUTO USATE CENTROAUTO
+    const USED_CARS_DB = {
+      // MARCHE PRINCIPALI
+      'ford': {
+        name: 'Ford',
+        count: 9,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Ford',
+        models: ['fiesta', 'focus', 'kuga', 'ecosport', 'puma', 'transit']
+      },
+      'jeep': {
+        name: 'Jeep',
+        count: 13,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Jeep',
+        models: ['renegade', 'compass', 'wrangler', 'cherokee']
+      },
+      'kia': {
+        name: 'Kia',
+        count: 1,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Kia',
+        models: ['sportage', 'picanto', 'rio', 'ceed', 'niro']
+      },
+      'lancia': {
+        name: 'Lancia',
+        count: 4,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Lancia',
+        models: ['ypsilon', 'delta']
+      },
+      'land rover': {
+        name: 'Land Rover',
+        count: 1,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Land+Rover',
+        models: ['defender', 'discovery', 'evoque', 'range rover']
+      },
+      'mazda': {
+        name: 'Mazda',
+        count: 2,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Mazda',
+        models: ['cx-5', 'mx-5', 'mazda2', 'mazda3']
+      },
+      'mg': {
+        name: 'MG',
+        count: 2,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=MG'
+      },
+      'opel': {
+        name: 'Opel',
+        count: 2,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Opel',
+        models: ['corsa', 'astra', 'mokka', 'grandland']
+      },
+      'peugeot': {
+        name: 'Peugeot',
+        count: 2,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Peugeot',
+        models: ['208', '308', '2008', '3008', '5008']
+      },
+      'renault': {
+        name: 'Renault',
+        count: 3,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Renault',
+        models: ['clio', 'captur', 'megane', 'kadjar']
+      },
+      'seat': {
+        name: 'Seat',
+        count: 1,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Seat',
+        models: ['ibiza', 'leon', 'arona', 'ateca']
+      },
+      'smart': {
+        name: 'Smart',
+        count: 1,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Smart',
+        models: ['fortwo', 'forfour']
+      },
+      'suzuki': {
+        name: 'Suzuki',
+        count: 1,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Suzuki',
+        models: ['vitara', 'swift', 'ignis', 'jimny']
+      },
+      'volkswagen': {
+        name: 'Volkswagen',
+        count: 4,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Volkswagen',
+        models: ['golf', 'polo', 'tiguan', 'passat', 't-roc', 'id.3', 'id.4']
+      },
+      // ALTRI MARCHI
+      'fiat': {
+        name: 'Fiat',
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Fiat',
+        models: ['500', '500x', '500l', 'panda', 'tipo', 'punto']
+      },
+      'audi': {
+        name: 'Audi',
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Audi',
+        models: ['a3', 'a4', 'q3', 'q5']
+      },
+      'bmw': {
+        name: 'BMW',
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=BMW',
+        models: ['serie 1', 'serie 3', 'x1', 'x3']
+      },
+      'mercedes': {
+        name: 'Mercedes-Benz',
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Mercedes-Benz',
+        models: ['classe a', 'classe c', 'gla', 'glc']
+      },
+      'volkswagen': {
+        name: 'Volkswagen',
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Volkswagen',
+        models: ['golf', 'polo', 'tiguan', 't-roc']
+      }
+    };
+
+    // MODELLI SPECIFICI (per ricerche tipo "500X usata")
+    const SPECIFIC_MODELS = {
+      '500': 'fiat',
+      '500x': 'fiat',
+      '500l': 'fiat',
+      'panda': 'fiat',
+      'tipo': 'fiat',
+      'punto': 'fiat',
+      'renegade': 'jeep',
+      'compass': 'jeep',
+      'wrangler': 'jeep',
+      'ypsilon': 'lancia',
+      'fiesta': 'ford',
+      'focus': 'ford',
+      'kuga': 'ford',
+      'ecosport': 'ford',
+      'golf': 'volkswagen',
+      'polo': 'volkswagen',
+      'tiguan': 'volkswagen',
+      'corsa': 'opel',
+      'astra': 'opel',
+      'clio': 'renault',
+      'captur': 'renault'
+    };
+
     // Verifica se cerca auto usate
     function isUsedCarQuery(text) {
       const lowerText = text.toLowerCase();
-      const usedKeywords = ['usato', 'usata', 'usati', 'usate', 'seconda mano', 'km zero', 'centroauto'];
-      const usedBrands = ['ford', 'kia', 'lancia', 'land rover', 'range rover', 'man', 'mazda', 
-                          'mg', 'opel', 'peugeot', 'renault', 'seat', 'smart', 'suzuki', 'volkswagen'];
+      const usedKeywords = ['usato', 'usata', 'usati', 'usate', 'seconda mano', 'km zero', 'centroauto', 'stock'];
       
-      return usedKeywords.some(kw => lowerText.includes(kw)) || 
-             usedBrands.some(brand => lowerText.includes(brand));
+      // Controlla keywords OPPURE se menziona una marca del database
+      const mentionsBrand = Object.keys(USED_CARS_DB).some(brand => lowerText.includes(brand));
+      const mentionsModel = Object.keys(SPECIFIC_MODELS).some(model => lowerText.includes(model));
+      
+      return usedKeywords.some(kw => lowerText.includes(kw)) || mentionsBrand || mentionsModel;
     }
 
-    // Cerca auto USATE su CentroAuto
-    async function searchUsedCars(query) {
-      try {
-        const lowerQuery = query.toLowerCase();
-        
-        // Estrai modello/marca dalla query
-        let searchTerm = query.replace(/usato|usata|usati|usate|seconda mano|km zero/gi, '').trim();
-        
-        const enhancedQuery = `${searchTerm} site:centroautovt.it/ricerca-auto/usate`;
-        
-        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(enhancedQuery)}`);
-        if (!response.ok) throw new Error("Errore ricerca");
-        
-        const data = await response.json();
-        
-        if (data.results && data.results.length > 0) {
-          const validResults = data.results.filter(r => 
-            r.url.toLowerCase().includes('centroautovt.it')
-          );
-
-          if (validResults.length === 0) {
-            return "❌ Non ho trovato auto usate per questa ricerca su CentroAuto.\n\nProva con:\n• Un'altra marca (Ford, Jeep, Kia, ecc.)\n• Un modello specifico (500X, Compass, ecc.)";
+    // Genera risposta per auto USATE
+    function getUsedCarsResponse(query) {
+      const lowerQuery = query.toLowerCase();
+      
+      // Cerca modello specifico
+      for (const [model, brand] of Object.entries(SPECIFIC_MODELS)) {
+        if (lowerQuery.includes(model)) {
+          const brandData = USED_CARS_DB[brand];
+          if (brandData) {
+            return `🚗 <b>${model.toUpperCase()} USATE</b> su CentroAuto\n\n` +
+                   `📍 Cerca tra le auto <b>${brandData.name}</b> disponibili:\n\n` +
+                   `🔗 <a href="${brandData.link}" target="_blank">VAI ALLE ${brandData.name.toUpperCase()} USATE</a>\n\n` +
+                   `💡 <i>Filtra per modello "${model}" una volta sulla pagina!</i>\n\n` +
+                   `📊 <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">Vedi tutto lo stock usato</a>`;
           }
-
-          let response = `🚗 Ho trovato ${validResults.length} auto usate:\n\n`;
+        }
+      }
+      
+      // Cerca marca specifica
+      for (const [brandKey, brandData] of Object.entries(USED_CARS_DB)) {
+        if (lowerQuery.includes(brandKey)) {
+          let response = `🚗 <b>${brandData.name.toUpperCase()} USATE</b> su CentroAuto\n\n`;
           
-          validResults.slice(0, 5).forEach((car, i) => {
-            response += `━━━ ${i + 1}. ${car.title} ━━━\n`;
-            response += `${car.description}\n\n`;
-            response += `🔗 <a href="${car.url}" target="_blank">Vedi dettagli su CentroAuto</a>\n\n`;
-          });
-
-          response += `💡 Visita <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">CentroAuto</a> per vedere tutto lo stock!`;
+          if (brandData.count) {
+            response += `📊 <b>${brandData.count} veicoli</b> disponibili\n\n`;
+          }
+          
+          if (brandData.models && brandData.models.length > 0) {
+            response += `🏷️ <b>Modelli disponibili:</b>\n`;
+            response += brandData.models.map(m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`).join('\n');
+            response += '\n\n';
+          }
+          
+          response += `🔗 <a href="${brandData.link}" target="_blank">VAI ALLE ${brandData.name.toUpperCase()} USATE</a>\n\n`;
+          response += `💡 <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">Sfoglia tutto lo stock</a>`;
           
           return response;
         }
-        
-        return "❌ Nessuna auto usata trovata. Prova con un'altra ricerca!";
-        
-      } catch (err) {
-        console.error("Errore ricerca usato:", err);
-        return "❌ Errore durante la ricerca. Riprova!";
       }
+      
+      // Risposta generica per "usato" senza marca specifica
+      return `🚗 <b>AUTO USATE</b> su CentroAuto VT\n\n` +
+             `📊 <b>Marche disponibili:</b>\n\n` +
+             `<b>TOP STOCK:</b>\n` +
+             `• Ford (9 auto) - <a href="${USED_CARS_DB.ford.link}" target="_blank">Vedi</a>\n` +
+             `• Jeep (13 auto) - <a href="${USED_CARS_DB.jeep.link}" target="_blank">Vedi</a>\n` +
+             `• Lancia (4 auto) - <a href="${USED_CARS_DB.lancia.link}" target="_blank">Vedi</a>\n` +
+             `• Volkswagen (4 auto) - <a href="${USED_CARS_DB.volkswagen.link}" target="_blank">Vedi</a>\n\n` +
+             `<b>ALTRE MARCHE:</b>\n` +
+             `Kia • Mazda • MG • Opel • Peugeot\n` +
+             `Renault • Seat • Smart • Suzuki\n\n` +
+             `🔗 <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">VEDI TUTTO LO STOCK</a>\n\n` +
+             `💡 <i>Scrivi "Ford usate" o "500X usata" per risultati specifici!</i>`;
     }
 
     // Cerca info AUTO NUOVE
@@ -1082,9 +1232,9 @@ FORMATO RISPOSTA:
       try {
         // Verifica se cerca auto usate o nuove
         if (isUsedCarQuery(userMessage)) {
-          // USATO: cerca e mostra link diretti
-          const results = await searchUsedCars(userMessage);
+          // USATO: usa il database locale per link diretti
           hideTyping();
+          const results = getUsedCarsResponse(userMessage);
           addMessage(results, "ai");
         } else {
           // NUOVO: usa AI per confrontare allestimenti
