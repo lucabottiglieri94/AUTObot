@@ -58,6 +58,7 @@
       min-width: 320px;
     }
 
+    /* LOGO TOP-LEFT + TESTO */
     .brandMark{
       display:flex;
       align-items:center;
@@ -118,6 +119,7 @@
     .btn.brand-alfa:hover{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)}
     .btn.brand-lancia:hover{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.1)}
 
+    /* CentroAuto Logo */
     .centroAutoLink{
       display:inline-flex;
       align-items:center;
@@ -152,6 +154,7 @@
     }
     .muted{color:var(--muted)}
 
+    /* LAYOUT: NEWS A SINISTRA (riquadro scrollabile) */
     .layout{
       margin-top:16px;
       display:grid;
@@ -186,6 +189,7 @@
       padding:12px;
     }
 
+    /* scrollbar (WebKit) */
     .newsScroll::-webkit-scrollbar{width:10px}
     .newsScroll::-webkit-scrollbar-thumb{
       background:rgba(59,130,246,.25);
@@ -225,6 +229,7 @@
 
     /* ========== CHATBOT STYLES ========== */
     
+    /* Pulsante AI Agent (bottom-right) */
     .chatTrigger{
       position:fixed;
       bottom:24px;
@@ -252,6 +257,7 @@
       object-fit:contain;
     }
 
+    /* Chat Box Container */
     .chatBox{
       position:fixed;
       bottom:24px;
@@ -285,6 +291,7 @@
       display:none;
     }
 
+    /* Chat Header */
     .chatHeader{
       background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
       padding:14px 16px;
@@ -339,6 +346,7 @@
       transform:scale(1.05);
     }
 
+    /* Chat Messages Area */
     .chatMessages{
       flex:1;
       overflow-y:auto;
@@ -357,6 +365,7 @@
     }
     .chatMessages::-webkit-scrollbar-track{background:rgba(0,0,0,.2)}
 
+    /* Message Bubbles */
     .message{
       display:flex;
       gap:8px;
@@ -390,6 +399,17 @@
       border-bottom-right-radius:4px;
     }
 
+    /* Link style dentro i messaggi */
+    .messageBubble a {
+      color: #fff;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+    .messageBubble a:hover {
+      color: #fbbf24;
+    }
+
+    /* Typing Indicator */
     .typingIndicator{
       display:flex;
       gap:8px;
@@ -414,6 +434,7 @@
       40%{transform:scale(1)}
     }
 
+    /* Chat Input */
     .chatInput{
       padding:16px;
       background:rgba(10,12,18,.95);
@@ -516,6 +537,7 @@
           <button id="alfaBtn" class="btn brand-alfa">Alfa Romeo</button>
           <button id="lanciaBtn" class="btn brand-lancia">Lancia</button>
           
+          <!-- Logo CentroAuto -->
           <a 
             href="https://www.centroautovt.it/" 
             target="_blank" 
@@ -542,6 +564,7 @@
 
   <main class="wrap">
     <div class="layout">
+      <!-- NEWS A SINISTRA -->
       <aside class="panel">
         <div class="panelHeader">
           <div>
@@ -557,6 +580,7 @@
         </div>
       </aside>
 
+      <!-- CONTENUTI A DESTRA -->
       <section class="rightSpace">
         <div style="font-weight:950;font-size:18px">Area contenuti</div>
         <div class="muted" style="margin-top:8px;line-height:1.45">
@@ -568,6 +592,7 @@
 
   <!-- ========== CHATBOT UI ========== -->
   
+  <!-- Pulsante trigger -->
   <div class="chatTrigger" id="chatTrigger">
     <img 
       src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" 
@@ -575,7 +600,9 @@
     />
   </div>
 
+  <!-- Chat Box -->
   <div class="chatBox" id="chatBox">
+    <!-- Logo visibile quando minimizzato -->
     <img 
       id="chatMinimizedLogo"
       src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" 
@@ -592,7 +619,7 @@
         />
         <div>
           <div class="chatHeaderTitle">AI BOTT Assistant</div>
-          <div class="chatHeaderSub">Esperto auto nuove e usate</div>
+          <div class="chatHeaderSub">Esperto configurazioni</div>
         </div>
       </div>
       <div class="chatHeaderBtns">
@@ -602,26 +629,24 @@
     </div>
 
     <div class="chatMessages" id="chatMessages">
+      <!-- Messaggio di benvenuto -->
       <div class="message ai">
-        <div class="messageBubble">👋 Ciao! Sono l'assistente AI BOTT specializzato in auto nuove e usate.
+        <div class="messageBubble">👋 Ciao! Sono l'assistente AI BOTT.
 
-🔍 Posso aiutarti con:
+🔍 COME FUNZIONO:
 
-🆕 AUTO NUOVE (Fiat, Jeep, Alfa, Lancia)
-• Allestimenti e versioni
-• Dotazioni e optional
-• Motorizzazioni e prezzi
-
-🚗 AUTO USATE (CentroAuto VT - DATABASE REALE)
-• Modelli con targhe, km, colori REALI
-• Ford, Jeep, Kia, Lancia, Land Rover
-• MAN, Mazda, MG, Opel, Peugeot
-• Renault, Seat, Smart, Suzuki, VW
-
+🚗 AUTO USATE → Ti do i LINK DIRETTI
 Esempi:
-"MG ZS usate disponibili"
-"Tutte le Ford usate"
-"Confronta Compass Longitude e Limited" 💡</div>
+• "500X usata"
+• "Ford usate"
+• "Jeep Compass usata"
+
+🆕 AUTO NUOVE → Confronto allestimenti
+Esempi:
+• "Confronta Compass Longitude e Limited"
+• "Differenze tra Panda Pop e Easy"
+
+Scrivi il modello che cerchi! 👇</div>
       </div>
     </div>
 
@@ -630,7 +655,7 @@ Esempi:
         type="text" 
         class="chatInputField" 
         id="chatInputField" 
-        placeholder="Es: MG ZS usate con tutti i dettagli"
+        placeholder="Es: 500X usata oppure Compass Longitude vs Limited"
         autocomplete="off"
       />
       <button class="chatSendBtn" id="chatSendBtn">
@@ -654,11 +679,9 @@ Esempi:
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-    // ========== CONFIGURAZIONE BACKEND ==========
-    const BACKEND_BASE = "https://aut-obot.vercel.app/0"; // 🔧 CAMBIA CON IL TUO URL VERCEL
     const BACKEND_NEWS = "/api/news";
     const BACKEND_CHAT = "https://auto-backend-three.vercel.app/api/chat";
-    const BACKEND_USED_CARS = `${BACKEND_BASE}/api/search-used-cars`;
+    const BACKEND_SEARCH = "https://auto-backend-three.vercel.app/api/search";
 
     const BRAND_LINKS = {
       Fiat: "https://www.fiat.it/omni/configuratore/#/",
@@ -851,9 +874,8 @@ Esempi:
       }
     });
 
-    // ========== CHATBOT LOGIC - CON DATABASE REALE ========== 
+    // ========== CHATBOT LOGIC - NUOVO SISTEMA ========== 
     
-    let chatHistory = [];
     let isMinimized = false;
 
     const chatTrigger = $("chatTrigger");
@@ -864,6 +886,7 @@ Esempi:
     const minimizeBtn = $("minimizeBtn");
     const closeBtn = $("closeBtn");
 
+    // Toggle chat
     chatTrigger.addEventListener("click", () => {
       chatBox.classList.add("open");
       chatBox.classList.remove("minimized");
@@ -899,15 +922,11 @@ Esempi:
       chatInputField.focus();
     });
 
-    function addMessage(text, sender) {
+    // Add message to UI
+    function addMessage(html, sender) {
       const messageDiv = document.createElement("div");
       messageDiv.className = `message ${sender}`;
-      
-      const content = sender === 'ai' ? text : escapeHtml(text);
-      
-      messageDiv.innerHTML = `
-        <div class="messageBubble">${content}</div>
-      `;
+      messageDiv.innerHTML = `<div class="messageBubble">${html}</div>`;
       chatMessages.appendChild(messageDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
@@ -932,194 +951,177 @@ Esempi:
       if (typing) typing.remove();
     }
 
-    // Verifica se la domanda riguarda auto USATE
+    // Verifica se cerca auto usate
     function isUsedCarQuery(text) {
       const lowerText = text.toLowerCase();
-      const usedKeywords = [
-        'usato', 'usata', 'usati', 'usate', 'seconda mano', 'km zero',
-        'centroauto', 'centro auto', 'stock', 'disponibile',
-        'ford', 'mazda', 'kia', 'peugeot', 'renault', 'opel', 
-        'volkswagen', 'mg', 'seat', 'smart', 'suzuki', 'land rover'
-      ];
+      const usedKeywords = ['usato', 'usata', 'usati', 'usate', 'seconda mano', 'km zero', 'centroauto'];
+      const usedBrands = ['ford', 'kia', 'lancia', 'land rover', 'range rover', 'man', 'mazda', 
+                          'mg', 'opel', 'peugeot', 'renault', 'seat', 'smart', 'suzuki', 'volkswagen'];
       
-      return usedKeywords.some(keyword => lowerText.includes(keyword));
+      return usedKeywords.some(kw => lowerText.includes(kw)) || 
+             usedBrands.some(brand => lowerText.includes(brand));
     }
 
-    // RICERCA NEL DATABASE AUTO USATE
+    // Cerca auto USATE su CentroAuto
     async function searchUsedCars(query) {
       try {
-        console.log('🔍 Cercando auto usate nel database:', query);
+        const lowerQuery = query.toLowerCase();
         
-        const response = await fetch(BACKEND_USED_CARS, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query })
-        });
-
-        if (!response.ok) {
-          throw new Error(`Errore ${response.status}`);
-        }
-
+        // Estrai modello/marca dalla query
+        let searchTerm = query.replace(/usato|usata|usati|usate|seconda mano|km zero/gi, '').trim();
+        
+        const enhancedQuery = `${searchTerm} site:centroautovt.it/ricerca-auto/usate`;
+        
+        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(enhancedQuery)}`);
+        if (!response.ok) throw new Error("Errore ricerca");
+        
         const data = await response.json();
         
-        if (data.success && data.cars && data.cars.length > 0) {
-          console.log(`✅ Trovate ${data.cars.length} auto nel database`);
+        if (data.results && data.results.length > 0) {
+          const validResults = data.results.filter(r => 
+            r.url.toLowerCase().includes('centroautovt.it')
+          );
+
+          if (validResults.length === 0) {
+            return "❌ Non ho trovato auto usate per questa ricerca su CentroAuto.\n\nProva con:\n• Un'altra marca (Ford, Jeep, Kia, ecc.)\n• Un modello specifico (500X, Compass, ecc.)";
+          }
+
+          let response = `🚗 Ho trovato ${validResults.length} auto usate:\n\n`;
           
-          // Formatta i risultati in modo dettagliato
-          return data.cars.map(car => {
-            let carInfo = `━━━ ${car.brand} ${car.model} ━━━\n`;
-            if (car.price) carInfo += `💰 Prezzo: ${car.price}\n`;
-            if (car.year) carInfo += `📅 Anno: ${car.year}\n`;
-            if (car.km) carInfo += `🛣️ Km: ${car.km}\n`;
-            if (car.fuel) carInfo += `⛽ Carburante: ${car.fuel}\n`;
-            if (car.transmission) carInfo += `⚙️ Cambio: ${car.transmission}\n`;
-            if (car.hp) carInfo += `🏎️ Potenza: ${car.hp}\n`;
-            if (car.color) carInfo += `🎨 Colore: ${car.color}\n`;
-            if (car.bodyType) carInfo += `🚗 Tipo: ${car.bodyType}\n`;
-            if (car.doors) carInfo += `🚪 Porte: ${car.doors}\n`;
-            
-            // Aggiungi fino a 3 features principali
-            if (car.features && car.features.length > 0) {
-              const topFeatures = car.features.slice(0, 3);
-              carInfo += `🎯 Accessori: ${topFeatures.join(', ')}\n`;
-            }
-            
-            if (car.url) carInfo += `🔗 Link: ${car.url}\n`;
-            
-            return carInfo;
-          }).join('\n');
+          validResults.slice(0, 5).forEach((car, i) => {
+            response += `━━━ ${i + 1}. ${car.title} ━━━\n`;
+            response += `${car.description}\n\n`;
+            response += `🔗 <a href="${car.url}" target="_blank">Vedi dettagli su CentroAuto</a>\n\n`;
+          });
+
+          response += `💡 Visita <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">CentroAuto</a> per vedere tutto lo stock!`;
+          
+          return response;
         }
         
-        console.log('⚠️ Nessuna auto trovata nel database');
+        return "❌ Nessuna auto usata trovata. Prova con un'altra ricerca!";
+        
+      } catch (err) {
+        console.error("Errore ricerca usato:", err);
+        return "❌ Errore durante la ricerca. Riprova!";
+      }
+    }
+
+    // Cerca info AUTO NUOVE
+    async function searchNewCars(query) {
+      try {
+        const officialSites = [
+          'site:fiat.it/configuratore OR site:fiat.it/gamma',
+          'site:jeep-official.it/configuratore OR site:jeep-official.it/gamma',
+          'site:alfaromeo.it/configuratore OR site:alfaromeo.it/gamma',
+          'site:lancia.it/configuratore OR site:lancia.it/gamma'
+        ];
+        
+        const enhancedQuery = `${query} (${officialSites.join(' OR ')})`;
+        
+        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(enhancedQuery)}`);
+        if (!response.ok) throw new Error("Errore ricerca");
+        
+        const data = await response.json();
+        
+        if (data.results && data.results.length > 0) {
+          const allowedDomains = ['fiat.it', 'jeep-official.it', 'alfaromeo.it', 'lancia.it'];
+          const validResults = data.results.filter(r => {
+            const url = r.url.toLowerCase();
+            return allowedDomains.some(domain => url.includes(domain));
+          });
+
+          if (validResults.length === 0) return null;
+
+          return validResults.slice(0, 3).map(r => {
+            const brand = r.url.includes('fiat') ? 'Fiat' :
+                         r.url.includes('jeep') ? 'Jeep' :
+                         r.url.includes('alfa') ? 'Alfa Romeo' : 'Lancia';
+            
+            return `━━━ ${brand.toUpperCase()} ━━━\n${r.title}\n\n${r.description}\n\n🔗 ${r.url}`;
+          }).join('\n\n');
+        }
         return null;
-      } catch (error) {
-        console.error('❌ Errore ricerca database:', error);
+      } catch (err) {
+        console.error("Errore ricerca nuove:", err);
         return null;
       }
     }
 
-    // SISTEMA PROMPT AGGIORNATO
-    const SYSTEM_PROMPT = `Sei un assistente esperto di auto NUOVE e USATE con DATABASE REALE.
+    // SISTEMA PROMPT per auto NUOVE
+    const SYSTEM_PROMPT_NEW = `Sei un assistente per auto NUOVE (Fiat, Jeep, Alfa Romeo, Lancia).
 
-AUTO NUOVE: Fiat, Jeep, Alfa Romeo, Lancia (configuratori ufficiali)
-AUTO USATE: Database CentroAuto VT con dati REALI (targhe, km, colori, accessori)
+REGOLE:
+1. Risposte SCHEMATICHE (max 10 righe)
+2. Usa ELENCHI PUNTATI
+3. Confronta allestimenti in modo chiaro
+4. Basati SOLO sui dati forniti
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 REGOLE FONDAMENTALI:
-1. Risposte SCHEMATICHE e CONCISE
-2. Usa ELENCHI PUNTATI per chiarezza
-3. Per AUTO USATE: mostra SEMPRE tutti i dettagli disponibili (prezzo, km, anno, colore, link)
-4. SEMPRE basati SOLO sui dati forniti
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🚗 FORMATO PER AUTO USATE (dal database):
-
-Quando ricevi dati dal database, presentali così:
-
-━━━ MARCA MODELLO ━━━
-💰 Prezzo: €XX.XXX
-📅 Anno: XX/XXXX
-🛣️ Km: XX.XXX
-⛽ Carburante: [tipo]
-⚙️ Cambio: [tipo]
-🏎️ Potenza: XX CV
-🎨 Colore: [colore]
-🎯 Accessori: [lista]
-🔗 Link: [url]
-
-IMPORTANTE:
-- Mostra TUTTI i dettagli disponibili
-- Non inventare dati se non presenti
-- Se il database è vuoto, dillo chiaramente
-- Max 3-4 auto per risposta per leggibilità
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🆕 FORMATO PER AUTO NUOVE:
-
-Per INFO GENERALI:
-✓ Punto chiave 1
-✓ Punto chiave 2
-
-Per CONFRONTI:
+FORMATO RISPOSTA:
 🔴 ALLESTIMENTO 1
 • Caratteristica 1
 • Caratteristica 2
 
-🔵 ALLESTIMENTO 2  
+🔵 ALLESTIMENTO 2
 • Caratteristica 1
 • Caratteristica 2
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 CONSIGLIO: [breve]`;
 
-⚠️ IMPORTANTE:
-- Database auto usate = dati REALI e precisi
-- Sii sempre trasparente su cosa sai e cosa no
-- Se chiede confronto tra usate, usa i dati reali dal database`;
-
-    // Send message to AI
+    // Send message
     async function sendMessage() {
       const userMessage = chatInputField.value.trim();
       if (!userMessage) return;
 
-      addMessage(userMessage, "user");
+      addMessage(escapeHtml(userMessage), "user");
       chatInputField.value = "";
       chatSendBtn.disabled = true;
-
-      chatHistory.push({ role: "user", content: userMessage });
 
       showTyping();
 
       try {
-        let contextData = null;
-
-        // Se chiede auto USATE, interroga il DATABASE
+        // Verifica se cerca auto usate o nuove
         if (isUsedCarQuery(userMessage)) {
-          contextData = await searchUsedCars(userMessage);
-        }
+          // USATO: cerca e mostra link diretti
+          const results = await searchUsedCars(userMessage);
+          hideTyping();
+          addMessage(results, "ai");
+        } else {
+          // NUOVO: usa AI per confrontare allestimenti
+          const searchResults = await searchNewCars(userMessage);
+          
+          const messages = [
+            { role: "system", content: SYSTEM_PROMPT_NEW },
+            { role: "user", content: userMessage }
+          ];
 
-        // Prepara i messaggi per l'API
-        const messages = [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...chatHistory
-        ];
+          if (searchResults) {
+            messages.push({
+              role: "system",
+              content: `DATI UFFICIALI:\n\n${searchResults}\n\nRispondi in modo schematico.`
+            });
+          }
 
-        // Se ci sono dati dal database, aggiungili al contesto
-        if (contextData) {
-          messages.push({
-            role: "system",
-            content: `DATI REALI DAL DATABASE CENTROAUTO:\n\n${contextData}\n\nQuesti sono i dati REALI delle auto in stock. Presentali tutti in modo chiaro e dettagliato.`
+          const response = await fetch(BACKEND_CHAT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ messages }),
           });
+
+          if (!response.ok) throw new Error(`Errore ${response.status}`);
+
+          const data = await response.json();
+          hideTyping();
+
+          let aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho trovato informazioni.";
+          aiMessage = escapeHtml(aiMessage);
+          addMessage(aiMessage, "ai");
         }
-
-        const response = await fetch(BACKEND_CHAT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages }),
-        });
-
-        if (!response.ok) throw new Error(`Errore ${response.status}`);
-
-        const data = await response.json();
-        
-        hideTyping();
-
-        let aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho capito.";
-        
-        aiMessage = aiMessage.replace(/[&<>"']/g, c => ({
-          "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-        }[c]));
-        
-        addMessage(aiMessage, "ai");
-
-        chatHistory.push({ role: "assistant", content: aiMessage });
 
       } catch (error) {
         hideTyping();
         console.error("Errore chat:", error);
-        addMessage("❌ Errore di connessione. Riprova tra poco.", "ai");
+        addMessage("❌ Errore di connessione. Riprova!", "ai");
       } finally {
         chatSendBtn.disabled = false;
         chatInputField.focus();
