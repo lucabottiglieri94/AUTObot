@@ -1422,6 +1422,14 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
     $("alfaBtn").addEventListener("click", () => window.open(BRAND_LINKS.AlfaRomeo, "_blank", "noopener,noreferrer"));
     $("lanciaBtn").addEventListener("click", () => window.open(BRAND_LINKS.Lancia, "_blank", "noopener,noreferrer"));
 
+    // ========== 🔐 AUTORIZZAZIONE ADMIN ========== 
+    const ADMIN_EMAIL = "lucabottiglieri94@gmail.com";
+    let isAdmin = false;
+
+    function checkAdminAccess(email) {
+      return email && email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    }
+
     // Admin Panel
     $("adminBtn").addEventListener("click", () => {
       if (!isAdmin) {
@@ -1472,14 +1480,6 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
         }
       }
     });
-
-    // ========== 🔐 AUTORIZZAZIONE ADMIN ========== 
-    const ADMIN_EMAIL = "lucabottiglieri94@gmail.com";
-    let isAdmin = false;
-
-    function checkAdminAccess(email) {
-      return email && email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-    }
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
