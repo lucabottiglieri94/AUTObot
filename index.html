@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI BOTT Automotive</title>
+  <title>AI BOTT Automotive - Self Learning</title>
 
   <style>
     :root{
@@ -58,7 +58,6 @@
       min-width: 320px;
     }
 
-    /* LOGO TOP-LEFT + TESTO */
     .brandMark{
       display:flex;
       align-items:center;
@@ -119,7 +118,6 @@
     .btn.brand-alfa:hover{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)}
     .btn.brand-lancia:hover{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.1)}
 
-    /* CentroAuto Logo */
     .centroAutoLink{
       display:inline-flex;
       align-items:center;
@@ -154,7 +152,6 @@
     }
     .muted{color:var(--muted)}
 
-    /* LAYOUT: NEWS A SINISTRA (riquadro scrollabile) */
     .layout{
       margin-top:16px;
       display:grid;
@@ -189,7 +186,6 @@
       padding:12px;
     }
 
-    /* scrollbar (WebKit) */
     .newsScroll::-webkit-scrollbar{width:10px}
     .newsScroll::-webkit-scrollbar-thumb{
       background:rgba(59,130,246,.25);
@@ -227,9 +223,89 @@
       background:rgba(0,0,0,.12);
     }
 
+    /* ========== ADMIN PANEL ========== */
+    .adminPanel{
+      position:fixed;
+      top:80px;
+      right:24px;
+      width:360px;
+      max-height:calc(100vh - 120px);
+      background:rgba(17,24,39,.95);
+      border:2px solid rgba(251,191,36,.6);
+      border-radius:16px;
+      overflow:hidden;
+      z-index:999;
+      display:none;
+      box-shadow:0 20px 60px rgba(251,191,36,.3);
+    }
+    .adminPanel.open{display:flex;flex-direction:column}
+
+    .adminHeader{
+      background:linear-gradient(135deg, rgba(251,191,36,.85), rgba(245,158,11,.85));
+      padding:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      color:#1a1d23;
+      font-weight:700;
+    }
+
+    .adminContent{
+      flex:1;
+      overflow-y:auto;
+      padding:16px;
+    }
+
+    .adminSection{
+      margin-bottom:20px;
+      padding:12px;
+      background:rgba(31,41,55,.5);
+      border-radius:10px;
+      border:1px solid var(--line);
+    }
+
+    .adminSectionTitle{
+      font-weight:700;
+      margin-bottom:10px;
+      color:var(--accent2);
+      font-size:14px;
+    }
+
+    .adminStat{
+      display:flex;
+      justify-content:space-between;
+      padding:6px 0;
+      font-size:13px;
+    }
+
+    .adminBtn{
+      width:100%;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid var(--accent);
+      background:rgba(59,130,246,.15);
+      color:var(--text);
+      cursor:pointer;
+      font-size:13px;
+      font-weight:600;
+      transition:all .2s;
+      margin-top:8px;
+    }
+    .adminBtn:hover{
+      background:rgba(59,130,246,.25);
+      transform:translateY(-1px);
+    }
+
+    .adminBtnDanger{
+      border-color:rgba(239,68,68,.6);
+      background:rgba(239,68,68,.15);
+    }
+    .adminBtnDanger:hover{
+      background:rgba(239,68,68,.25);
+    }
+
     /* ========== CHATBOT STYLES ========== */
     
-    /* Pulsante AI Agent (bottom-right) */
     .chatTrigger{
       position:fixed;
       bottom:24px;
@@ -257,7 +333,6 @@
       object-fit:contain;
     }
 
-    /* Chat Box Container */
     .chatBox{
       position:fixed;
       bottom:24px;
@@ -291,7 +366,6 @@
       display:none;
     }
 
-    /* Chat Header */
     .chatHeader{
       background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
       padding:14px 16px;
@@ -346,7 +420,6 @@
       transform:scale(1.05);
     }
 
-    /* Chat Messages Area */
     .chatMessages{
       flex:1;
       overflow-y:auto;
@@ -365,7 +438,6 @@
     }
     .chatMessages::-webkit-scrollbar-track{background:rgba(0,0,0,.2)}
 
-    /* Message Bubbles */
     .message{
       display:flex;
       gap:8px;
@@ -399,7 +471,14 @@
       border-bottom-right-radius:4px;
     }
 
-    /* Link style dentro i messaggi */
+    /* CORREZIONE OPERATORE */
+    .message.correction .messageBubble{
+      background:linear-gradient(135deg, rgba(251,191,36,.85) 0%, rgba(245,158,11,.85) 100%);
+      color:#1a1d23;
+      border:2px solid rgba(251,191,36,.6);
+      font-weight:600;
+    }
+
     .messageBubble a {
       color: #fff;
       text-decoration: underline;
@@ -409,7 +488,22 @@
       color: #fbbf24;
     }
 
-    /* Typing Indicator */
+    .correctBtn{
+      margin-top:8px;
+      padding:8px 12px;
+      border-radius:8px;
+      background:rgba(251,191,36,.2);
+      border:1px solid rgba(251,191,36,.5);
+      color:#fbbf24;
+      font-size:12px;
+      cursor:pointer;
+      transition:all .2s;
+    }
+    .correctBtn:hover{
+      background:rgba(251,191,36,.3);
+      transform:translateY(-1px);
+    }
+
     .typingIndicator{
       display:flex;
       gap:8px;
@@ -434,7 +528,6 @@
       40%{transform:scale(1)}
     }
 
-    /* Chat Input */
     .chatInput{
       padding:16px;
       background:rgba(10,12,18,.95);
@@ -503,6 +596,13 @@
         width:60px;
         height:60px;
       }
+      .adminPanel{
+        width:100%;
+        max-width:100%;
+        top:60px;
+        right:0;
+        border-radius:0;
+      }
     }
 
     @media (max-width: 768px){
@@ -528,7 +628,7 @@
             />
             <div>
               <div class="brandName">AI BOTT</div>
-              <div class="brandSub">Automotive</div>
+              <div class="brandSub">Self-Learning System</div>
             </div>
           </div>
 
@@ -537,7 +637,6 @@
           <button id="alfaBtn" class="btn brand-alfa">Alfa Romeo</button>
           <button id="lanciaBtn" class="btn brand-lancia">Lancia</button>
           
-          <!-- Logo CentroAuto -->
           <a 
             href="https://www.centroautovt.it/" 
             target="_blank" 
@@ -555,6 +654,7 @@
 
         <div class="row" style="gap:10px">
           <span id="userPill" class="pill muted">Non autenticato</span>
+          <button id="adminBtn" class="btn" style="display:none;background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.5)">🔧 Admin</button>
           <button id="loginBtn" class="btn primary">Login Google</button>
           <button id="logoutBtn" class="btn" style="display:none">Logout</button>
         </div>
@@ -564,7 +664,6 @@
 
   <main class="wrap">
     <div class="layout">
-      <!-- NEWS A SINISTRA -->
       <aside class="panel">
         <div class="panelHeader">
           <div>
@@ -580,19 +679,74 @@
         </div>
       </aside>
 
-      <!-- CONTENUTI A DESTRA -->
       <section class="rightSpace">
-        <div style="font-weight:950;font-size:18px">Area contenuti</div>
+        <div style="font-weight:950;font-size:18px">🤖 Sistema Auto-Apprendimento</div>
         <div class="muted" style="margin-top:8px;line-height:1.45">
-          Qui puoi mettere descrizione, KPI, link rapidi o altri contenuti.
+          Il bot impara dalle correzioni degli operatori e si aggiorna automaticamente:
+          <br><br>
+          • <b>Auto Nuove</b>: Aggiornamento ogni 15 giorni
+          <br>
+          • <b>Auto Usate</b>: Aggiornamento ogni 7 giorni
+          <br>
+          • <b>Correzioni</b>: Apprese in tempo reale
         </div>
       </section>
     </div>
   </main>
 
+  <!-- ========== ADMIN PANEL ========== -->
+  <div class="adminPanel" id="adminPanel">
+    <div class="adminHeader">
+      <span>🔧 Pannello Admin</span>
+      <button class="chatHeaderBtn" id="closeAdminBtn" style="background:rgba(0,0,0,.2)">×</button>
+    </div>
+    <div class="adminContent">
+      <div class="adminSection">
+        <div class="adminSectionTitle">📊 Statistiche Sistema</div>
+        <div class="adminStat">
+          <span>Correzioni applicate:</span>
+          <span id="correctionsCount">0</span>
+        </div>
+        <div class="adminStat">
+          <span>Ultimo aggiornamento NUOVO:</span>
+          <span id="lastUpdateNew">-</span>
+        </div>
+        <div class="adminStat">
+          <span>Ultimo aggiornamento USATO:</span>
+          <span id="lastUpdateUsed">-</span>
+        </div>
+        <div class="adminStat">
+          <span>Prossimo aggiornamento NUOVO:</span>
+          <span id="nextUpdateNew">-</span>
+        </div>
+        <div class="adminStat">
+          <span>Prossimo aggiornamento USATO:</span>
+          <span id="nextUpdateUsed">-</span>
+        </div>
+      </div>
+
+      <div class="adminSection">
+        <div class="adminSectionTitle">🔄 Aggiornamenti Manuali</div>
+        <button class="adminBtn" id="forceUpdateNew">Forza Aggiornamento AUTO NUOVE</button>
+        <button class="adminBtn" id="forceUpdateUsed">Forza Aggiornamento AUTO USATE</button>
+      </div>
+
+      <div class="adminSection">
+        <div class="adminSectionTitle">📝 Ultime Correzioni</div>
+        <div id="recentCorrections" style="font-size:12px;max-height:200px;overflow-y:auto">
+          Nessuna correzione ancora
+        </div>
+      </div>
+
+      <div class="adminSection">
+        <div class="adminSectionTitle">⚠️ Zona Pericolosa</div>
+        <button class="adminBtn adminBtnDanger" id="resetLearning">Reset Apprendimento</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ========== CHATBOT UI ========== -->
   
-  <!-- Pulsante trigger -->
   <div class="chatTrigger" id="chatTrigger">
     <img 
       src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" 
@@ -600,9 +754,7 @@
     />
   </div>
 
-  <!-- Chat Box -->
   <div class="chatBox" id="chatBox">
-    <!-- Logo visibile quando minimizzato -->
     <img 
       id="chatMinimizedLogo"
       src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" 
@@ -619,7 +771,7 @@
         />
         <div>
           <div class="chatHeaderTitle">AI BOTT Assistant</div>
-          <div class="chatHeaderSub">Esperto configurazioni</div>
+          <div class="chatHeaderSub">Self-Learning System</div>
         </div>
       </div>
       <div class="chatHeaderBtns">
@@ -629,9 +781,10 @@
     </div>
 
     <div class="chatMessages" id="chatMessages">
-      <!-- Messaggio di benvenuto -->
       <div class="message ai">
-        <div class="messageBubble">👋 Ciao capo! Come posso aiutarti?</div>
+        <div class="messageBubble">👋 Ciao capo! Come posso aiutarti?
+        
+🧠 Sistema auto-apprendimento attivo!</div>
       </div>
     </div>
 
@@ -663,6 +816,20 @@
       signOut,
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      addDoc,
+      query,
+      orderBy,
+      limit,
+      getDocs,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const BACKEND_NEWS = "/api/news";
     const BACKEND_CHAT = "https://auto-backend-three.vercel.app/api/chat";
@@ -735,9 +902,425 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt:"select_account", display:"popup" });
+
+    // ========== 🧠 SISTEMA AUTO-APPRENDIMENTO ========== 
+
+    let learningData = {
+      corrections: [],
+      lastUpdateNew: null,
+      lastUpdateUsed: null,
+      newCarsData: {},
+      usedCarsData: {}
+    };
+
+    // Carica dati apprendimento da Firebase
+    async function loadLearningData() {
+      try {
+        const docRef = doc(db, 'ai-learning', 'knowledge-base');
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          learningData = docSnap.data();
+          console.log('✅ Dati apprendimento caricati:', learningData);
+          updateAdminStats();
+        } else {
+          // Inizializza per la prima volta
+          await setDoc(docRef, {
+            corrections: [],
+            lastUpdateNew: serverTimestamp(),
+            lastUpdateUsed: serverTimestamp(),
+            newCarsData: NEW_CARS_DATABASE,
+            usedCarsData: USED_CARS_DB
+          });
+          console.log('✅ Database apprendimento inizializzato');
+        }
+      } catch (error) {
+        console.error('❌ Errore caricamento dati:', error);
+      }
+    }
+
+    // Salva correzione operatore
+    async function saveCorrection(userMessage, aiResponse, correction) {
+      try {
+        const correctionData = {
+          timestamp: new Date().toISOString(),
+          userMessage: userMessage,
+          aiResponse: aiResponse,
+          correction: correction,
+          operator: auth.currentUser?.email || 'unknown'
+        };
+
+        // Aggiungi alla collezione correzioni
+        await addDoc(collection(db, 'ai-learning', 'knowledge-base', 'corrections'), correctionData);
+
+        // Aggiorna il counter
+        const docRef = doc(db, 'ai-learning', 'knowledge-base');
+        const docSnap = await getDoc(docRef);
+        const currentCorrections = docSnap.data()?.corrections || [];
+        
+        await updateDoc(docRef, {
+          corrections: [...currentCorrections, correctionData]
+        });
+
+        console.log('✅ Correzione salvata:', correctionData);
+        
+        // Applica la correzione al database
+        await applyCorrection(correction);
+        
+        return true;
+      } catch (error) {
+        console.error('❌ Errore salvataggio correzione:', error);
+        return false;
+      }
+    }
+
+    // Applica correzione al database
+    async function applyCorrection(correction) {
+      // Parse della correzione usando AI
+      try {
+        const messages = [
+          {
+            role: "system",
+            content: `Sei un parser di correzioni. Estrai le informazioni strutturate dalla correzione dell'operatore.
+            
+Rispondi SOLO con un JSON in questo formato:
+{
+  "type": "new" o "used",
+  "action": "add", "remove", "update",
+  "brand": "nome marca",
+  "model": "nome modello",
+  "trim": "nome allestimento",
+  "details": "dettagli specifici"
+}
+
+Esempio correzione: "Il pack Tech non si può mettere sulla Grande Panda La Prima perché è full optional di suo"
+Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","trim":"La Prima","details":"Pack Tech non disponibile - full optional di serie"}`
+          },
+          {
+            role: "user",
+            content: correction
+          }
+        ];
+
+        const response = await fetch(BACKEND_CHAT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages }),
+        });
+
+        if (!response.ok) throw new Error("Errore parsing");
+
+        const data = await response.json();
+        const parsedCorrection = JSON.parse(data.choices[0].message.content);
+
+        // Aggiorna il database locale
+        if (parsedCorrection.type === 'new') {
+          // Aggiorna auto nuove
+          const docRef = doc(db, 'ai-learning', 'knowledge-base');
+          const docSnap = await getDoc(docRef);
+          const currentData = docSnap.data().newCarsData;
+
+          // Applica la modifica
+          if (parsedCorrection.action === 'update' || parsedCorrection.action === 'add') {
+            if (!currentData[parsedCorrection.brand].models[parsedCorrection.model].restrictions) {
+              currentData[parsedCorrection.brand].models[parsedCorrection.model].restrictions = {};
+            }
+            currentData[parsedCorrection.brand].models[parsedCorrection.model].restrictions[parsedCorrection.trim] = parsedCorrection.details;
+          }
+
+          await updateDoc(docRef, {
+            newCarsData: currentData
+          });
+
+          console.log('✅ Correzione applicata al database nuove');
+        }
+
+        await loadLearningData(); // Ricarica i dati
+        updateAdminStats();
+
+      } catch (error) {
+        console.error('❌ Errore applicazione correzione:', error);
+      }
+    }
+
+    // Verifica se serve aggiornamento
+    function needsUpdate(lastUpdate, daysInterval) {
+      if (!lastUpdate) return true;
+      const lastUpdateDate = lastUpdate.toDate ? lastUpdate.toDate() : new Date(lastUpdate);
+      const now = new Date();
+      const diffDays = (now - lastUpdateDate) / (1000 * 60 * 60 * 24);
+      return diffDays >= daysInterval;
+    }
+
+    // Auto-aggiornamento schedulato
+    async function checkAutoUpdates() {
+      try {
+        const docRef = doc(db, 'ai-learning', 'knowledge-base');
+        const docSnap = await getDoc(docRef);
+        const data = docSnap.data();
+
+        // Verifica AUTO NUOVE (ogni 15 giorni)
+        if (needsUpdate(data.lastUpdateNew, 15)) {
+          console.log('🔄 Avvio aggiornamento AUTO NUOVE...');
+          await updateNewCarsData();
+        }
+
+        // Verifica AUTO USATE (ogni 7 giorni)
+        if (needsUpdate(data.lastUpdateUsed, 7)) {
+          console.log('🔄 Avvio aggiornamento AUTO USATE...');
+          await updateUsedCarsData();
+        }
+
+      } catch (error) {
+        console.error('❌ Errore check aggiornamenti:', error);
+      }
+    }
+
+    // Aggiorna dati auto nuove
+    async function updateNewCarsData() {
+      try {
+        // Cerca aggiornamenti sui configuratori
+        const searchPromises = [
+          fetch(`${BACKEND_SEARCH}?q=Fiat nuovi modelli 2025 site:fiat.it`),
+          fetch(`${BACKEND_SEARCH}?q=Jeep nuovi modelli 2025 site:jeep-official.it`),
+          fetch(`${BACKEND_SEARCH}?q=Alfa Romeo nuovi modelli 2025 site:alfaromeo.it`),
+          fetch(`${BACKEND_SEARCH}?q=Lancia nuovi modelli 2025 site:lancia.it`)
+        ];
+
+        const results = await Promise.all(searchPromises);
+        
+        // Aggiorna timestamp
+        const docRef = doc(db, 'ai-learning', 'knowledge-base');
+        await updateDoc(docRef, {
+          lastUpdateNew: serverTimestamp()
+        });
+
+        console.log('✅ Auto nuove aggiornate');
+        await loadLearningData();
+        updateAdminStats();
+
+      } catch (error) {
+        console.error('❌ Errore aggiornamento auto nuove:', error);
+      }
+    }
+
+    // Aggiorna dati auto usate
+    async function updateUsedCarsData() {
+      try {
+        // Scrape CentroAuto per nuove disponibilità
+        const response = await fetch(`${BACKEND_SEARCH}?q=site:centroautovt.it/ricerca-auto/usate`);
+        
+        // Aggiorna timestamp
+        const docRef = doc(db, 'ai-learning', 'knowledge-base');
+        await updateDoc(docRef, {
+          lastUpdateUsed: serverTimestamp()
+        });
+
+        console.log('✅ Auto usate aggiornate');
+        await loadLearningData();
+        updateAdminStats();
+
+      } catch (error) {
+        console.error('❌ Errore aggiornamento auto usate:', error);
+      }
+    }
+
+    // Aggiorna statistiche admin panel
+    function updateAdminStats() {
+      const correctionsCount = learningData.corrections?.length || 0;
+      $('correctionsCount').textContent = correctionsCount;
+
+      if (learningData.lastUpdateNew) {
+        const lastNew = learningData.lastUpdateNew.toDate ? learningData.lastUpdateNew.toDate() : new Date(learningData.lastUpdateNew);
+        $('lastUpdateNew').textContent = fmtDate(lastNew);
+        
+        const nextNew = new Date(lastNew);
+        nextNew.setDate(nextNew.getDate() + 15);
+        $('nextUpdateNew').textContent = fmtDate(nextNew);
+      }
+
+      if (learningData.lastUpdateUsed) {
+        const lastUsed = learningData.lastUpdateUsed.toDate ? learningData.lastUpdateUsed.toDate() : new Date(learningData.lastUpdateUsed);
+        $('lastUpdateUsed').textContent = fmtDate(lastUsed);
+        
+        const nextUsed = new Date(lastUsed);
+        nextUsed.setDate(nextUsed.getDate() + 7);
+        $('nextUpdateUsed').textContent = fmtDate(nextUsed);
+      }
+
+      // Mostra ultime correzioni
+      if (correctionsCount > 0) {
+        const recent = learningData.corrections.slice(-5).reverse();
+        $('recentCorrections').innerHTML = recent.map(c => `
+          <div style="padding:8px;margin-bottom:8px;background:rgba(59,130,246,.1);border-radius:6px;border:1px solid var(--line)">
+            <div style="font-weight:600;margin-bottom:4px">${escapeHtml(c.operator)}</div>
+            <div style="opacity:.8">${escapeHtml(c.correction.substring(0, 80))}...</div>
+            <div style="opacity:.6;font-size:11px;margin-top:4px">${fmtDate(c.timestamp)}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // ========== DATABASE AUTO (con integrazione learning) ========== 
+
+    const NEW_CARS_DATABASE = {
+      'fiat': {
+        brand: 'Fiat',
+        site: 'fiat.it',
+        models: {
+          '500': {
+            name: '500 Elettrica',
+            trims: ['Action', 'Passion', 'Icon', 'La Prima'],
+            keywords: ['500', 'cinquecento', '500e', '500 elettrica']
+          },
+          '500x': {
+            name: '500X',
+            trims: ['City Cross', 'Cross', 'Sport'],
+            keywords: ['500x', 'cinquecento x']
+          },
+          'panda': {
+            name: 'Panda',
+            trims: ['Easy', 'Cross', 'Sport'],
+            packs: {
+              'Cross': ['Pack Comfort', 'Pack Style', 'Pack Tech']
+            },
+            keywords: ['panda']
+          },
+          'grande-panda': {
+            name: 'Grande Panda',
+            trims: ['Pop', 'Icon', 'La Prima'],
+            keywords: ['grande panda', 'grandepanda', 'panda grande']
+          },
+          '600': {
+            name: '600',
+            trims: ['RED', 'La Prima'],
+            keywords: ['600', 'seicento', '600 ibrida', '600 elettrica']
+          },
+          'tipo': {
+            name: 'Tipo',
+            trims: ['City Life', 'City Cross', 'Cross', 'Sport'],
+            keywords: ['tipo']
+          },
+          'ducato': {
+            name: 'Ducato',
+            trims: ['Furgone', 'Combi', 'Passo Corto', 'Passo Medio', 'Passo Lungo'],
+            keywords: ['ducato']
+          }
+        }
+      },
+      'jeep': {
+        brand: 'Jeep',
+        site: 'jeep-official.it',
+        models: {
+          'avenger': {
+            name: 'Avenger',
+            trims: ['Longitude', 'Altitude', 'Summit', 'The North Face Edition'],
+            keywords: ['avenger']
+          },
+          'renegade': {
+            name: 'Renegade',
+            trims: ['Longitude', 'Limited', 'Trailhawk', '80th Anniversary'],
+            keywords: ['renegade']
+          },
+          'compass': {
+            name: 'Compass',
+            trims: ['Longitude', 'Limited', 'Trailhawk', 'S', '80th Anniversary'],
+            keywords: ['compass']
+          },
+          'wrangler': {
+            name: 'Wrangler',
+            trims: ['Sport', 'Sahara', 'Rubicon', '4xe'],
+            keywords: ['wrangler']
+          },
+          'grand-cherokee': {
+            name: 'Grand Cherokee',
+            trims: ['Limited', 'Overland', 'Summit', 'Trailhawk', '4xe'],
+            keywords: ['grand cherokee', 'grandcherokee']
+          },
+          'gladiator': {
+            name: 'Gladiator',
+            trims: ['Sport', 'Overland', 'Rubicon'],
+            keywords: ['gladiator']
+          }
+        }
+      },
+      'alfa': {
+        brand: 'Alfa Romeo',
+        site: 'alfaromeo.it',
+        models: {
+          'junior': {
+            name: 'Junior',
+            trims: ['Ibrida Q4', 'Elettrica', 'Speciale', 'Veloce'],
+            keywords: ['junior', 'alfa junior']
+          },
+          'tonale': {
+            name: 'Tonale',
+            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Q4'],
+            keywords: ['tonale']
+          },
+          'stelvio': {
+            name: 'Stelvio',
+            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Quadrifoglio'],
+            keywords: ['stelvio']
+          },
+          'giulia': {
+            name: 'Giulia',
+            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Quadrifoglio'],
+            keywords: ['giulia']
+          }
+        }
+      },
+      'lancia': {
+        brand: 'Lancia',
+        site: 'lancia.it',
+        models: {
+          'ypsilon': {
+            name: 'Ypsilon',
+            trims: ['Cassina', 'Edizione Limitata', 'LX', 'Elettrica'],
+            keywords: ['ypsilon', 'ipsilon', 'y']
+          }
+        }
+      }
+    };
+
+    const USED_CARS_DB = {
+      'ford': {
+        name: 'Ford',
+        count: 9,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Ford',
+        models: ['fiesta', 'focus', 'kuga', 'ecosport', 'puma', 'transit']
+      },
+      'jeep': {
+        name: 'Jeep',
+        count: 13,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Jeep',
+        models: ['renegade', 'compass', 'wrangler', 'cherokee']
+      },
+      'kia': {
+        name: 'Kia',
+        count: 1,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Kia',
+        models: ['sportage', 'picanto', 'rio', 'ceed', 'niro']
+      },
+      'lancia': {
+        name: 'Lancia',
+        count: 4,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Lancia',
+        models: ['ypsilon', 'delta']
+      },
+      'volkswagen': {
+        name: 'Volkswagen',
+        count: 4,
+        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Volkswagen',
+        models: ['golf', 'polo', 'tiguan', 'passat', 't-roc', 'id.3', 'id.4']
+      }
+    };
+
+    // ========== RESTO DEL CODICE CHATBOT ========== 
 
     (async function initApp(){
       try { await setPersistence(auth, browserLocalPersistence); }
@@ -751,6 +1334,13 @@
       }catch(e){
         setStatus("❌ Errore login: " + (e.code || e.message));
       }
+
+      // Carica dati apprendimento
+      await loadLearningData();
+
+      // Check aggiornamenti automatici ogni ora
+      setInterval(checkAutoUpdates, 60 * 60 * 1000);
+      checkAutoUpdates(); // Prima esecuzione
     })();
 
     async function loadNews() {
@@ -832,6 +1422,35 @@
     $("alfaBtn").addEventListener("click", () => window.open(BRAND_LINKS.AlfaRomeo, "_blank", "noopener,noreferrer"));
     $("lanciaBtn").addEventListener("click", () => window.open(BRAND_LINKS.Lancia, "_blank", "noopener,noreferrer"));
 
+    // Admin Panel
+    $("adminBtn").addEventListener("click", () => {
+      $("adminPanel").classList.toggle("open");
+    });
+
+    $("closeAdminBtn").addEventListener("click", () => {
+      $("adminPanel").classList.remove("open");
+    });
+
+    $("forceUpdateNew").addEventListener("click", updateNewCarsData);
+    $("forceUpdateUsed").addEventListener("click", updateUsedCarsData);
+
+    $("resetLearning").addEventListener("click", async () => {
+      if (confirm('⚠️ Sei sicuro? Questo cancellerà TUTTE le correzioni apprese!')) {
+        try {
+          const docRef = doc(db, 'ai-learning', 'knowledge-base');
+          await updateDoc(docRef, {
+            corrections: [],
+            newCarsData: NEW_CARS_DATABASE,
+            usedCarsData: USED_CARS_DB
+          });
+          alert('✅ Sistema resettato!');
+          await loadLearningData();
+        } catch (error) {
+          alert('❌ Errore reset: ' + error.message);
+        }
+      }
+    });
+
     onAuthStateChanged(auth, (user) => {
       if (user) {
         $("userPill").textContent = "✅ " + (user.email || "Utente");
@@ -841,6 +1460,7 @@
 
         $("loginBtn").style.display = "none";
         $("logoutBtn").style.display = "inline-block";
+        $("adminBtn").style.display = "inline-block";
         $("refreshBtn").disabled = false;
 
         loadNews();
@@ -852,6 +1472,7 @@
 
         $("loginBtn").style.display = "inline-block";
         $("logoutBtn").style.display = "none";
+        $("adminBtn").style.display = "none";
         $("refreshBtn").disabled = true;
 
         $("newsList").innerHTML = "";
@@ -859,9 +1480,11 @@
       }
     });
 
-    // ========== CHATBOT LOGIC - COMPLETO DATABASE AUTO NUOVE ========== 
-    
+    // ========== CHATBOT CON CORREZIONI ========== 
+
     let isMinimized = false;
+    let lastAiResponse = "";
+    let lastUserMessage = "";
 
     const chatTrigger = $("chatTrigger");
     const chatBox = $("chatBox");
@@ -871,149 +1494,100 @@
     const minimizeBtn = $("minimizeBtn");
     const closeBtn = $("closeBtn");
 
-    // ========== 🚗 DATABASE COMPLETO AUTO NUOVE (2025) ========== 
-    const NEW_CARS_DATABASE = {
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      // FIAT
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      'fiat': {
-        brand: 'Fiat',
-        site: 'fiat.it',
-        models: {
-          '500': {
-            name: '500 Elettrica',
-            trims: ['Action', 'Passion', 'Icon', 'La Prima'],
-            keywords: ['500', 'cinquecento', '500e', '500 elettrica']
-          },
-          '500x': {
-            name: '500X',
-            trims: ['City Cross', 'Cross', 'Sport'],
-            keywords: ['500x', 'cinquecento x']
-          },
-          'panda': {
-            name: 'Panda',
-            trims: ['Easy', 'Cross', 'Sport'],
-            packs: {
-              'Cross': ['Pack Comfort', 'Pack Style', 'Pack Tech']
-            },
-            keywords: ['panda']
-          },
-          'grande-panda': {
-            name: 'Grande Panda',
-            trims: ['Pop', 'Icon', 'La Prima'],
-            keywords: ['grande panda', 'grandepanda', 'panda grande']
-          },
-          '600': {
-            name: '600',
-            trims: ['RED', 'La Prima'],
-            keywords: ['600', 'seicento', '600 ibrida', '600 elettrica']
-          },
-          'tipo': {
-            name: 'Tipo',
-            trims: ['City Life', 'City Cross', 'Cross', 'Sport'],
-            keywords: ['tipo']
-          },
-          'ducato': {
-            name: 'Ducato',
-            trims: ['Furgone', 'Combi', 'Passo Corto', 'Passo Medio', 'Passo Lungo'],
-            keywords: ['ducato']
-          }
-        }
-      },
+    chatTrigger.addEventListener("click", () => {
+      chatBox.classList.add("open");
+      chatBox.classList.remove("minimized");
+      chatTrigger.style.display = "none";
+      $("chatMinimizedLogo").style.display = "none";
+      chatInputField.focus();
+    });
 
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      // JEEP
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      'jeep': {
-        brand: 'Jeep',
-        site: 'jeep-official.it',
-        models: {
-          'avenger': {
-            name: 'Avenger',
-            trims: ['Longitude', 'Altitude', 'Summit', 'The North Face Edition'],
-            keywords: ['avenger']
-          },
-          'renegade': {
-            name: 'Renegade',
-            trims: ['Longitude', 'Limited', 'Trailhawk', '80th Anniversary'],
-            keywords: ['renegade']
-          },
-          'compass': {
-            name: 'Compass',
-            trims: ['Longitude', 'Limited', 'Trailhawk', 'S', '80th Anniversary'],
-            keywords: ['compass']
-          },
-          'wrangler': {
-            name: 'Wrangler',
-            trims: ['Sport', 'Sahara', 'Rubicon', '4xe'],
-            keywords: ['wrangler']
-          },
-          'grand-cherokee': {
-            name: 'Grand Cherokee',
-            trims: ['Limited', 'Overland', 'Summit', 'Trailhawk', '4xe'],
-            keywords: ['grand cherokee', 'grandcherokee']
-          },
-          'gladiator': {
-            name: 'Gladiator',
-            trims: ['Sport', 'Overland', 'Rubicon'],
-            keywords: ['gladiator']
-          }
-        }
-      },
+    minimizeBtn.addEventListener("click", () => {
+      chatBox.classList.add("minimized");
+      isMinimized = true;
+      $("chatMinimizedLogo").style.display = "block";
+    });
 
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      // ALFA ROMEO
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      'alfa': {
-        brand: 'Alfa Romeo',
-        site: 'alfaromeo.it',
-        models: {
-          'junior': {
-            name: 'Junior',
-            trims: ['Ibrida Q4', 'Elettrica', 'Speciale', 'Veloce'],
-            keywords: ['junior', 'alfa junior']
-          },
-          'tonale': {
-            name: 'Tonale',
-            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Q4'],
-            keywords: ['tonale']
-          },
-          'stelvio': {
-            name: 'Stelvio',
-            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Quadrifoglio'],
-            keywords: ['stelvio']
-          },
-          'giulia': {
-            name: 'Giulia',
-            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Quadrifoglio'],
-            keywords: ['giulia']
-          }
-        }
-      },
+    closeBtn.addEventListener("click", () => {
+      chatBox.classList.remove("open");
+      chatBox.classList.remove("minimized");
+      chatTrigger.style.display = "flex";
+    });
 
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      // LANCIA
-      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      'lancia': {
-        brand: 'Lancia',
-        site: 'lancia.it',
-        models: {
-          'ypsilon': {
-            name: 'Ypsilon',
-            trims: ['Cassina', 'Edizione Limitata', 'LX', 'Elettrica'],
-            keywords: ['ypsilon', 'ipsilon', 'y']
-          }
-        }
+    chatBox.querySelector(".chatHeader").addEventListener("click", (e) => {
+      if (isMinimized && !e.target.closest("button")) {
+        chatBox.classList.remove("minimized");
+        isMinimized = false;
+        $("chatMinimizedLogo").style.display = "none";
+      }
+    });
+
+    $("chatMinimizedLogo").addEventListener("click", () => {
+      chatBox.classList.remove("minimized");
+      isMinimized = false;
+      $("chatMinimizedLogo").style.display = "none";
+      chatInputField.focus();
+    });
+
+    function addMessage(html, sender, showCorrectBtn = false) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}`;
+      
+      let content = `<div class="messageBubble">${html}</div>`;
+      
+      if (showCorrectBtn && auth.currentUser) {
+        content += `<button class="correctBtn" onclick="promptCorrection()">✏️ Correggi questa risposta</button>`;
+      }
+      
+      messageDiv.innerHTML = content;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    window.promptCorrection = async function() {
+      const correction = prompt('📝 Inserisci la correzione:\n\nEsempio: "Il pack Tech non si può mettere sulla Grande Panda La Prima perché è full optional di suo"');
+      
+      if (!correction || !correction.trim()) return;
+      
+      // Mostra correzione
+      addMessage(`📝 <b>CORREZIONE OPERATORE:</b><br>${escapeHtml(correction)}`, 'correction');
+      
+      // Salva correzione
+      const saved = await saveCorrection(lastUserMessage, lastAiResponse, correction);
+      
+      if (saved) {
+        addMessage('✅ <b>Correzione appresa!</b><br>Ho aggiornato la mia conoscenza. Grazie capo! 🧠', 'ai');
+      } else {
+        addMessage('❌ Errore nel salvare la correzione. Riprova!', 'ai');
       }
     };
 
-    // ========== FUNZIONE: Riconosci modello AUTO NUOVA ==========
+    function showTyping() {
+      const typingDiv = document.createElement("div");
+      typingDiv.className = "message ai";
+      typingDiv.id = "typingIndicator";
+      typingDiv.innerHTML = `
+        <div class="typingIndicator">
+          <div class="typingDot"></div>
+          <div class="typingDot"></div>
+          <div class="typingDot"></div>
+        </div>
+      `;
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideTyping() {
+      const typing = $("typingIndicator");
+      if (typing) typing.remove();
+    }
+
     function detectNewCarModel(query) {
       const lowerQuery = query.toLowerCase();
+      const database = learningData.newCarsData || NEW_CARS_DATABASE;
       
-      for (const [brandKey, brandData] of Object.entries(NEW_CARS_DATABASE)) {
+      for (const [brandKey, brandData] of Object.entries(database)) {
         for (const [modelKey, modelData] of Object.entries(brandData.models)) {
-          // Controlla se una keyword del modello è presente
           if (modelData.keywords.some(kw => lowerQuery.includes(kw))) {
             return {
               brand: brandData.brand,
@@ -1021,7 +1595,8 @@
               model: modelData.name,
               modelKey: modelKey,
               trims: modelData.trims,
-              site: brandData.site
+              site: brandData.site,
+              restrictions: modelData.restrictions || {}
             };
           }
         }
@@ -1030,159 +1605,25 @@
       return null;
     }
 
-    // ========== DATABASE AUTO USATE CENTROAUTO ========== 
-    const USED_CARS_DB = {
-      'ford': {
-        name: 'Ford',
-        count: 9,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Ford',
-        models: ['fiesta', 'focus', 'kuga', 'ecosport', 'puma', 'transit']
-      },
-      'jeep': {
-        name: 'Jeep',
-        count: 13,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Jeep',
-        models: ['renegade', 'compass', 'wrangler', 'cherokee']
-      },
-      'kia': {
-        name: 'Kia',
-        count: 1,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Kia',
-        models: ['sportage', 'picanto', 'rio', 'ceed', 'niro']
-      },
-      'lancia': {
-        name: 'Lancia',
-        count: 4,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Lancia',
-        models: ['ypsilon', 'delta']
-      },
-      'land rover': {
-        name: 'Land Rover',
-        count: 1,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Land+Rover',
-        models: ['defender', 'discovery', 'evoque', 'range rover']
-      },
-      'mazda': {
-        name: 'Mazda',
-        count: 2,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Mazda',
-        models: ['cx-5', 'mx-5', 'mazda2', 'mazda3']
-      },
-      'mg': {
-        name: 'MG',
-        count: 2,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=MG'
-      },
-      'opel': {
-        name: 'Opel',
-        count: 2,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Opel',
-        models: ['corsa', 'astra', 'mokka', 'grandland']
-      },
-      'peugeot': {
-        name: 'Peugeot',
-        count: 2,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Peugeot',
-        models: ['208', '308', '2008', '3008', '5008']
-      },
-      'renault': {
-        name: 'Renault',
-        count: 3,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Renault',
-        models: ['clio', 'captur', 'megane', 'kadjar']
-      },
-      'seat': {
-        name: 'Seat',
-        count: 1,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Seat',
-        models: ['ibiza', 'leon', 'arona', 'ateca']
-      },
-      'smart': {
-        name: 'Smart',
-        count: 1,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Smart',
-        models: ['fortwo', 'forfour']
-      },
-      'suzuki': {
-        name: 'Suzuki',
-        count: 1,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Suzuki',
-        models: ['vitara', 'swift', 'ignis', 'jimny']
-      },
-      'volkswagen': {
-        name: 'Volkswagen',
-        count: 4,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Volkswagen',
-        models: ['golf', 'polo', 'tiguan', 'passat', 't-roc', 'id.3', 'id.4']
-      },
-      'fiat': {
-        name: 'Fiat',
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Fiat',
-        models: ['500', '500x', '500l', 'panda', 'tipo', 'punto']
-      }
-    };
-
-    // MODELLI SPECIFICI USATO
-    const SPECIFIC_MODELS_USED = {
-      '500': 'fiat',
-      '500x': 'fiat',
-      '500l': 'fiat',
-      'punto': 'fiat',
-      'renegade': 'jeep',
-      'wrangler': 'jeep',
-      'cherokee': 'jeep',
-      'fiesta': 'ford',
-      'focus': 'ford',
-      'kuga': 'ford',
-      'ecosport': 'ford',
-      'golf': 'volkswagen',
-      'polo': 'volkswagen',
-      't-roc': 'volkswagen',
-      'corsa': 'opel',
-      'astra': 'opel',
-      'clio': 'renault',
-      'captur': 'renault'
-    };
-
-    // Verifica se cerca auto USATE
     function isUsedCarQuery(text) {
       const lowerText = text.toLowerCase();
-      
-      // CRITERIO 1: Keyword ESPLICITE di usato
       const explicitUsedKeywords = ['usato', 'usata', 'usati', 'usate', 'seconda mano', 'km zero', 'centroauto', 'centro auto', 'stock', 'occasione', 'occasioni'];
       if (explicitUsedKeywords.some(kw => lowerText.includes(kw))) return true;
       
-      // CRITERIO 2: Marche SOLO nell'usato
       const onlyUsedBrands = ['ford', 'kia', 'mazda', 'mg', 'opel', 'peugeot', 'renault', 'seat', 'smart', 'suzuki', 'volkswagen', 'land rover'];
       if (onlyUsedBrands.some(brand => lowerText.includes(brand))) return true;
       
-      // CRITERIO 3: Modelli solo usato
-      const usedOnlyModels = ['fiesta', 'focus', 'kuga', 'ecosport', 'sportage', 'picanto', 'cx-5', 'mokka', '208', '308', '2008', '3008', 'clio', 'captur', 'megane', 'golf', 'polo', 't-roc'];
+      const usedOnlyModels = ['fiesta', 'focus', 'kuga', 'ecosport', 'sportage', 'picanto', 'cx-5', 'mokka', '208', '308', '2008', '3008', 'clio', 'captur', 'megane', 't-roc'];
       if (usedOnlyModels.some(model => lowerText.includes(model))) return true;
       
       return false;
     }
 
-    // Genera risposta USATO
     function getUsedCarsResponse(query) {
       const lowerQuery = query.toLowerCase();
+      const database = learningData.usedCarsData || USED_CARS_DB;
       
-      // Cerca modello specifico
-      for (const [model, brand] of Object.entries(SPECIFIC_MODELS_USED)) {
-        if (lowerQuery.includes(model)) {
-          const brandData = USED_CARS_DB[brand];
-          if (brandData) {
-            return `🚗 <b>${model.toUpperCase()} USATE</b> su CentroAuto\n\n` +
-                   `📍 Cerca tra le auto <b>${brandData.name}</b> disponibili:\n\n` +
-                   `🔗 <a href="${brandData.link}" target="_blank">VAI ALLE ${brandData.name.toUpperCase()} USATE</a>\n\n` +
-                   `💡 <i>Filtra per modello "${model}" una volta sulla pagina!</i>\n\n` +
-                   `📊 <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">Vedi tutto lo stock usato</a>`;
-          }
-        }
-      }
-      
-      // Cerca marca
-      for (const [brandKey, brandData] of Object.entries(USED_CARS_DB)) {
+      for (const [brandKey, brandData] of Object.entries(database)) {
         if (lowerQuery.includes(brandKey)) {
           let response = `🚗 <b>${brandData.name.toUpperCase()} USATE</b> su CentroAuto\n\n`;
           
@@ -1196,38 +1637,23 @@
             response += '\n\n';
           }
           
-          response += `🔗 <a href="${brandData.link}" target="_blank">VAI ALLE ${brandData.name.toUpperCase()} USATE</a>\n\n`;
-          response += `💡 <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">Sfoglia tutto lo stock</a>`;
+          response += `🔗 <a href="${brandData.link}" target="_blank">VAI ALLE ${brandData.name.toUpperCase()} USATE</a>`;
           
           return response;
         }
       }
       
-      // Risposta generica
       return `🚗 <b>AUTO USATE</b> su CentroAuto VT\n\n` +
-             `📊 <b>Marche disponibili:</b>\n\n` +
-             `<b>TOP STOCK:</b>\n` +
-             `• Ford (9 auto) - <a href="${USED_CARS_DB.ford.link}" target="_blank">Vedi</a>\n` +
-             `• Jeep (13 auto) - <a href="${USED_CARS_DB.jeep.link}" target="_blank">Vedi</a>\n` +
-             `• Lancia (4 auto) - <a href="${USED_CARS_DB.lancia.link}" target="_blank">Vedi</a>\n` +
-             `• Volkswagen (4 auto) - <a href="${USED_CARS_DB.volkswagen.link}" target="_blank">Vedi</a>\n\n` +
-             `<b>ALTRE MARCHE:</b>\n` +
-             `Kia • Mazda • MG • Opel • Peugeot\n` +
-             `Renault • Seat • Smart • Suzuki\n\n` +
-             `🔗 <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">VEDI TUTTO LO STOCK</a>\n\n` +
-             `💡 <i>Scrivi "Ford usate" o "500X usata" per risultati specifici!</i>`;
+             `🔗 <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">VEDI TUTTO LO STOCK</a>`;
     }
 
-    // ========== RICERCA AUTO NUOVE (con database) ==========
     async function searchNewCars(query, detectedModel) {
       try {
         let searchQuery = query;
         
-        // Se abbiamo riconosciuto il modello, costruisci query specifica
         if (detectedModel) {
           searchQuery = `${detectedModel.brand} ${detectedModel.model} allestimenti ${detectedModel.trims.join(' ')} site:${detectedModel.site}`;
         } else {
-          // Query generica per configuratori
           const officialSites = [
             'site:fiat.it/configuratore OR site:fiat.it/gamma',
             'site:jeep-official.it/configuratore OR site:jeep-official.it/gamma',
@@ -1266,105 +1692,33 @@
       }
     }
 
-    // SISTEMA PROMPT MIGLIORATO
-    const SYSTEM_PROMPT_NEW = `Sei un assistente esperto di auto NUOVE (Fiat, Jeep, Alfa Romeo, Lancia).
+    const SYSTEM_PROMPT_NEW = `Sei un assistente esperto di auto NUOVE (Fiat, Jeep, Alfa Romeo, Lancia) con sistema di auto-apprendimento.
 
-ALLESTIMENTI CORRETTI (aggiornati):
-• Grande Panda: Pop, Icon, La Prima
-• Panda Cross: Pack Comfort, Pack Style, Pack Tech disponibili
+IMPORTANTE: Considera le correzioni apprese dagli operatori nelle tue risposte.
 
-REGOLE FONDAMENTALI:
-1. Risposte SCHEMATICHE e CONCISE (max 10 righe)
-2. Usa ELENCHI PUNTATI per chiarezza
-3. Confronta allestimenti evidenziando DIFFERENZE chiave
-4. Basati SOLO sui dati forniti dai configuratori ufficiali
-5. Per la Panda Cross menziona sempre i pack disponibili
+REGOLE:
+1. Risposte SCHEMATICHE (max 10 righe)
+2. Usa ELENCHI PUNTATI
+3. Confronta allestimenti chiaramente
+4. Basati SOLO sui dati forniti
+5. Rispetta le restrizioni apprese
 
-FORMATO per INFO GENERALI:
-✓ Punto chiave 1
-✓ Punto chiave 2
-✓ Punto chiave 3
-
-FORMATO per CONFRONTO ALLESTIMENTI:
+FORMATO:
 🔴 ALLESTIMENTO 1
-• Caratteristica esclusiva 1
-• Caratteristica esclusiva 2
+• Caratteristica 1
+• Caratteristica 2
 
 🔵 ALLESTIMENTO 2
-• Caratteristica esclusiva 1
-• Caratteristica esclusiva 2
+• Caratteristica 1
+• Caratteristica 2
 
-💡 CONSIGLIO: [suggerimento breve basato sui dati]`;
+💡 CONSIGLIO: [breve]`;
 
-    // Toggle chat
-    chatTrigger.addEventListener("click", () => {
-      chatBox.classList.add("open");
-      chatBox.classList.remove("minimized");
-      chatTrigger.style.display = "none";
-      $("chatMinimizedLogo").style.display = "none";
-      chatInputField.focus();
-    });
-
-    minimizeBtn.addEventListener("click", () => {
-      chatBox.classList.add("minimized");
-      isMinimized = true;
-      $("chatMinimizedLogo").style.display = "block";
-    });
-
-    closeBtn.addEventListener("click", () => {
-      chatBox.classList.remove("open");
-      chatBox.classList.remove("minimized");
-      chatTrigger.style.display = "flex";
-    });
-
-    chatBox.querySelector(".chatHeader").addEventListener("click", (e) => {
-      if (isMinimized && !e.target.closest("button")) {
-        chatBox.classList.remove("minimized");
-        isMinimized = false;
-        $("chatMinimizedLogo").style.display = "none";
-      }
-    });
-
-    $("chatMinimizedLogo").addEventListener("click", () => {
-      chatBox.classList.remove("minimized");
-      isMinimized = false;
-      $("chatMinimizedLogo").style.display = "none";
-      chatInputField.focus();
-    });
-
-    function addMessage(html, sender) {
-      const messageDiv = document.createElement("div");
-      messageDiv.className = `message ${sender}`;
-      messageDiv.innerHTML = `<div class="messageBubble">${html}</div>`;
-      chatMessages.appendChild(messageDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function showTyping() {
-      const typingDiv = document.createElement("div");
-      typingDiv.className = "message ai";
-      typingDiv.id = "typingIndicator";
-      typingDiv.innerHTML = `
-        <div class="typingIndicator">
-          <div class="typingDot"></div>
-          <div class="typingDot"></div>
-          <div class="typingDot"></div>
-        </div>
-      `;
-      chatMessages.appendChild(typingDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function hideTyping() {
-      const typing = $("typingIndicator");
-      if (typing) typing.remove();
-    }
-
-    // ========== INVIO MESSAGGIO MIGLIORATO ==========
     async function sendMessage() {
       const userMessage = chatInputField.value.trim();
       if (!userMessage) return;
 
+      lastUserMessage = userMessage;
       addMessage(escapeHtml(userMessage), "user");
       chatInputField.value = "";
       chatSendBtn.disabled = true;
@@ -1372,18 +1726,13 @@ FORMATO per CONFRONTO ALLESTIMENTI:
       showTyping();
 
       try {
-        // ✅ STEP 1: È una richiesta di auto USATE?
         if (isUsedCarQuery(userMessage)) {
           hideTyping();
           const results = getUsedCarsResponse(userMessage);
-          addMessage(results, "ai");
-        } 
-        // ✅ STEP 2: È una richiesta di auto NUOVE
-        else {
-          // Rileva il modello specifico se presente
+          lastAiResponse = results;
+          addMessage(results, "ai", true);
+        } else {
           const detectedModel = detectNewCarModel(userMessage);
-          
-          // Cerca sui configuratori
           const searchResults = await searchNewCars(userMessage, detectedModel);
           
           const messages = [
@@ -1392,20 +1741,36 @@ FORMATO per CONFRONTO ALLESTIMENTI:
           ];
 
           if (searchResults) {
-            let context = `DATI UFFICIALI DAI CONFIGURATORI:\n\n${searchResults}\n\n`;
+            let context = `DATI UFFICIALI:\n\n${searchResults}\n\n`;
             
-            // Aggiungi info modello se rilevato
             if (detectedModel) {
-              context += `MODELLO RILEVATO: ${detectedModel.brand} ${detectedModel.model}\n`;
-              context += `ALLESTIMENTI DISPONIBILI: ${detectedModel.trims.join(', ')}\n\n`;
+              context += `MODELLO: ${detectedModel.brand} ${detectedModel.model}\n`;
+              context += `ALLESTIMENTI: ${detectedModel.trims.join(', ')}\n`;
+              
+              // Aggiungi restrizioni apprese
+              if (Object.keys(detectedModel.restrictions).length > 0) {
+                context += `\nRESTRIZIONI APPRESE:\n`;
+                for (const [trim, restriction] of Object.entries(detectedModel.restrictions)) {
+                  context += `- ${trim}: ${restriction}\n`;
+                }
+              }
             }
             
-            context += `Rispondi in modo SCHEMATICO basandoti SOLO su questi dati.`;
+            // Aggiungi ultime correzioni rilevanti
+            const relevantCorrections = learningData.corrections?.filter(c => 
+              c.userMessage.toLowerCase().includes(userMessage.toLowerCase().split(' ')[0])
+            ).slice(-3);
             
-            messages.push({
-              role: "system",
-              content: context
-            });
+            if (relevantCorrections && relevantCorrections.length > 0) {
+              context += `\nCORREZIONI OPERATORI APPRESE:\n`;
+              relevantCorrections.forEach(c => {
+                context += `- ${c.correction}\n`;
+              });
+            }
+            
+            context += `\nRispondi in modo SCHEMATICO.`;
+            
+            messages.push({ role: "system", content: context });
           }
 
           const response = await fetch(BACKEND_CHAT, {
@@ -1421,7 +1786,8 @@ FORMATO per CONFRONTO ALLESTIMENTI:
 
           let aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho trovato informazioni.";
           aiMessage = escapeHtml(aiMessage);
-          addMessage(aiMessage, "ai");
+          lastAiResponse = aiMessage;
+          addMessage(aiMessage, "ai", true);
         }
 
       } catch (error) {
