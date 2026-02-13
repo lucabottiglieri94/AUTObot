@@ -859,7 +859,7 @@
       }
     });
 
-    // ========== CHATBOT LOGIC - SISTEMA CORRETTO ========== 
+    // ========== CHATBOT LOGIC - COMPLETO DATABASE AUTO NUOVE ========== 
     
     let isMinimized = false;
 
@@ -871,72 +871,163 @@
     const minimizeBtn = $("minimizeBtn");
     const closeBtn = $("closeBtn");
 
-    // Toggle chat
-    chatTrigger.addEventListener("click", () => {
-      chatBox.classList.add("open");
-      chatBox.classList.remove("minimized");
-      chatTrigger.style.display = "none";
-      $("chatMinimizedLogo").style.display = "none";
-      chatInputField.focus();
-    });
+    // ========== 🚗 DATABASE COMPLETO AUTO NUOVE (2025) ========== 
+    const NEW_CARS_DATABASE = {
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // FIAT
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      'fiat': {
+        brand: 'Fiat',
+        site: 'fiat.it',
+        models: {
+          '500': {
+            name: '500 Elettrica',
+            trims: ['Action', 'Passion', 'Icon', 'La Prima'],
+            keywords: ['500', 'cinquecento', '500e', '500 elettrica']
+          },
+          '500x': {
+            name: '500X',
+            trims: ['City Cross', 'Cross', 'Sport'],
+            keywords: ['500x', 'cinquecento x']
+          },
+          'panda': {
+            name: 'Panda',
+            trims: ['Easy', 'Cross', 'Sport'],
+            keywords: ['panda']
+          },
+          'grande-panda': {
+            name: 'Grande Panda',
+            trims: ['RED', 'La Prima'],
+            keywords: ['grande panda', 'grandepanda', 'panda grande']
+          },
+          '600': {
+            name: '600',
+            trims: ['RED', 'La Prima'],
+            keywords: ['600', 'seicento', '600 ibrida', '600 elettrica']
+          },
+          'tipo': {
+            name: 'Tipo',
+            trims: ['City Life', 'City Cross', 'Cross', 'Sport'],
+            keywords: ['tipo']
+          },
+          'ducato': {
+            name: 'Ducato',
+            trims: ['Furgone', 'Combi', 'Passo Corto', 'Passo Medio', 'Passo Lungo'],
+            keywords: ['ducato']
+          }
+        }
+      },
 
-    minimizeBtn.addEventListener("click", () => {
-      chatBox.classList.add("minimized");
-      isMinimized = true;
-      $("chatMinimizedLogo").style.display = "block";
-    });
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // JEEP
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      'jeep': {
+        brand: 'Jeep',
+        site: 'jeep-official.it',
+        models: {
+          'avenger': {
+            name: 'Avenger',
+            trims: ['Longitude', 'Altitude', 'Summit', 'The North Face Edition'],
+            keywords: ['avenger']
+          },
+          'renegade': {
+            name: 'Renegade',
+            trims: ['Longitude', 'Limited', 'Trailhawk', '80th Anniversary'],
+            keywords: ['renegade']
+          },
+          'compass': {
+            name: 'Compass',
+            trims: ['Longitude', 'Limited', 'Trailhawk', 'S', '80th Anniversary'],
+            keywords: ['compass']
+          },
+          'wrangler': {
+            name: 'Wrangler',
+            trims: ['Sport', 'Sahara', 'Rubicon', '4xe'],
+            keywords: ['wrangler']
+          },
+          'grand-cherokee': {
+            name: 'Grand Cherokee',
+            trims: ['Limited', 'Overland', 'Summit', 'Trailhawk', '4xe'],
+            keywords: ['grand cherokee', 'grandcherokee']
+          },
+          'gladiator': {
+            name: 'Gladiator',
+            trims: ['Sport', 'Overland', 'Rubicon'],
+            keywords: ['gladiator']
+          }
+        }
+      },
 
-    closeBtn.addEventListener("click", () => {
-      chatBox.classList.remove("open");
-      chatBox.classList.remove("minimized");
-      chatTrigger.style.display = "flex";
-    });
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // ALFA ROMEO
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      'alfa': {
+        brand: 'Alfa Romeo',
+        site: 'alfaromeo.it',
+        models: {
+          'junior': {
+            name: 'Junior',
+            trims: ['Ibrida Q4', 'Elettrica', 'Speciale', 'Veloce'],
+            keywords: ['junior', 'alfa junior']
+          },
+          'tonale': {
+            name: 'Tonale',
+            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Q4'],
+            keywords: ['tonale']
+          },
+          'stelvio': {
+            name: 'Stelvio',
+            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Quadrifoglio'],
+            keywords: ['stelvio']
+          },
+          'giulia': {
+            name: 'Giulia',
+            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Quadrifoglio'],
+            keywords: ['giulia']
+          }
+        }
+      },
 
-    chatBox.querySelector(".chatHeader").addEventListener("click", (e) => {
-      if (isMinimized && !e.target.closest("button")) {
-        chatBox.classList.remove("minimized");
-        isMinimized = false;
-        $("chatMinimizedLogo").style.display = "none";
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // LANCIA
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      'lancia': {
+        brand: 'Lancia',
+        site: 'lancia.it',
+        models: {
+          'ypsilon': {
+            name: 'Ypsilon',
+            trims: ['Cassina', 'Edizione Limitata', 'LX', 'Elettrica'],
+            keywords: ['ypsilon', 'ipsilon', 'y']
+          }
+        }
       }
-    });
+    };
 
-    $("chatMinimizedLogo").addEventListener("click", () => {
-      chatBox.classList.remove("minimized");
-      isMinimized = false;
-      $("chatMinimizedLogo").style.display = "none";
-      chatInputField.focus();
-    });
-
-    // Add message to UI
-    function addMessage(html, sender) {
-      const messageDiv = document.createElement("div");
-      messageDiv.className = `message ${sender}`;
-      messageDiv.innerHTML = `<div class="messageBubble">${html}</div>`;
-      chatMessages.appendChild(messageDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+    // ========== FUNZIONE: Riconosci modello AUTO NUOVA ==========
+    function detectNewCarModel(query) {
+      const lowerQuery = query.toLowerCase();
+      
+      for (const [brandKey, brandData] of Object.entries(NEW_CARS_DATABASE)) {
+        for (const [modelKey, modelData] of Object.entries(brandData.models)) {
+          // Controlla se una keyword del modello è presente
+          if (modelData.keywords.some(kw => lowerQuery.includes(kw))) {
+            return {
+              brand: brandData.brand,
+              brandKey: brandKey,
+              model: modelData.name,
+              modelKey: modelKey,
+              trims: modelData.trims,
+              site: brandData.site
+            };
+          }
+        }
+      }
+      
+      return null;
     }
 
-    function showTyping() {
-      const typingDiv = document.createElement("div");
-      typingDiv.className = "message ai";
-      typingDiv.id = "typingIndicator";
-      typingDiv.innerHTML = `
-        <div class="typingIndicator">
-          <div class="typingDot"></div>
-          <div class="typingDot"></div>
-          <div class="typingDot"></div>
-        </div>
-      `;
-      chatMessages.appendChild(typingDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function hideTyping() {
-      const typing = $("typingIndicator");
-      if (typing) typing.remove();
-    }
-
-    // DATABASE AUTO USATE CENTROAUTO
+    // ========== DATABASE AUTO USATE CENTROAUTO ========== 
     const USED_CARS_DB = {
       'ford': {
         name: 'Ford',
@@ -1028,60 +1119,53 @@
       }
     };
 
-    // MODELLI SPECIFICI
-    const SPECIFIC_MODELS = {
+    // MODELLI SPECIFICI USATO
+    const SPECIFIC_MODELS_USED = {
       '500': 'fiat',
       '500x': 'fiat',
       '500l': 'fiat',
-      'panda': 'fiat',
-      'tipo': 'fiat',
       'punto': 'fiat',
       'renegade': 'jeep',
-      'compass': 'jeep',
       'wrangler': 'jeep',
-      'ypsilon': 'lancia',
+      'cherokee': 'jeep',
       'fiesta': 'ford',
       'focus': 'ford',
       'kuga': 'ford',
       'ecosport': 'ford',
       'golf': 'volkswagen',
       'polo': 'volkswagen',
-      'tiguan': 'volkswagen',
+      't-roc': 'volkswagen',
       'corsa': 'opel',
       'astra': 'opel',
       'clio': 'renault',
       'captur': 'renault'
     };
 
-    // ✅ SISTEMA MIGLIORATO: Verifica ESPLICITA per auto usate
+    // Verifica se cerca auto USATE
     function isUsedCarQuery(text) {
       const lowerText = text.toLowerCase();
       
-      // CRITERIO 1: Keyword esplicite di USATO
+      // CRITERIO 1: Keyword ESPLICITE di usato
       const explicitUsedKeywords = ['usato', 'usata', 'usati', 'usate', 'seconda mano', 'km zero', 'centroauto', 'centro auto', 'stock', 'occasione', 'occasioni'];
-      const hasExplicitUsedKeyword = explicitUsedKeywords.some(kw => lowerText.includes(kw));
+      if (explicitUsedKeywords.some(kw => lowerText.includes(kw))) return true;
       
-      if (hasExplicitUsedKeyword) return true;
+      // CRITERIO 2: Marche SOLO nell'usato
+      const onlyUsedBrands = ['ford', 'kia', 'mazda', 'mg', 'opel', 'peugeot', 'renault', 'seat', 'smart', 'suzuki', 'volkswagen', 'land rover'];
+      if (onlyUsedBrands.some(brand => lowerText.includes(brand))) return true;
       
-      // CRITERIO 2: Marche SOLO disponibili nell'usato (NON nei configuratori nuovi)
-      const onlyUsedBrands = ['ford', 'kia', 'mazda', 'mg', 'opel', 'peugeot', 'renault', 'seat', 'smart', 'suzuki', 'volkswagen', 'land rover', 'range rover'];
-      const mentionsOnlyUsedBrand = onlyUsedBrands.some(brand => lowerText.includes(brand));
+      // CRITERIO 3: Modelli solo usato
+      const usedOnlyModels = ['fiesta', 'focus', 'kuga', 'ecosport', 'sportage', 'picanto', 'cx-5', 'mokka', '208', '308', '2008', '3008', 'clio', 'captur', 'megane', 'golf', 'polo', 't-roc'];
+      if (usedOnlyModels.some(model => lowerText.includes(model))) return true;
       
-      if (mentionsOnlyUsedBrand) return true;
-      
-      // CRITERIO 3: Modelli di marche usato-only
-      const usedOnlyModels = ['fiesta', 'focus', 'kuga', 'ecosport', 'sportage', 'picanto', 'cx-5', 'corsa', 'astra', 'mokka', '208', '308', '2008', '3008', 'clio', 'captur', 'golf', 'polo', 'tiguan'];
-      const mentionsUsedOnlyModel = usedOnlyModels.some(model => lowerText.includes(model));
-      
-      return mentionsUsedOnlyModel;
+      return false;
     }
 
-    // Genera risposta per auto USATE
+    // Genera risposta USATO
     function getUsedCarsResponse(query) {
       const lowerQuery = query.toLowerCase();
       
       // Cerca modello specifico
-      for (const [model, brand] of Object.entries(SPECIFIC_MODELS)) {
+      for (const [model, brand] of Object.entries(SPECIFIC_MODELS_USED)) {
         if (lowerQuery.includes(model)) {
           const brandData = USED_CARS_DB[brand];
           if (brandData) {
@@ -1094,7 +1178,7 @@
         }
       }
       
-      // Cerca marca specifica
+      // Cerca marca
       for (const [brandKey, brandData] of Object.entries(USED_CARS_DB)) {
         if (lowerQuery.includes(brandKey)) {
           let response = `🚗 <b>${brandData.name.toUpperCase()} USATE</b> su CentroAuto\n\n`;
@@ -1116,7 +1200,7 @@
         }
       }
       
-      // Risposta generica per "usato"
+      // Risposta generica
       return `🚗 <b>AUTO USATE</b> su CentroAuto VT\n\n` +
              `📊 <b>Marche disponibili:</b>\n\n` +
              `<b>TOP STOCK:</b>\n` +
@@ -1131,19 +1215,26 @@
              `💡 <i>Scrivi "Ford usate" o "500X usata" per risultati specifici!</i>`;
     }
 
-    // Cerca info AUTO NUOVE (solo Fiat, Jeep, Alfa, Lancia)
-    async function searchNewCars(query) {
+    // ========== RICERCA AUTO NUOVE (con database) ==========
+    async function searchNewCars(query, detectedModel) {
       try {
-        const officialSites = [
-          'site:fiat.it/configuratore OR site:fiat.it/gamma',
-          'site:jeep-official.it/configuratore OR site:jeep-official.it/gamma',
-          'site:alfaromeo.it/configuratore OR site:alfaromeo.it/gamma',
-          'site:lancia.it/configuratore OR site:lancia.it/gamma'
-        ];
+        let searchQuery = query;
         
-        const enhancedQuery = `${query} allestimenti versioni (${officialSites.join(' OR ')})`;
+        // Se abbiamo riconosciuto il modello, costruisci query specifica
+        if (detectedModel) {
+          searchQuery = `${detectedModel.brand} ${detectedModel.model} allestimenti ${detectedModel.trims.join(' ')} site:${detectedModel.site}`;
+        } else {
+          // Query generica per configuratori
+          const officialSites = [
+            'site:fiat.it/configuratore OR site:fiat.it/gamma',
+            'site:jeep-official.it/configuratore OR site:jeep-official.it/gamma',
+            'site:alfaromeo.it/configuratore OR site:alfaromeo.it/gamma',
+            'site:lancia.it/configuratore OR site:lancia.it/gamma'
+          ];
+          searchQuery = `${query} allestimenti versioni (${officialSites.join(' OR ')})`;
+        }
         
-        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(enhancedQuery)}`);
+        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(searchQuery)}`);
         if (!response.ok) throw new Error("Errore ricerca");
         
         const data = await response.json();
@@ -1172,27 +1263,96 @@
       }
     }
 
-    // SISTEMA PROMPT per auto NUOVE
-    const SYSTEM_PROMPT_NEW = `Sei un assistente per auto NUOVE (Fiat, Jeep, Alfa Romeo, Lancia).
+    // SISTEMA PROMPT MIGLIORATO
+    const SYSTEM_PROMPT_NEW = `Sei un assistente esperto di auto NUOVE (Fiat, Jeep, Alfa Romeo, Lancia).
 
-REGOLE:
-1. Risposte SCHEMATICHE (max 10 righe)
-2. Usa ELENCHI PUNTATI
-3. Confronta allestimenti in modo chiaro
-4. Basati SOLO sui dati forniti
+REGOLE FONDAMENTALI:
+1. Risposte SCHEMATICHE e CONCISE (max 10 righe)
+2. Usa ELENCHI PUNTATI per chiarezza
+3. Confronta allestimenti evidenziando DIFFERENZE chiave
+4. Basati SOLO sui dati forniti dai configuratori ufficiali
 
-FORMATO RISPOSTA:
+FORMATO per INFO GENERALI:
+✓ Punto chiave 1
+✓ Punto chiave 2
+✓ Punto chiave 3
+
+FORMATO per CONFRONTO ALLESTIMENTI:
 🔴 ALLESTIMENTO 1
-• Caratteristica 1
-• Caratteristica 2
+• Caratteristica esclusiva 1
+• Caratteristica esclusiva 2
 
 🔵 ALLESTIMENTO 2
-• Caratteristica 1
-• Caratteristica 2
+• Caratteristica esclusiva 1
+• Caratteristica esclusiva 2
 
-💡 CONSIGLIO: [breve]`;
+💡 CONSIGLIO: [suggerimento breve basato sui dati]`;
 
-    // ✅ INVIO MESSAGGIO - LOGICA CORRETTA
+    // Toggle chat
+    chatTrigger.addEventListener("click", () => {
+      chatBox.classList.add("open");
+      chatBox.classList.remove("minimized");
+      chatTrigger.style.display = "none";
+      $("chatMinimizedLogo").style.display = "none";
+      chatInputField.focus();
+    });
+
+    minimizeBtn.addEventListener("click", () => {
+      chatBox.classList.add("minimized");
+      isMinimized = true;
+      $("chatMinimizedLogo").style.display = "block";
+    });
+
+    closeBtn.addEventListener("click", () => {
+      chatBox.classList.remove("open");
+      chatBox.classList.remove("minimized");
+      chatTrigger.style.display = "flex";
+    });
+
+    chatBox.querySelector(".chatHeader").addEventListener("click", (e) => {
+      if (isMinimized && !e.target.closest("button")) {
+        chatBox.classList.remove("minimized");
+        isMinimized = false;
+        $("chatMinimizedLogo").style.display = "none";
+      }
+    });
+
+    $("chatMinimizedLogo").addEventListener("click", () => {
+      chatBox.classList.remove("minimized");
+      isMinimized = false;
+      $("chatMinimizedLogo").style.display = "none";
+      chatInputField.focus();
+    });
+
+    function addMessage(html, sender) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}`;
+      messageDiv.innerHTML = `<div class="messageBubble">${html}</div>`;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showTyping() {
+      const typingDiv = document.createElement("div");
+      typingDiv.className = "message ai";
+      typingDiv.id = "typingIndicator";
+      typingDiv.innerHTML = `
+        <div class="typingIndicator">
+          <div class="typingDot"></div>
+          <div class="typingDot"></div>
+          <div class="typingDot"></div>
+        </div>
+      `;
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideTyping() {
+      const typing = $("typingIndicator");
+      if (typing) typing.remove();
+    }
+
+    // ========== INVIO MESSAGGIO MIGLIORATO ==========
     async function sendMessage() {
       const userMessage = chatInputField.value.trim();
       if (!userMessage) return;
@@ -1204,15 +1364,19 @@ FORMATO RISPOSTA:
       showTyping();
 
       try {
-        // ✅ DECISIONE: AUTO USATE o NUOVE?
+        // ✅ STEP 1: È una richiesta di auto USATE?
         if (isUsedCarQuery(userMessage)) {
-          // ➡️ USATO: Risposta immediata con link diretti
           hideTyping();
           const results = getUsedCarsResponse(userMessage);
           addMessage(results, "ai");
-        } else {
-          // ➡️ NUOVO: Usa AI con ricerca configuratori
-          const searchResults = await searchNewCars(userMessage);
+        } 
+        // ✅ STEP 2: È una richiesta di auto NUOVE
+        else {
+          // Rileva il modello specifico se presente
+          const detectedModel = detectNewCarModel(userMessage);
+          
+          // Cerca sui configuratori
+          const searchResults = await searchNewCars(userMessage, detectedModel);
           
           const messages = [
             { role: "system", content: SYSTEM_PROMPT_NEW },
@@ -1220,9 +1384,19 @@ FORMATO RISPOSTA:
           ];
 
           if (searchResults) {
+            let context = `DATI UFFICIALI DAI CONFIGURATORI:\n\n${searchResults}\n\n`;
+            
+            // Aggiungi info modello se rilevato
+            if (detectedModel) {
+              context += `MODELLO RILEVATO: ${detectedModel.brand} ${detectedModel.model}\n`;
+              context += `ALLESTIMENTI DISPONIBILI: ${detectedModel.trims.join(', ')}\n\n`;
+            }
+            
+            context += `Rispondi in modo SCHEMATICO basandoti SOLO su questi dati.`;
+            
             messages.push({
               role: "system",
-              content: `DATI UFFICIALI:\n\n${searchResults}\n\nRispondi in modo schematico.`
+              content: context
             });
           }
 
