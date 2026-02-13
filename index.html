@@ -893,11 +893,14 @@
           'panda': {
             name: 'Panda',
             trims: ['Easy', 'Cross', 'Sport'],
+            packs: {
+              'Cross': ['Pack Comfort', 'Pack Style', 'Pack Tech']
+            },
             keywords: ['panda']
           },
           'grande-panda': {
             name: 'Grande Panda',
-            trims: ['RED', 'La Prima'],
+            trims: ['Pop', 'Icon', 'La Prima'],
             keywords: ['grande panda', 'grandepanda', 'panda grande']
           },
           '600': {
@@ -1266,11 +1269,16 @@
     // SISTEMA PROMPT MIGLIORATO
     const SYSTEM_PROMPT_NEW = `Sei un assistente esperto di auto NUOVE (Fiat, Jeep, Alfa Romeo, Lancia).
 
+ALLESTIMENTI CORRETTI (aggiornati):
+• Grande Panda: Pop, Icon, La Prima
+• Panda Cross: Pack Comfort, Pack Style, Pack Tech disponibili
+
 REGOLE FONDAMENTALI:
 1. Risposte SCHEMATICHE e CONCISE (max 10 righe)
 2. Usa ELENCHI PUNTATI per chiarezza
 3. Confronta allestimenti evidenziando DIFFERENZE chiave
 4. Basati SOLO sui dati forniti dai configuratori ufficiali
+5. Per la Panda Cross menziona sempre i pack disponibili
 
 FORMATO per INFO GENERALI:
 ✓ Punto chiave 1
