@@ -1424,6 +1424,10 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
 
     // Admin Panel
     $("adminBtn").addEventListener("click", () => {
+      if (!isAdmin) {
+        alert('🚫 ACCESSO NEGATO!\n\nSolo l\'amministratore può accedere al pannello.\n\nEmail autorizzata: lucabottiglieri94@gmail.com');
+        return;
+      }
       $("adminPanel").classList.toggle("open");
     });
 
@@ -1431,10 +1435,28 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
       $("adminPanel").classList.remove("open");
     });
 
-    $("forceUpdateNew").addEventListener("click", updateNewCarsData);
-    $("forceUpdateUsed").addEventListener("click", updateUsedCarsData);
+    $("forceUpdateNew").addEventListener("click", async () => {
+      if (!isAdmin) {
+        alert('🚫 ACCESSO NEGATO!');
+        return;
+      }
+      await updateNewCarsData();
+    });
+    
+    $("forceUpdateUsed").addEventListener("click", async () => {
+      if (!isAdmin) {
+        alert('🚫 ACCESSO NEGATO!');
+        return;
+      }
+      await updateUsedCarsData();
+    });
 
     $("resetLearning").addEventListener("click", async () => {
+      if (!isAdmin) {
+        alert('🚫 ACCESSO NEGATO!');
+        return;
+      }
+      
       if (confirm('⚠️ Sei sicuro? Questo cancellerà TUTTE le correzioni apprese!')) {
         try {
           const docRef = doc(db, 'ai-learning', 'knowledge-base');
@@ -1451,20 +1473,42 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
       }
     });
 
+    // ========== 🔐 AUTORIZZAZIONE ADMIN ========== 
+    const ADMIN_EMAIL = "lucabottiglieri94@gmail.com";
+    let isAdmin = false;
+
+    function checkAdminAccess(email) {
+      return email && email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    }
+
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        isAdmin = checkAdminAccess(user.email);
+        
         $("userPill").textContent = "✅ " + (user.email || "Utente");
         $("userPill").classList.remove("muted");
         $("userPill").style.borderColor = "rgba(34,197,94,.5)";
         $("userPill").style.background = "rgba(34,197,94,.1)";
 
+        // Badge ADMIN
+        if (isAdmin) {
+          $("userPill").textContent = "👑 ADMIN • " + user.email;
+          $("userPill").style.borderColor = "rgba(251,191,36,.6)";
+          $("userPill").style.background = "rgba(251,191,36,.15)";
+        }
+
         $("loginBtn").style.display = "none";
         $("logoutBtn").style.display = "inline-block";
-        $("adminBtn").style.display = "inline-block";
+        
+        // Mostra pulsante admin SOLO se è l'admin
+        $("adminBtn").style.display = isAdmin ? "inline-block" : "none";
+        
         $("refreshBtn").disabled = false;
 
         loadNews();
       } else {
+        isAdmin = false;
+        
         $("userPill").textContent = "🔒 Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor = "";
@@ -1535,7 +1579,8 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
       
       let content = `<div class="messageBubble">${html}</div>`;
       
-      if (showCorrectBtn && auth.currentUser) {
+      // Mostra pulsante correzione SOLO se è admin
+      if (showCorrectBtn && isAdmin) {
         content += `<button class="correctBtn" onclick="promptCorrection()">✏️ Correggi questa risposta</button>`;
       }
       
@@ -1545,22 +1590,212 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
     }
 
     window.promptCorrection = async function() {
-      const correction = prompt('📝 Inserisci la correzione:\n\nEsempio: "Il pack Tech non si può mettere sulla Grande Panda La Prima perché è full optional di suo"');
+      // ✅ CONTROLLO ADMIN
+      if (!isAdmin) {
+        alert('🚫 ACCESSO NEGATO!\n\nSolo l\'amministratore può correggere il bot.\n\nEmail autorizzata: lucabottiglieri94@gmail.com');
+        return;
+      }
+      
+      const correction = prompt('📝 Inserisci la correzione:\n\nEsempi:\n- "Hai sbagliato le misure della 600"\n- "Il pack Tech non si può sulla La Prima perché è full optional"');
       
       if (!correction || !correction.trim()) return;
       
-      // Mostra correzione
-      addMessage(`📝 <b>CORREZIONE OPERATORE:</b><br>${escapeHtml(correction)}`, 'correction');
+      // ⚡ RILEVAMENTO AUTOMATICO ERRORI TECNICI
+      const technicalErrorPatterns = [
+        /hai sbagliato.*misure/i,
+        /hai sbagliato.*dimensioni/i,
+        /hai sbagliato.*peso/i,
+        /hai sbagliato.*potenza/i,
+        /hai sbagliato.*prestazioni/i,
+        /hai sbagliato.*consumi/i,
+        /hai sbagliato.*prezzo/i,
+        /misure sbagliate/i,
+        /dati sbagliati/i,
+        /informazioni errate/i,
+        /dati tecnici errati/i
+      ];
       
-      // Salva correzione
-      const saved = await saveCorrection(lastUserMessage, lastAiResponse, correction);
+      const isTechnicalError = technicalErrorPatterns.some(pattern => pattern.test(correction));
       
-      if (saved) {
-        addMessage('✅ <b>Correzione appresa!</b><br>Ho aggiornato la mia conoscenza. Grazie capo! 🧠', 'ai');
+      if (isTechnicalError) {
+        // 🔍 AUTO-FETCH DAI CONFIGURATORI
+        addMessage(`🔍 <b>RILEVATO ERRORE TECNICO</b><br>Vado a prendere i dati corretti dal configuratore...`, 'correction');
+        
+        showTyping();
+        
+        try {
+          // Estrai il modello dalla correzione
+          const modelMatch = correction.match(/(500|600|panda|tipo|ducato|grande panda|avenger|renegade|compass|wrangler|junior|tonale|stelvio|giulia|ypsilon)/i);
+          
+          if (modelMatch) {
+            const modelName = modelMatch[0].toLowerCase();
+            
+            // Cerca dati UFFICIALI sul configuratore
+            const detectedModel = detectNewCarModelByName(modelName);
+            
+            if (detectedModel) {
+              const searchQuery = `${detectedModel.brand} ${detectedModel.model} scheda tecnica dimensioni peso prestazioni site:${detectedModel.site}`;
+              
+              const searchResponse = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(searchQuery)}`);
+              const searchData = await searchResponse.json();
+              
+              if (searchData.results && searchData.results.length > 0) {
+                const officialData = searchData.results[0];
+                
+                hideTyping();
+                
+                // Mostra dati ufficiali trovati
+                addMessage(`✅ <b>DATI UFFICIALI TROVATI</b><br><br>` +
+                  `📊 Fonte: ${officialData.url}<br><br>` +
+                  `${officialData.description}<br><br>` +
+                  `<a href="${officialData.url}" target="_blank">🔗 Vedi scheda tecnica completa</a>`, 'correction');
+                
+                // Usa AI per estrarre i dati strutturati
+                const extractMessages = [
+                  {
+                    role: "system",
+                    content: `Estrai i dati tecnici dal testo fornito e restituiscili in formato JSON strutturato.
+                    
+Formato richiesto:
+{
+  "model": "nome modello",
+  "dimensions": {
+    "length": "valore in mm",
+    "width": "valore in mm",
+    "height": "valore in mm"
+  },
+  "weight": "valore in kg",
+  "performance": {
+    "power": "valore CV/kW",
+    "acceleration": "0-100 km/h",
+    "top_speed": "velocità max"
+  },
+  "consumption": "consumi medi",
+  "price_from": "prezzo base"
+}
+
+Se un dato non è presente, usa null.`
+                  },
+                  {
+                    role: "user",
+                    content: `${officialData.title}\n\n${officialData.description}`
+                  }
+                ];
+                
+                const extractResponse = await fetch(BACKEND_CHAT, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ messages: extractMessages }),
+                });
+                
+                if (extractResponse.ok) {
+                  const extractData = await extractResponse.json();
+                  let technicalData = null;
+                  
+                  try {
+                    const content = extractData.choices[0].message.content;
+                    // Rimuovi eventuali markdown code blocks
+                    const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/);
+                    const jsonString = jsonMatch ? jsonMatch[1] : content;
+                    technicalData = JSON.parse(jsonString);
+                  } catch (e) {
+                    console.error('Errore parsing JSON:', e);
+                  }
+                  
+                  if (technicalData) {
+                    // Salva i dati tecnici nel database
+                    const docRef = doc(db, 'ai-learning', 'knowledge-base');
+                    const docSnap = await getDoc(docRef);
+                    const currentData = docSnap.data().newCarsData || NEW_CARS_DATABASE;
+                    
+                    // Trova e aggiorna il modello
+                    for (const [brandKey, brandData] of Object.entries(currentData)) {
+                      for (const [modelKey, modelData] of Object.entries(brandData.models)) {
+                        if (modelData.name.toLowerCase().includes(modelName) || 
+                            modelData.keywords.some(kw => kw.includes(modelName))) {
+                          
+                          if (!modelData.technical) {
+                            modelData.technical = {};
+                          }
+                          
+                          modelData.technical = {
+                            ...modelData.technical,
+                            ...technicalData,
+                            lastUpdate: new Date().toISOString(),
+                            source: officialData.url
+                          };
+                          
+                          console.log('✅ Dati tecnici aggiornati:', modelData.technical);
+                          break;
+                        }
+                      }
+                    }
+                    
+                    await updateDoc(docRef, {
+                      newCarsData: currentData
+                    });
+                    
+                    addMessage(`✅ <b>DATI TECNICI AGGIORNATI!</b><br><br>` +
+                      `Ho salvato i dati ufficiali del configuratore.<br>` +
+                      `Ora so le informazioni corrette! 🧠`, 'ai');
+                  }
+                }
+              } else {
+                hideTyping();
+                addMessage(`❌ Non ho trovato dati sul configuratore ufficiale.<br>Per favore fornisci i dati corretti manualmente.`, 'ai');
+              }
+            } else {
+              hideTyping();
+              addMessage(`❌ Non ho riconosciuto il modello. Specifica meglio quale auto (es: "Fiat 600").`, 'ai');
+            }
+          } else {
+            hideTyping();
+            addMessage(`❌ Non ho capito di quale modello parli. Specifica il nome (es: "600", "Compass").`, 'ai');
+          }
+        } catch (error) {
+          hideTyping();
+          console.error('Errore fetch dati:', error);
+          addMessage(`❌ Errore nel recupero dati. Riprova o fornisci i dati manualmente.`, 'ai');
+        }
       } else {
-        addMessage('❌ Errore nel salvare la correzione. Riprova!', 'ai');
+        // Correzione manuale normale
+        addMessage(`📝 <b>CORREZIONE ADMIN:</b><br>${escapeHtml(correction)}`, 'correction');
+        
+        const saved = await saveCorrection(lastUserMessage, lastAiResponse, correction);
+        
+        if (saved) {
+          addMessage('✅ <b>Correzione appresa!</b><br>Ho aggiornato la mia conoscenza. Grazie capo! 🧠', 'ai');
+        } else {
+          addMessage('❌ Errore nel salvare la correzione. Riprova!', 'ai');
+        }
       }
     };
+    
+    // Funzione helper per riconoscere modello dal nome
+    function detectNewCarModelByName(modelName) {
+      const lowerModel = modelName.toLowerCase();
+      const database = learningData.newCarsData || NEW_CARS_DATABASE;
+      
+      for (const [brandKey, brandData] of Object.entries(database)) {
+        for (const [modelKey, modelData] of Object.entries(brandData.models)) {
+          if (modelData.name.toLowerCase().includes(lowerModel) || 
+              modelData.keywords.some(kw => kw.includes(lowerModel))) {
+            return {
+              brand: brandData.brand,
+              brandKey: brandKey,
+              model: modelData.name,
+              modelKey: modelKey,
+              trims: modelData.trims,
+              site: brandData.site,
+              restrictions: modelData.restrictions || {},
+              technical: modelData.technical || {}
+            };
+          }
+        }
+      }
+      
+      return null;
+    }
 
     function showTyping() {
       const typingDiv = document.createElement("div");
@@ -1694,14 +1929,18 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
 
     const SYSTEM_PROMPT_NEW = `Sei un assistente esperto di auto NUOVE (Fiat, Jeep, Alfa Romeo, Lancia) con sistema di auto-apprendimento.
 
-IMPORTANTE: Considera le correzioni apprese dagli operatori nelle tue risposte.
+IMPORTANTE: 
+- Considera le correzioni apprese dagli operatori
+- Usa SEMPRE i dati tecnici ufficiali quando disponibili nel database
+- Se hai dati tecnici verificati (dimensioni, peso, prestazioni), citali con precisione
 
 REGOLE:
 1. Risposte SCHEMATICHE (max 10 righe)
 2. Usa ELENCHI PUNTATI
-3. Confronta allestimenti chiaramente
-4. Basati SOLO sui dati forniti
-5. Rispetta le restrizioni apprese
+3. Per dati tecnici: cita le fonti ufficiali
+4. Confronta allestimenti chiaramente
+5. Basati SOLO sui dati forniti
+6. Rispetta le restrizioni apprese
 
 FORMATO:
 🔴 ALLESTIMENTO 1
@@ -1711,6 +1950,12 @@ FORMATO:
 🔵 ALLESTIMENTO 2
 • Caratteristica 1
 • Caratteristica 2
+
+📊 DATI TECNICI (se richiesti):
+• Dimensioni: L x W x H mm
+• Peso: X kg
+• Potenza: X CV/kW
+• Prestazioni: 0-100 in X sec
 
 💡 CONSIGLIO: [breve]`;
 
@@ -1746,6 +1991,37 @@ FORMATO:
             if (detectedModel) {
               context += `MODELLO: ${detectedModel.brand} ${detectedModel.model}\n`;
               context += `ALLESTIMENTI: ${detectedModel.trims.join(', ')}\n`;
+              
+              // Aggiungi DATI TECNICI UFFICIALI se disponibili
+              if (detectedModel.technical && Object.keys(detectedModel.technical).length > 0) {
+                context += `\n📊 DATI TECNICI UFFICIALI (fonte: ${detectedModel.technical.source || 'configuratore'}):\n`;
+                
+                if (detectedModel.technical.dimensions) {
+                  context += `• Dimensioni: ${detectedModel.technical.dimensions.length || 'N/A'} x ${detectedModel.technical.dimensions.width || 'N/A'} x ${detectedModel.technical.dimensions.height || 'N/A'} mm\n`;
+                }
+                if (detectedModel.technical.weight) {
+                  context += `• Peso: ${detectedModel.technical.weight}\n`;
+                }
+                if (detectedModel.technical.performance) {
+                  if (detectedModel.technical.performance.power) {
+                    context += `• Potenza: ${detectedModel.technical.performance.power}\n`;
+                  }
+                  if (detectedModel.technical.performance.acceleration) {
+                    context += `• Accelerazione: ${detectedModel.technical.performance.acceleration}\n`;
+                  }
+                  if (detectedModel.technical.performance.top_speed) {
+                    context += `• Velocità max: ${detectedModel.technical.performance.top_speed}\n`;
+                  }
+                }
+                if (detectedModel.technical.consumption) {
+                  context += `• Consumi: ${detectedModel.technical.consumption}\n`;
+                }
+                if (detectedModel.technical.price_from) {
+                  context += `• Prezzo da: ${detectedModel.technical.price_from}\n`;
+                }
+                
+                context += `\nIMPORTANTE: Questi sono i dati UFFICIALI verificati. Usali con precisione.\n`;
+              }
               
               // Aggiungi restrizioni apprese
               if (Object.keys(detectedModel.restrictions).length > 0) {
