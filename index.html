@@ -631,22 +631,7 @@
     <div class="chatMessages" id="chatMessages">
       <!-- Messaggio di benvenuto -->
       <div class="message ai">
-        <div class="messageBubble">👋 Ciao! Sono l'assistente AI BOTT.
-
-🔍 COME FUNZIONO:
-
-🚗 AUTO USATE → Ti do i LINK DIRETTI
-Esempi:
-• "500X usata"
-• "Ford usate"
-• "Jeep Compass usata"
-
-🆕 AUTO NUOVE → Confronto allestimenti
-Esempi:
-• "Confronta Compass Longitude e Limited"
-• "Differenze tra Panda Pop e Easy"
-
-Scrivi il modello che cerchi! 👇</div>
+        <div class="messageBubble">👋 Ciao capo! Come posso aiutarti?</div>
       </div>
     </div>
 
@@ -655,7 +640,7 @@ Scrivi il modello che cerchi! 👇</div>
         type="text" 
         class="chatInputField" 
         id="chatInputField" 
-        placeholder="Es: 500X usata oppure Compass Longitude vs Limited"
+        placeholder="Chiedimi di auto nuove o usate..."
         autocomplete="off"
       />
       <button class="chatSendBtn" id="chatSendBtn">
@@ -874,7 +859,7 @@ Scrivi il modello che cerchi! 👇</div>
       }
     });
 
-    // ========== CHATBOT LOGIC - NUOVO SISTEMA ========== 
+    // ========== CHATBOT LOGIC - SISTEMA CORRETTO ========== 
     
     let isMinimized = false;
 
@@ -953,7 +938,6 @@ Scrivi il modello che cerchi! 👇</div>
 
     // DATABASE AUTO USATE CENTROAUTO
     const USED_CARS_DB = {
-      // MARCHE PRINCIPALI
       'ford': {
         name: 'Ford',
         count: 9,
@@ -1037,35 +1021,14 @@ Scrivi il modello che cerchi! 👇</div>
         link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Volkswagen',
         models: ['golf', 'polo', 'tiguan', 'passat', 't-roc', 'id.3', 'id.4']
       },
-      // ALTRI MARCHI
       'fiat': {
         name: 'Fiat',
         link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Fiat',
         models: ['500', '500x', '500l', 'panda', 'tipo', 'punto']
-      },
-      'audi': {
-        name: 'Audi',
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Audi',
-        models: ['a3', 'a4', 'q3', 'q5']
-      },
-      'bmw': {
-        name: 'BMW',
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=BMW',
-        models: ['serie 1', 'serie 3', 'x1', 'x3']
-      },
-      'mercedes': {
-        name: 'Mercedes-Benz',
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Mercedes-Benz',
-        models: ['classe a', 'classe c', 'gla', 'glc']
-      },
-      'volkswagen': {
-        name: 'Volkswagen',
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Volkswagen',
-        models: ['golf', 'polo', 'tiguan', 't-roc']
       }
     };
 
-    // MODELLI SPECIFICI (per ricerche tipo "500X usata")
+    // MODELLI SPECIFICI
     const SPECIFIC_MODELS = {
       '500': 'fiat',
       '500x': 'fiat',
@@ -1090,16 +1053,27 @@ Scrivi il modello che cerchi! 👇</div>
       'captur': 'renault'
     };
 
-    // Verifica se cerca auto usate
+    // ✅ SISTEMA MIGLIORATO: Verifica ESPLICITA per auto usate
     function isUsedCarQuery(text) {
       const lowerText = text.toLowerCase();
-      const usedKeywords = ['usato', 'usata', 'usati', 'usate', 'seconda mano', 'km zero', 'centroauto', 'stock'];
       
-      // Controlla keywords OPPURE se menziona una marca del database
-      const mentionsBrand = Object.keys(USED_CARS_DB).some(brand => lowerText.includes(brand));
-      const mentionsModel = Object.keys(SPECIFIC_MODELS).some(model => lowerText.includes(model));
+      // CRITERIO 1: Keyword esplicite di USATO
+      const explicitUsedKeywords = ['usato', 'usata', 'usati', 'usate', 'seconda mano', 'km zero', 'centroauto', 'centro auto', 'stock', 'occasione', 'occasioni'];
+      const hasExplicitUsedKeyword = explicitUsedKeywords.some(kw => lowerText.includes(kw));
       
-      return usedKeywords.some(kw => lowerText.includes(kw)) || mentionsBrand || mentionsModel;
+      if (hasExplicitUsedKeyword) return true;
+      
+      // CRITERIO 2: Marche SOLO disponibili nell'usato (NON nei configuratori nuovi)
+      const onlyUsedBrands = ['ford', 'kia', 'mazda', 'mg', 'opel', 'peugeot', 'renault', 'seat', 'smart', 'suzuki', 'volkswagen', 'land rover', 'range rover'];
+      const mentionsOnlyUsedBrand = onlyUsedBrands.some(brand => lowerText.includes(brand));
+      
+      if (mentionsOnlyUsedBrand) return true;
+      
+      // CRITERIO 3: Modelli di marche usato-only
+      const usedOnlyModels = ['fiesta', 'focus', 'kuga', 'ecosport', 'sportage', 'picanto', 'cx-5', 'corsa', 'astra', 'mokka', '208', '308', '2008', '3008', 'clio', 'captur', 'golf', 'polo', 'tiguan'];
+      const mentionsUsedOnlyModel = usedOnlyModels.some(model => lowerText.includes(model));
+      
+      return mentionsUsedOnlyModel;
     }
 
     // Genera risposta per auto USATE
@@ -1142,7 +1116,7 @@ Scrivi il modello che cerchi! 👇</div>
         }
       }
       
-      // Risposta generica per "usato" senza marca specifica
+      // Risposta generica per "usato"
       return `🚗 <b>AUTO USATE</b> su CentroAuto VT\n\n` +
              `📊 <b>Marche disponibili:</b>\n\n` +
              `<b>TOP STOCK:</b>\n` +
@@ -1157,7 +1131,7 @@ Scrivi il modello che cerchi! 👇</div>
              `💡 <i>Scrivi "Ford usate" o "500X usata" per risultati specifici!</i>`;
     }
 
-    // Cerca info AUTO NUOVE
+    // Cerca info AUTO NUOVE (solo Fiat, Jeep, Alfa, Lancia)
     async function searchNewCars(query) {
       try {
         const officialSites = [
@@ -1167,7 +1141,7 @@ Scrivi il modello che cerchi! 👇</div>
           'site:lancia.it/configuratore OR site:lancia.it/gamma'
         ];
         
-        const enhancedQuery = `${query} (${officialSites.join(' OR ')})`;
+        const enhancedQuery = `${query} allestimenti versioni (${officialSites.join(' OR ')})`;
         
         const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(enhancedQuery)}`);
         if (!response.ok) throw new Error("Errore ricerca");
@@ -1218,7 +1192,7 @@ FORMATO RISPOSTA:
 
 💡 CONSIGLIO: [breve]`;
 
-    // Send message
+    // ✅ INVIO MESSAGGIO - LOGICA CORRETTA
     async function sendMessage() {
       const userMessage = chatInputField.value.trim();
       if (!userMessage) return;
@@ -1230,14 +1204,14 @@ FORMATO RISPOSTA:
       showTyping();
 
       try {
-        // Verifica se cerca auto usate o nuove
+        // ✅ DECISIONE: AUTO USATE o NUOVE?
         if (isUsedCarQuery(userMessage)) {
-          // USATO: usa il database locale per link diretti
+          // ➡️ USATO: Risposta immediata con link diretti
           hideTyping();
           const results = getUsedCarsResponse(userMessage);
           addMessage(results, "ai");
         } else {
-          // NUOVO: usa AI per confrontare allestimenti
+          // ➡️ NUOVO: Usa AI con ricerca configuratori
           const searchResults = await searchNewCars(userMessage);
           
           const messages = [
