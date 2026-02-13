@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI BOTT Automotive - Self Learning</title>
+  <title>AI BOTT Automotive</title>
 
   <style>
     :root{
@@ -223,87 +223,6 @@
       background:rgba(0,0,0,.12);
     }
 
-    /* ========== ADMIN PANEL ========== */
-    .adminPanel{
-      position:fixed;
-      top:80px;
-      right:24px;
-      width:360px;
-      max-height:calc(100vh - 120px);
-      background:rgba(17,24,39,.95);
-      border:2px solid rgba(251,191,36,.6);
-      border-radius:16px;
-      overflow:hidden;
-      z-index:999;
-      display:none;
-      box-shadow:0 20px 60px rgba(251,191,36,.3);
-    }
-    .adminPanel.open{display:flex;flex-direction:column}
-
-    .adminHeader{
-      background:linear-gradient(135deg, rgba(251,191,36,.85), rgba(245,158,11,.85));
-      padding:14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      color:#1a1d23;
-      font-weight:700;
-    }
-
-    .adminContent{
-      flex:1;
-      overflow-y:auto;
-      padding:16px;
-    }
-
-    .adminSection{
-      margin-bottom:20px;
-      padding:12px;
-      background:rgba(31,41,55,.5);
-      border-radius:10px;
-      border:1px solid var(--line);
-    }
-
-    .adminSectionTitle{
-      font-weight:700;
-      margin-bottom:10px;
-      color:var(--accent2);
-      font-size:14px;
-    }
-
-    .adminStat{
-      display:flex;
-      justify-content:space-between;
-      padding:6px 0;
-      font-size:13px;
-    }
-
-    .adminBtn{
-      width:100%;
-      padding:10px;
-      border-radius:8px;
-      border:1px solid var(--accent);
-      background:rgba(59,130,246,.15);
-      color:var(--text);
-      cursor:pointer;
-      font-size:13px;
-      font-weight:600;
-      transition:all .2s;
-      margin-top:8px;
-    }
-    .adminBtn:hover{
-      background:rgba(59,130,246,.25);
-      transform:translateY(-1px);
-    }
-
-    .adminBtnDanger{
-      border-color:rgba(239,68,68,.6);
-      background:rgba(239,68,68,.15);
-    }
-    .adminBtnDanger:hover{
-      background:rgba(239,68,68,.25);
-    }
-
     /* ========== CHATBOT STYLES ========== */
     
     .chatTrigger{
@@ -471,14 +390,6 @@
       border-bottom-right-radius:4px;
     }
 
-    /* CORREZIONE OPERATORE */
-    .message.correction .messageBubble{
-      background:linear-gradient(135deg, rgba(251,191,36,.85) 0%, rgba(245,158,11,.85) 100%);
-      color:#1a1d23;
-      border:2px solid rgba(251,191,36,.6);
-      font-weight:600;
-    }
-
     .messageBubble a {
       color: #fff;
       text-decoration: underline;
@@ -486,22 +397,6 @@
     }
     .messageBubble a:hover {
       color: #fbbf24;
-    }
-
-    .correctBtn{
-      margin-top:8px;
-      padding:8px 12px;
-      border-radius:8px;
-      background:rgba(251,191,36,.2);
-      border:1px solid rgba(251,191,36,.5);
-      color:#fbbf24;
-      font-size:12px;
-      cursor:pointer;
-      transition:all .2s;
-    }
-    .correctBtn:hover{
-      background:rgba(251,191,36,.3);
-      transform:translateY(-1px);
     }
 
     .typingIndicator{
@@ -596,13 +491,6 @@
         width:60px;
         height:60px;
       }
-      .adminPanel{
-        width:100%;
-        max-width:100%;
-        top:60px;
-        right:0;
-        border-radius:0;
-      }
     }
 
     @media (max-width: 768px){
@@ -628,7 +516,7 @@
             />
             <div>
               <div class="brandName">AI BOTT</div>
-              <div class="brandSub">Self-Learning System</div>
+              <div class="brandSub">Automotive</div>
             </div>
           </div>
 
@@ -654,7 +542,6 @@
 
         <div class="row" style="gap:10px">
           <span id="userPill" class="pill muted">Non autenticato</span>
-          <button id="adminBtn" class="btn" style="display:none;background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.5)">🔧 Admin</button>
           <button id="loginBtn" class="btn primary">Login Google</button>
           <button id="logoutBtn" class="btn" style="display:none">Logout</button>
         </div>
@@ -680,70 +567,21 @@
       </aside>
 
       <section class="rightSpace">
-        <div style="font-weight:950;font-size:18px">🤖 Sistema Auto-Apprendimento</div>
+        <div style="font-weight:950;font-size:18px">🤖 AI Bot con Ricerca Google</div>
         <div class="muted" style="margin-top:8px;line-height:1.45">
-          Il bot impara dalle correzioni degli operatori e si aggiorna automaticamente:
+          Il bot cerca automaticamente su Google per darti informazioni precise su:
           <br><br>
-          • <b>Auto Nuove</b>: Aggiornamento ogni 15 giorni
+          • <b>Dimensioni e misure</b> delle auto
           <br>
-          • <b>Auto Usate</b>: Aggiornamento ogni 7 giorni
+          • <b>Prestazioni e motori</b>
           <br>
-          • <b>Correzioni</b>: Apprese in tempo reale
+          • <b>Prezzi e consumi</b>
+          <br>
+          • <b>Confronto allestimenti</b>
         </div>
       </section>
     </div>
   </main>
-
-  <!-- ========== ADMIN PANEL ========== -->
-  <div class="adminPanel" id="adminPanel">
-    <div class="adminHeader">
-      <span>🔧 Pannello Admin</span>
-      <button class="chatHeaderBtn" id="closeAdminBtn" style="background:rgba(0,0,0,.2)">×</button>
-    </div>
-    <div class="adminContent">
-      <div class="adminSection">
-        <div class="adminSectionTitle">📊 Statistiche Sistema</div>
-        <div class="adminStat">
-          <span>Correzioni applicate:</span>
-          <span id="correctionsCount">0</span>
-        </div>
-        <div class="adminStat">
-          <span>Ultimo aggiornamento NUOVO:</span>
-          <span id="lastUpdateNew">-</span>
-        </div>
-        <div class="adminStat">
-          <span>Ultimo aggiornamento USATO:</span>
-          <span id="lastUpdateUsed">-</span>
-        </div>
-        <div class="adminStat">
-          <span>Prossimo aggiornamento NUOVO:</span>
-          <span id="nextUpdateNew">-</span>
-        </div>
-        <div class="adminStat">
-          <span>Prossimo aggiornamento USATO:</span>
-          <span id="nextUpdateUsed">-</span>
-        </div>
-      </div>
-
-      <div class="adminSection">
-        <div class="adminSectionTitle">🔄 Aggiornamenti Manuali</div>
-        <button class="adminBtn" id="forceUpdateNew">Forza Aggiornamento AUTO NUOVE</button>
-        <button class="adminBtn" id="forceUpdateUsed">Forza Aggiornamento AUTO USATE</button>
-      </div>
-
-      <div class="adminSection">
-        <div class="adminSectionTitle">📝 Ultime Correzioni</div>
-        <div id="recentCorrections" style="font-size:12px;max-height:200px;overflow-y:auto">
-          Nessuna correzione ancora
-        </div>
-      </div>
-
-      <div class="adminSection">
-        <div class="adminSectionTitle">⚠️ Zona Pericolosa</div>
-        <button class="adminBtn adminBtnDanger" id="resetLearning">Reset Apprendimento</button>
-      </div>
-    </div>
-  </div>
 
   <!-- ========== CHATBOT UI ========== -->
   
@@ -771,7 +609,7 @@
         />
         <div>
           <div class="chatHeaderTitle">AI BOTT Assistant</div>
-          <div class="chatHeaderSub">Self-Learning System</div>
+          <div class="chatHeaderSub">Esperto configurazioni</div>
         </div>
       </div>
       <div class="chatHeaderBtns">
@@ -783,8 +621,8 @@
     <div class="chatMessages" id="chatMessages">
       <div class="message ai">
         <div class="messageBubble">👋 Ciao capo! Come posso aiutarti?
-        
-🧠 Sistema auto-apprendimento attivo!</div>
+
+🔍 Cerco su Google per darti info precise!</div>
       </div>
     </div>
 
@@ -793,7 +631,7 @@
         type="text" 
         class="chatInputField" 
         id="chatInputField" 
-        placeholder="Chiedimi di auto nuove o usate..."
+        placeholder="Es: Quanto è lunga la Fiat 600?"
         autocomplete="off"
       />
       <button class="chatSendBtn" id="chatSendBtn">
@@ -816,20 +654,6 @@
       signOut,
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      doc,
-      getDoc,
-      setDoc,
-      updateDoc,
-      addDoc,
-      query,
-      orderBy,
-      limit,
-      getDocs,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const BACKEND_NEWS = "/api/news";
     const BACKEND_CHAT = "https://auto-backend-three.vercel.app/api/chat";
@@ -902,425 +726,9 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
 
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt:"select_account", display:"popup" });
-
-    // ========== 🧠 SISTEMA AUTO-APPRENDIMENTO ========== 
-
-    let learningData = {
-      corrections: [],
-      lastUpdateNew: null,
-      lastUpdateUsed: null,
-      newCarsData: {},
-      usedCarsData: {}
-    };
-
-    // Carica dati apprendimento da Firebase
-    async function loadLearningData() {
-      try {
-        const docRef = doc(db, 'ai-learning', 'knowledge-base');
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          learningData = docSnap.data();
-          console.log('✅ Dati apprendimento caricati:', learningData);
-          updateAdminStats();
-        } else {
-          // Inizializza per la prima volta
-          await setDoc(docRef, {
-            corrections: [],
-            lastUpdateNew: serverTimestamp(),
-            lastUpdateUsed: serverTimestamp(),
-            newCarsData: NEW_CARS_DATABASE,
-            usedCarsData: USED_CARS_DB
-          });
-          console.log('✅ Database apprendimento inizializzato');
-        }
-      } catch (error) {
-        console.error('❌ Errore caricamento dati:', error);
-      }
-    }
-
-    // Salva correzione operatore
-    async function saveCorrection(userMessage, aiResponse, correction) {
-      try {
-        const correctionData = {
-          timestamp: new Date().toISOString(),
-          userMessage: userMessage,
-          aiResponse: aiResponse,
-          correction: correction,
-          operator: auth.currentUser?.email || 'unknown'
-        };
-
-        // Aggiungi alla collezione correzioni
-        await addDoc(collection(db, 'ai-learning', 'knowledge-base', 'corrections'), correctionData);
-
-        // Aggiorna il counter
-        const docRef = doc(db, 'ai-learning', 'knowledge-base');
-        const docSnap = await getDoc(docRef);
-        const currentCorrections = docSnap.data()?.corrections || [];
-        
-        await updateDoc(docRef, {
-          corrections: [...currentCorrections, correctionData]
-        });
-
-        console.log('✅ Correzione salvata:', correctionData);
-        
-        // Applica la correzione al database
-        await applyCorrection(correction);
-        
-        return true;
-      } catch (error) {
-        console.error('❌ Errore salvataggio correzione:', error);
-        return false;
-      }
-    }
-
-    // Applica correzione al database
-    async function applyCorrection(correction) {
-      // Parse della correzione usando AI
-      try {
-        const messages = [
-          {
-            role: "system",
-            content: `Sei un parser di correzioni. Estrai le informazioni strutturate dalla correzione dell'operatore.
-            
-Rispondi SOLO con un JSON in questo formato:
-{
-  "type": "new" o "used",
-  "action": "add", "remove", "update",
-  "brand": "nome marca",
-  "model": "nome modello",
-  "trim": "nome allestimento",
-  "details": "dettagli specifici"
-}
-
-Esempio correzione: "Il pack Tech non si può mettere sulla Grande Panda La Prima perché è full optional di suo"
-Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","trim":"La Prima","details":"Pack Tech non disponibile - full optional di serie"}`
-          },
-          {
-            role: "user",
-            content: correction
-          }
-        ];
-
-        const response = await fetch(BACKEND_CHAT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages }),
-        });
-
-        if (!response.ok) throw new Error("Errore parsing");
-
-        const data = await response.json();
-        const parsedCorrection = JSON.parse(data.choices[0].message.content);
-
-        // Aggiorna il database locale
-        if (parsedCorrection.type === 'new') {
-          // Aggiorna auto nuove
-          const docRef = doc(db, 'ai-learning', 'knowledge-base');
-          const docSnap = await getDoc(docRef);
-          const currentData = docSnap.data().newCarsData;
-
-          // Applica la modifica
-          if (parsedCorrection.action === 'update' || parsedCorrection.action === 'add') {
-            if (!currentData[parsedCorrection.brand].models[parsedCorrection.model].restrictions) {
-              currentData[parsedCorrection.brand].models[parsedCorrection.model].restrictions = {};
-            }
-            currentData[parsedCorrection.brand].models[parsedCorrection.model].restrictions[parsedCorrection.trim] = parsedCorrection.details;
-          }
-
-          await updateDoc(docRef, {
-            newCarsData: currentData
-          });
-
-          console.log('✅ Correzione applicata al database nuove');
-        }
-
-        await loadLearningData(); // Ricarica i dati
-        updateAdminStats();
-
-      } catch (error) {
-        console.error('❌ Errore applicazione correzione:', error);
-      }
-    }
-
-    // Verifica se serve aggiornamento
-    function needsUpdate(lastUpdate, daysInterval) {
-      if (!lastUpdate) return true;
-      const lastUpdateDate = lastUpdate.toDate ? lastUpdate.toDate() : new Date(lastUpdate);
-      const now = new Date();
-      const diffDays = (now - lastUpdateDate) / (1000 * 60 * 60 * 24);
-      return diffDays >= daysInterval;
-    }
-
-    // Auto-aggiornamento schedulato
-    async function checkAutoUpdates() {
-      try {
-        const docRef = doc(db, 'ai-learning', 'knowledge-base');
-        const docSnap = await getDoc(docRef);
-        const data = docSnap.data();
-
-        // Verifica AUTO NUOVE (ogni 15 giorni)
-        if (needsUpdate(data.lastUpdateNew, 15)) {
-          console.log('🔄 Avvio aggiornamento AUTO NUOVE...');
-          await updateNewCarsData();
-        }
-
-        // Verifica AUTO USATE (ogni 7 giorni)
-        if (needsUpdate(data.lastUpdateUsed, 7)) {
-          console.log('🔄 Avvio aggiornamento AUTO USATE...');
-          await updateUsedCarsData();
-        }
-
-      } catch (error) {
-        console.error('❌ Errore check aggiornamenti:', error);
-      }
-    }
-
-    // Aggiorna dati auto nuove
-    async function updateNewCarsData() {
-      try {
-        // Cerca aggiornamenti sui configuratori
-        const searchPromises = [
-          fetch(`${BACKEND_SEARCH}?q=Fiat nuovi modelli 2025 site:fiat.it`),
-          fetch(`${BACKEND_SEARCH}?q=Jeep nuovi modelli 2025 site:jeep-official.it`),
-          fetch(`${BACKEND_SEARCH}?q=Alfa Romeo nuovi modelli 2025 site:alfaromeo.it`),
-          fetch(`${BACKEND_SEARCH}?q=Lancia nuovi modelli 2025 site:lancia.it`)
-        ];
-
-        const results = await Promise.all(searchPromises);
-        
-        // Aggiorna timestamp
-        const docRef = doc(db, 'ai-learning', 'knowledge-base');
-        await updateDoc(docRef, {
-          lastUpdateNew: serverTimestamp()
-        });
-
-        console.log('✅ Auto nuove aggiornate');
-        await loadLearningData();
-        updateAdminStats();
-
-      } catch (error) {
-        console.error('❌ Errore aggiornamento auto nuove:', error);
-      }
-    }
-
-    // Aggiorna dati auto usate
-    async function updateUsedCarsData() {
-      try {
-        // Scrape CentroAuto per nuove disponibilità
-        const response = await fetch(`${BACKEND_SEARCH}?q=site:centroautovt.it/ricerca-auto/usate`);
-        
-        // Aggiorna timestamp
-        const docRef = doc(db, 'ai-learning', 'knowledge-base');
-        await updateDoc(docRef, {
-          lastUpdateUsed: serverTimestamp()
-        });
-
-        console.log('✅ Auto usate aggiornate');
-        await loadLearningData();
-        updateAdminStats();
-
-      } catch (error) {
-        console.error('❌ Errore aggiornamento auto usate:', error);
-      }
-    }
-
-    // Aggiorna statistiche admin panel
-    function updateAdminStats() {
-      const correctionsCount = learningData.corrections?.length || 0;
-      $('correctionsCount').textContent = correctionsCount;
-
-      if (learningData.lastUpdateNew) {
-        const lastNew = learningData.lastUpdateNew.toDate ? learningData.lastUpdateNew.toDate() : new Date(learningData.lastUpdateNew);
-        $('lastUpdateNew').textContent = fmtDate(lastNew);
-        
-        const nextNew = new Date(lastNew);
-        nextNew.setDate(nextNew.getDate() + 15);
-        $('nextUpdateNew').textContent = fmtDate(nextNew);
-      }
-
-      if (learningData.lastUpdateUsed) {
-        const lastUsed = learningData.lastUpdateUsed.toDate ? learningData.lastUpdateUsed.toDate() : new Date(learningData.lastUpdateUsed);
-        $('lastUpdateUsed').textContent = fmtDate(lastUsed);
-        
-        const nextUsed = new Date(lastUsed);
-        nextUsed.setDate(nextUsed.getDate() + 7);
-        $('nextUpdateUsed').textContent = fmtDate(nextUsed);
-      }
-
-      // Mostra ultime correzioni
-      if (correctionsCount > 0) {
-        const recent = learningData.corrections.slice(-5).reverse();
-        $('recentCorrections').innerHTML = recent.map(c => `
-          <div style="padding:8px;margin-bottom:8px;background:rgba(59,130,246,.1);border-radius:6px;border:1px solid var(--line)">
-            <div style="font-weight:600;margin-bottom:4px">${escapeHtml(c.operator)}</div>
-            <div style="opacity:.8">${escapeHtml(c.correction.substring(0, 80))}...</div>
-            <div style="opacity:.6;font-size:11px;margin-top:4px">${fmtDate(c.timestamp)}</div>
-          </div>
-        `).join('');
-      }
-    }
-
-    // ========== DATABASE AUTO (con integrazione learning) ========== 
-
-    const NEW_CARS_DATABASE = {
-      'fiat': {
-        brand: 'Fiat',
-        site: 'fiat.it',
-        models: {
-          '500': {
-            name: '500 Elettrica',
-            trims: ['Action', 'Passion', 'Icon', 'La Prima'],
-            keywords: ['500', 'cinquecento', '500e', '500 elettrica']
-          },
-          '500x': {
-            name: '500X',
-            trims: ['City Cross', 'Cross', 'Sport'],
-            keywords: ['500x', 'cinquecento x']
-          },
-          'panda': {
-            name: 'Panda',
-            trims: ['Easy', 'Cross', 'Sport'],
-            packs: {
-              'Cross': ['Pack Comfort', 'Pack Style', 'Pack Tech']
-            },
-            keywords: ['panda']
-          },
-          'grande-panda': {
-            name: 'Grande Panda',
-            trims: ['Pop', 'Icon', 'La Prima'],
-            keywords: ['grande panda', 'grandepanda', 'panda grande']
-          },
-          '600': {
-            name: '600',
-            trims: ['RED', 'La Prima'],
-            keywords: ['600', 'seicento', '600 ibrida', '600 elettrica']
-          },
-          'tipo': {
-            name: 'Tipo',
-            trims: ['City Life', 'City Cross', 'Cross', 'Sport'],
-            keywords: ['tipo']
-          },
-          'ducato': {
-            name: 'Ducato',
-            trims: ['Furgone', 'Combi', 'Passo Corto', 'Passo Medio', 'Passo Lungo'],
-            keywords: ['ducato']
-          }
-        }
-      },
-      'jeep': {
-        brand: 'Jeep',
-        site: 'jeep-official.it',
-        models: {
-          'avenger': {
-            name: 'Avenger',
-            trims: ['Longitude', 'Altitude', 'Summit', 'The North Face Edition'],
-            keywords: ['avenger']
-          },
-          'renegade': {
-            name: 'Renegade',
-            trims: ['Longitude', 'Limited', 'Trailhawk', '80th Anniversary'],
-            keywords: ['renegade']
-          },
-          'compass': {
-            name: 'Compass',
-            trims: ['Longitude', 'Limited', 'Trailhawk', 'S', '80th Anniversary'],
-            keywords: ['compass']
-          },
-          'wrangler': {
-            name: 'Wrangler',
-            trims: ['Sport', 'Sahara', 'Rubicon', '4xe'],
-            keywords: ['wrangler']
-          },
-          'grand-cherokee': {
-            name: 'Grand Cherokee',
-            trims: ['Limited', 'Overland', 'Summit', 'Trailhawk', '4xe'],
-            keywords: ['grand cherokee', 'grandcherokee']
-          },
-          'gladiator': {
-            name: 'Gladiator',
-            trims: ['Sport', 'Overland', 'Rubicon'],
-            keywords: ['gladiator']
-          }
-        }
-      },
-      'alfa': {
-        brand: 'Alfa Romeo',
-        site: 'alfaromeo.it',
-        models: {
-          'junior': {
-            name: 'Junior',
-            trims: ['Ibrida Q4', 'Elettrica', 'Speciale', 'Veloce'],
-            keywords: ['junior', 'alfa junior']
-          },
-          'tonale': {
-            name: 'Tonale',
-            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Q4'],
-            keywords: ['tonale']
-          },
-          'stelvio': {
-            name: 'Stelvio',
-            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Quadrifoglio'],
-            keywords: ['stelvio']
-          },
-          'giulia': {
-            name: 'Giulia',
-            trims: ['Super', 'Sprint', 'Ti', 'Veloce', 'Quadrifoglio'],
-            keywords: ['giulia']
-          }
-        }
-      },
-      'lancia': {
-        brand: 'Lancia',
-        site: 'lancia.it',
-        models: {
-          'ypsilon': {
-            name: 'Ypsilon',
-            trims: ['Cassina', 'Edizione Limitata', 'LX', 'Elettrica'],
-            keywords: ['ypsilon', 'ipsilon', 'y']
-          }
-        }
-      }
-    };
-
-    const USED_CARS_DB = {
-      'ford': {
-        name: 'Ford',
-        count: 9,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Ford',
-        models: ['fiesta', 'focus', 'kuga', 'ecosport', 'puma', 'transit']
-      },
-      'jeep': {
-        name: 'Jeep',
-        count: 13,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Jeep',
-        models: ['renegade', 'compass', 'wrangler', 'cherokee']
-      },
-      'kia': {
-        name: 'Kia',
-        count: 1,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Kia',
-        models: ['sportage', 'picanto', 'rio', 'ceed', 'niro']
-      },
-      'lancia': {
-        name: 'Lancia',
-        count: 4,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Lancia',
-        models: ['ypsilon', 'delta']
-      },
-      'volkswagen': {
-        name: 'Volkswagen',
-        count: 4,
-        link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Volkswagen',
-        models: ['golf', 'polo', 'tiguan', 'passat', 't-roc', 'id.3', 'id.4']
-      }
-    };
-
-    // ========== RESTO DEL CODICE CHATBOT ========== 
 
     (async function initApp(){
       try { await setPersistence(auth, browserLocalPersistence); }
@@ -1334,13 +742,6 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
       }catch(e){
         setStatus("❌ Errore login: " + (e.code || e.message));
       }
-
-      // Carica dati apprendimento
-      await loadLearningData();
-
-      // Check aggiornamenti automatici ogni ora
-      setInterval(checkAutoUpdates, 60 * 60 * 1000);
-      checkAutoUpdates(); // Prima esecuzione
     })();
 
     async function loadNews() {
@@ -1422,93 +823,19 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
     $("alfaBtn").addEventListener("click", () => window.open(BRAND_LINKS.AlfaRomeo, "_blank", "noopener,noreferrer"));
     $("lanciaBtn").addEventListener("click", () => window.open(BRAND_LINKS.Lancia, "_blank", "noopener,noreferrer"));
 
-    // Admin Panel
-    $("adminBtn").addEventListener("click", () => {
-      if (!isAdmin) {
-        alert('🚫 ACCESSO NEGATO!\n\nSolo l\'amministratore può accedere al pannello.\n\nEmail autorizzata: lucabottiglieri94@gmail.com');
-        return;
-      }
-      $("adminPanel").classList.toggle("open");
-    });
-
-    $("closeAdminBtn").addEventListener("click", () => {
-      $("adminPanel").classList.remove("open");
-    });
-
-    $("forceUpdateNew").addEventListener("click", async () => {
-      if (!isAdmin) {
-        alert('🚫 ACCESSO NEGATO!');
-        return;
-      }
-      await updateNewCarsData();
-    });
-    
-    $("forceUpdateUsed").addEventListener("click", async () => {
-      if (!isAdmin) {
-        alert('🚫 ACCESSO NEGATO!');
-        return;
-      }
-      await updateUsedCarsData();
-    });
-
-    $("resetLearning").addEventListener("click", async () => {
-      if (!isAdmin) {
-        alert('🚫 ACCESSO NEGATO!');
-        return;
-      }
-      
-      if (confirm('⚠️ Sei sicuro? Questo cancellerà TUTTE le correzioni apprese!')) {
-        try {
-          const docRef = doc(db, 'ai-learning', 'knowledge-base');
-          await updateDoc(docRef, {
-            corrections: [],
-            newCarsData: NEW_CARS_DATABASE,
-            usedCarsData: USED_CARS_DB
-          });
-          alert('✅ Sistema resettato!');
-          await loadLearningData();
-        } catch (error) {
-          alert('❌ Errore reset: ' + error.message);
-        }
-      }
-    });
-
-    // ========== 🔐 AUTORIZZAZIONE ADMIN ========== 
-    const ADMIN_EMAIL = "lucabottiglieri94@gmail.com";
-    let isAdmin = false;
-
-    function checkAdminAccess(email) {
-      return email && email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-    }
-
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        isAdmin = checkAdminAccess(user.email);
-        
         $("userPill").textContent = "✅ " + (user.email || "Utente");
         $("userPill").classList.remove("muted");
         $("userPill").style.borderColor = "rgba(34,197,94,.5)";
         $("userPill").style.background = "rgba(34,197,94,.1)";
 
-        // Badge ADMIN
-        if (isAdmin) {
-          $("userPill").textContent = "👑 ADMIN • " + user.email;
-          $("userPill").style.borderColor = "rgba(251,191,36,.6)";
-          $("userPill").style.background = "rgba(251,191,36,.15)";
-        }
-
         $("loginBtn").style.display = "none";
         $("logoutBtn").style.display = "inline-block";
-        
-        // Mostra pulsante admin SOLO se è l'admin
-        $("adminBtn").style.display = isAdmin ? "inline-block" : "none";
-        
         $("refreshBtn").disabled = false;
 
         loadNews();
       } else {
-        isAdmin = false;
-        
         $("userPill").textContent = "🔒 Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor = "";
@@ -1516,7 +843,6 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
 
         $("loginBtn").style.display = "inline-block";
         $("logoutBtn").style.display = "none";
-        $("adminBtn").style.display = "none";
         $("refreshBtn").disabled = true;
 
         $("newsList").innerHTML = "";
@@ -1524,11 +850,7 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
       }
     });
 
-    // ========== CHATBOT CON CORREZIONI ========== 
-
-    let isMinimized = false;
-    let lastAiResponse = "";
-    let lastUserMessage = "";
+    // ========== CHATBOT ========== 
 
     const chatTrigger = $("chatTrigger");
     const chatBox = $("chatBox");
@@ -1537,6 +859,8 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
     const chatSendBtn = $("chatSendBtn");
     const minimizeBtn = $("minimizeBtn");
     const closeBtn = $("closeBtn");
+
+    let isMinimized = false;
 
     chatTrigger.addEventListener("click", () => {
       chatBox.classList.add("open");
@@ -1573,228 +897,12 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
       chatInputField.focus();
     });
 
-    function addMessage(html, sender, showCorrectBtn = false) {
+    function addMessage(html, sender) {
       const messageDiv = document.createElement("div");
       messageDiv.className = `message ${sender}`;
-      
-      let content = `<div class="messageBubble">${html}</div>`;
-      
-      // Mostra pulsante correzione SOLO se è admin
-      if (showCorrectBtn && isAdmin) {
-        content += `<button class="correctBtn" onclick="promptCorrection()">✏️ Correggi questa risposta</button>`;
-      }
-      
-      messageDiv.innerHTML = content;
+      messageDiv.innerHTML = `<div class="messageBubble">${html}</div>`;
       chatMessages.appendChild(messageDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    window.promptCorrection = async function() {
-      // ✅ CONTROLLO ADMIN
-      if (!isAdmin) {
-        alert('🚫 ACCESSO NEGATO!\n\nSolo l\'amministratore può correggere il bot.\n\nEmail autorizzata: lucabottiglieri94@gmail.com');
-        return;
-      }
-      
-      const correction = prompt('📝 Inserisci la correzione:\n\nEsempi:\n- "Hai sbagliato le misure della 600"\n- "Il pack Tech non si può sulla La Prima perché è full optional"');
-      
-      if (!correction || !correction.trim()) return;
-      
-      // ⚡ RILEVAMENTO AUTOMATICO ERRORI TECNICI
-      const technicalErrorPatterns = [
-        /hai sbagliato.*misure/i,
-        /hai sbagliato.*dimensioni/i,
-        /hai sbagliato.*peso/i,
-        /hai sbagliato.*potenza/i,
-        /hai sbagliato.*prestazioni/i,
-        /hai sbagliato.*consumi/i,
-        /hai sbagliato.*prezzo/i,
-        /misure sbagliate/i,
-        /dati sbagliati/i,
-        /informazioni errate/i,
-        /dati tecnici errati/i
-      ];
-      
-      const isTechnicalError = technicalErrorPatterns.some(pattern => pattern.test(correction));
-      
-      if (isTechnicalError) {
-        // 🔍 AUTO-FETCH DAI CONFIGURATORI
-        addMessage(`🔍 <b>RILEVATO ERRORE TECNICO</b><br>Vado a prendere i dati corretti dal configuratore...`, 'correction');
-        
-        showTyping();
-        
-        try {
-          // Estrai il modello dalla correzione
-          const modelMatch = correction.match(/(500|600|panda|tipo|ducato|grande panda|avenger|renegade|compass|wrangler|junior|tonale|stelvio|giulia|ypsilon)/i);
-          
-          if (modelMatch) {
-            const modelName = modelMatch[0].toLowerCase();
-            
-            // Cerca dati UFFICIALI sul configuratore
-            const detectedModel = detectNewCarModelByName(modelName);
-            
-            if (detectedModel) {
-              const searchQuery = `${detectedModel.brand} ${detectedModel.model} scheda tecnica dimensioni peso prestazioni site:${detectedModel.site}`;
-              
-              const searchResponse = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(searchQuery)}`);
-              const searchData = await searchResponse.json();
-              
-              if (searchData.results && searchData.results.length > 0) {
-                const officialData = searchData.results[0];
-                
-                hideTyping();
-                
-                // Mostra dati ufficiali trovati
-                addMessage(`✅ <b>DATI UFFICIALI TROVATI</b><br><br>` +
-                  `📊 Fonte: ${officialData.url}<br><br>` +
-                  `${officialData.description}<br><br>` +
-                  `<a href="${officialData.url}" target="_blank">🔗 Vedi scheda tecnica completa</a>`, 'correction');
-                
-                // Usa AI per estrarre i dati strutturati
-                const extractMessages = [
-                  {
-                    role: "system",
-                    content: `Estrai i dati tecnici dal testo fornito e restituiscili in formato JSON strutturato.
-                    
-Formato richiesto:
-{
-  "model": "nome modello",
-  "dimensions": {
-    "length": "valore in mm",
-    "width": "valore in mm",
-    "height": "valore in mm"
-  },
-  "weight": "valore in kg",
-  "performance": {
-    "power": "valore CV/kW",
-    "acceleration": "0-100 km/h",
-    "top_speed": "velocità max"
-  },
-  "consumption": "consumi medi",
-  "price_from": "prezzo base"
-}
-
-Se un dato non è presente, usa null.`
-                  },
-                  {
-                    role: "user",
-                    content: `${officialData.title}\n\n${officialData.description}`
-                  }
-                ];
-                
-                const extractResponse = await fetch(BACKEND_CHAT, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ messages: extractMessages }),
-                });
-                
-                if (extractResponse.ok) {
-                  const extractData = await extractResponse.json();
-                  let technicalData = null;
-                  
-                  try {
-                    const content = extractData.choices[0].message.content;
-                    // Rimuovi eventuali markdown code blocks
-                    const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/);
-                    const jsonString = jsonMatch ? jsonMatch[1] : content;
-                    technicalData = JSON.parse(jsonString);
-                  } catch (e) {
-                    console.error('Errore parsing JSON:', e);
-                  }
-                  
-                  if (technicalData) {
-                    // Salva i dati tecnici nel database
-                    const docRef = doc(db, 'ai-learning', 'knowledge-base');
-                    const docSnap = await getDoc(docRef);
-                    const currentData = docSnap.data().newCarsData || NEW_CARS_DATABASE;
-                    
-                    // Trova e aggiorna il modello
-                    for (const [brandKey, brandData] of Object.entries(currentData)) {
-                      for (const [modelKey, modelData] of Object.entries(brandData.models)) {
-                        if (modelData.name.toLowerCase().includes(modelName) || 
-                            modelData.keywords.some(kw => kw.includes(modelName))) {
-                          
-                          if (!modelData.technical) {
-                            modelData.technical = {};
-                          }
-                          
-                          modelData.technical = {
-                            ...modelData.technical,
-                            ...technicalData,
-                            lastUpdate: new Date().toISOString(),
-                            source: officialData.url
-                          };
-                          
-                          console.log('✅ Dati tecnici aggiornati:', modelData.technical);
-                          break;
-                        }
-                      }
-                    }
-                    
-                    await updateDoc(docRef, {
-                      newCarsData: currentData
-                    });
-                    
-                    addMessage(`✅ <b>DATI TECNICI AGGIORNATI!</b><br><br>` +
-                      `Ho salvato i dati ufficiali del configuratore.<br>` +
-                      `Ora so le informazioni corrette! 🧠`, 'ai');
-                  }
-                }
-              } else {
-                hideTyping();
-                addMessage(`❌ Non ho trovato dati sul configuratore ufficiale.<br>Per favore fornisci i dati corretti manualmente.`, 'ai');
-              }
-            } else {
-              hideTyping();
-              addMessage(`❌ Non ho riconosciuto il modello. Specifica meglio quale auto (es: "Fiat 600").`, 'ai');
-            }
-          } else {
-            hideTyping();
-            addMessage(`❌ Non ho capito di quale modello parli. Specifica il nome (es: "600", "Compass").`, 'ai');
-          }
-        } catch (error) {
-          hideTyping();
-          console.error('Errore fetch dati:', error);
-          addMessage(`❌ Errore nel recupero dati. Riprova o fornisci i dati manualmente.`, 'ai');
-        }
-      } else {
-        // Correzione manuale normale
-        addMessage(`📝 <b>CORREZIONE ADMIN:</b><br>${escapeHtml(correction)}`, 'correction');
-        
-        const saved = await saveCorrection(lastUserMessage, lastAiResponse, correction);
-        
-        if (saved) {
-          addMessage('✅ <b>Correzione appresa!</b><br>Ho aggiornato la mia conoscenza. Grazie capo! 🧠', 'ai');
-        } else {
-          addMessage('❌ Errore nel salvare la correzione. Riprova!', 'ai');
-        }
-      }
-    };
-    
-    // Funzione helper per riconoscere modello dal nome
-    function detectNewCarModelByName(modelName) {
-      const lowerModel = modelName.toLowerCase();
-      const database = learningData.newCarsData || NEW_CARS_DATABASE;
-      
-      for (const [brandKey, brandData] of Object.entries(database)) {
-        for (const [modelKey, modelData] of Object.entries(brandData.models)) {
-          if (modelData.name.toLowerCase().includes(lowerModel) || 
-              modelData.keywords.some(kw => kw.includes(lowerModel))) {
-            return {
-              brand: brandData.brand,
-              brandKey: brandKey,
-              model: modelData.name,
-              modelKey: modelKey,
-              trims: modelData.trims,
-              site: brandData.site,
-              restrictions: modelData.restrictions || {},
-              technical: modelData.technical || {}
-            };
-          }
-        }
-      }
-      
-      return null;
     }
 
     function showTyping() {
@@ -1817,237 +925,153 @@ Se un dato non è presente, usa null.`
       if (typing) typing.remove();
     }
 
-    function detectNewCarModel(query) {
-      const lowerQuery = query.toLowerCase();
-      const database = learningData.newCarsData || NEW_CARS_DATABASE;
-      
-      for (const [brandKey, brandData] of Object.entries(database)) {
-        for (const [modelKey, modelData] of Object.entries(brandData.models)) {
-          if (modelData.keywords.some(kw => lowerQuery.includes(kw))) {
-            return {
-              brand: brandData.brand,
-              brandKey: brandKey,
-              model: modelData.name,
-              modelKey: modelKey,
-              trims: modelData.trims,
-              site: brandData.site,
-              restrictions: modelData.restrictions || {}
-            };
-          }
-        }
-      }
-      
-      return null;
+    // Riconosci domande tecniche
+    function isTechnicalQuery(text) {
+      const patterns = [
+        /quanto.*lunga/i, /quanto.*larga/i, /quanto.*alta/i,
+        /dimensioni/i, /lunghezza/i, /larghezza/i, /altezza/i, /misure/i,
+        /che motore/i, /motore/i, /motorizzazione/i, /cilindrata/i,
+        /cavalli/i, /\bcv\b/i, /\bkw\b/i, /potenza/i,
+        /accelerazione/i, /0-100/i, /velocità massima/i, /velocità max/i, /prestazioni/i,
+        /consumi/i, /km\/l/i, /l\/100km/i, /quanto consuma/i, /autonomia/i,
+        /peso/i, /quanto pesa/i,
+        /prezzo/i, /quanto costa/i, /costo/i,
+        /bagagliaio/i, /capacità bagagliaio/i, /litri bagagliaio/i,
+        /scheda tecnica/i, /dati tecnici/i, /specifiche/i
+      ];
+      return patterns.some(p => p.test(text));
     }
 
+    // Ricerca Google
+    async function searchGoogle(query) {
+      try {
+        addMessage(`🔍 <b>RICERCA GOOGLE...</b><br>Query: "${escapeHtml(query)}"`, 'ai');
+        
+        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error('Errore ricerca');
+        
+        const data = await response.json();
+        if (!data.results || data.results.length === 0) return null;
+        
+        const results = data.results.slice(0, 3);
+        let context = `RISULTATI GOOGLE:\n\n`;
+        results.forEach((r, i) => {
+          context += `[${i+1}] ${r.title}\n${r.description}\nFonte: ${r.url}\n\n`;
+        });
+        
+        return { context, results };
+      } catch (error) {
+        console.error('Errore Google:', error);
+        return null;
+      }
+    }
+
+    // Estrai dati
+    async function extractData(googleResults, query) {
+      try {
+        const messages = [
+          {
+            role: "system",
+            content: `Estrai SOLO dati PRECISI dai risultati Google. Non inventare.
+
+FORMATO:
+📊 [MODELLO AUTO]
+
+✓ Dato: valore (fonte)
+✗ Non trovato
+
+Rispondi in modo SCHEMATICO.`
+          },
+          {
+            role: "user",
+            content: `Domanda: "${query}"\n\n${googleResults.context}`
+          }
+        ];
+        
+        const response = await fetch(BACKEND_CHAT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages }),
+        });
+        
+        if (!response.ok) throw new Error('Errore AI');
+        
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content || null;
+      } catch (error) {
+        console.error('Errore estrazione:', error);
+        return null;
+      }
+    }
+
+    // Database auto usate
+    const USED_CARS = {
+      'ford': { name: 'Ford', count: 9, link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Ford' },
+      'jeep': { name: 'Jeep', count: 13, link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Jeep' },
+      'volkswagen': { name: 'Volkswagen', count: 4, link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Volkswagen' }
+    };
+
     function isUsedCarQuery(text) {
-      const lowerText = text.toLowerCase();
-      const explicitUsedKeywords = ['usato', 'usata', 'usati', 'usate', 'seconda mano', 'km zero', 'centroauto', 'centro auto', 'stock', 'occasione', 'occasioni'];
-      if (explicitUsedKeywords.some(kw => lowerText.includes(kw))) return true;
-      
-      const onlyUsedBrands = ['ford', 'kia', 'mazda', 'mg', 'opel', 'peugeot', 'renault', 'seat', 'smart', 'suzuki', 'volkswagen', 'land rover'];
-      if (onlyUsedBrands.some(brand => lowerText.includes(brand))) return true;
-      
-      const usedOnlyModels = ['fiesta', 'focus', 'kuga', 'ecosport', 'sportage', 'picanto', 'cx-5', 'mokka', '208', '308', '2008', '3008', 'clio', 'captur', 'megane', 't-roc'];
-      if (usedOnlyModels.some(model => lowerText.includes(model))) return true;
-      
-      return false;
+      const lower = text.toLowerCase();
+      const keywords = ['usato', 'usata', 'usati', 'usate', 'centroauto', 'ford', 'volkswagen'];
+      return keywords.some(k => lower.includes(k));
     }
 
     function getUsedCarsResponse(query) {
-      const lowerQuery = query.toLowerCase();
-      const database = learningData.usedCarsData || USED_CARS_DB;
-      
-      for (const [brandKey, brandData] of Object.entries(database)) {
-        if (lowerQuery.includes(brandKey)) {
-          let response = `🚗 <b>${brandData.name.toUpperCase()} USATE</b> su CentroAuto\n\n`;
-          
-          if (brandData.count) {
-            response += `📊 <b>${brandData.count} veicoli</b> disponibili\n\n`;
-          }
-          
-          if (brandData.models && brandData.models.length > 0) {
-            response += `🏷️ <b>Modelli disponibili:</b>\n`;
-            response += brandData.models.map(m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`).join('\n');
-            response += '\n\n';
-          }
-          
-          response += `🔗 <a href="${brandData.link}" target="_blank">VAI ALLE ${brandData.name.toUpperCase()} USATE</a>`;
-          
-          return response;
+      const lower = query.toLowerCase();
+      for (const [key, data] of Object.entries(USED_CARS)) {
+        if (lower.includes(key)) {
+          return `🚗 <b>${data.name.toUpperCase()} USATE</b><br><br>` +
+                 `📊 ${data.count} veicoli disponibili<br><br>` +
+                 `🔗 <a href="${data.link}" target="_blank">VAI ALLE ${data.name.toUpperCase()} USATE</a>`;
         }
       }
-      
-      return `🚗 <b>AUTO USATE</b> su CentroAuto VT\n\n` +
-             `🔗 <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">VEDI TUTTO LO STOCK</a>`;
+      return `🚗 <b>AUTO USATE</b> su CentroAuto<br><br>` +
+             `🔗 <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">VEDI STOCK COMPLETO</a>`;
     }
 
-    async function searchNewCars(query, detectedModel) {
-      try {
-        let searchQuery = query;
-        
-        if (detectedModel) {
-          searchQuery = `${detectedModel.brand} ${detectedModel.model} allestimenti ${detectedModel.trims.join(' ')} site:${detectedModel.site}`;
-        } else {
-          const officialSites = [
-            'site:fiat.it/configuratore OR site:fiat.it/gamma',
-            'site:jeep-official.it/configuratore OR site:jeep-official.it/gamma',
-            'site:alfaromeo.it/configuratore OR site:alfaromeo.it/gamma',
-            'site:lancia.it/configuratore OR site:lancia.it/gamma'
-          ];
-          searchQuery = `${query} allestimenti versioni (${officialSites.join(' OR ')})`;
-        }
-        
-        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(searchQuery)}`);
-        if (!response.ok) throw new Error("Errore ricerca");
-        
-        const data = await response.json();
-        
-        if (data.results && data.results.length > 0) {
-          const allowedDomains = ['fiat.it', 'jeep-official.it', 'alfaromeo.it', 'lancia.it'];
-          const validResults = data.results.filter(r => {
-            const url = r.url.toLowerCase();
-            return allowedDomains.some(domain => url.includes(domain));
-          });
-
-          if (validResults.length === 0) return null;
-
-          return validResults.slice(0, 3).map(r => {
-            const brand = r.url.includes('fiat') ? 'Fiat' :
-                         r.url.includes('jeep') ? 'Jeep' :
-                         r.url.includes('alfa') ? 'Alfa Romeo' : 'Lancia';
-            
-            return `━━━ ${brand.toUpperCase()} ━━━\n${r.title}\n\n${r.description}\n\n🔗 ${r.url}`;
-          }).join('\n\n');
-        }
-        return null;
-      } catch (err) {
-        console.error("Errore ricerca nuove:", err);
-        return null;
-      }
-    }
-
-    const SYSTEM_PROMPT_NEW = `Sei un assistente esperto di auto NUOVE (Fiat, Jeep, Alfa Romeo, Lancia) con sistema di auto-apprendimento.
-
-IMPORTANTE: 
-- Considera le correzioni apprese dagli operatori
-- Usa SEMPRE i dati tecnici ufficiali quando disponibili nel database
-- Se hai dati tecnici verificati (dimensioni, peso, prestazioni), citali con precisione
-
-REGOLE:
-1. Risposte SCHEMATICHE (max 10 righe)
-2. Usa ELENCHI PUNTATI
-3. Per dati tecnici: cita le fonti ufficiali
-4. Confronta allestimenti chiaramente
-5. Basati SOLO sui dati forniti
-6. Rispetta le restrizioni apprese
-
-FORMATO:
-🔴 ALLESTIMENTO 1
-• Caratteristica 1
-• Caratteristica 2
-
-🔵 ALLESTIMENTO 2
-• Caratteristica 1
-• Caratteristica 2
-
-📊 DATI TECNICI (se richiesti):
-• Dimensioni: L x W x H mm
-• Peso: X kg
-• Potenza: X CV/kW
-• Prestazioni: 0-100 in X sec
-
-💡 CONSIGLIO: [breve]`;
-
+    // Send message
     async function sendMessage() {
       const userMessage = chatInputField.value.trim();
       if (!userMessage) return;
 
-      lastUserMessage = userMessage;
       addMessage(escapeHtml(userMessage), "user");
       chatInputField.value = "";
       chatSendBtn.disabled = true;
-
       showTyping();
 
       try {
-        if (isUsedCarQuery(userMessage)) {
-          hideTyping();
-          const results = getUsedCarsResponse(userMessage);
-          lastAiResponse = results;
-          addMessage(results, "ai", true);
-        } else {
-          const detectedModel = detectNewCarModel(userMessage);
-          const searchResults = await searchNewCars(userMessage, detectedModel);
+        if (isTechnicalQuery(userMessage)) {
+          // RICERCA GOOGLE per dati tecnici
+          const googleResults = await searchGoogle(userMessage);
           
+          if (googleResults) {
+            const extractedData = await extractData(googleResults, userMessage);
+            hideTyping();
+            
+            if (extractedData) {
+              let response = extractedData + '<br><br>━━━━━━━━━━<br><br>📎 <b>FONTI:</b><br>';
+              googleResults.results.forEach((r, i) => {
+                response += `${i+1}. <a href="${r.url}" target="_blank">${r.title}</a><br>`;
+              });
+              addMessage(response, "ai");
+            } else {
+              addMessage('❌ Non ho trovato dati precisi.', "ai");
+            }
+          } else {
+            hideTyping();
+            addMessage('❌ Nessun risultato su Google.', "ai");
+          }
+        } else if (isUsedCarQuery(userMessage)) {
+          // AUTO USATE
+          hideTyping();
+          addMessage(getUsedCarsResponse(userMessage), "ai");
+        } else {
+          // RISPOSTA AI NORMALE
           const messages = [
-            { role: "system", content: SYSTEM_PROMPT_NEW },
+            { role: "system", content: "Sei un assistente auto. Rispondi in modo SCHEMATICO (max 10 righe)." },
             { role: "user", content: userMessage }
           ];
-
-          if (searchResults) {
-            let context = `DATI UFFICIALI:\n\n${searchResults}\n\n`;
-            
-            if (detectedModel) {
-              context += `MODELLO: ${detectedModel.brand} ${detectedModel.model}\n`;
-              context += `ALLESTIMENTI: ${detectedModel.trims.join(', ')}\n`;
-              
-              // Aggiungi DATI TECNICI UFFICIALI se disponibili
-              if (detectedModel.technical && Object.keys(detectedModel.technical).length > 0) {
-                context += `\n📊 DATI TECNICI UFFICIALI (fonte: ${detectedModel.technical.source || 'configuratore'}):\n`;
-                
-                if (detectedModel.technical.dimensions) {
-                  context += `• Dimensioni: ${detectedModel.technical.dimensions.length || 'N/A'} x ${detectedModel.technical.dimensions.width || 'N/A'} x ${detectedModel.technical.dimensions.height || 'N/A'} mm\n`;
-                }
-                if (detectedModel.technical.weight) {
-                  context += `• Peso: ${detectedModel.technical.weight}\n`;
-                }
-                if (detectedModel.technical.performance) {
-                  if (detectedModel.technical.performance.power) {
-                    context += `• Potenza: ${detectedModel.technical.performance.power}\n`;
-                  }
-                  if (detectedModel.technical.performance.acceleration) {
-                    context += `• Accelerazione: ${detectedModel.technical.performance.acceleration}\n`;
-                  }
-                  if (detectedModel.technical.performance.top_speed) {
-                    context += `• Velocità max: ${detectedModel.technical.performance.top_speed}\n`;
-                  }
-                }
-                if (detectedModel.technical.consumption) {
-                  context += `• Consumi: ${detectedModel.technical.consumption}\n`;
-                }
-                if (detectedModel.technical.price_from) {
-                  context += `• Prezzo da: ${detectedModel.technical.price_from}\n`;
-                }
-                
-                context += `\nIMPORTANTE: Questi sono i dati UFFICIALI verificati. Usali con precisione.\n`;
-              }
-              
-              // Aggiungi restrizioni apprese
-              if (Object.keys(detectedModel.restrictions).length > 0) {
-                context += `\nRESTRIZIONI APPRESE:\n`;
-                for (const [trim, restriction] of Object.entries(detectedModel.restrictions)) {
-                  context += `- ${trim}: ${restriction}\n`;
-                }
-              }
-            }
-            
-            // Aggiungi ultime correzioni rilevanti
-            const relevantCorrections = learningData.corrections?.filter(c => 
-              c.userMessage.toLowerCase().includes(userMessage.toLowerCase().split(' ')[0])
-            ).slice(-3);
-            
-            if (relevantCorrections && relevantCorrections.length > 0) {
-              context += `\nCORREZIONI OPERATORI APPRESE:\n`;
-              relevantCorrections.forEach(c => {
-                context += `- ${c.correction}\n`;
-              });
-            }
-            
-            context += `\nRispondi in modo SCHEMATICO.`;
-            
-            messages.push({ role: "system", content: context });
-          }
 
           const response = await fetch(BACKEND_CHAT, {
             method: "POST",
@@ -2055,21 +1079,18 @@ FORMATO:
             body: JSON.stringify({ messages }),
           });
 
-          if (!response.ok) throw new Error(`Errore ${response.status}`);
+          if (!response.ok) throw new Error('Errore AI');
 
           const data = await response.json();
           hideTyping();
 
-          let aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho trovato informazioni.";
-          aiMessage = escapeHtml(aiMessage);
-          lastAiResponse = aiMessage;
-          addMessage(aiMessage, "ai", true);
+          const aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho capito.";
+          addMessage(escapeHtml(aiMessage), "ai");
         }
-
       } catch (error) {
         hideTyping();
-        console.error("Errore chat:", error);
-        addMessage("❌ Errore di connessione. Riprova!", "ai");
+        console.error("Errore:", error);
+        addMessage("❌ Errore. Riprova!", "ai");
       } finally {
         chatSendBtn.disabled = false;
         chatInputField.focus();
@@ -2077,7 +1098,6 @@ FORMATO:
     }
 
     chatSendBtn.addEventListener("click", sendMessage);
-
     chatInputField.addEventListener("keypress", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
