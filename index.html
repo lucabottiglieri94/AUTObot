@@ -1004,33 +1004,173 @@ Rispondi in modo SCHEMATICO.`
       }
     }
 
-    // Database auto usate
-    const USED_CARS = {
-      'ford': { name: 'Ford', count: 9, link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Ford' },
-      'jeep': { name: 'Jeep', count: 13, link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Jeep' },
-      'volkswagen': { name: 'Volkswagen', count: 4, link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Volkswagen' }
-    };
-
-    function isUsedCarQuery(text) {
-      const lower = text.toLowerCase();
-      const keywords = ['usato', 'usata', 'usati', 'usate', 'centroauto', 'ford', 'volkswagen'];
-      return keywords.some(k => lower.includes(k));
-    }
-
-    function getUsedCarsResponse(query) {
-      const lower = query.toLowerCase();
-      for (const [key, data] of Object.entries(USED_CARS)) {
-        if (lower.includes(key)) {
-          return `🚗 <b>${data.name.toUpperCase()} USATE</b><br><br>` +
-                 `📊 ${data.count} veicoli disponibili<br><br>` +
-                 `🔗 <a href="${data.link}" target="_blank">VAI ALLE ${data.name.toUpperCase()} USATE</a>`;
+    // DATABASE AUTO NUOVE (solo modelli IN PRODUZIONE 2025)
+    const NEW_CARS_DATABASE = {
+      'fiat': {
+        brand: 'Fiat',
+        site: 'fiat.it',
+        models: {
+          '500': { name: '500 Elettrica', keywords: ['500', 'cinquecento', '500e'] },
+          '600': { name: '600', keywords: ['600', 'seicento'] },
+          'panda': { name: 'Panda', keywords: ['panda'] },
+          'grande-panda': { name: 'Grande Panda', keywords: ['grande panda', 'grandepanda'] },
+          'tipo': { name: 'Tipo', keywords: ['tipo'] }
+        }
+      },
+      'jeep': {
+        brand: 'Jeep',
+        site: 'jeep-official.it',
+        models: {
+          'avenger': { name: 'Avenger', keywords: ['avenger'] },
+          'renegade': { name: 'Renegade', keywords: ['renegade'] },
+          'compass': { name: 'Compass', keywords: ['compass'] },
+          'wrangler': { name: 'Wrangler', keywords: ['wrangler'] }
+        }
+      },
+      'alfa': {
+        brand: 'Alfa Romeo',
+        site: 'alfaromeo.it',
+        models: {
+          'junior': { name: 'Junior', keywords: ['junior', 'alfa junior'] },
+          'tonale': { name: 'Tonale', keywords: ['tonale'] },
+          'stelvio': { name: 'Stelvio', keywords: ['stelvio'] },
+          'giulia': { name: 'Giulia', keywords: ['giulia'] }
+          // GIULIETTA NON PIÙ IN PRODUZIONE - rimossa
+        }
+      },
+      'lancia': {
+        brand: 'Lancia',
+        site: 'lancia.it',
+        models: {
+          'ypsilon': { name: 'Ypsilon', keywords: ['ypsilon', 'ipsilon', 'y'] }
         }
       }
-      return `🚗 <b>AUTO USATE</b> su CentroAuto<br><br>` +
-             `🔗 <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">VEDI STOCK COMPLETO</a>`;
+    };
+
+    // Riconosci modello
+    function detectModel(text) {
+      const lower = text.toLowerCase();
+      for (const [brandKey, brandData] of Object.entries(NEW_CARS_DATABASE)) {
+        for (const [modelKey, modelData] of Object.entries(brandData.models)) {
+          if (modelData.keywords.some(kw => lower.includes(kw))) {
+            return {
+              brand: brandData.brand,
+              model: modelData.name,
+              site: brandData.site
+            };
+          }
+        }
+      }
+      return null;
     }
 
-    // Send message
+    // Cerca sul configuratore ufficiale
+    async function searchOfficialConfigurator(query, detectedModel) {
+      try {
+        let searchQuery;
+        
+        if (detectedModel) {
+          searchQuery = `${detectedModel.brand} ${detectedModel.model} allestimenti versioni site:${detectedModel.site}`;
+        } else {
+          const sites = [
+            'site:fiat.it/configuratore OR site:fiat.it/gamma',
+            'site:jeep-official.it/configuratore OR site:jeep-official.it/gamma',
+            'site:alfaromeo.it/configuratore OR site:alfaromeo.it/gamma',
+            'site:lancia.it/configuratore OR site:lancia.it/gamma'
+          ];
+          searchQuery = `${query} (${sites.join(' OR ')})`;
+        }
+        
+        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(searchQuery)}`);
+        if (!response.ok) return null;
+        
+        const data = await response.json();
+        if (!data.results || data.results.length === 0) return null;
+        
+        const officialDomains = ['fiat.it', 'jeep-official.it', 'alfaromeo.it', 'lancia.it'];
+        const results = data.results.filter(r => 
+          officialDomains.some(d => r.url.includes(d))
+        );
+        
+        if (results.length === 0) return null;
+        
+        return {
+          found: true,
+          results: results.slice(0, 2)
+        };
+      } catch (error) {
+        console.error('Errore configuratore:', error);
+        return null;
+      }
+    }
+
+    // Ricerca Google (SEMPRE come fallback)
+    async function searchGoogle(query) {
+      try {
+        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error('Errore ricerca');
+        
+        const data = await response.json();
+        if (!data.results || data.results.length === 0) return null;
+        
+        const results = data.results.slice(0, 3);
+        let context = `RISULTATI GOOGLE:\n\n`;
+        results.forEach((r, i) => {
+          context += `[${i+1}] ${r.title}\n${r.description}\nFonte: ${r.url}\n\n`;
+        });
+        
+        return { context, results };
+      } catch (error) {
+        console.error('Errore Google:', error);
+        return null;
+      }
+    }
+
+    // Estrai dati con AI
+    async function extractData(searchResults, query) {
+      try {
+        const messages = [
+          {
+            role: "system",
+            content: `Estrai SOLO dati PRECISI. Non inventare.
+
+Se trovi un modello FUORI PRODUZIONE (es: Giulietta, Punto, ecc.), dillo chiaramente:
+"⚠️ [MODELLO] non è più in produzione dal [ANNO]"
+
+Poi suggerisci modelli simili attuali.
+
+FORMATO:
+📊 [MODELLO]
+✓ Dato: valore (fonte)
+✗ Non trovato
+
+Se fuori produzione:
+⚠️ FUORI PRODUZIONE dal [anno]
+💡 Modelli simili attuali: [lista]`
+          },
+          {
+            role: "user",
+            content: `Domanda: "${query}"\n\n${searchResults.context}`
+          }
+        ];
+        
+        const response = await fetch(BACKEND_CHAT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages }),
+        });
+        
+        if (!response.ok) throw new Error('Errore AI');
+        
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content || null;
+      } catch (error) {
+        console.error('Errore estrazione:', error);
+        return null;
+      }
+    }
+
+    // Send message - INTELLIGENZA MIGLIORATA
     async function sendMessage() {
       const userMessage = chatInputField.value.trim();
       if (!userMessage) return;
@@ -1041,8 +1181,26 @@ Rispondi in modo SCHEMATICO.`
       showTyping();
 
       try {
-        if (isTechnicalQuery(userMessage)) {
-          // RICERCA GOOGLE per dati tecnici
+        // STEP 1: Rileva modello (se presente)
+        const detectedModel = detectModel(userMessage);
+        
+        // STEP 2: Cerca PRIMA sul configuratore ufficiale (se modello riconosciuto)
+        let officialResults = null;
+        if (detectedModel) {
+          addMessage(`🔍 Cerco sul configuratore ${detectedModel.brand}...`, 'ai');
+          officialResults = await searchOfficialConfigurator(userMessage, detectedModel);
+        }
+        
+        // STEP 3: Se non trova sul configuratore → GOOGLE
+        if (!officialResults || officialResults.results.length === 0) {
+          hideTyping();
+          if (detectedModel) {
+            addMessage(`⚠️ Non trovato sul configuratore ufficiale.<br>🔍 Cerco su Google...`, 'ai');
+          } else {
+            addMessage(`🔍 Cerco su Google...`, 'ai');
+          }
+          showTyping();
+          
           const googleResults = await searchGoogle(userMessage);
           
           if (googleResults) {
@@ -1056,36 +1214,63 @@ Rispondi in modo SCHEMATICO.`
               });
               addMessage(response, "ai");
             } else {
-              addMessage('❌ Non ho trovato dati precisi.', "ai");
+              addMessage('❌ Non ho trovato informazioni precise.', "ai");
             }
           } else {
             hideTyping();
-            addMessage('❌ Nessun risultato su Google.', "ai");
+            addMessage('❌ Nessun risultato trovato.', "ai");
           }
-        } else if (isUsedCarQuery(userMessage)) {
-          // AUTO USATE
-          hideTyping();
-          addMessage(getUsedCarsResponse(userMessage), "ai");
         } else {
-          // RISPOSTA AI NORMALE
+          // STEP 4: Trovato sul configuratore → usa AI per rispondere
+          hideTyping();
+          
+          let context = `DATI CONFIGURATORE UFFICIALE:\n\n`;
+          officialResults.results.forEach((r, i) => {
+            context += `[${i+1}] ${r.title}\n${r.description}\nFonte: ${r.url}\n\n`;
+          });
+          
           const messages = [
-            { role: "system", content: "Sei un assistente auto. Rispondi in modo SCHEMATICO (max 10 righe)." },
-            { role: "user", content: userMessage }
+            {
+              role: "system",
+              content: `Sei un esperto auto. Rispondi in modo SCHEMATICO (max 10 righe).
+              
+Usa SOLO le info dai configuratori ufficiali forniti.
+
+FORMATO:
+📊 [MODELLO]
+• Info 1
+• Info 2
+• Info 3
+
+🔗 Fonte ufficiale`
+            },
+            {
+              role: "user",
+              content: `Domanda: "${userMessage}"\n\n${context}`
+            }
           ];
 
-          const response = await fetch(BACKEND_CHAT, {
+          const aiResponse = await fetch(BACKEND_CHAT, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ messages }),
           });
 
-          if (!response.ok) throw new Error('Errore AI');
+          if (!aiResponse.ok) throw new Error('Errore AI');
 
-          const data = await response.json();
+          const aiData = await aiResponse.json();
+          showTyping();
+          
+          let finalResponse = aiData.choices?.[0]?.message?.content || "Info non disponibili.";
+          finalResponse = escapeHtml(finalResponse);
+          
+          finalResponse += '<br><br>━━━━━━━━━━<br><br>📎 <b>CONFIGURATORE UFFICIALE:</b><br>';
+          officialResults.results.forEach((r, i) => {
+            finalResponse += `${i+1}. <a href="${r.url}" target="_blank">${r.title}</a><br>`;
+          });
+          
           hideTyping();
-
-          const aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho capito.";
-          addMessage(escapeHtml(aiMessage), "ai");
+          addMessage(finalResponse, "ai");
         }
       } catch (error) {
         hideTyping();
