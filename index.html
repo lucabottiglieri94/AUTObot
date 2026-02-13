@@ -1589,6 +1589,252 @@ Output: {"type":"new","action":"remove","brand":"fiat","model":"grande-panda","t
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    function showTyping() {
+      const typingDiv = document.createElement("div");
+      typingDiv.className = "message ai";
+      typingDiv.id = "typingIndicator";
+      typingDiv.innerHTML = `
+        <div class="typingIndicator">
+          <div class="typingDot"></div>
+          <div class="typingDot"></div>
+          <div class="typingDot"></div>
+        </div>
+      `;
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideTyping() {
+      const typing = $("typingIndicator");
+      if (typing) typing.remove();
+    }
+
+    // ========== 🔍 RICONOSCIMENTO DOMANDE TECNICHE ========== 
+    
+    function isTechnicalQuery(text) {
+      const technicalPatterns = [
+        // Dimensioni
+        /quanto.*lunga/i,
+        /quanto.*larga/i,
+        /quanto.*alta/i,
+        /dimensioni/i,
+        /lunghezza/i,
+        /larghezza/i,
+        /altezza/i,
+        /misure/i,
+        
+        // Motore
+        /che motore/i,
+        /motore/i,
+        /motorizzazione/i,
+        /cilindrata/i,
+        /cavalli/i,
+        /\bcv\b/i,
+        /\bkw\b/i,
+        /potenza/i,
+        
+        // Prestazioni
+        /accelerazione/i,
+        /0-100/i,
+        /velocità massima/i,
+        /velocità max/i,
+        /prestazioni/i,
+        
+        // Consumi
+        /consumi/i,
+        /km\/l/i,
+        /l\/100km/i,
+        /quanto consuma/i,
+        /autonomia/i,
+        
+        // Peso
+        /peso/i,
+        /quanto pesa/i,
+        
+        // Prezzo
+        /prezzo/i,
+        /quanto costa/i,
+        /costo/i,
+        
+        // Bagagliaio
+        /bagagliaio/i,
+        /capacità bagagliaio/i,
+        /litri bagagliaio/i,
+        
+        // Scheda tecnica
+        /scheda tecnica/i,
+        /dati tecnici/i,
+        /specifiche/i
+      ];
+      
+      return technicalPatterns.some(pattern => pattern.test(text));
+    }
+    
+    // ========== 🌐 RICERCA GOOGLE DIRETTA ========== 
+    
+    async function searchGoogleDirect(query) {
+      try {
+        // Costruisci URL Google Search con la query esatta dell'utente
+        const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&hl=it&udm=50`;
+        
+        addMessage(`🔍 <b>RICERCA GOOGLE IN CORSO...</b><br>Query: "${escapeHtml(query)}"<br><br><a href="${googleSearchUrl}" target="_blank">🔗 Vedi risultati su Google</a>`, 'ai');
+        
+        // Usa il backend search che fa scraping intelligente
+        const searchResponse = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(query)}`);
+        
+        if (!searchResponse.ok) {
+          throw new Error('Errore ricerca Google');
+        }
+        
+        const searchData = await searchResponse.json();
+        
+        if (!searchData.results || searchData.results.length === 0) {
+          return null;
+        }
+        
+        // Prendi i primi 3 risultati più rilevanti
+        const topResults = searchData.results.slice(0, 3);
+        
+        // Costruisci contesto dai risultati Google
+        let googleContext = `RISULTATI GOOGLE SEARCH per "${query}":\n\n`;
+        
+        topResults.forEach((result, index) => {
+          googleContext += `━━━ RISULTATO ${index + 1} ━━━\n`;
+          googleContext += `Fonte: ${result.url}\n`;
+          googleContext += `Titolo: ${result.title}\n\n`;
+          googleContext += `${result.description}\n\n`;
+        });
+        
+        return {
+          context: googleContext,
+          results: topResults
+        };
+        
+      } catch (error) {
+        console.error('Errore ricerca Google:', error);
+        return null;
+      }
+    }
+    
+    // ========== 📊 ESTRAI DATI TECNICI DAI RISULTATI ========== 
+    
+    async function extractTechnicalData(googleResults, originalQuery) {
+      try {
+        const messages = [
+          {
+            role: "system",
+            content: `Sei un estrattore di dati tecnici automotive. 
+            
+Analizza i risultati Google forniti e estrai SOLO i dati tecnici PRECISI e NUMERICI.
+
+REGOLE CRITICHE:
+1. Usa SOLO numeri ESATTI trovati nei risultati
+2. Se un dato non è presente → scrivi "Non trovato"
+3. Mantieni le unità di misura (mm, kg, CV, km/h, ecc.)
+4. Non inventare o stimare MAI
+5. Cita sempre la fonte
+
+FORMATO RISPOSTA:
+📊 [NOME AUTO]
+
+✓ Dato trovato: valore (fonte)
+✗ Dato non trovato
+
+Esempi:
+✓ Lunghezza: 4171 mm (Fiat.it)
+✓ Potenza: 156 CV (AutoScout24)
+✗ Peso: Non trovato nei risultati
+
+IMPORTANTE: Rispondi in modo SCHEMATICO, NON in prosa narrativa.`
+          },
+          {
+            role: "user",
+            content: `Domanda originale: "${originalQuery}"\n\n${googleResults.context}`
+          }
+        ];
+        
+        const response = await fetch(BACKEND_CHAT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages }),
+        });
+        
+        if (!response.ok) throw new Error('Errore estrazione dati');
+        
+        const data = await response.json();
+        const extractedData = data.choices?.[0]?.message?.content || null;
+        
+        return extractedData;
+        
+      } catch (error) {
+        console.error('Errore estrazione:', error);
+        return null;
+      }
+    }
+
+    let isMinimized = false;
+    let lastAiResponse = "";
+    let lastUserMessage = "";
+
+    const chatTrigger = $("chatTrigger");
+    const chatBox = $("chatBox");
+    const chatMessages = $("chatMessages");
+    const chatInputField = $("chatInputField");
+    const chatSendBtn = $("chatSendBtn");
+    const minimizeBtn = $("minimizeBtn");
+    const closeBtn = $("closeBtn");
+
+    chatTrigger.addEventListener("click", () => {
+      chatBox.classList.add("open");
+      chatBox.classList.remove("minimized");
+      chatTrigger.style.display = "none";
+      $("chatMinimizedLogo").style.display = "none";
+      chatInputField.focus();
+    });
+
+    minimizeBtn.addEventListener("click", () => {
+      chatBox.classList.add("minimized");
+      isMinimized = true;
+      $("chatMinimizedLogo").style.display = "block";
+    });
+
+    closeBtn.addEventListener("click", () => {
+      chatBox.classList.remove("open");
+      chatBox.classList.remove("minimized");
+      chatTrigger.style.display = "flex";
+    });
+
+    chatBox.querySelector(".chatHeader").addEventListener("click", (e) => {
+      if (isMinimized && !e.target.closest("button")) {
+        chatBox.classList.remove("minimized");
+        isMinimized = false;
+        $("chatMinimizedLogo").style.display = "none";
+      }
+    });
+
+    $("chatMinimizedLogo").addEventListener("click", () => {
+      chatBox.classList.remove("minimized");
+      isMinimized = false;
+      $("chatMinimizedLogo").style.display = "none";
+      chatInputField.focus();
+    });
+
+    function addMessage(html, sender, showCorrectBtn = false) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}`;
+      
+      let content = `<div class="messageBubble">${html}</div>`;
+      
+      // Mostra pulsante correzione SOLO se è admin
+      if (showCorrectBtn && isAdmin) {
+        content += `<button class="correctBtn" onclick="promptCorrection()">✏️ Correggi questa risposta</button>`;
+      }
+      
+      messageDiv.innerHTML = content;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
     window.promptCorrection = async function() {
       // ✅ CONTROLLO ADMIN
       if (!isAdmin) {
@@ -1971,12 +2217,48 @@ FORMATO:
       showTyping();
 
       try {
-        if (isUsedCarQuery(userMessage)) {
+        // ✅ STEP 1: È una domanda TECNICA?
+        if (isTechnicalQuery(userMessage)) {
+          hideTyping();
+          
+          // 🔍 RICERCA GOOGLE DIRETTA
+          const googleResults = await searchGoogleDirect(userMessage);
+          
+          if (googleResults) {
+            showTyping();
+            
+            // 📊 ESTRAI DATI TECNICI
+            const technicalData = await extractTechnicalData(googleResults, userMessage);
+            
+            hideTyping();
+            
+            if (technicalData) {
+              lastAiResponse = technicalData;
+              
+              // Aggiungi link ai risultati
+              let responseWithLinks = technicalData + '\n\n━━━━━━━━━━━━━━━━━\n\n📎 <b>FONTI:</b>\n';
+              googleResults.results.forEach((result, i) => {
+                responseWithLinks += `${i+1}. <a href="${result.url}" target="_blank">${result.title}</a>\n`;
+              });
+              
+              addMessage(responseWithLinks, "ai", true);
+            } else {
+              addMessage('❌ Non sono riuscito ad estrarre i dati tecnici. Prova a riformulare la domanda.', "ai");
+            }
+          } else {
+            addMessage('❌ Nessun risultato trovato su Google. Prova con termini diversi.', "ai");
+          }
+          
+        } 
+        // ✅ STEP 2: È una richiesta di auto USATE?
+        else if (isUsedCarQuery(userMessage)) {
           hideTyping();
           const results = getUsedCarsResponse(userMessage);
           lastAiResponse = results;
           addMessage(results, "ai", true);
-        } else {
+        } 
+        // ✅ STEP 3: È una richiesta di auto NUOVE (allestimenti, confronti)
+        else {
           const detectedModel = detectNewCarModel(userMessage);
           const searchResults = await searchNewCars(userMessage, detectedModel);
           
