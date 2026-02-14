@@ -1004,33 +1004,418 @@ Rispondi in modo SCHEMATICO.`
       }
     }
 
-    // Database auto usate
-    const USED_CARS = {
-      'ford': { name: 'Ford', count: 9, link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Ford' },
-      'jeep': { name: 'Jeep', count: 13, link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Jeep' },
-      'volkswagen': { name: 'Volkswagen', count: 4, link: 'https://www.centroautovt.it/ricerca-auto/usate?brand=Volkswagen' }
+    // ========== 📚 DATABASE UFFICIALE 2026 (da PDF gamma) ========== 
+    
+    const OFFICIAL_MODELS_2026 = {
+      'fiat': {
+        brand: 'Fiat',
+        site: 'fiat.it',
+        inProduction: [
+          {
+            name: '500 Elettrica',
+            variants: ['Pop', 'Icon', 'La Prima', 'Torino', '3+1'],
+            type: 'Citycar 100% elettrica',
+            keywords: ['500 elettrica', '500e', 'cinquecento elettrica']
+          },
+          {
+            name: '500 Hybrid',
+            variants: ['Pop', 'Icon', 'Business', 'La Prima'],
+            type: 'Citycar ibrida',
+            price: 'Da 16.900 euro',
+            keywords: ['500 hybrid', 'cinquecento ibrida', '500 benzina']
+          },
+          {
+            name: 'Panda',
+            variants: ['Standard', 'Cross'],
+            type: 'Citycar compatta',
+            keywords: ['panda']
+          },
+          {
+            name: 'Grande Panda',
+            type: 'Crossover compatto',
+            motorization: 'Hybrid/Elettrica',
+            keywords: ['grande panda', 'grandepanda']
+          },
+          {
+            name: '600',
+            type: 'Crossover compatto',
+            motorization: 'Hybrid/Elettrica',
+            keywords: ['600', 'seicento']
+          },
+          {
+            name: '600 Sport Edizione Milano',
+            type: 'Crossover sportivo',
+            keywords: ['600 sport', '600 milano']
+          },
+          {
+            name: '500X',
+            variants: ['City Cross', 'Cross'],
+            traction: '4x2 o 4x4',
+            keywords: ['500x', 'cinquecento x']
+          }
+        ],
+        comingSoon: [
+          {
+            name: 'Giga Panda',
+            launch: 'Autunno 2026',
+            type: 'SUV Segmento C',
+            length: '4.4 metri',
+            motorization: 'Full Hybrid 150 CV / Elettrica',
+            keywords: ['giga panda', 'panda suv', 'grizzly']
+          },
+          {
+            name: 'Panda Fastback',
+            launch: 'Fine 2026',
+            type: 'SUV Coupé',
+            motorization: 'Full Hybrid / Elettrica',
+            keywords: ['panda fastback', 'fastback']
+          },
+          {
+            name: 'Qubo L',
+            launch: '2026',
+            type: 'Multispazio 5/7 posti',
+            motorization: 'Mild Hybrid / Diesel / Elettrico',
+            keywords: ['qubo', 'qubo l']
+          }
+        ],
+        discontinued: [
+          {
+            name: 'Tipo',
+            endDate: '30 giugno 2026',
+            replacement: 'Giga Panda',
+            note: 'Dopo 11 anni termina la produzione',
+            keywords: ['tipo']
+          },
+          {
+            name: 'Punto / Grande Punto',
+            endDate: 'Fuori produzione da anni',
+            replacement: 'Panda o 500',
+            keywords: ['punto', 'grande punto']
+          }
+        ]
+      },
+
+      'jeep': {
+        brand: 'Jeep',
+        site: 'jeep-official.it',
+        inProduction: [
+          {
+            name: 'Avenger',
+            type: 'B-SUV compatto',
+            motorization: 'e-Hybrid / Elettrica / 4xe',
+            price: 'Da 25.200 euro (benzina)',
+            variants: ['Standard', 'Black Edition'],
+            keywords: ['avenger']
+          },
+          {
+            name: 'Renegade',
+            type: 'B-SUV',
+            variants: ['Longitude', 'Altitude', 'Summit'],
+            motorization: 'Benzina/Diesel/MHEV/4xe',
+            keywords: ['renegade']
+          },
+          {
+            name: 'Compass',
+            type: 'C-SUV',
+            variants: ['Altitude', 'First Edition', 'Summit'],
+            motorization: 'Mild Hybrid 145 CV / PHEV 195 CV / Elettrica 213-230-375 CV',
+            production: 'Melfi, Italia',
+            keywords: ['compass']
+          },
+          {
+            name: 'Wrangler',
+            type: 'Fuoristrada iconico',
+            variants: ['Sport', 'Sahara', 'Rubicon', 'Rubicon 4xe'],
+            motorization: 'Benzina / 4xe PHEV',
+            note: 'Verso fine ciclo, nuovo modello 2026-2027',
+            keywords: ['wrangler']
+          },
+          {
+            name: 'Grand Cherokee',
+            type: 'SUV segmento E',
+            variants: ['Laredo', 'Limited', 'Overland', 'Summit', 'Trailhawk'],
+            motorization: 'Benzina / Diesel / 4xe PHEV',
+            keywords: ['grand cherokee', 'grandcherokee']
+          }
+        ],
+        comingSoon: [
+          {
+            name: 'Wagoneer S',
+            launch: '2026',
+            type: 'SUV elettrico premium',
+            power: '600 CV',
+            acceleration: '0-100 in 3.4-3.5 sec',
+            autonomy: '480 km',
+            keywords: ['wagoneer', 'wagoneer s']
+          },
+          {
+            name: 'Recon',
+            launch: '2026-2027',
+            type: 'Fuoristrada elettrico Trail Rated',
+            features: 'Portiere e tetto rimovibili',
+            keywords: ['recon']
+          }
+        ],
+        discontinued: [
+          {
+            name: 'Cherokee',
+            endDate: 'Non prevista per Europa',
+            note: 'Solo mercato USA',
+            keywords: ['cherokee']
+          }
+        ]
+      },
+
+      'alfa': {
+        brand: 'Alfa Romeo',
+        site: 'alfaromeo.it',
+        inProduction: [
+          {
+            name: 'Junior',
+            type: 'B-SUV compatto',
+            length: '4.17 metri',
+            motorization: 'Mild Hybrid 136 CV / Elettrica 156 CV / Elettrica Veloce 240 CV',
+            price: 'Da 30.750 euro (ibrida) / 39.500 euro (elettrica)',
+            variants: ['Sprint', 'Ti', 'Speciale', 'Veloce'],
+            keywords: ['junior', 'alfa junior']
+          },
+          {
+            name: 'Tonale',
+            type: 'C-SUV',
+            variants: ['Super', 'Sprint', 'Ti', 'Veloce', 'Milano Cortina 2026'],
+            motorization: 'Mild Hybrid 175 CV / Plug-in 270 CV / Diesel 130 CV',
+            price: 'Da 39.850 euro',
+            note: 'Restyling 2026 presentato ottobre 2025',
+            keywords: ['tonale']
+          },
+          {
+            name: 'Giulia',
+            type: 'Berlina sportiva segmento D',
+            length: '4.64 metri',
+            motorization: 'Diesel 2.2 (160 CV / 210 CV Q4)',
+            production: 'Cassino, Italia',
+            note: 'In produzione fino al 2027. Nuova generazione elettrica nel 2027',
+            keywords: ['giulia']
+          },
+          {
+            name: 'Stelvio',
+            type: 'SUV sportivo segmento D',
+            length: '4.69 metri',
+            motorization: 'Diesel 2.2 (160 CV / 210 CV Q4)',
+            production: 'Cassino, Italia',
+            note: 'In produzione fino al 2027. Nuova generazione elettrica seconda metà 2027',
+            keywords: ['stelvio']
+          },
+          {
+            name: '33 Stradale',
+            type: 'Supercar edizione limitata',
+            production: '33 esemplari',
+            price: 'Oltre 2 milioni euro',
+            status: 'SOLD OUT',
+            motorization: 'V6 benzina / Elettrica',
+            keywords: ['33 stradale']
+          }
+        ],
+        comingSoon: [
+          {
+            name: 'Giulia (2a generazione)',
+            launch: '2027',
+            type: 'Berlina elettrica/ibrida',
+            platform: 'STLA Large',
+            production: 'Cassino',
+            keywords: ['nuova giulia', 'giulia elettrica']
+          },
+          {
+            name: 'Stelvio (2a generazione)',
+            launch: 'Seconda metà 2027',
+            type: 'SUV elettrico/ibrido',
+            platform: 'STLA Large',
+            keywords: ['nuovo stelvio', 'stelvio elettrico']
+          }
+        ],
+        discontinued: [
+          {
+            name: 'Giulietta',
+            endDate: '2020',
+            replacement: 'Tonale / Junior',
+            note: 'Fuori produzione dal 2020',
+            keywords: ['giulietta']
+          },
+          {
+            name: 'MiTo',
+            endDate: '2018',
+            replacement: 'Junior',
+            keywords: ['mito']
+          },
+          {
+            name: '159',
+            endDate: '2011',
+            replacement: 'Giulia',
+            keywords: ['159']
+          }
+        ]
+      },
+
+      'lancia': {
+        brand: 'Lancia',
+        site: 'lancia.it',
+        inProduction: [
+          {
+            name: 'Ypsilon',
+            variants: ['Cassina', 'Edizione Limitata', 'LX', 'Elettrica'],
+            type: 'Citycar',
+            keywords: ['ypsilon', 'ipsilon', 'y']
+          }
+        ],
+        comingSoon: [],
+        discontinued: [
+          {
+            name: 'Delta',
+            endDate: '2014',
+            note: 'Fuori produzione dal 2014',
+            keywords: ['delta']
+          }
+        ]
+      }
     };
 
-    function isUsedCarQuery(text) {
-      const lower = text.toLowerCase();
-      const keywords = ['usato', 'usata', 'usati', 'usate', 'centroauto', 'ford', 'volkswagen'];
-      return keywords.some(k => lower.includes(k));
-    }
-
-    function getUsedCarsResponse(query) {
-      const lower = query.toLowerCase();
-      for (const [key, data] of Object.entries(USED_CARS)) {
-        if (lower.includes(key)) {
-          return `🚗 <b>${data.name.toUpperCase()} USATE</b><br><br>` +
-                 `📊 ${data.count} veicoli disponibili<br><br>` +
-                 `🔗 <a href="${data.link}" target="_blank">VAI ALLE ${data.name.toUpperCase()} USATE</a>`;
+    // Cerca modello nel database
+    function searchInOfficialDB(query) {
+      const lowerQuery = query.toLowerCase();
+      
+      for (const [brandKey, brandData] of Object.entries(OFFICIAL_MODELS_2026)) {
+        // Cerca nei modelli IN PRODUZIONE
+        for (const model of brandData.inProduction) {
+          if (model.keywords.some(kw => lowerQuery.includes(kw))) {
+            return {
+              status: 'IN_PRODUCTION',
+              brand: brandData.brand,
+              site: brandData.site,
+              model: model
+            };
+          }
+        }
+        
+        // Cerca nei modelli IN ARRIVO
+        for (const model of brandData.comingSoon) {
+          if (model.keywords.some(kw => lowerQuery.includes(kw))) {
+            return {
+              status: 'COMING_SOON',
+              brand: brandData.brand,
+              site: brandData.site,
+              model: model
+            };
+          }
+        }
+        
+        // Cerca nei modelli FUORI PRODUZIONE
+        for (const model of brandData.discontinued) {
+          if (model.keywords.some(kw => lowerQuery.includes(kw))) {
+            return {
+              status: 'DISCONTINUED',
+              brand: brandData.brand,
+              model: model
+            };
+          }
         }
       }
-      return `🚗 <b>AUTO USATE</b> su CentroAuto<br><br>` +
-             `🔗 <a href="https://www.centroautovt.it/ricerca-auto/usate" target="_blank">VEDI STOCK COMPLETO</a>`;
+      
+      return null;
     }
 
-    // Send message
+    // Cerca sul configuratore ufficiale
+    async function searchOfficialConfigurator(query, dbResult) {
+      try {
+        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(query)}`);
+        if (!response.ok) return null;
+        
+        const data = await response.json();
+        if (!data.results || data.results.length === 0) return null;
+        
+        const officialDomains = ['fiat.it', 'jeep-official.it', 'alfaromeo.it', 'lancia.it'];
+        const results = data.results.filter(r => 
+          officialDomains.some(d => r.url.includes(d))
+        );
+        
+        if (results.length === 0) return null;
+        
+        return {
+          found: true,
+          results: results.slice(0, 2)
+        };
+      } catch (error) {
+        console.error('Errore configuratore:', error);
+        return null;
+      }
+    }
+
+    // Ricerca Google (SEMPRE come fallback)
+    async function searchGoogle(query) {
+      try {
+        const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error('Errore ricerca');
+        
+        const data = await response.json();
+        if (!data.results || data.results.length === 0) return null;
+        
+        const results = data.results.slice(0, 3);
+        let context = `RISULTATI GOOGLE:\n\n`;
+        results.forEach((r, i) => {
+          context += `[${i+1}] ${r.title}\n${r.description}\nFonte: ${r.url}\n\n`;
+        });
+        
+        return { context, results };
+      } catch (error) {
+        console.error('Errore Google:', error);
+        return null;
+      }
+    }
+
+    // Estrai dati con AI
+    async function extractData(searchResults, query) {
+      try {
+        const messages = [
+          {
+            role: "system",
+            content: `Estrai SOLO dati PRECISI. Non inventare.
+
+Se trovi un modello FUORI PRODUZIONE (es: Giulietta, Punto, ecc.), dillo chiaramente:
+"⚠️ [MODELLO] non è più in produzione dal [ANNO]"
+
+Poi suggerisci modelli simili attuali.
+
+FORMATO:
+📊 [MODELLO]
+✓ Dato: valore (fonte)
+✗ Non trovato
+
+Se fuori produzione:
+⚠️ FUORI PRODUZIONE dal [anno]
+💡 Modelli simili attuali: [lista]`
+          },
+          {
+            role: "user",
+            content: `Domanda: "${query}"\n\n${searchResults.context}`
+          }
+        ];
+        
+        const response = await fetch(BACKEND_CHAT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages }),
+        });
+        
+        if (!response.ok) throw new Error('Errore AI');
+        
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content || null;
+      } catch (error) {
+        console.error('Errore estrazione:', error);
+        return null;
+      }
+    }
+
+    // Send message - INTELLIGENZA CON DATABASE UFFICIALE 2026
     async function sendMessage() {
       const userMessage = chatInputField.value.trim();
       if (!userMessage) return;
@@ -1041,8 +1426,137 @@ Rispondi in modo SCHEMATICO.`
       showTyping();
 
       try {
-        if (isTechnicalQuery(userMessage)) {
-          // RICERCA GOOGLE per dati tecnici
+        // STEP 1: Cerca nel database ufficiale
+        const dbResult = searchInOfficialDB(userMessage);
+        
+        if (dbResult && dbResult.status === 'DISCONTINUED') {
+          // MODELLO FUORI PRODUZIONE
+          hideTyping();
+          
+          let response = `⚠️ <b>MODELLO FUORI PRODUZIONE</b><br><br>`;
+          response += `<b>${dbResult.model.name}</b> ${dbResult.brand}<br>`;
+          response += `📅 Fine produzione: ${dbResult.model.endDate}<br><br>`;
+          
+          if (dbResult.model.note) {
+            response += `ℹ️ ${dbResult.model.note}<br><br>`;
+          }
+          
+          if (dbResult.model.replacement) {
+            response += `💡 <b>MODELLO ATTUALE SIMILE:</b><br>`;
+            response += `${dbResult.model.replacement}<br><br>`;
+            response += `Vuoi info sul ${dbResult.model.replacement}? Chiedimi pure! 😊`;
+          }
+          
+          addMessage(response, "ai");
+          
+        } else if (dbResult && dbResult.status === 'IN_PRODUCTION') {
+          // MODELLO IN PRODUZIONE - Cerca configuratore
+          addMessage(`🔍 Cerco info sul configuratore ${dbResult.brand}...`, 'ai');
+          
+          const officialQuery = `${dbResult.brand} ${dbResult.model.name} allestimenti versioni prezzo site:${dbResult.site}`;
+          const officialResults = await searchOfficialConfigurator(officialQuery, dbResult);
+          
+          if (officialResults && officialResults.results.length > 0) {
+            // Trovato sul configuratore
+            let context = `CONFIGURATORE UFFICIALE ${dbResult.brand.toUpperCase()}:\n\n`;
+            context += `MODELLO: ${dbResult.model.name}\n`;
+            if (dbResult.model.type) context += `Tipo: ${dbResult.model.type}\n`;
+            if (dbResult.model.motorization) context += `Motorizzazioni: ${dbResult.model.motorization}\n`;
+            if (dbResult.model.variants) context += `Allestimenti: ${dbResult.model.variants.join(', ')}\n`;
+            if (dbResult.model.price) context += `Prezzo: ${dbResult.model.price}\n`;
+            context += `\n`;
+            
+            officialResults.results.forEach((r, i) => {
+              context += `[${i+1}] ${r.title}\n${r.description}\n${r.url}\n\n`;
+            });
+
+            const aiResponse = await fetch(BACKEND_CHAT, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                messages: [
+                  {
+                    role: "system",
+                    content: `Sei un esperto auto. Rispondi in modo SCHEMATICO (max 10 righe).
+                    
+Usa SOLO i dati del configuratore ufficiale forniti.
+
+FORMATO:
+📊 [MODELLO]
+• Info essenziale 1
+• Info essenziale 2
+• Info essenziale 3
+
+💰 Prezzo (se disponibile)
+🔗 Configuratore`
+                  },
+                  {
+                    role: "user",
+                    content: `Domanda: "${userMessage}"\n\nDATI UFFICIALI:\n${context}`
+                  }
+                ]
+              }),
+            });
+
+            const aiData = await aiResponse.json();
+            hideTyping();
+            
+            let finalResponse = aiData.choices?.[0]?.message?.content || "Info non disponibili.";
+            finalResponse = escapeHtml(finalResponse);
+            
+            finalResponse += '<br><br>━━━━━━━━━━<br><br>📎 <b>CONFIGURATORE:</b><br>';
+            officialResults.results.forEach((r, i) => {
+              finalResponse += `${i+1}. <a href="${r.url}" target="_blank">${r.title}</a><br>`;
+            });
+            
+            addMessage(finalResponse, "ai");
+          } else {
+            // Non trovato sul configuratore → Google fallback
+            hideTyping();
+            addMessage(`⚠️ Non trovato sul configuratore.<br>🔍 Cerco su Google...`, 'ai');
+            showTyping();
+            
+            const googleResults = await searchGoogle(`${dbResult.brand} ${dbResult.model.name} ${userMessage}`);
+            
+            if (googleResults) {
+              const extractedData = await extractData(googleResults, userMessage);
+              hideTyping();
+              
+              if (extractedData) {
+                let response = extractedData + '<br><br>━━━━━━━━━━<br><br>📎 <b>FONTI:</b><br>';
+                googleResults.results.forEach((r, i) => {
+                  response += `${i+1}. <a href="${r.url}" target="_blank">${r.title}</a><br>`;
+                });
+                addMessage(response, "ai");
+              } else {
+                addMessage('❌ Non ho trovato informazioni precise.', "ai");
+              }
+            } else {
+              hideTyping();
+              addMessage('❌ Nessun risultato trovato.', "ai");
+            }
+          }
+          
+        } else if (dbResult && dbResult.status === 'COMING_SOON') {
+          // MODELLO IN ARRIVO
+          hideTyping();
+          
+          let response = `🚀 <b>NOVITÀ IN ARRIVO</b><br><br>`;
+          response += `<b>${dbResult.model.name}</b> ${dbResult.brand}<br>`;
+          response += `📅 Lancio previsto: ${dbResult.model.launch}<br>`;
+          if (dbResult.model.type) response += `🚗 Tipo: ${dbResult.model.type}<br>`;
+          if (dbResult.model.motorization) response += `⚡ Motore: ${dbResult.model.motorization}<br>`;
+          if (dbResult.model.power) response += `💪 Potenza: ${dbResult.model.power}<br>`;
+          if (dbResult.model.features) response += `✨ ${dbResult.model.features}<br>`;
+          
+          addMessage(response, "ai");
+          
+        } else {
+          // NON TROVATO NEL DATABASE - usa Google
+          hideTyping();
+          addMessage(`🔍 Cerco su Google...`, 'ai');
+          showTyping();
+          
           const googleResults = await searchGoogle(userMessage);
           
           if (googleResults) {
@@ -1056,37 +1570,14 @@ Rispondi in modo SCHEMATICO.`
               });
               addMessage(response, "ai");
             } else {
-              addMessage('❌ Non ho trovato dati precisi.', "ai");
+              addMessage('❌ Non ho trovato informazioni.', "ai");
             }
           } else {
             hideTyping();
-            addMessage('❌ Nessun risultato su Google.', "ai");
+            addMessage('❌ Nessun risultato trovato.', "ai");
           }
-        } else if (isUsedCarQuery(userMessage)) {
-          // AUTO USATE
-          hideTyping();
-          addMessage(getUsedCarsResponse(userMessage), "ai");
-        } else {
-          // RISPOSTA AI NORMALE
-          const messages = [
-            { role: "system", content: "Sei un assistente auto. Rispondi in modo SCHEMATICO (max 10 righe)." },
-            { role: "user", content: userMessage }
-          ];
-
-          const response = await fetch(BACKEND_CHAT, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ messages }),
-          });
-
-          if (!response.ok) throw new Error('Errore AI');
-
-          const data = await response.json();
-          hideTyping();
-
-          const aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho capito.";
-          addMessage(escapeHtml(aiMessage), "ai");
         }
+
       } catch (error) {
         hideTyping();
         console.error("Errore:", error);
