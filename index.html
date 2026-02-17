@@ -558,11 +558,11 @@
       <aside class="panel">
         <div class="panelHeader">
           <div>
-            <div class="panelTitle">ðŸ“° Ultime News</div>
+            <div class="panelTitle">&#128240; Ultime News</div>
             <div class="muted panelSub">Visibili solo dopo login.</div>
             <div id="status" class="muted">Effettua il login per caricare le news.</div>
           </div>
-          <button id="refreshBtn" class="btn" disabled>ðŸ”„</button>
+          <button id="refreshBtn" class="btn" disabled>&#128260;</button>
         </div>
 
         <div class="newsScroll">
@@ -621,24 +621,13 @@
     <div class="chatMessages" id="chatMessages">
       <!-- Messaggio di benvenuto -->
       <div class="message ai">
-        <div class="messageBubble">ðŸ‘‹ Ciao! Sono l'assistente AI BOTT specializzato in auto nuove e usate.
+        <div class="messageBubble">Ciao! &#128075; Sono <strong>AI BOTT</strong>, il tuo assistente auto.
 
-ðŸ” Posso aiutarti con:
+&#128269; Chiedimi di:
+&#8226; Auto <strong>nuove</strong> &mdash; Fiat, Jeep, Alfa, Lancia
+&#8226; Auto <strong>usate</strong> &mdash; CentroAuto VT (Ford, Jeep, Opel, VW...)
 
-ðŸ†• AUTO NUOVE (Fiat, Jeep, Alfa, Lancia)
-â€¢ Allestimenti e versioni
-â€¢ Dotazioni e optional
-â€¢ Motorizzazioni e prezzi
-
-ðŸš— AUTO USATE (CentroAuto VT)
-â€¢ Ford, Jeep, Kia, Lancia, Land Rover
-â€¢ MAN, Mazda, MG, Opel, Peugeot
-â€¢ Renault, Seat, Smart, Suzuki, VW
-â€¢ Prezzi, km, anno, accessori
-
-Esempi:
-"Ford usate disponibili"
-"Confronta Compass Longitude e Limited" ðŸ’¡</div>
+&#9997; Es: <em>&ldquo;Ford usata&rdquo;</em> oppure <em>&ldquo;Compass allestimenti&rdquo;</em></div></div>
       </div>
     </div>
 
@@ -731,13 +720,13 @@ Esempi:
         return `
           <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">
             <div class="newsTitle">${escapeHtml(title)}</div>
-            ${host ? `<div class="newsMeta">ðŸ”— ${escapeHtml(host)}</div>` : ""}
-            ${date ? `<div class="newsDate">ðŸ• ${escapeHtml(date)}</div>` : ""}
+            ${host ? `<div class="newsMeta">&#128279; ${escapeHtml(host)}</div>` : ""}
+            ${date ? `<div class="newsDate">&#128336; ${escapeHtml(date)}</div>` : ""}
           </a>
         `;
       }).join("");
 
-      setStatus(`âœ… ${items.length} news caricate â€¢ ${new Date().toLocaleString("it-IT")}`);
+      setStatus(`✅ ${items.length} news caricate • ${new Date().toLocaleString("it-IT")}`);
     }
 
     const app = initializeApp(firebaseConfig);
@@ -764,7 +753,7 @@ Esempi:
       const user = auth.currentUser;
       if (!user) {
         $("newsList").innerHTML = "";
-        setStatus("ðŸ”’ Effettua il login per vedere le news.");
+        setStatus("🔒 Effettua il login per vedere le news.");
         return;
       }
 
@@ -798,7 +787,7 @@ Esempi:
 
     $("loginBtn").addEventListener("click", async () => {
       try {
-        setStatus("ðŸ” Apertura login Google...");
+        setStatus("📲 Apertura login Google...");
 
         try {
           const result = await signInWithPopup(auth, provider);
@@ -807,7 +796,7 @@ Esempi:
           if (popupError.code === "auth/popup-blocked" ||
               popupError.code === "auth/popup-closed-by-user" ||
               popupError.code === "auth/cancelled-popup-request") {
-            setStatus("ðŸ”„ Reindirizzamento in corso...");
+            setStatus("🔄 Reindirizzamento in corso...");
             await signInWithRedirect(auth, provider);
           } else {
             throw popupError;
@@ -826,7 +815,7 @@ Esempi:
       try {
         await signOut(auth);
         $("newsList").innerHTML = "";
-        setStatus("ðŸ‘‹ Logout effettuato.");
+        setStatus("Logout effettuato.");
       } catch (e) {
         setStatus("âŒ Errore logout: " + (e.code || e.message));
       }
@@ -852,7 +841,7 @@ Esempi:
 
         loadNews();
       } else {
-        $("userPill").textContent = "ðŸ”’ Non autenticato";
+        $("userPill").textContent = "Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor = "";
         $("userPill").style.background = "";
@@ -862,7 +851,7 @@ Esempi:
         $("refreshBtn").disabled = true;
 
         $("newsList").innerHTML = "";
-        setStatus("ðŸ”’ Effettua il login per caricare le news.");
+        setStatus("Effettua il login per caricare le news.");
       }
     });
 
@@ -1144,7 +1133,7 @@ Renault (3), Seat (1), Smart (1), Suzuki (1), Volkswagen (4)
 
 â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
 
-ðŸ“‹ REGOLE FONDAMENTALI:
+[REGOLE FONDAMENTALI]
 1. Risposte SCHEMATICHE e CONCISE (max 10 righe)
 2. Usa ELENCHI PUNTATI per chiarezza
 3. Evidenzia solo INFO ESSENZIALI
@@ -1152,7 +1141,7 @@ Renault (3), Seat (1), Smart (1), Suzuki (1), Volkswagen (4)
 
 â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
 
-ðŸ†• FORMATO PER AUTO NUOVE:
+[FORMATO AUTO NUOVE]
 
 Per INFO GENERALI:
 âœ“ Punto chiave 1
@@ -1160,28 +1149,28 @@ Per INFO GENERALI:
 âœ“ Punto chiave 3
 
 Per CONFRONTI ALLESTIMENTI:
-ðŸ”´ ALLESTIMENTO 1
-â€¢ Caratteristica esclusiva 1
-â€¢ Caratteristica esclusiva 2
+>> ALLESTIMENTO 1
+- Caratteristica esclusiva 1
+- Caratteristica esclusiva 2
 
-ðŸ”µ ALLESTIMENTO 2  
-â€¢ Caratteristica esclusiva 1
-â€¢ Caratteristica esclusiva 2
+>> ALLESTIMENTO 2
+- Caratteristica esclusiva 1
+- Caratteristica esclusiva 2
 
-ðŸ’¡ CONSIGLIO: [suggerimento breve]
+[!] CONSIGLIO: [suggerimento breve]
 
 â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
 
-ðŸš— FORMATO PER AUTO USATE:
+[FORMATO AUTO USATE]
 
 Elenca le auto trovate cosÃ¬:
 â”â”â” MARCA MODELLO â”â”â”
-ðŸ“… Anno: XXXX
-ðŸ›£ï¸ Km: XXX.XXX
-ðŸ’° Prezzo: â‚¬XX.XXX
+Anno: XXXX
+Km: XXX.XXX
+Prezzo: euro XX.XXX
 âš™ï¸ Motore: [info motore]
-ðŸŽ¯ Accessori principali: [lista]
-ðŸ”— Link: [url]
+Accessori principali: [lista]
+Link: [url]
 
 IMPORTANTE per USATO:
 - Specifica SEMPRE: marca, modello, prezzo, km, anno
