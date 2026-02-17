@@ -742,7 +742,7 @@
 
       try{
         const result = await getRedirectResult(auth);
-        if (result?.user) setStatus("âœ… Login riuscito! Benvenuto " + result.user.email);
+        if (result?.user) setStatus("Login riuscito! Benvenuto " +
       }catch(e){
         setStatus("âŒ Errore login: " + (e.code || e.message));
       }
@@ -790,7 +790,7 @@
 
         try {
           const result = await signInWithPopup(auth, provider);
-          setStatus("âœ… Login riuscito! Benvenuto " + result.user.email);
+          setStatus("Login riuscito! Benvenuto " + result.user.email);
         } catch (popupError) {
           if (popupError.code === "auth/popup-blocked" ||
               popupError.code === "auth/popup-closed-by-user" ||
@@ -829,7 +829,7 @@
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        $("userPill").textContent = "âœ… " + (user.email || "Utente");
+        $("userPill").textContent = "✅ " + (user.email || "Utente");
         $("userPill").classList.remove("muted");
         $("userPill").style.borderColor = "rgba(34,197,94,.5)";
         $("userPill").style.background = "rgba(34,197,94,.1)";
@@ -1126,67 +1126,65 @@ AUTO NUOVE: Fiat, Jeep, Alfa Romeo, Lancia (configuratori ufficiali)
 AUTO USATE: CentroAuto VT (https://www.centroautovt.it/)
 
 MARCHE USATO DISPONIBILI:
-Ford (9), Jeep (13), Kia (1), Lancia (4), Land Rover (1), 
-MAN (1), Mazda (2), MG (2), Opel (2), Peugeot (2), 
+Ford (9), Jeep (13), Kia (1), Lancia (4), Land Rover (1),
+MAN (1), Mazda (2), MG (2), Opel (2), Peugeot (2),
 Renault (3), Seat (1), Smart (1), Suzuki (1), Volkswagen (4)
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+================================
 
-[REGOLE FONDAMENTALI]
+REGOLE FONDAMENTALI:
 1. Risposte SCHEMATICHE e CONCISE (max 10 righe)
-2. Usa ELENCHI PUNTATI per chiarezza
+2. Usa elenchi puntati con trattino (-)
 3. Evidenzia solo INFO ESSENZIALI
-4. SEMPRE basati SOLO sui dati forniti dai siti ufficiali
+4. Basati SOLO sui dati forniti
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+================================
 
-[FORMATO AUTO NUOVE]
+FORMATO AUTO NUOVE:
 
 Per INFO GENERALI:
-âœ“ Punto chiave 1
-âœ“ Punto chiave 2
-âœ“ Punto chiave 3
+- Punto chiave 1
+- Punto chiave 2
+- Punto chiave 3
 
 Per CONFRONTI ALLESTIMENTI:
->> ALLESTIMENTO 1
+[ALLESTIMENTO 1]
 - Caratteristica esclusiva 1
 - Caratteristica esclusiva 2
 
->> ALLESTIMENTO 2
+[ALLESTIMENTO 2]
 - Caratteristica esclusiva 1
 - Caratteristica esclusiva 2
 
-[!] CONSIGLIO: [suggerimento breve]
+Consiglio: [suggerimento breve]
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+================================
 
-[FORMATO AUTO USATE]
+FORMATO AUTO USATE:
 
-Elenca le auto trovate cosÃ¬:
-â”â”â” MARCA MODELLO â”â”â”
+Per ogni auto trovata usa ESATTAMENTE questo schema:
+--- MARCA MODELLO ---
 Anno: XXXX
 Km: XXX.XXX
 Prezzo: euro XX.XXX
-âš™ï¸ Motore: [info motore]
-Accessori principali: [lista]
-Link: [url]
+Motore: [info motore]
+Accessori: [lista]
+Link: https://www.centroautovt.it/ricerca-auto/usate?brand=SLUG
 
-IMPORTANTE per USATO:
-- Specifica SEMPRE: marca, modello, prezzo, km, anno
-- Elenca gli accessori/dotazioni principali
+REGOLE USATO:
+- Mostra SEMPRE marca, modello, prezzo, km, anno
 - Max 3-4 auto per risposta
-- Se chiede confronto tra usate, fai tabella comparativa
-- Se chiede una marca specifica (Ford, Kia, Peugeot, ecc.), filtra solo quella
-- MOSTRA SEMPRE il link CentroAuto come testo semplice (non HTML): https://www.centroautovt.it/ricerca-auto/usate?brand=SLUG
-- NON usare tag HTML per i link, scrivi solo lURL nudo
+- Filtra per marca se richiesta
+- Scrivi i link come testo semplice (NO tag HTML)
+- Usa solo lettere normali, NO emoji nei testi strutturati
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+================================
 
-âš ï¸ IMPORTANTE:
-- NO informazioni generiche
-- NO lunghe descrizioni narrative  
-- SÃŒ a dati concreti e verificabili
-- Se non hai dati precisi, dillo chiaramente`;
+ATTENZIONE:
+- NO informazioni inventate
+- NO descrizioni narrative lunghe
+- Se non hai dati precisi, dillo chiaramente
+- Usa SOLO testo ASCII nei formati strutturati (niente emoji nei campi dati)`;
 
 
     // Send message to AI
@@ -1238,11 +1236,7 @@ IMPORTANTE per USATO:
 
         let aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho capito.";
         
-        // Escape HTML ma mantieni i \n per la formattazione
-        aiMessage = aiMessage.replace(/[&<>"']/g, c => ({
-          "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-        }[c]));
-        
+        // linkify gestisce l'escape HTML - non fare doppio escape qui
         addMessage(aiMessage, "ai");
 
         chatHistory.push({ role: "assistant", content: aiMessage });
