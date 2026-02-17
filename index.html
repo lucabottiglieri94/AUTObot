@@ -660,7 +660,7 @@
                 font-family:inherit;transition:border-color .2s"
               onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'"
             />
-            <button id="cmpBtn" onclick="startComparison()" style="
+            <button id="cmpBtn"  style="
               background:linear-gradient(135deg,#3b82f6,#60a5fa);
               border:none;border-radius:10px;padding:10px 20px;
               color:#fff;font-weight:700;font-size:14px;cursor:pointer;
@@ -673,10 +673,10 @@
           <!-- Quick suggestions -->
           <div style="padding:10px 20px;border-bottom:1px solid rgba(31,41,55,.4);display:flex;gap:8px;flex-wrap:wrap;">
             <span style="color:#9ca3af;font-size:12px;align-self:center;">Rapido:</span>
-            <button class="cmpSuggest" onclick="setSuggest('Grande Panda','Junior')">Grande Panda vs Junior</button>
-            <button class="cmpSuggest" onclick="setSuggest('Compass','Tonale')">Compass vs Tonale</button>
-            <button class="cmpSuggest" onclick="setSuggest('Stelvio','Renegade')">Stelvio vs Renegade</button>
-            <button class="cmpSuggest" onclick="setSuggest('Ypsilon','Avenger')">Ypsilon vs Avenger</button>
+            <button class="cmpSuggest" data-s1="Grande Panda" data-s2="Junior">Grande Panda vs Junior</button>
+            <button class="cmpSuggest" data-s1="Compass" data-s2="Tonale">Compass vs Tonale</button>
+            <button class="cmpSuggest" data-s1="Stelvio" data-s2="Renegade">Stelvio vs Renegade</button>
+            <button class="cmpSuggest" data-s1="Ypsilon" data-s2="Avenger">Ypsilon vs Avenger</button>
           </div>
 
           <!-- Results area -->
@@ -1290,6 +1290,15 @@ ATTENZIONE: NO info inventate. NO emoji nei campi dati. Solo testo ASCII.`;
         '</div>' +
         '<div class="cmpVerdict"><strong style="color:#60a5fa;">&#9654; Verdetto:</strong> ' + (cmp.verdetto||'Nessun verdetto disponibile.') + '</div>';
     }
+
+    // Wiring bottoni comparatore via addEventListener (no onclick inline)
+    document.getElementById('cmpBtn').addEventListener('click', startComparison);
+
+    document.querySelectorAll('.cmpSuggest').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setSuggest(btn.dataset.s1, btn.dataset.s2);
+      });
+    });
 
   </script>
 </body>
