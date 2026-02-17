@@ -495,6 +495,81 @@
       }
     }
 
+    /* ===== COMPARATORE ===== */
+    .cmpSuggest{
+      background:rgba(59,130,246,.12);
+      border:1px solid rgba(59,130,246,.3);
+      border-radius:999px;
+      padding:4px 10px;
+      color:#93c5fd;
+      font-size:11px;
+      cursor:pointer;
+      transition:all .2s;
+      font-family:inherit;
+    }
+    .cmpSuggest:hover{
+      background:rgba(59,130,246,.25);
+      border-color:rgba(59,130,246,.6);
+    }
+    .cmpCard{
+      flex:1;
+      min-width:220px;
+      background:rgba(31,41,55,.45);
+      border:1px solid rgba(59,130,246,.2);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .cmpCardHeader{
+      padding:12px 16px;
+      font-weight:800;
+      font-size:15px;
+      border-bottom:1px solid rgba(31,41,55,.8);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .cmpCardHeader.left{ background:rgba(59,130,246,.18); }
+    .cmpCardHeader.right{ background:rgba(96,165,250,.14); }
+    .cmpRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      padding:9px 16px;
+      border-bottom:1px solid rgba(31,41,55,.4);
+      font-size:13px;
+      gap:8px;
+    }
+    .cmpRow:last-child{ border-bottom:none; }
+    .cmpLabel{ color:#9ca3af; white-space:nowrap; min-width:90px; }
+    .cmpVal{ color:#e5e7eb; text-align:right; font-weight:600; }
+    .cmpWin{ color:#4ade80; }
+    .cmpVerdict{
+      margin-top:16px;
+      padding:14px 16px;
+      background:rgba(59,130,246,.1);
+      border:1px solid rgba(59,130,246,.25);
+      border-radius:12px;
+      font-size:13px;
+      line-height:1.6;
+      color:#e5e7eb;
+    }
+    .cmpLoading{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:40px;
+      color:#9ca3af;
+      font-size:14px;
+    }
+    .cmpDot{
+      width:8px;height:8px;border-radius:50%;
+      background:#3b82f6;
+      animation:bounce 1.4s infinite ease-in-out;
+    }
+    .cmpDot:nth-child(2){animation-delay:.2s}
+    .cmpDot:nth-child(3){animation-delay:.4s}
+
     @media (max-width: 768px){
       .btn{padding:8px 10px;font-size:13px}
       .brandLogo{width:30px;height:30px}
@@ -571,11 +646,79 @@
       </aside>
 
       <!-- CONTENUTI A DESTRA -->
-      <section class="rightSpace">
-        <div style="font-weight:950;font-size:18px">Area contenuti</div>
-        <div class="muted" style="margin-top:8px;line-height:1.45">
-          Qui puoi mettere descrizione, KPI, link rapidi o altri contenuti.
+      <section class="rightSpace" style="padding:0;border:none;background:none;">
+
+        <!-- ===== COMPARATORE AUTO ===== -->
+        <div id="comparatorPanel" style="
+          background:rgba(17,24,39,.78);
+          border:1px solid #1f2937;
+          border-radius:16px;
+          overflow:hidden;
+        ">
+          <!-- Header -->
+          <div style="
+            padding:16px 20px;
+            border-bottom:1px solid rgba(31,41,55,.75);
+            background:rgba(10,12,18,.35);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            flex-wrap:wrap;
+          ">
+            <div>
+              <div style="font-weight:950;font-size:18px">&#9878; Comparatore Auto</div>
+              <div style="color:#9ca3af;font-size:13px;margin-top:4px">Confronta due auto fianco a fianco</div>
+            </div>
+            <button id="cmpResetBtn" class="btn" style="font-size:12px;padding:7px 12px;">
+              &#10227; Reset
+            </button>
+          </div>
+
+          <!-- Input row -->
+          <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.5);display:flex;gap:10px;flex-wrap:wrap;">
+            <input id="cmpInput1" type="text" placeholder="Auto 1 — es. Jeep Compass Longitude"
+              style="flex:1;min-width:180px;background:rgba(31,41,55,.6);border:1px solid #1f2937;
+                border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;
+                font-family:inherit;transition:border-color .2s"
+              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'"
+            />
+            <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;font-weight:700;">VS</div>
+            <input id="cmpInput2" type="text" placeholder="Auto 2 — es. Fiat Tipo Cross"
+              style="flex:1;min-width:180px;background:rgba(31,41,55,.6);border:1px solid #1f2937;
+                border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;
+                font-family:inherit;transition:border-color .2s"
+              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'"
+            />
+            <button id="cmpBtn" onclick="startComparison()" style="
+              background:linear-gradient(135deg,#3b82f6,#60a5fa);
+              border:none;border-radius:10px;padding:10px 20px;
+              color:#fff;font-weight:700;font-size:14px;cursor:pointer;
+              transition:all .2s;white-space:nowrap;font-family:inherit;
+            "
+              onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 16px rgba(59,130,246,.4)'"
+              onmouseout="this.style.transform='none';this.style.boxShadow='none'"
+            >
+              &#128269; Confronta
+            </button>
+          </div>
+
+          <!-- Quick suggestions -->
+          <div style="padding:10px 20px;border-bottom:1px solid rgba(31,41,55,.4);display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="color:#9ca3af;font-size:12px;align-self:center;">Esempio rapido:</span>
+            <button class="cmpSuggest" onclick="setSuggest('Jeep Compass Longitude','Jeep Compass Limited')">Compass Longitude vs Limited</button>
+            <button class="cmpSuggest" onclick="setSuggest('Fiat Panda','Fiat Tipo')">Panda vs Tipo</button>
+            <button class="cmpSuggest" onclick="setSuggest('Alfa Romeo Giulia','Alfa Romeo Stelvio')">Giulia vs Stelvio</button>
+          </div>
+
+          <!-- Results area -->
+          <div id="cmpResults" style="padding:20px;min-height:120px;">
+            <div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">
+              &#8593; Inserisci due auto e premi Confronta
+            </div>
+          </div>
         </div>
+
       </section>
     </div>
   </main>
@@ -1261,6 +1404,211 @@ ATTENZIONE:
         sendMessage();
       }
     });
+
+    // ===== COMPARATORE AUTO =====
+    const BACKEND_CHAT_URL = "https://auto-backend-three.vercel.app/api/chat";
+
+    function setSuggest(a, b) {
+      document.getElementById('cmpInput1').value = a;
+      document.getElementById('cmpInput2').value = b;
+      document.getElementById('cmpInput1').style.borderColor = '#3b82f6';
+      document.getElementById('cmpInput2').style.borderColor = '#3b82f6';
+    }
+
+    document.getElementById('cmpResetBtn').addEventListener('click', () => {
+      document.getElementById('cmpInput1').value = '';
+      document.getElementById('cmpInput2').value = '';
+      document.getElementById('cmpResults').innerHTML = `
+        <div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">
+          &#8593; Inserisci due auto e premi Confronta
+        </div>`;
+    });
+
+    // Enter key on inputs
+    ['cmpInput1','cmpInput2'].forEach(id => {
+      document.getElementById(id).addEventListener('keypress', e => {
+        if (e.key === 'Enter') startComparison();
+      });
+    });
+
+    async function startComparison() {
+      const car1 = document.getElementById('cmpInput1').value.trim();
+      const car2 = document.getElementById('cmpInput2').value.trim();
+      const results = document.getElementById('cmpResults');
+      const btn = document.getElementById('cmpBtn');
+
+      if (!car1 || !car2) {
+        results.innerHTML = `<div style="text-align:center;color:#f87171;padding:20px;font-size:13px;">
+          &#9888; Inserisci entrambe le auto da confrontare!
+        </div>`;
+        return;
+      }
+
+      // Loading
+      btn.disabled = true;
+      results.innerHTML = `
+        <div class="cmpLoading">
+          <div class="cmpDot"></div>
+          <div class="cmpDot"></div>
+          <div class="cmpDot"></div>
+          <span>Analisi in corso...</span>
+        </div>`;
+
+      try {
+        const prompt = `Confronta queste due auto in modo PRECISO e STRUTTURATO.
+Restituisci SOLO un JSON valido, nessun testo fuori dal JSON.
+
+Auto 1: ${car1}
+Auto 2: ${car2}
+
+Formato JSON richiesto (rispetta ESATTAMENTE questa struttura):
+{
+  "auto1": {
+    "nome": "Nome completo auto 1",
+    "prezzo": "es. da 22.000 euro",
+    "motore": "es. 1.6 MultiJet 130cv",
+    "consumi": "es. 5.5 L/100km",
+    "bagagliaio": "es. 440 L",
+    "dimensioni": "es. 4.51m",
+    "punti_forza": ["punto 1", "punto 2", "punto 3"],
+    "punti_deboli": ["punto 1", "punto 2"]
+  },
+  "auto2": {
+    "nome": "Nome completo auto 2",
+    "prezzo": "es. da 19.500 euro",
+    "motore": "es. 1.0 FireFly 100cv",
+    "consumi": "es. 6.0 L/100km",
+    "bagagliaio": "es. 380 L",
+    "dimensioni": "es. 4.37m",
+    "punti_forza": ["punto 1", "punto 2", "punto 3"],
+    "punti_deboli": ["punto 1", "punto 2"]
+  },
+  "verdetto": "Breve verdetto di 2-3 righe su quale scegliere e perche, in base al tipo di utilizzo.",
+  "migliore_prezzo": "auto1 o auto2",
+  "migliore_efficienza": "auto1 o auto2"
+}`;
+
+        const response = await fetch(BACKEND_CHAT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [
+              { role: 'system', content: 'Sei un esperto di automobili. Rispondi SOLO con JSON valido, senza markdown, senza backtick, senza testo aggiuntivo.' },
+              { role: 'user', content: prompt }
+            ]
+          })
+        });
+
+        if (!response.ok) throw new Error('Errore API');
+        const data = await response.json();
+        let raw = data.choices?.[0]?.message?.content || '';
+
+        // Strip markdown code blocks if present
+        raw = raw.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+
+        let cmp;
+        try {
+          cmp = JSON.parse(raw);
+        } catch(e) {
+          throw new Error('Risposta non valida dal server');
+        }
+
+        renderComparison(cmp, car1, car2);
+
+      } catch(err) {
+        results.innerHTML = `<div style="text-align:center;color:#f87171;padding:24px;font-size:13px;">
+          Errore: ${err.message || 'Impossibile completare il confronto'}.<br>
+          <span style="color:#9ca3af">Riprova tra qualche secondo.</span>
+        </div>`;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function renderComparison(cmp, q1, q2) {
+      const a1 = cmp.auto1;
+      const a2 = cmp.auto2;
+      const results = document.getElementById('cmpResults');
+
+      const betterPrice = cmp.migliore_prezzo;
+      const betterEff   = cmp.migliore_efficienza;
+
+      function badge(which, field) {
+        return which === field ? ' cmpWin" title="Migliore">&#9733; ' : '">';
+      }
+
+      function rows(a1, a2) {
+        const fields = [
+          { label: 'Prezzo', k: 'prezzo', winner: betterPrice },
+          { label: 'Motore', k: 'motore', winner: null },
+          { label: 'Consumi', k: 'consumi', winner: betterEff },
+          { label: 'Bagagliaio', k: 'bagagliaio', winner: null },
+          { label: 'Dimensioni', k: 'dimensioni', winner: null },
+        ];
+
+        return fields.map(f => `
+          <div class="cmpRow">
+            <span class="cmpLabel">${f.label}</span>
+            <div style="display:flex;gap:12px;flex:1;justify-content:flex-end;">
+              <span class="cmpVal${f.winner === 'auto1' ? ' cmpWin' : ''}" style="flex:1;text-align:center">${a1[f.k] || '—'}</span>
+              <span style="color:#374151;">|</span>
+              <span class="cmpVal${f.winner === 'auto2' ? ' cmpWin' : ''}" style="flex:1;text-align:center">${a2[f.k] || '—'}</span>
+            </div>
+          </div>`).join('');
+      }
+
+      function listItems(items, color) {
+        if (!items || !items.length) return '<li style="color:#9ca3af">—</li>';
+        return items.map(i => `<li style="color:${color};margin-bottom:4px">&#8226; ${i}</li>`).join('');
+      }
+
+      results.innerHTML = `
+        <!-- Header labels -->
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <div class="cmpCard">
+            <div class="cmpCardHeader left">&#128308; ${a1.nome || q1}</div>
+            ${rows(a1, a2)}
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;padding:0 4px;">
+            <div style="width:2px;height:60px;background:linear-gradient(180deg,transparent,rgba(59,130,246,.4),transparent);"></div>
+          </div>
+          <div class="cmpCard">
+            <div class="cmpCardHeader right">&#128309; ${a2.nome || q2}</div>
+            ${rows(a2, a1)}
+          </div>
+        </div>
+
+        <!-- Pro/Contro -->
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;background:rgba(31,41,55,.3);border-radius:12px;padding:12px 14px;">
+            <div style="font-weight:700;font-size:12px;color:#4ade80;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">
+              Punti forza &#128308;
+            </div>
+            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a1.punti_forza,'#d1fae5')}</ul>
+            <div style="font-weight:700;font-size:12px;color:#f87171;margin:10px 0 8px;text-transform:uppercase;letter-spacing:.5px;">
+              Punti deboli
+            </div>
+            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a1.punti_deboli,'#fecaca')}</ul>
+          </div>
+          <div style="flex:1;min-width:200px;background:rgba(31,41,55,.3);border-radius:12px;padding:12px 14px;">
+            <div style="font-weight:700;font-size:12px;color:#4ade80;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">
+              Punti forza &#128309;
+            </div>
+            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a2.punti_forza,'#d1fae5')}</ul>
+            <div style="font-weight:700;font-size:12px;color:#f87171;margin:10px 0 8px;text-transform:uppercase;letter-spacing:.5px;">
+              Punti deboli
+            </div>
+            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a2.punti_deboli,'#fecaca')}</ul>
+          </div>
+        </div>
+
+        <!-- Verdetto -->
+        <div class="cmpVerdict">
+          <strong style="color:#60a5fa;">&#9654; Verdetto:</strong> ${cmp.verdetto || 'Nessun verdetto disponibile.'}
+        </div>
+      `;
+    }
+
   </script>
 </body>
 </html>
