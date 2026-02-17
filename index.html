@@ -32,7 +32,7 @@
     }
 
     header{
-      position:sticky;
+      position:relative;
       top:0;
       z-index:10;
       background:rgba(10,10,12,.72);
@@ -862,8 +862,8 @@
         return `
           <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">
             <div class="newsTitle">${escapeHtml(title)}</div>
-            ${host ? `<div class="newsMeta">&#128279; ${escapeHtml(host)}</div>` : ""}
-            ${date ? `<div class="newsDate">&#128336; ${escapeHtml(date)}</div>` : ""}
+            ${host ? `<div class="newsMeta">🔗 ${escapeHtml(host)}</div>` : ""}
+            ${date ? `<div class="newsDate">🕐 ${escapeHtml(date)}</div>` : ""}
           </a>
         `;
       }).join("");
@@ -1407,6 +1407,52 @@ ATTENZIONE:
 
     // ===== COMPARATORE AUTO =====
     const BACKEND_CHAT_URL = "https://auto-backend-three.vercel.app/api/chat";
+    const BACKEND_SEARCH_URL = "https://auto-backend-three.vercel.app/api/search";
+
+    // Marche auto nuove supportate
+    const NEW_CAR_BRANDS = ['fiat','jeep','alfa romeo','alfa','lancia'];
+    const OFFICIAL_DOMAINS = ['fiat.it','jeep-official.it','alfaromeo.it','lancia.it'];
+
+    // Modelli noti per riconoscimento automatico marca
+    const MODEL_BRAND_MAP = {
+      // Fiat
+      'grande panda':'fiat','panda':'fiat','500':'fiat','500x':'fiat','500l':'fiat',
+      'tipo':'fiat','bravo':'fiat','punto':'fiat','ducato':'fiat','doblo':'fiat',
+      'freemont':'fiat','500e':'fiat','600':'fiat',
+      // Jeep
+      'renegade':'jeep','compass':'jeep','avenger':'jeep','wrangler':'jeep',
+      'cherokee':'jeep','grand cherokee':'jeep','gladiator':'jeep','commander':'jeep',
+      // Alfa Romeo
+      'giulia':'alfa romeo','stelvio':'alfa romeo','tonale':'alfa romeo',
+      'giulietta':'alfa romeo','mito':'alfa romeo','junior':'alfa romeo',
+      'brera':'alfa romeo','spider':'alfa romeo','147':'alfa romeo','156':'alfa romeo',
+      // Lancia
+      'ypsilon':'lancia','delta':'lancia','lybra':'lancia','musa':'lancia',
+      'voyager':'lancia','thema':'lancia',
+    };
+
+    function detectBrand(input) {
+      const lower = input.toLowerCase().trim();
+      // Check direct brand mention
+      for (const b of NEW_CAR_BRANDS) {
+        if (lower.includes(b)) return b === 'alfa' ? 'alfa romeo' : b;
+      }
+      // Check model map
+      for (const [model, brand] of Object.entries(MODEL_BRAND_MAP)) {
+        if (lower.includes(model)) return brand;
+      }
+      return null;
+    }
+
+    function brandDomain(brand) {
+      const map = {
+        'fiat': 'fiat.it',
+        'jeep': 'jeep-official.it',
+        'alfa romeo': 'alfaromeo.it',
+        'lancia': 'lancia.it'
+      };
+      return map[brand] || null;
+    }
 
     function setSuggest(a, b) {
       document.getElementById('cmpInput1').value = a;
@@ -1420,16 +1466,55 @@ ATTENZIONE:
       document.getElementById('cmpInput2').value = '';
       document.getElementById('cmpResults').innerHTML = `
         <div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">
-          &#8593; Inserisci due auto e premi Confronta
+          ↑ Inserisci due auto e premi Confronta
         </div>`;
     });
 
-    // Enter key on inputs
     ['cmpInput1','cmpInput2'].forEach(id => {
       document.getElementById(id).addEventListener('keypress', e => {
         if (e.key === 'Enter') startComparison();
       });
     });
+
+    async function fetchCarData(query) {
+      const brand = detectBrand(query);
+      const domain = brand ? brandDomain(brand) : null;
+
+      // Build targeted search query
+      let searchQ;
+      if (domain) {
+        searchQ = `${query} allestimenti versioni scheda tecnica site:${domain}`;
+      } else {
+        // Generic search across all official sites
+        searchQ = `${query} allestimenti versioni scheda tecnica (site:fiat.it OR site:jeep-official.it OR site:alfaromeo.it OR site:lancia.it)`;
+      }
+
+      try {
+        const resp = await fetch(`${BACKEND_SEARCH_URL}?q=${encodeURIComponent(searchQ)}`);
+        if (!resp.ok) return null;
+        const data = await resp.json();
+        if (!data.results || !data.results.length) return null;
+
+        // Filter to official domains only
+        const valid = data.results.filter(r =>
+          OFFICIAL_DOMAINS.some(d => (r.url||'').toLowerCase().includes(d))
+        );
+        if (!valid.length) return null;
+
+        // Return top 3 results as context
+        return valid.slice(0,3).map(r =>
+          `Titolo: ${r.title}
+Descrizione: ${r.description || ''}
+URL: ${r.url}`
+        ).join('
+
+---
+
+');
+      } catch(e) {
+        return null;
+      }
+    }
 
     async function startComparison() {
       const car1 = document.getElementById('cmpInput1').value.trim();
@@ -1439,51 +1524,73 @@ ATTENZIONE:
 
       if (!car1 || !car2) {
         results.innerHTML = `<div style="text-align:center;color:#f87171;padding:20px;font-size:13px;">
-          &#9888; Inserisci entrambe le auto da confrontare!
+          ⚠ Inserisci entrambe le auto da confrontare!
         </div>`;
         return;
       }
 
-      // Loading
       btn.disabled = true;
       results.innerHTML = `
         <div class="cmpLoading">
-          <div class="cmpDot"></div>
-          <div class="cmpDot"></div>
-          <div class="cmpDot"></div>
-          <span>Analisi in corso...</span>
+          <div class="cmpDot"></div><div class="cmpDot"></div><div class="cmpDot"></div>
+          <span>Ricerca sui configuratori ufficiali...</span>
         </div>`;
 
       try {
-        const prompt = `Confronta queste due auto in modo PRECISO e STRUTTURATO.
-Restituisci SOLO un JSON valido, nessun testo fuori dal JSON.
+        // Fetch data for both cars in parallel
+        const [data1, data2] = await Promise.all([
+          fetchCarData(car1),
+          fetchCarData(car2)
+        ]);
 
-Auto 1: ${car1}
-Auto 2: ${car2}
+        // Update loading message
+        results.innerHTML = `
+          <div class="cmpLoading">
+            <div class="cmpDot"></div><div class="cmpDot"></div><div class="cmpDot"></div>
+            <span>Analisi in corso...</span>
+          </div>`;
 
-Formato JSON richiesto (rispetta ESATTAMENTE questa struttura):
+        // Build context for AI
+        let context = '';
+        if (data1) context += `=== DATI UFFICIALI: ${car1} ===
+${data1}
+
+`;
+        if (data2) context += `=== DATI UFFICIALI: ${car2} ===
+${data2}
+
+`;
+
+        const systemMsg = context
+          ? `Sei un esperto di auto nuove. Usa SOLO i dati ufficiali forniti qui sotto per il confronto:
+
+${context}
+Rispondi SOLO con JSON valido, senza markdown, senza backtick.`
+          : `Sei un esperto di auto nuove Fiat, Jeep, Alfa Romeo e Lancia. Rispondi SOLO con JSON valido, senza markdown, senza backtick.`;
+
+        const userMsg = `Confronta ${car1} e ${car2}. Restituisci SOLO questo JSON:
 {
   "auto1": {
-    "nome": "Nome completo auto 1",
-    "prezzo": "es. da 22.000 euro",
-    "motore": "es. 1.6 MultiJet 130cv",
-    "consumi": "es. 5.5 L/100km",
-    "bagagliaio": "es. 440 L",
-    "dimensioni": "es. 4.51m",
-    "punti_forza": ["punto 1", "punto 2", "punto 3"],
-    "punti_deboli": ["punto 1", "punto 2"]
+    "nome": "nome completo con allestimento",
+    "prezzo": "prezzo base indicativo",
+    "motore": "motorizzazione principale",
+    "consumi": "consumo medio",
+    "bagagliaio": "volume bagagliaio",
+    "dimensioni": "lunghezza",
+    "punti_forza": ["forza 1","forza 2","forza 3"],
+    "punti_deboli": ["debolezza 1","debolezza 2"]
   },
   "auto2": {
-    "nome": "Nome completo auto 2",
-    "prezzo": "es. da 19.500 euro",
-    "motore": "es. 1.0 FireFly 100cv",
-    "consumi": "es. 6.0 L/100km",
-    "bagagliaio": "es. 380 L",
-    "dimensioni": "es. 4.37m",
-    "punti_forza": ["punto 1", "punto 2", "punto 3"],
-    "punti_deboli": ["punto 1", "punto 2"]
+    "nome": "nome completo con allestimento",
+    "prezzo": "prezzo base indicativo",
+    "motore": "motorizzazione principale",
+    "consumi": "consumo medio",
+    "bagagliaio": "volume bagagliaio",
+    "dimensioni": "lunghezza",
+    "punti_forza": ["forza 1","forza 2","forza 3"],
+    "punti_deboli": ["debolezza 1","debolezza 2"]
   },
-  "verdetto": "Breve verdetto di 2-3 righe su quale scegliere e perche, in base al tipo di utilizzo.",
+  "verdetto": "testo verdetto 2-3 frasi",
   "migliore_prezzo": "auto1 o auto2",
   "migliore_efficienza": "auto1 o auto2"
 }`;
@@ -1493,18 +1600,16 @@ Formato JSON richiesto (rispetta ESATTAMENTE questa struttura):
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             messages: [
-              { role: 'system', content: 'Sei un esperto di automobili. Rispondi SOLO con JSON valido, senza markdown, senza backtick, senza testo aggiuntivo.' },
-              { role: 'user', content: prompt }
+              { role: 'system', content: systemMsg },
+              { role: 'user',   content: userMsg }
             ]
           })
         });
 
-        if (!response.ok) throw new Error('Errore API');
-        const data = await response.json();
-        let raw = data.choices?.[0]?.message?.content || '';
-
-        // Strip markdown code blocks if present
-        raw = raw.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+        if (!response.ok) throw new Error('Errore API ' + response.status);
+        const apiData = await response.json();
+        let raw = apiData.choices?.[0]?.message?.content || '';
+        raw = raw.replace(/```json\s*/gi,'').replace(/```\s*/gi,'').trim();
 
         let cmp;
         try {
@@ -1529,86 +1634,86 @@ Formato JSON richiesto (rispetta ESATTAMENTE questa struttura):
       const a1 = cmp.auto1;
       const a2 = cmp.auto2;
       const results = document.getElementById('cmpResults');
-
       const betterPrice = cmp.migliore_prezzo;
       const betterEff   = cmp.migliore_efficienza;
 
-      function badge(which, field) {
-        return which === field ? ' cmpWin" title="Migliore">&#9733; ' : '">';
-      }
+      const fields = [
+        { label: 'Prezzo',      k: 'prezzo',      winner: betterPrice },
+        { label: 'Motore',      k: 'motore',      winner: null },
+        { label: 'Consumi',     k: 'consumi',     winner: betterEff },
+        { label: 'Bagagliaio',  k: 'bagagliaio',  winner: null },
+        { label: 'Dimensioni',  k: 'dimensioni',  winner: null },
+      ];
 
-      function rows(a1, a2) {
-        const fields = [
-          { label: 'Prezzo', k: 'prezzo', winner: betterPrice },
-          { label: 'Motore', k: 'motore', winner: null },
-          { label: 'Consumi', k: 'consumi', winner: betterEff },
-          { label: 'Bagagliaio', k: 'bagagliaio', winner: null },
-          { label: 'Dimensioni', k: 'dimensioni', winner: null },
-        ];
-
-        return fields.map(f => `
-          <div class="cmpRow">
+      function tableRows() {
+        // Header row
+        let html = `<div class="cmpRow" style="background:rgba(59,130,246,.08);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">
+          <span class="cmpLabel" style="color:#9ca3af;">Caratteristica</span>
+          <div style="display:flex;gap:0;flex:1;justify-content:flex-end;">
+            <span style="flex:1;text-align:center;color:#f87171;">🔴 ${a1.nome || q1}</span>
+            <span style="flex:1;text-align:center;color:#60a5fa;">🔵 ${a2.nome || q2}</span>
+          </div>
+        </div>`;
+        fields.forEach(f => {
+          const w1 = f.winner === 'auto1';
+          const w2 = f.winner === 'auto2';
+          html += `<div class="cmpRow">
             <span class="cmpLabel">${f.label}</span>
-            <div style="display:flex;gap:12px;flex:1;justify-content:flex-end;">
-              <span class="cmpVal${f.winner === 'auto1' ? ' cmpWin' : ''}" style="flex:1;text-align:center">${a1[f.k] || '—'}</span>
-              <span style="color:#374151;">|</span>
-              <span class="cmpVal${f.winner === 'auto2' ? ' cmpWin' : ''}" style="flex:1;text-align:center">${a2[f.k] || '—'}</span>
+            <div style="display:flex;flex:1;justify-content:flex-end;gap:4px;">
+              <span class="cmpVal${w1?' cmpWin':''}" style="flex:1;text-align:center;">
+                ${w1 ? '★ ' : ''}${a1[f.k] || '—'}
+              </span>
+              <span style="color:#374151;align-self:center;">|</span>
+              <span class="cmpVal${w2?' cmpWin':''}" style="flex:1;text-align:center;">
+                ${w2 ? '★ ' : ''}${a2[f.k] || '—'}
+              </span>
             </div>
-          </div>`).join('');
+          </div>`;
+        });
+        return html;
       }
 
-      function listItems(items, color) {
+      function procon(items, color) {
         if (!items || !items.length) return '<li style="color:#9ca3af">—</li>';
-        return items.map(i => `<li style="color:${color};margin-bottom:4px">&#8226; ${i}</li>`).join('');
+        return items.map(i => `<li style="color:${color};margin-bottom:5px;font-size:12px;">• ${i}</li>`).join('');
       }
 
       results.innerHTML = `
-        <!-- Header labels -->
-        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
-          <div class="cmpCard">
-            <div class="cmpCardHeader left">&#128308; ${a1.nome || q1}</div>
-            ${rows(a1, a2)}
-          </div>
-          <div style="display:flex;align-items:center;justify-content:center;padding:0 4px;">
-            <div style="width:2px;height:60px;background:linear-gradient(180deg,transparent,rgba(59,130,246,.4),transparent);"></div>
-          </div>
-          <div class="cmpCard">
-            <div class="cmpCardHeader right">&#128309; ${a2.nome || q2}</div>
-            ${rows(a2, a1)}
-          </div>
+        <!-- Tabella comparativa -->
+        <div class="cmpCard" style="width:100%;margin-bottom:14px;">
+          ${tableRows()}
         </div>
 
-        <!-- Pro/Contro -->
-        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-          <div style="flex:1;min-width:200px;background:rgba(31,41,55,.3);border-radius:12px;padding:12px 14px;">
-            <div style="font-weight:700;font-size:12px;color:#4ade80;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">
-              Punti forza &#128308;
+        <!-- Pro/Contro affiancati -->
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:180px;background:rgba(31,41,55,.35);border-radius:12px;padding:12px 14px;border:1px solid rgba(248,113,113,.15)">
+            <div style="font-weight:800;font-size:11px;color:#f87171;margin-bottom:6px;letter-spacing:.5px;">
+              🔴 ${a1.nome || q1}
             </div>
-            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a1.punti_forza,'#d1fae5')}</ul>
-            <div style="font-weight:700;font-size:12px;color:#f87171;margin:10px 0 8px;text-transform:uppercase;letter-spacing:.5px;">
-              Punti deboli
-            </div>
-            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a1.punti_deboli,'#fecaca')}</ul>
+            <div style="font-size:11px;color:#4ade80;font-weight:700;margin-bottom:4px;">PUNTI FORZA</div>
+            <ul style="list-style:none;padding:0;margin:0 0 8px;">${procon(a1.punti_forza,'#d1fae5')}</ul>
+            <div style="font-size:11px;color:#f87171;font-weight:700;margin-bottom:4px;">PUNTI DEBOLI</div>
+            <ul style="list-style:none;padding:0;margin:0;">${procon(a1.punti_deboli,'#fecaca')}</ul>
           </div>
-          <div style="flex:1;min-width:200px;background:rgba(31,41,55,.3);border-radius:12px;padding:12px 14px;">
-            <div style="font-weight:700;font-size:12px;color:#4ade80;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">
-              Punti forza &#128309;
+          <div style="flex:1;min-width:180px;background:rgba(31,41,55,.35);border-radius:12px;padding:12px 14px;border:1px solid rgba(96,165,250,.15)">
+            <div style="font-weight:800;font-size:11px;color:#60a5fa;margin-bottom:6px;letter-spacing:.5px;">
+              🔵 ${a2.nome || q2}
             </div>
-            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a2.punti_forza,'#d1fae5')}</ul>
-            <div style="font-weight:700;font-size:12px;color:#f87171;margin:10px 0 8px;text-transform:uppercase;letter-spacing:.5px;">
-              Punti deboli
-            </div>
-            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a2.punti_deboli,'#fecaca')}</ul>
+            <div style="font-size:11px;color:#4ade80;font-weight:700;margin-bottom:4px;">PUNTI FORZA</div>
+            <ul style="list-style:none;padding:0;margin:0 0 8px;">${procon(a2.punti_forza,'#d1fae5')}</ul>
+            <div style="font-size:11px;color:#f87171;font-weight:700;margin-bottom:4px;">PUNTI DEBOLI</div>
+            <ul style="list-style:none;padding:0;margin:0;">${procon(a2.punti_deboli,'#fecaca')}</ul>
           </div>
         </div>
 
         <!-- Verdetto -->
         <div class="cmpVerdict">
-          <strong style="color:#60a5fa;">&#9654; Verdetto:</strong> ${cmp.verdetto || 'Nessun verdetto disponibile.'}
+          <strong style="color:#60a5fa;">▶ Verdetto:</strong> ${cmp.verdetto || 'Nessun verdetto disponibile.'}
         </div>
       `;
     }
 
   </script>
+</body>  </script>
 </body>
 </html>
