@@ -15,17 +15,9 @@
       --line:#1f2937;
       --text:#e5e7eb;
       --muted:#9ca3af;
-
-      --blue:#3b82f6;
-      --blue2:#60a5fa;
-
-      /* ORANGE MODERNO */
-      --orange:#f97316;      /* primary */
-      --orange2:#fb923c;     /* gradient */
-      --orangeSoft: rgba(249,115,22,.18);
-      --orangeLine: rgba(249,115,22,.45);
+      --accent:#3b82f6;
+      --accent2:#60a5fa;
     }
-
     *{box-sizing:border-box;margin:0;padding:0}
 
     body{
@@ -33,13 +25,15 @@
       color:var(--text);
       min-height:100vh;
       background:
-        radial-gradient(1200px 700px at 18% -12%, rgba(59,130,246,.18), transparent 58%),
-        radial-gradient(1000px 600px at 78% 8%, rgba(249,115,22,.10), transparent 62%),
+        radial-gradient(1200px 700px at 18% -12%, rgba(59,130,246,.22), transparent 58%),
+        radial-gradient(900px 520px at 72% 8%, rgba(96,165,250,.14), transparent 60%),
         linear-gradient(180deg, var(--bgTop) 0%, var(--bgMid) 48%, var(--bgBot) 100%);
     }
 
     header{
-      position:relative; top:0; z-index:10;
+      position:relative;
+      top:0;
+      z-index:10;
       background:rgba(10,10,12,.72);
       backdrop-filter:blur(10px);
       border-bottom:1px solid var(--line);
@@ -48,25 +42,46 @@
     .wrap{max-width:1200px;margin:0 auto;padding:16px}
 
     .row{
-      display:flex; gap:12px; align-items:center;
-      justify-content:space-between; flex-wrap:wrap;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
     }
 
     .brand{
-      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
       min-width: 320px;
     }
 
-    .brandMark{display:flex;align-items:center;gap:10px;user-select:none}
+    .brandMark{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      user-select:none;
+    }
     .brandLogo{
-      width:4cm; height:4cm; object-fit:contain;
-      background:transparent;border:none;outline:none;filter:none;
+      width:4cm;
+      height:4cm;
+      object-fit:contain;
+      background:transparent;
+      border:none;
+      outline:none;
+      filter:none;
       mix-blend-mode: screen;
     }
+
     .brandName{
-      font-weight:950; letter-spacing:.2px; font-size:18px; line-height:1;
-      background:linear-gradient(135deg, var(--blue) 0%, var(--blue2) 100%);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      font-weight:950;
+      letter-spacing:.2px;
+      font-size:18px;
+      line-height:1;
+      background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
       white-space:nowrap;
     }
     .brandSub{opacity:.75;white-space:nowrap}
@@ -101,7 +116,8 @@
     .btn.brand-lancia:hover{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.1)}
 
     .centroAutoLink{
-      display:inline-flex; align-items:center;
+      display:inline-flex;
+      align-items:center;
       padding:6px 12px;
       border:2px solid rgba(34,197,94,.4);
       background:rgba(34,197,94,.08);
@@ -117,7 +133,9 @@
       box-shadow:0 4px 16px rgba(34,197,94,.3);
     }
     .centroAutoLogo{
-      height:42px; width:auto; object-fit:contain;
+      height:42px;
+      width:auto;
+      object-fit:contain;
       filter:drop-shadow(0 1px 3px rgba(0,0,0,.2));
     }
 
@@ -134,7 +152,7 @@
     .layout{
       margin-top:16px;
       display:grid;
-      grid-template-columns: 420px 1fr; /* NEWS | CONTENUTO */
+      grid-template-columns: 420px 1fr;
       gap:16px;
       align-items:start;
     }
@@ -192,15 +210,8 @@
     .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
     .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
 
-    /* ===== COLONNE A DESTRA ===== */
-    .rightGrid{
-      display:grid;
-      grid-template-columns: 1fr 420px;  /* SINISTRA GRANDE | DESTRA STRETTA */
-      gap:16px;
-      align-items:start;
-    }
-
     /* ===== WIDGET BASE ===== */
+    .widgetStack{display:grid;gap:16px;margin-top:16px;}
     .widgetPanel{
       background:rgba(17,24,39,.78);
       border:1px solid #1f2937;
@@ -208,7 +219,7 @@
       overflow:hidden;
     }
     .widgetHeader{
-      padding:14px 16px;
+      padding:16px 20px;
       border-bottom:1px solid rgba(31,41,55,.75);
       background:rgba(10,12,18,.35);
       display:flex;
@@ -219,16 +230,14 @@
     }
     .widgetTitle{font-weight:950;font-size:18px}
     .widgetSub{color:#9ca3af;font-size:13px;margin-top:4px}
-    .widgetBody{padding:14px 16px;}
-    .smallNote{margin-top:10px;color:#9ca3af;font-size:12px}
-
+    .widgetBody{padding:16px 20px;}
     .formRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
     .field{
       flex:1;
-      min-width:260px;
+      min-width:220px;
       background:rgba(31,41,55,.6);
       border:1px solid #1f2937;
-      border-radius:12px;
+      border-radius:10px;
       padding:10px 14px;
       color:#e5e7eb;
       font-size:13px;
@@ -236,9 +245,7 @@
       font-family:inherit;
       transition:border-color .2s, background .2s;
     }
-    .field:focus{border-color:var(--orangeLine);background:rgba(31,41,55,.8)}
-
-    /* ===== TOGGLE (SEGMENTED) ORANGE MODERNO ===== */
+    .field:focus{border-color:#3b82f6;background:rgba(31,41,55,.8)}
     .seg{
       display:inline-flex;
       border:1px solid rgba(31,41,55,.9);
@@ -249,53 +256,53 @@
     .seg button{
       border:none;
       background:transparent;
-      color:#cbd5e1;
-      padding:8px 11px;
+      color:#9ca3af;
+      padding:8px 10px;
       font-size:12px;
       cursor:pointer;
-      transition:all .18s;
+      transition:all .2s;
       font-family:inherit;
-      font-weight:800;
+      font-weight:700;
       white-space:nowrap;
     }
-    .seg button:hover{
-      background:rgba(249,115,22,.10);
-      color:#fff;
-    }
     .seg button.active{
-      color:#111827;
-      background:linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
-      box-shadow:0 10px 24px rgba(249,115,22,.18);
+      color:#e5e7eb;
+      background:rgba(59,130,246,.18);
     }
+    .seg button:hover{background:rgba(59,130,246,.12);color:#cfe1ff}
 
-    /* ===== AGENDA 3 COLONNE ===== */
     .split3{
       display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns:repeat(3,1fr);
       gap:10px;
       margin-top:14px;
       align-items:start;
     }
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+      .newsScroll{max-height:60vh}
+      .brand{min-width: unset}
+      .split3{grid-template-columns:1fr}
+    }
+
     .dayCol{
       background:rgba(31,41,55,.35);
       border:1px solid rgba(31,41,55,.75);
       border-radius:14px;
       overflow:hidden;
-      min-width:0;
     }
     .dayHead{
       padding:12px 14px;
-      font-weight:950;
+      font-weight:900;
       font-size:13px;
       border-bottom:1px solid rgba(31,41,55,.65);
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      background:rgba(249,115,22,.10); /* ORANGE */
+      background:rgba(59,130,246,.10);
     }
-    .dayMeta{color:#9ca3af;font-weight:800;font-size:12px}
-
+    .dayMeta{color:#9ca3af;font-weight:700;font-size:12px}
     .list{
       padding:10px 12px;
       display:grid;
@@ -304,7 +311,7 @@
       overflow:auto;
     }
     .list::-webkit-scrollbar{width:8px}
-    .list::-webkit-scrollbar-thumb{background:rgba(249,115,22,.25);border-radius:999px}
+    .list::-webkit-scrollbar-thumb{background:rgba(59,130,246,.25);border-radius:999px}
     .list::-webkit-scrollbar-track{background:rgba(0,0,0,.12)}
 
     .item{
@@ -315,19 +322,14 @@
       border:1px solid rgba(31,41,55,.7);
       border-radius:12px;
       background:rgba(17,24,39,.35);
-      min-width:0;
     }
-    .itemMain{flex:1;min-width:0;}
+    .itemMain{flex:1;min-width:0}
     .itemText{
       font-size:13px;
       line-height:1.35;
-      min-width:0;
-      word-break: normal;
-      overflow-wrap:anywhere;
-      white-space: normal;
+      word-break:break-word;
     }
     .itemText.done{text-decoration:line-through;opacity:.65}
-
     .itemActions{display:flex;gap:6px;align-items:center}
     .iconBtn{
       width:32px;height:32px;
@@ -336,34 +338,23 @@
       background:rgba(17,24,39,.45);
       color:#e5e7eb;
       cursor:pointer;
-      transition:all .18s;
+      transition:all .2s;
       display:flex;align-items:center;justify-content:center;
       font-size:14px;
-      font-weight:950;
+      font-weight:900;
     }
     .iconBtn:hover{
-      border-color:var(--orangeLine);
+      border-color:rgba(59,130,246,.55);
       background:rgba(17,24,39,.7);
       transform:translateY(-1px);
     }
-
-    /* matita ORANGE */
-    .iconBtn.pencil{
-      border-color:rgba(249,115,22,.35);
-      background:rgba(249,115,22,.10);
-    }
-    .iconBtn.pencil:hover{
-      border-color:rgba(249,115,22,.70);
-      background:rgba(249,115,22,.18);
-    }
-
     .chk{
       width:18px;height:18px;flex:0 0 auto;
-      accent-color: var(--orange);
+      accent-color:#3b82f6;
       margin-top:2px;
       cursor:pointer;
     }
-
+    .smallNote{margin-top:10px;color:#9ca3af;font-size:12px}
     .memoArea{width:100%;min-height:110px;resize:vertical}
 
     .syncBadge{
@@ -375,16 +366,8 @@
       color:#9ca3af;
       white-space:nowrap;
     }
-    .syncBadge.ok{
-      border-color:rgba(249,115,22,.55);
-      background:rgba(249,115,22,.12);
-      color:#fed7aa;
-    }
-    .syncBadge.warn{
-      border-color:rgba(251,191,36,.5);
-      background:rgba(251,191,36,.10);
-      color:#fde68a;
-    }
+    .syncBadge.ok{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10);color:#bbf7d0}
+    .syncBadge.warn{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.10);color:#fde68a}
 
     /* ===== CALENDARIO SETTIMANALE ===== */
     #weekGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;}
@@ -394,177 +377,58 @@
       border-radius:14px;
       padding:10px;
       cursor:pointer;
-      transition:all .18s;
+      transition:all .2s;
       min-height:110px;
       display:flex;
       flex-direction:column;
       gap:6px;
-      min-width:0;
     }
     .weekDay:hover{
-      border-color:rgba(249,115,22,.55);
+      border-color:rgba(59,130,246,.55);
       background:rgba(17,24,39,.55);
-      transform:translateY(-1px)
+      transform:translateY(-1px);
     }
-    .weekDayTop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-    .weekDow{font-weight:950;font-size:12px;color:#e5e7eb}
-    .weekDate{font-size:12px;color:#9ca3af;font-weight:800}
+    .weekDayTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:8px;
+    }
+    .weekDow{font-weight:900;font-size:12px;color:#e5e7eb}
+    .weekDate{font-size:12px;color:#9ca3af;font-weight:700}
     .weekBadge{
-      font-size:11px;padding:3px 8px;border-radius:999px;
+      font-size:11px;
+      padding:3px 8px;
+      border-radius:999px;
       border:1px solid rgba(31,41,55,.9);
       background:rgba(0,0,0,.12);
       color:#9ca3af;
       white-space:nowrap;
     }
-    .weekBadge.has{
-      border-color:rgba(249,115,22,.55);
-      background:rgba(249,115,22,.12);
-      color:#fed7aa;
+    .weekBadge.has{border-color:rgba(59,130,246,.45);background:rgba(59,130,246,.12);color:#bfdbfe}
+    .weekList{
+      margin-top:2px;
+      display:grid;
+      gap:5px;
+      font-size:12px;
+      color:#d1d5db;
     }
-    .weekList{margin-top:2px;display:grid;gap:5px;font-size:12px;color:#d1d5db;min-width:0}
-    .weekLine{opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+    .weekLine{
+      opacity:.85;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
     .weekDay.today{
       border-color:rgba(34,197,94,.55);
       background:rgba(34,197,94,.08);
     }
     .weekDay.selected{
-      outline:2px solid rgba(249,115,22,.55);
+      outline:2px solid rgba(59,130,246,.55);
       outline-offset:1px;
     }
-
-    /* ===== COMPARATORE ===== */
-    .cmpSuggest{
-      background:rgba(249,115,22,.10);
-      border:1px solid rgba(249,115,22,.28);
-      border-radius:999px;
-      padding:4px 10px;
-      color:#fed7aa;
-      font-size:11px;
-      cursor:pointer;
-      transition:all .18s;
-      font-family:inherit;
-      font-weight:800;
-    }
-    .cmpSuggest:hover{
-      background:rgba(249,115,22,.18);
-      border-color:rgba(249,115,22,.55)
-    }
-
-    /* ===== CHAT AGENT ===== */
-    .chatTrigger{
-      position:fixed; bottom:24px; right:24px;
-      width:70px; height:70px; border-radius:50%;
-      background:transparent; border:none; cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      box-shadow:0 8px 24px rgba(0,0,0,.3);
-      transition:all .25s ease;
-      z-index:1000;
-    }
-    .chatTrigger:hover{transform:scale(1.08);box-shadow:0 12px 32px rgba(0,0,0,.5)}
-    .chatTrigger img{width:70px;height:70px;object-fit:contain}
-
-    .chatBox{
-      position:fixed; bottom:24px; right:24px;
-      width:420px; max-width:calc(100vw - 32px);
-      height:600px; max-height:calc(100vh - 48px);
-      background:rgba(17,24,39,.95);
-      border:1px solid rgba(31,41,55,.9);
-      border-radius:20px;
-      display:none;
-      flex-direction:column;
-      box-shadow:0 20px 60px rgba(0,0,0,.6);
-      z-index:1001;
-      overflow:hidden;
-      backdrop-filter:blur(20px);
-    }
-    .chatBox.open{display:flex}
-    .chatHeader{
-      background:linear-gradient(135deg, rgba(249,115,22,.90), rgba(251,146,60,.90));
-      padding:14px 16px;
-      display:flex; align-items:center; justify-content:space-between;
-      border-bottom:1px solid rgba(255,255,255,.15);
-    }
-    .chatHeaderLeft{display:flex;align-items:center;gap:10px}
-    .chatHeaderLogo{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);padding:4px}
-    .chatHeaderTitle{font-weight:950;font-size:15px;color:#fff}
-    .chatHeaderSub{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px}
-    .chatHeaderBtns{display:flex;gap:8px}
-    .chatHeaderBtn{
-      width:32px;height:32px;border-radius:8px;
-      background:rgba(255,255,255,.15);
-      border:none;color:#fff;cursor:pointer;font-size:18px;
-      display:flex;align-items:center;justify-content:center;
-      transition:all .18s;font-weight:950;
-    }
-    .chatHeaderBtn:hover{background:rgba(255,255,255,.25);transform:scale(1.05)}
-    .chatMessages{
-      flex:1; overflow-y:auto; padding:16px;
-      background:linear-gradient(180deg, rgba(26,29,35,.95) 0%, rgba(16,18,22,.95) 100%);
-      display:flex; flex-direction:column; gap:12px;
-    }
-    .message{display:flex;gap:8px}
-    .message.user{flex-direction:row-reverse}
-    .messageBubble{
-      max-width:85%;
-      padding:12px 16px;
-      border-radius:18px;
-      font-size:14px;
-      line-height:1.55;
-      word-wrap:break-word;
-      white-space:pre-line;
-    }
-    .message.ai .messageBubble{
-      background:linear-gradient(135deg, rgba(249,115,22,.85) 0%, rgba(251,146,60,.85) 100%);
-      color:#fff; border-bottom-left-radius:4px;
-    }
-    .message.user .messageBubble{
-      background:rgba(255,255,255,.92);
-      color:#111827; border-bottom-right-radius:4px;
-    }
-    .chatInput{
-      padding:14px; background:rgba(10,12,18,.95);
-      border-top:1px solid rgba(31,41,55,.9);
-      display:flex; gap:10px;
-    }
-    .chatInputField{
-      flex:1;
-      background:rgba(31,41,55,.6);
-      border:1px solid rgba(31,41,55,.9);
-      border-radius:12px;
-      padding:12px 14px;
-      color:#e5e7eb;
-      font-size:14px;
-      outline:none;
-      transition:all .18s;
-      font-family:inherit;
-    }
-    .chatInputField:focus{border-color:rgba(249,115,22,.9);background:rgba(31,41,55,.8)}
-    .chatInputField::placeholder{color:#9ca3af}
-    .chatSendBtn{
-      width:48px;height:48px;border-radius:12px;
-      background:linear-gradient(135deg, rgba(249,115,22,.95), rgba(251,146,60,.95));
-      border:none;color:#fff;cursor:pointer;font-size:20px;
-      display:flex;align-items:center;justify-content:center;
-      transition:all .18s;
-    }
-    .chatSendBtn:hover:not(:disabled){transform:scale(1.05)}
-    .chatSendBtn:disabled{opacity:.5;cursor:not-allowed}
-
-    /* RESPONSIVE */
     @media (max-width: 980px){
-      .layout{grid-template-columns:1fr}
-      .newsScroll{max-height:60vh}
-      .brand{min-width: unset}
-      .rightGrid{grid-template-columns:1fr}
-      .split3{grid-template-columns:1fr}
       #weekGrid{grid-template-columns:repeat(2,1fr) !important;}
-      .chatBox{
-        width:100%;max-width:100%;
-        height:100vh;max-height:100vh;
-        bottom:0;right:0;border-radius:0;
-      }
-      .chatTrigger{bottom:16px;right:16px;width:60px;height:60px}
-      .chatTrigger img{width:60px;height:60px}
     }
   </style>
 </head>
@@ -575,9 +439,11 @@
       <div class="row">
         <div class="brand">
           <div class="brandMark">
-            <img class="brandLogo"
+            <img
+              class="brandLogo"
               src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png"
-              alt="AI BOTT logo" />
+              alt="AI BOTT logo"
+            />
             <div>
               <div class="brandName">AI BOTT</div>
               <div class="brandSub">Automotive</div>
@@ -590,8 +456,11 @@
           <button id="lanciaBtn" class="btn brand-lancia">Lancia</button>
 
           <a href="https://www.centroautovt.it/" target="_blank" rel="noopener noreferrer" class="centroAutoLink">
-            <img src="https://image2url.com/r2/default/images/1770805237740-1db65b1e-5553-4b5b-b28a-750e3520a0a2.png"
-              alt="CentroAuto VT" class="centroAutoLogo" />
+            <img
+              src="https://image2url.com/r2/default/images/1770805237740-1db65b1e-5553-4b5b-b28a-750e3520a0a2.png"
+              alt="CentroAuto VT"
+              class="centroAutoLogo"
+            />
           </a>
         </div>
 
@@ -621,173 +490,118 @@
         </div>
       </aside>
 
-      <!-- CONTENUTO A DESTRA -->
+      <!-- DESTRA -->
       <section style="padding:0;border:none;background:none;">
-        <div class="rightGrid">
-          <!-- SINISTRA GRANDE -->
-          <div style="display:grid;gap:16px;">
-            <!-- CALENDARIO SETTIMANALE (zona freccia) -->
-            <div class="widgetPanel" id="weekPanel">
-              <div class="widgetHeader">
-                <div>
-                  <div class="widgetTitle">🗓 Calendario settimanale</div>
-                  <div class="widgetSub">Click su un giorno: i nuovi task vanno lì.</div>
-                </div>
-                <span id="weekSelectedPill" class="pill muted">Selezione: oggi</span>
-              </div>
-              <div class="widgetBody">
-                <div id="weekGrid"></div>
-                <div class="smallNote">Sincronizzato con Agenda e Firebase (anche telefono).</div>
-              </div>
+        <!-- (facoltativo) spazio per comparatore o altro -->
+        <div class="widgetPanel" style="margin-bottom:16px;">
+          <div class="widgetHeader">
+            <div>
+              <div class="widgetTitle">⚔ Comparatore</div>
+              <div class="widgetSub">Widget placeholder (puoi rimettere il tuo comparatore completo qui).</div>
             </div>
+          </div>
+          <div class="widgetBody muted" style="font-size:13px;">
+            Qui è la zona grande vuota nella tua schermata.
+          </div>
+        </div>
 
-            <!-- COMPARATORE (in basso a sinistra) -->
-            <div class="widgetPanel" id="comparatorPanel">
-              <div class="widgetHeader">
-                <div>
-                  <div class="widgetTitle">⚔ Comparatore Auto</div>
-                  <div class="widgetSub">Inserisci 2 modelli. (Puoi collegare il tuo /api/search dopo.)</div>
-                </div>
-                <button id="cmpResetBtn" class="btn" style="font-size:12px;padding:7px 12px;">↩ Reset</button>
+        <div class="widgetStack">
+          <!-- CALENDARIO SETTIMANALE (zona freccia) -->
+          <div class="widgetPanel" id="weekPanel">
+            <div class="widgetHeader">
+              <div>
+                <div class="widgetTitle">🗓 Calendario settimanale</div>
+                <div class="widgetSub">Settimana corrente. Click su un giorno: i nuovi task vanno lì.</div>
               </div>
-
-              <div class="widgetBody" style="border-bottom:1px solid rgba(31,41,55,.5);">
-                <div class="formRow">
-                  <input id="cmpInput1" class="field" type="text" placeholder="Es: Grande Panda, Compass, Stelvio..." />
-                  <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;font-weight:950;">VS</div>
-                  <input id="cmpInput2" class="field" type="text" placeholder="Es: Junior, Avenger, Ypsilon..." />
-                  <button id="cmpBtn" class="btn primary" type="button">🔎 Confronta</button>
-                </div>
-
-                <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-                  <span style="color:#9ca3af;font-size:12px;align-self:center;">Rapido:</span>
-                  <button class="cmpSuggest" data-s1="Grande Panda" data-s2="Junior">Grande Panda vs Junior</button>
-                  <button class="cmpSuggest" data-s1="Compass" data-s2="Tonale">Compass vs Tonale</button>
-                  <button class="cmpSuggest" data-s1="Ypsilon" data-s2="Avenger">Ypsilon vs Avenger</button>
-                </div>
-              </div>
-
-              <div id="cmpResults" class="widgetBody">
-                <div class="muted" style="text-align:center;padding:18px 0;font-size:13px;">
-                  Scrivi due modelli e premi Confronta.
-                </div>
-              </div>
+              <span id="weekSelectedPill" class="pill muted">Selezione: oggi</span>
+            </div>
+            <div class="widgetBody">
+              <div id="weekGrid"></div>
+              <div class="smallNote">Sincronizzato con Agenda e con Firebase (anche da telefono).</div>
             </div>
           </div>
 
-          <!-- DESTRA STRETTA -->
-          <div style="display:grid;gap:16px;">
-            <!-- AGENDA 3 GIORNI -->
-            <div class="widgetPanel" id="agendaPanel">
-              <div class="widgetHeader">
-                <div>
-                  <div class="widgetTitle">📅 Agenda 3 giorni</div>
-                  <div class="widgetSub">Oggi, domani, +2. Scorre ogni giorno.</div>
-                </div>
-                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                  <span id="syncBadge" class="syncBadge warn">Sync: non attivo</span>
-                  <button id="agendaClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci fatti</button>
-                </div>
+          <!-- AGENDA 3 GIORNI -->
+          <div class="widgetPanel" id="agendaPanel">
+            <div class="widgetHeader">
+              <div>
+                <div class="widgetTitle">📅 Agenda 3 giorni</div>
+                <div class="widgetSub">Scorre automaticamente ogni giorno (oggi, domani, +2).</div>
               </div>
-
-              <div class="widgetBody">
-                <div class="formRow">
-                  <input id="taskInput" class="field" type="text" placeholder="Scrivi un task..." />
-                  <div class="seg" aria-label="Giorno task (se NON selezioni nel calendario)">
-                    <button id="dayBtn0" class="active" type="button">Oggi</button>
-                    <button id="dayBtn1" type="button">Domani</button>
-                    <button id="dayBtn2" type="button">+2</button>
-                  </div>
-                  <button id="addTaskBtn" class="btn primary" type="button">Aggiungi</button>
-                </div>
-
-                <div class="split3">
-                  <div class="dayCol">
-                    <div class="dayHead">
-                      <span>Oggi</span>
-                      <span id="dayDate0" class="dayMeta"></span>
-                    </div>
-                    <div id="taskList0" class="list"></div>
-                  </div>
-
-                  <div class="dayCol">
-                    <div class="dayHead" style="background:rgba(249,115,22,.08);">
-                      <span>Domani</span>
-                      <span id="dayDate1" class="dayMeta"></span>
-                    </div>
-                    <div id="taskList1" class="list"></div>
-                  </div>
-
-                  <div class="dayCol">
-                    <div class="dayHead" style="background:rgba(249,115,22,.06);">
-                      <span>+2</span>
-                      <span id="dayDate2" class="dayMeta"></span>
-                    </div>
-                    <div id="taskList2" class="list"></div>
-                  </div>
-                </div>
-
-                <div class="smallNote">Selezione calendario attiva: priorità sui 3 pulsanti.</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <span id="syncBadge" class="syncBadge warn">Sync: non attivo</span>
+                <button id="agendaClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci fatti</button>
               </div>
             </div>
 
-            <!-- MEMO -->
-            <div class="widgetPanel" id="memoPanel">
-              <div class="widgetHeader">
-                <div>
-                  <div class="widgetTitle">📝 Memo</div>
-                  <div class="widgetSub">Matita: barra/risbarra. Sync Firebase.</div>
+            <div class="widgetBody">
+              <div class="formRow">
+                <input id="taskInput" class="field" type="text" placeholder="Scrivi un task..." />
+                <div class="seg" aria-label="Giorno task (solo se NON selezioni nel calendario)">
+                  <button id="dayBtn0" class="active" type="button">Oggi</button>
+                  <button id="dayBtn1" type="button">Domani</button>
+                  <button id="dayBtn2" type="button">+2</button>
                 </div>
-                <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
+                <button id="addTaskBtn" class="btn primary" type="button">Aggiungi</button>
               </div>
 
-              <div class="widgetBody">
-                <div class="formRow" style="align-items:stretch;">
-                  <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
-                  <button id="addMemoBtn" class="btn primary" type="button" style="align-self:flex-start;">Aggiungi</button>
+              <div class="split3" style="margin-top:14px;">
+                <div class="dayCol">
+                  <div class="dayHead">
+                    <span>Oggi</span>
+                    <span id="dayDate0" class="dayMeta"></span>
+                  </div>
+                  <div id="taskList0" class="list"></div>
                 </div>
 
-                <div style="margin-top:14px;">
-                  <div id="memoList" class="list" style="max-height:320px;"></div>
+                <div class="dayCol">
+                  <div class="dayHead" style="background:rgba(96,165,250,.08);">
+                    <span>Domani</span>
+                    <span id="dayDate1" class="dayMeta"></span>
+                  </div>
+                  <div id="taskList1" class="list"></div>
                 </div>
 
-                <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
+                <div class="dayCol">
+                  <div class="dayHead" style="background:rgba(59,130,246,.06);">
+                    <span>+2</span>
+                    <span id="dayDate2" class="dayMeta"></span>
+                  </div>
+                  <div id="taskList2" class="list"></div>
+                </div>
               </div>
+
+              <div class="smallNote">Enter sul task = aggiungi. Selezione calendario attiva: ha priorità sui 3 pulsanti.</div>
+            </div>
+          </div>
+
+          <!-- MEMO -->
+          <div class="widgetPanel" id="memoPanel">
+            <div class="widgetHeader">
+              <div>
+                <div class="widgetTitle">📝 Memo</div>
+                <div class="widgetSub">Matita: barra/risbarra. Sync su Firebase.</div>
+              </div>
+              <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
+            </div>
+
+            <div class="widgetBody">
+              <div class="formRow" style="align-items:stretch;">
+                <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
+                <button id="addMemoBtn" class="btn primary" type="button" style="align-self:flex-start;">Aggiungi</button>
+              </div>
+
+              <div style="margin-top:14px;">
+                <div id="memoList" class="list" style="max-height:320px;"></div>
+              </div>
+
+              <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
             </div>
           </div>
         </div>
       </section>
     </div>
   </main>
-
-  <!-- CHAT AGENT -->
-  <button class="chatTrigger" id="chatTrigger" aria-label="Apri chat">
-    <img src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI Agent"/>
-  </button>
-
-  <div class="chatBox" id="chatBox" aria-label="Chat AI">
-    <div class="chatHeader">
-      <div class="chatHeaderLeft">
-        <img class="chatHeaderLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI"/>
-        <div>
-          <div class="chatHeaderTitle">AI BOTT Assistant</div>
-          <div class="chatHeaderSub">Supporto rapido</div>
-        </div>
-      </div>
-      <div class="chatHeaderBtns">
-        <button class="chatHeaderBtn" id="closeBtn" title="Chiudi">×</button>
-      </div>
-    </div>
-
-    <div class="chatMessages" id="chatMessages">
-      <div class="message ai"><div class="messageBubble">Dimmi cosa ti serve.</div></div>
-    </div>
-
-    <div class="chatInput">
-      <input type="text" class="chatInputField" id="chatInputField" placeholder="Scrivi..." autocomplete="off" />
-      <button class="chatSendBtn" id="chatSendBtn" aria-label="Invia">➤</button>
-    </div>
-  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -931,76 +745,40 @@
     $("alfaBtn").addEventListener("click",  () => window.open(BRAND_LINKS.AlfaRomeo, "_blank","noopener,noreferrer"));
     $("lanciaBtn").addEventListener("click",() => window.open(BRAND_LINKS.Lancia,    "_blank","noopener,noreferrer"));
 
-    /* =========================
-       COMPARATORE (base)
-    ========================= */
-    function setSuggest(a,b){ $("cmpInput1").value=a; $("cmpInput2").value=b; }
-    document.querySelectorAll(".cmpSuggest").forEach(btn=>{
-      btn.addEventListener("click", ()=>setSuggest(btn.dataset.s1, btn.dataset.s2));
-    });
-    $("cmpResetBtn").addEventListener("click", ()=>{
-      $("cmpInput1").value=""; $("cmpInput2").value="";
-      $("cmpResults").innerHTML = '<div class="muted" style="text-align:center;padding:18px 0;font-size:13px;">Scrivi due modelli e premi Confronta.</div>';
-    });
-
-    function guessBrand(model){
-      const s = (model||"").toLowerCase();
-      const fiat = ["panda","500","tipo","ducato","dobl","doblo","600","grande panda","punto"];
-      const jeep = ["avenger","renegade","compass","wrangler","grand cherokee","cherokee"];
-      const alfa = ["giulia","stelvio","tonale","junior","giulietta","mito"];
-      const lancia = ["ypsilon"];
-      if (alfa.some(x=>s.includes(x))) return "AlfaRomeo";
-      if (jeep.some(x=>s.includes(x))) return "Jeep";
-      if (lancia.some(x=>s.includes(x))) return "Lancia";
-      if (fiat.some(x=>s.includes(x))) return "Fiat";
-      return null;
-    }
-
-    $("cmpBtn").addEventListener("click", ()=>{
-      const a = $("cmpInput1").value.trim();
-      const b = $("cmpInput2").value.trim();
-      if(!a || !b){
-        $("cmpResults").innerHTML = '<div class="muted" style="text-align:center;padding:18px 0;font-size:13px;">Inserisci 2 modelli.</div>';
-        return;
-      }
-      const ba = guessBrand(a);
-      const bb = guessBrand(b);
-      const linkA = ba ? BRAND_LINKS[ba] : null;
-      const linkB = bb ? BRAND_LINKS[bb] : null;
-
-      $("cmpResults").innerHTML = `
-        <div style="display:grid;gap:12px;">
-          <div style="display:grid;gap:6px;padding:12px;border:1px solid rgba(31,41,55,.7);border-radius:14px;background:rgba(17,24,39,.35);">
-            <div style="font-weight:950;">${escapeHtml(a)}</div>
-            <div class="muted" style="font-size:12px;">Marca stimata: ${escapeHtml(ba || "non riconosciuta")}</div>
-            ${linkA ? `<a class="btn" style="display:inline-flex;width:max-content;text-decoration:none;" target="_blank" rel="noopener noreferrer" href="${linkA}">Apri configuratore</a>` : ""}
-          </div>
-          <div style="display:grid;gap:6px;padding:12px;border:1px solid rgba(31,41,55,.7);border-radius:14px;background:rgba(17,24,39,.35);">
-            <div style="font-weight:950;">${escapeHtml(b)}</div>
-            <div class="muted" style="font-size:12px;">Marca stimata: ${escapeHtml(bb || "non riconosciuta")}</div>
-            ${linkB ? `<a class="btn" style="display:inline-flex;width:max-content;text-decoration:none;" target="_blank" rel="noopener noreferrer" href="${linkB}">Apri configuratore</a>` : ""}
-          </div>
-          <div class="muted" style="font-size:12px;">
-            Per collegare il tuo backend search: dimmi endpoint e JSON di risposta.
-          </div>
-        </div>
-      `;
-    });
-
-    /* =========================
-       FIRESTORE SYNC (TASK + MEMO)
-    ========================= */
-    const SYNC = { unsub:null, docRef:null, data:{ tasks:{}, memos:{} }, ready:false };
+    // =========================
+    // FIRESTORE SYNC (TASK + MEMO)
+    // =========================
+    const SYNC = {
+      unsub: null,
+      docRef: null,
+      data: { tasks: {}, memos: {} },
+      ready: false
+    };
 
     function setSyncBadge(state){
       const b = $("syncBadge");
-      if(state === "ok"){ b.className = "syncBadge ok"; b.textContent = "Sync: attivo"; }
-      else if(state === "warn"){ b.className = "syncBadge warn"; b.textContent = "Sync: non attivo"; }
-      else { b.className = "syncBadge"; b.textContent = "Sync: ..."; }
+      if(state === "ok"){
+        b.className = "syncBadge ok";
+        b.textContent = "Sync: attivo";
+      } else if(state === "warn"){
+        b.className = "syncBadge warn";
+        b.textContent = "Sync: non attivo";
+      } else {
+        b.className = "syncBadge";
+        b.textContent = "Sync: ...";
+      }
     }
 
-    function todayMidnight(d=new Date()){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
-    function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+    function todayMidnight(d=new Date()){
+      const x = new Date(d);
+      x.setHours(0,0,0,0);
+      return x;
+    }
+    function addDays(d, n){
+      const x = new Date(d);
+      x.setDate(x.getDate()+n);
+      return x;
+    }
     function dateKey(d){
       const x = todayMidnight(d);
       const y = x.getFullYear();
@@ -1008,8 +786,12 @@
       const dd = String(x.getDate()).padStart(2,'0');
       return `${y}-${m}-${dd}`;
     }
-    function prettyDay(d){ return d.toLocaleDateString("it-IT",{weekday:"short",day:"2-digit",month:"2-digit"}); }
-    function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+    function prettyDay(d){
+      return d.toLocaleDateString("it-IT",{weekday:"short",day:"2-digit",month:"2-digit"});
+    }
+    function uid(){
+      return Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
 
     function normalizePlanner(p){
       const tasks = (p && typeof p.tasks === "object" && p.tasks) ? p.tasks : {};
@@ -1044,10 +826,11 @@
       try{ await writePlanner(next); }catch{}
     }
 
-    /* =========================
-       AGENDA 3 GIORNI
-    ========================= */
+    // =========================
+    // AGENDA 3 GIORNI (SCORRE OGNI GIORNO)
+    // =========================
     let selectedOffset = 0;
+
     function setDayOffset(n){
       selectedOffset = n;
       $("dayBtn0").classList.toggle("active", n===0);
@@ -1079,9 +862,9 @@
       }, Math.max(1000, ms));
     })();
 
-    /* =========================
-       CALENDARIO SETTIMANALE
-    ========================= */
+    // =========================
+    // CALENDARIO SETTIMANALE (collegato ai task)
+    // =========================
     let manualTargetDateKey = null;
 
     function startOfWeekMonday(d=new Date()){
@@ -1091,8 +874,12 @@
       x.setDate(x.getDate() + diff);
       return x;
     }
-    function shortDow(d){ return d.toLocaleDateString("it-IT",{weekday:"short"}).replace(".",""); }
-    function formatDM(d){ return d.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"}); }
+    function shortDow(d){
+      return d.toLocaleDateString("it-IT",{weekday:"short"}).replace(".","");
+    }
+    function formatDM(d){
+      return d.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"});
+    }
 
     function setWeekSelected(dateKeyStr){
       manualTargetDateKey = dateKeyStr || null;
@@ -1120,6 +907,7 @@
       const base = startOfWeekMonday(new Date());
       const todayKey = dateKey(new Date());
       const allTasks = Object.values(SYNC.data.tasks || {});
+
       const days = Array.from({length:7}, (_,i)=> addDays(base,i));
 
       grid.innerHTML = days.map(d=>{
@@ -1166,9 +954,9 @@
       });
     }
 
-    /* =========================
-       RENDER TASK + MEMO
-    ========================= */
+    // =========================
+    // RENDER TASK + MEMO
+    // =========================
     function renderTasksAndMemos(){
       if(!auth.currentUser){
         const msg = '<div class="muted" style="padding:10px 6px;font-size:12px;">Login richiesto.</div>';
@@ -1235,73 +1023,115 @@
         }).join("");
       }
 
+      // wiring TASK
       document.querySelectorAll("#agendaPanel .item").forEach(el => {
         const id = el.getAttribute("data-id");
         const chk = el.querySelector(".chk");
         const del = el.querySelector(".del");
+
         chk.addEventListener("change", () => {
-          safeWrite(d => { if(d.tasks[id]) d.tasks[id].done = !!chk.checked; return d; });
+          safeWrite(d => {
+            if(d.tasks[id]) d.tasks[id].done = !!chk.checked;
+            return d;
+          });
         });
         del.addEventListener("click", () => {
-          safeWrite(d => { delete d.tasks[id]; return d; });
+          safeWrite(d => {
+            delete d.tasks[id];
+            return d;
+          });
         });
       });
 
+      // wiring MEMO
       document.querySelectorAll("#memoPanel .item").forEach(el => {
         const id = el.getAttribute("data-id");
         const pencil = el.querySelector(".pencil");
         const del = el.querySelector(".del");
+
         pencil.addEventListener("click", () => {
-          safeWrite(d => { if(d.memos[id]) d.memos[id].done = !d.memos[id].done; return d; });
+          safeWrite(d => {
+            if(d.memos[id]) d.memos[id].done = !d.memos[id].done;
+            return d;
+          });
         });
         del.addEventListener("click", () => {
-          safeWrite(d => { delete d.memos[id]; return d; });
+          safeWrite(d => {
+            delete d.memos[id];
+            return d;
+          });
         });
       });
     }
 
-    /* =========================
-       ADD/CLEAR
-    ========================= */
+    // =========================
+    // AZIONI UI (ADD/CLEAR)
+    // =========================
     $("addTaskBtn").addEventListener("click", () => {
       const text = $("taskInput").value.trim();
       if(!text) return;
 
       const base = todayMidnight(new Date());
-      const targetKey = manualTargetDateKey ? manualTargetDateKey : dateKey(addDays(base, selectedOffset));
-      const id = uid();
+      let targetKey = null;
 
-      safeWrite(d => { d.tasks[id] = { id, dateKey: targetKey, text, done:false, createdAt: Date.now() }; return d; });
+      if (manualTargetDateKey) {
+        targetKey = manualTargetDateKey;        // calendario settimanale
+      } else {
+        targetKey = dateKey(addDays(base, selectedOffset)); // agenda 3 giorni
+      }
+
+      const id = uid();
+      safeWrite(d => {
+        d.tasks[id] = { id, dateKey: targetKey, text, done:false, createdAt: Date.now() };
+        return d;
+      });
+
       $("taskInput").value = "";
     });
 
-    $("taskInput").addEventListener("keydown", (e)=>{
+    $("taskInput").addEventListener("keypress", (e)=>{
       if(e.key==="Enter"){ e.preventDefault(); $("addTaskBtn").click(); }
     });
 
     $("agendaClearDoneBtn").addEventListener("click", ()=>{
-      safeWrite(d => { for(const [id,t] of Object.entries(d.tasks)) if(t && t.done) delete d.tasks[id]; return d; });
+      safeWrite(d => {
+        for(const [id,t] of Object.entries(d.tasks)){
+          if(t && t.done) delete d.tasks[id];
+        }
+        return d;
+      });
     });
 
     $("addMemoBtn").addEventListener("click", ()=>{
       const text = $("memoInput").value.trim();
       if(!text) return;
       const id = uid();
-      safeWrite(d => { d.memos[id] = { id, text, done:false, createdAt: Date.now() }; return d; });
+      safeWrite(d => {
+        d.memos[id] = { id, text, done:false, createdAt: Date.now() };
+        return d;
+      });
       $("memoInput").value = "";
     });
 
     $("memoInput").addEventListener("keydown", (e)=>{
-      if(e.key==="Enter" && (e.ctrlKey || e.metaKey)){ e.preventDefault(); $("addMemoBtn").click(); }
+      if(e.key==="Enter" && (e.ctrlKey || e.metaKey)){
+        e.preventDefault();
+        $("addMemoBtn").click();
+      }
     });
 
     $("memoClearDoneBtn").addEventListener("click", ()=>{
-      safeWrite(d => { for(const [id,m] of Object.entries(d.memos)) if(m && m.done) delete d.memos[id]; return d; });
+      safeWrite(d => {
+        for(const [id,m] of Object.entries(d.memos)){
+          if(m && m.done) delete d.memos[id];
+        }
+        return d;
+      });
     });
 
-    /* =========================
-       SYNC START/STOP
-    ========================= */
+    // =========================
+    // START/STOP SYNC
+    // =========================
     function startPlannerSync(user){
       stopPlannerSync();
       SYNC.docRef = doc(db, "users", user.uid, "planner", "main");
@@ -1316,10 +1146,13 @@
         renderTasksAndMemos();
         renderWeekCalendar();
         refreshDayHeaders();
+
         if(!snap.exists()){
           setDoc(SYNC.docRef, SYNC.data, { merge:false }).catch(()=>{});
         }
-      }, () => setSyncBadge("warn"));
+      }, () => {
+        setSyncBadge("warn");
+      });
     }
 
     function stopPlannerSync(){
@@ -1333,57 +1166,15 @@
       renderWeekCalendar();
     }
 
-    /* =========================
-       CHAT (demo locale)
-    ========================= */
-    const chatTrigger = $("chatTrigger");
-    const chatBox = $("chatBox");
-    const closeBtn = $("closeBtn");
-    const chatMessages = $("chatMessages");
-    const chatInputField = $("chatInputField");
-    const chatSendBtn = $("chatSendBtn");
-
-    function addMsg(text, who="user"){
-      const wrap = document.createElement("div");
-      wrap.className = "message " + (who === "ai" ? "ai" : "user");
-      const bub = document.createElement("div");
-      bub.className = "messageBubble";
-      bub.textContent = text;
-      wrap.appendChild(bub);
-      chatMessages.appendChild(wrap);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-    async function sendChat(){
-      const text = (chatInputField.value || "").trim();
-      if(!text) return;
-      chatInputField.value = "";
-      addMsg(text, "user");
-      addMsg("Ok. (Collego l’API chat quando mi dai URL e payload.)", "ai");
-    }
-
-    chatTrigger.addEventListener("click", () => {
-      chatBox.classList.add("open");
-      chatTrigger.style.display = "none";
-      chatInputField.focus();
-    });
-    closeBtn.addEventListener("click", () => {
-      chatBox.classList.remove("open");
-      chatTrigger.style.display = "flex";
-    });
-    chatSendBtn.addEventListener("click", sendChat);
-    chatInputField.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter"){ e.preventDefault(); sendChat(); }
-    });
-
-    /* =========================
-       AUTH
-    ========================= */
+    // =========================
+    // AUTH STATE
+    // =========================
     onAuthStateChanged(auth, user => {
       if (user) {
         $("userPill").textContent = "✅ " + (user.email || "Utente");
         $("userPill").classList.remove("muted");
-        $("userPill").style.borderColor = "rgba(249,115,22,.55)";
-        $("userPill").style.background  = "rgba(249,115,22,.12)";
+        $("userPill").style.borderColor = "rgba(34,197,94,.5)";
+        $("userPill").style.background  = "rgba(34,197,94,.1)";
         $("loginBtn").style.display  = "none";
         $("logoutBtn").style.display = "inline-block";
         $("refreshBtn").disabled = false;
