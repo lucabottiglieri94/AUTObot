@@ -17,6 +17,11 @@
       --muted:#9ca3af;
       --accent:#3b82f6;
       --accent2:#60a5fa;
+
+      /* arancio moderno */
+      --orange:#f97316;
+      --orange2:#fb923c;
+      --orangeGlow: rgba(249,115,22,.22);
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{
@@ -143,7 +148,7 @@
     .panelSub{margin-top:6px}
 
     .newsScroll{
-      max-height: calc(100vh - 140px);
+      max-height: calc(100vh - 240px);
       overflow:auto;
       padding:12px;
     }
@@ -313,7 +318,6 @@
       font-family:inherit;
     }
     .cmpSuggest:hover{background:rgba(59,130,246,.25);border-color:rgba(59,130,246,.6)}
-
     .cmpLoading{display:flex;align-items:center;justify-content:center;gap:10px;padding:40px;color:#9ca3af;font-size:14px}
 
     /* ===== AGENDA + MEMO ===== */
@@ -350,7 +354,7 @@
       font-family:inherit;
       transition:border-color .2s, background .2s;
     }
-    .field:focus{border-color:#3b82f6;background:rgba(31,41,55,.8)}
+    .field:focus{border-color:var(--orange);background:rgba(31,41,55,.8)}
     .seg{
       display:inline-flex;
       border:1px solid rgba(31,41,55,.9);
@@ -363,8 +367,12 @@
       padding:8px 10px;font-size:12px;cursor:pointer;
       transition:all .2s;font-family:inherit;font-weight:700;white-space:nowrap;
     }
-    .seg button.active{color:#e5e7eb;background:rgba(59,130,246,.18)}
-    .seg button:hover{background:rgba(59,130,246,.12);color:#cfe1ff}
+    .seg button.active{
+      color:#fff;
+      background:linear-gradient(135deg, rgba(249,115,22,.28) 0%, rgba(251,146,60,.22) 100%);
+    }
+    .seg button:hover{background:rgba(249,115,22,.14);color:#ffe6d5}
+
     .split3{
       display:grid;
       grid-template-columns:repeat(3,1fr);
@@ -421,8 +429,8 @@
       display:flex;align-items:center;justify-content:center;
       font-size:14px;font-weight:900;
     }
-    .iconBtn:hover{border-color:rgba(59,130,246,.55);background:rgba(17,24,39,.7);transform:translateY(-1px)}
-    .chk{width:18px;height:18px;flex:0 0 auto;accent-color:#3b82f6;margin-top:2px;cursor:pointer}
+    .iconBtn:hover{border-color:rgba(249,115,22,.55);background:rgba(17,24,39,.7);transform:translateY(-1px)}
+    .chk{width:18px;height:18px;flex:0 0 auto;accent-color:var(--orange);margin-top:2px;cursor:pointer}
     .smallNote{margin-top:10px;color:#9ca3af;font-size:12px}
     .memoArea{width:100%;min-height:110px;resize:vertical}
 
@@ -437,6 +445,80 @@
     }
     .syncBadge.ok{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10);color:#bbf7d0}
     .syncBadge.warn{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.10);color:#fde68a}
+
+    /* header widget leggera tinta arancio */
+    #agendaPanel .widgetHeader,
+    #memoPanel .widgetHeader{
+      background:linear-gradient(180deg, rgba(249,115,22,.09) 0%, rgba(10,12,18,.35) 70%);
+    }
+
+    /* ===== CALENDARIO SETTIMANALE sotto news ===== */
+    .weekPanel{
+      border-top:1px solid rgba(31,41,55,.75);
+      padding:12px;
+      background:rgba(10,12,18,.18);
+    }
+    .weekHead{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      margin-bottom:10px;
+    }
+    .weekTitle{font-weight:950;font-size:16px}
+    .weekSub{color:#9ca3af;font-size:12px}
+    .weekGrid{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:8px;
+    }
+    .weekCell{
+      aspect-ratio: 1 / 1;
+      border:1px solid rgba(31,41,55,.75);
+      background:rgba(17,24,39,.35);
+      border-radius:14px;
+      padding:10px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .weekCell.today{
+      border-color:rgba(249,115,22,.55);
+      box-shadow:0 0 0 3px rgba(249,115,22,.10) inset;
+    }
+    .weekTop{
+      display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+    }
+    .weekDow{font-size:11px;color:#9ca3af;font-weight:800;text-transform:uppercase}
+    .weekDay{font-size:16px;font-weight:950}
+    .weekTasks{
+      margin-top:2px;
+      display:grid;
+      gap:4px;
+      overflow:hidden;
+    }
+    .weekTask{
+      font-size:11px;
+      line-height:1.2;
+      color:#e5e7eb;
+      opacity:.95;
+      padding:5px 7px;
+      border-radius:10px;
+      border:1px solid rgba(31,41,55,.65);
+      background:rgba(31,41,55,.30);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .weekTask.done{opacity:.55;text-decoration:line-through}
+    .weekMore{
+      font-size:11px;
+      color:#fdba74;
+      opacity:.9;
+      font-weight:800;
+    }
+    @media (max-width: 980px){
+      .weekGrid{gap:6px}
+      .weekCell{border-radius:12px;padding:8px}
+    }
   </style>
 </head>
 
@@ -486,8 +568,21 @@
           </div>
           <button id="refreshBtn" class="btn" disabled>🔄</button>
         </div>
+
         <div class="newsScroll">
           <div id="newsList"></div>
+        </div>
+
+        <!-- CALENDARIO SETTIMANALE SOTTO LE NEWS -->
+        <div class="weekPanel">
+          <div class="weekHead">
+            <div>
+              <div class="weekTitle">🗓 Calendario settimanale</div>
+              <div class="weekSub">Mostra i task dell’agenda nella settimana corrente</div>
+            </div>
+            <div id="weekRange" class="pill muted">—</div>
+          </div>
+          <div id="weekGrid" class="weekGrid"></div>
         </div>
       </aside>
 
@@ -614,7 +709,7 @@
     </div>
   </main>
 
-  <!-- Chat UI (lasciato invariato) -->
+  <!-- Chat UI -->
   <div class="chatTrigger" id="chatTrigger">
     <img src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI Agent"/>
   </div>
@@ -729,7 +824,6 @@
     const auth = getAuth(app);
     const db   = getFirestore(app);
 
-    // cache offline Firestore (utile su mobile)
     enableIndexedDbPersistence(db).catch(()=>{});
 
     const provider = new GoogleAuthProvider();
@@ -798,7 +892,7 @@
       unsub: null,
       uid: null,
       docRef: null,
-      data: { tasks: {}, memos: {} },  // map per id
+      data: { tasks: {}, memos: {} },
       ready: false
     };
 
@@ -840,7 +934,68 @@
       return Math.random().toString(16).slice(2) + Date.now().toString(16);
     }
 
-    // Agenda scorre: sempre OGGI, DOMANI, +2 in base alla data corrente
+    // ===== Calendario settimanale (quadrato) con task =====
+    function startOfWeekMonday(d=new Date()){
+      const x = todayMidnight(d);
+      const day = x.getDay(); // 0=Dom ... 1=Lun
+      const diff = (day === 0 ? -6 : 1 - day);
+      x.setDate(x.getDate() + diff);
+      return x;
+    }
+    function fmtRange(a,b){
+      const A = a.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"});
+      const B = b.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"});
+      return `${A}–${B}`;
+    }
+    function renderWeekCalendar(){
+      const grid = $("weekGrid");
+      const range = $("weekRange");
+      if(!grid || !range) return;
+
+      if(!auth.currentUser){
+        range.textContent = "Login richiesto";
+        grid.innerHTML = "";
+        return;
+      }
+
+      const base = startOfWeekMonday(new Date());
+      const end  = addDays(base, 6);
+      range.textContent = fmtRange(base, end);
+
+      const allTasks = Object.values(SYNC.data.tasks || {});
+      const todayKey = dateKey(new Date());
+      const dows = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
+
+      grid.innerHTML = Array.from({length:7}).map((_,i)=>{
+        const d = addDays(base, i);
+        const k = dateKey(d);
+
+        const tasks = allTasks
+          .filter(t => t && t.dateKey === k)
+          .sort((a,b)=> (Number(a.done) - Number(b.done)) || ((a.createdAt||0)-(b.createdAt||0)));
+
+        const show = tasks.slice(0,3).map(t=>{
+          const cls = t.done ? "weekTask done" : "weekTask";
+          return `<div class="${cls}" title="${escapeHtml(t.text||"")}">${escapeHtml(t.text||"")}</div>`;
+        }).join("");
+
+        const more = tasks.length > 3 ? `<div class="weekMore">+${tasks.length-3} altri</div>` : "";
+
+        return `
+          <div class="weekCell ${k===todayKey ? "today":""}">
+            <div class="weekTop">
+              <div class="weekDow">${dows[i]}</div>
+              <div class="weekDay">${String(d.getDate()).padStart(2,"0")}</div>
+            </div>
+            <div class="weekTasks">
+              ${tasks.length ? (show + more) : `<div class="muted" style="font-size:11px;opacity:.7">—</div>`}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Agenda scorre: sempre OGGI, DOMANI, +2
     let selectedOffset = 0;
 
     function refreshDayHeaders(){
@@ -851,10 +1006,10 @@
       $("dayDate0").textContent = prettyDay(d0);
       $("dayDate1").textContent = prettyDay(d1);
       $("dayDate2").textContent = prettyDay(d2);
-      renderTasksAndMemos(); // ricalcola in base ai 3 giorni correnti
+      renderTasksAndMemos();
+      renderWeekCalendar();
     }
 
-    // aggiorna a mezzanotte automaticamente
     (function scheduleMidnightRefresh(){
       const now = new Date();
       const next = new Date(now);
@@ -874,7 +1029,6 @@
 
     async function writePlanner(nextData){
       if(!SYNC.docRef) return;
-      // scrittura full (semplice e robusta per piccoli dati)
       await setDoc(SYNC.docRef, nextData, { merge: false });
     }
 
@@ -884,14 +1038,14 @@
       const next = mutatorFn(current);
       SYNC.data = next;
       renderTasksAndMemos();
+      renderWeekCalendar();
       try{
         await writePlanner(next);
       }catch{
-        // se offline, Firestore farà sync appena possibile (cache attiva)
+        // offline ok
       }
     }
 
-    // pulizia: elimina task più vecchi di 30 giorni (anche se non visibili)
     function cleanupOldTasks(data){
       const keepAfter = todayMidnight(addDays(new Date(), -30));
       const limitKey = dateKey(keepAfter);
@@ -904,7 +1058,6 @@
     }
 
     function renderTasksAndMemos(){
-      // se non loggato, mostra vuoto
       const logged = !!auth.currentUser;
       if(!logged){
         $("taskList0").innerHTML = '<div class="muted" style="padding:10px 6px;font-size:12px;">Login richiesto.</div>';
@@ -947,7 +1100,6 @@
         }).join("");
       }
 
-      // memos
       const box = $("memoList");
       const memos = Object.values(SYNC.data.memos || {})
         .sort((a,b)=> (Number(a.done) - Number(b.done)) || ((a.createdAt||0) - (b.createdAt||0)));
@@ -971,7 +1123,6 @@
         }).join("");
       }
 
-      // wiring task events
       document.querySelectorAll("#agendaPanel .item").forEach(el => {
         const id = el.getAttribute("data-id");
         const chk = el.querySelector(".chk");
@@ -990,7 +1141,6 @@
         });
       });
 
-      // wiring memo events
       document.querySelectorAll("#memoPanel .item").forEach(el => {
         const id = el.getAttribute("data-id");
         const pencil = el.querySelector(".pencil");
@@ -1085,8 +1235,8 @@
         SYNC.ready = true;
         setSyncBadge("ok");
         renderTasksAndMemos();
+        renderWeekCalendar();
 
-        // se doc non esiste, crealo una volta
         if(!snap.exists()){
           setDoc(SYNC.docRef, SYNC.data, { merge:false }).catch(()=>{});
         }
@@ -1104,6 +1254,7 @@
       SYNC.ready = false;
       setSyncBadge("warn");
       renderTasksAndMemos();
+      renderWeekCalendar();
     }
 
     // =========================
@@ -1138,10 +1289,8 @@
     });
 
     // =========================
-    // Comparatore + Chat: lasciati invariati (se ti servono, incollaci qui la tua parte originale)
+    // Comparatore (mini suggest) + Chat base
     // =========================
-
-    // mini: suggest comparatore
     function setSuggest(a,b){
       $("cmpInput1").value=a; $("cmpInput2").value=b;
       $("cmpInput1").style.borderColor="#3b82f6";
@@ -1155,8 +1304,7 @@
       $("cmpResults").innerHTML = '<div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">↑ Scrivi il modello e premi Confronta</div>';
     });
 
-    // Chat open/close (base)
-    let isMinimized = false;
+    // Chat open/close
     const chatTrigger    = $("chatTrigger");
     const chatBox        = $("chatBox");
     const chatInputField = $("chatInputField");
@@ -1169,7 +1317,6 @@
     });
     $("minimizeBtn").addEventListener("click", () => {
       chatBox.classList.add("minimized");
-      isMinimized = true;
       $("chatMinimizedLogo").style.display = "block";
     });
     $("closeBtn").addEventListener("click", () => {
@@ -1178,7 +1325,6 @@
     });
     $("chatMinimizedLogo").addEventListener("click", () => {
       chatBox.classList.remove("minimized");
-      isMinimized = false;
       $("chatMinimizedLogo").style.display = "none";
       chatInputField.focus();
     });
