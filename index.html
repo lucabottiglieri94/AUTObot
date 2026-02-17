@@ -742,9 +742,9 @@
 
       try{
         const result = await getRedirectResult(auth);
-        if (result?.user) setStatus("Login riuscito! Benvenuto " +
+        if (result?.user) setStatus("Login riuscito! Benvenuto " + result.user.email);
       }catch(e){
-        setStatus("âŒ Errore login: " + (e.code || e.message));
+        setStatus("Errore login: " + (e.code || e.message));
       }
     })();
 
@@ -756,7 +756,7 @@
         return;
       }
 
-      setStatus("â³ Caricamento news...");
+        setStatus("Caricamento news...");
       $("refreshBtn").disabled = true;
 
       try {
@@ -777,8 +777,8 @@
         else if (Array.isArray(data)) renderItems(data);
         else throw new Error("Formato dati non valido");
       } catch (err) {
-        $("newsList").innerHTML = '<div class="muted" style="padding:20px;text-align:center">âŒ Errore caricamento news</div>';
-        setStatus("âŒ Errore: " + (err?.message || err));
+        $("newsList").innerHTML = '<div class="muted" style="padding:20px;text-align:center">Errore caricamento news</div>';
+        setStatus("Errore: " + (err?.message || err));
       } finally {
         $("refreshBtn").disabled = !auth.currentUser;
       }
