@@ -32,7 +32,7 @@
     }
 
     header{
-      position:sticky;
+      position:relative;  /* FIX: era sticky, ora non segue lo scroll */
       top:0;
       z-index:10;
       background:rgba(10,10,12,.72);
@@ -58,7 +58,6 @@
       min-width: 320px;
     }
 
-    /* LOGO TOP-LEFT + TESTO */
     .brandMark{
       display:flex;
       align-items:center;
@@ -119,7 +118,6 @@
     .btn.brand-alfa:hover{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)}
     .btn.brand-lancia:hover{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.1)}
 
-    /* CentroAuto Logo */
     .centroAutoLink{
       display:inline-flex;
       align-items:center;
@@ -154,7 +152,6 @@
     }
     .muted{color:var(--muted)}
 
-    /* LAYOUT: NEWS A SINISTRA (riquadro scrollabile) */
     .layout{
       margin-top:16px;
       display:grid;
@@ -189,7 +186,6 @@
       padding:12px;
     }
 
-    /* scrollbar (WebKit) */
     .newsScroll::-webkit-scrollbar{width:10px}
     .newsScroll::-webkit-scrollbar-thumb{
       background:rgba(59,130,246,.25);
@@ -228,8 +224,6 @@
     }
 
     /* ========== CHATBOT STYLES ========== */
-    
-    /* Pulsante AI Agent (bottom-right) */
     .chatTrigger{
       position:fixed;
       bottom:24px;
@@ -257,7 +251,6 @@
       object-fit:contain;
     }
 
-    /* Chat Box Container */
     .chatBox{
       position:fixed;
       bottom:24px;
@@ -291,7 +284,6 @@
       display:none;
     }
 
-    /* Chat Header */
     .chatHeader{
       background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
       padding:14px 16px;
@@ -346,7 +338,6 @@
       transform:scale(1.05);
     }
 
-    /* Chat Messages Area */
     .chatMessages{
       flex:1;
       overflow-y:auto;
@@ -365,7 +356,6 @@
     }
     .chatMessages::-webkit-scrollbar-track{background:rgba(0,0,0,.2)}
 
-    /* Message Bubbles */
     .message{
       display:flex;
       gap:8px;
@@ -376,9 +366,7 @@
       to{opacity:1;transform:translateY(0)}
     }
 
-    .message.user{
-      flex-direction:row-reverse;
-    }
+    .message.user{ flex-direction:row-reverse; }
     .messageBubble{
       max-width:85%;
       padding:12px 16px;
@@ -399,7 +387,6 @@
       border-bottom-right-radius:4px;
     }
 
-    /* Typing Indicator */
     .typingIndicator{
       display:flex;
       gap:8px;
@@ -424,7 +411,6 @@
       40%{transform:scale(1)}
     }
 
-    /* Chat Input */
     .chatInput{
       padding:16px;
       background:rgba(10,12,18,.95);
@@ -448,9 +434,7 @@
       border-color:var(--accent);
       background:rgba(31,41,55,.8);
     }
-    .chatInputField::placeholder{
-      color:var(--muted);
-    }
+    .chatInputField::placeholder{ color:var(--muted); }
     .chatSendBtn{
       width:48px;
       height:48px;
@@ -469,10 +453,7 @@
       transform:scale(1.05);
       box-shadow:0 4px 16px rgba(59,130,246,.4);
     }
-    .chatSendBtn:disabled{
-      opacity:.5;
-      cursor:not-allowed;
-    }
+    .chatSendBtn:disabled{ opacity:.5; cursor:not-allowed; }
 
     @media (max-width: 980px){
       .layout{grid-template-columns:1fr}
@@ -487,12 +468,7 @@
         right:0;
         border-radius:0;
       }
-      .chatTrigger{
-        bottom:16px;
-        right:16px;
-        width:60px;
-        height:60px;
-      }
+      .chatTrigger{ bottom:16px; right:16px; width:60px; height:60px; }
     }
 
     /* ===== COMPARATORE ===== */
@@ -602,7 +578,6 @@
           <button id="alfaBtn" class="btn brand-alfa">Alfa Romeo</button>
           <button id="lanciaBtn" class="btn brand-lancia">Lancia</button>
           
-          <!-- Logo CentroAuto -->
           <a 
             href="https://www.centroautovt.it/" 
             target="_blank" 
@@ -639,7 +614,6 @@
           </div>
           <button id="refreshBtn" class="btn" disabled>&#128260;</button>
         </div>
-
         <div class="newsScroll">
           <div id="newsList"></div>
         </div>
@@ -647,8 +621,6 @@
 
       <!-- CONTENUTI A DESTRA -->
       <section class="rightSpace" style="padding:0;border:none;background:none;">
-
-        <!-- ===== COMPARATORE AUTO ===== -->
         <div id="comparatorPanel" style="
           background:rgba(17,24,39,.78);
           border:1px solid #1f2937;
@@ -668,23 +640,21 @@
           ">
             <div>
               <div style="font-weight:950;font-size:18px">&#9878; Comparatore Auto</div>
-              <div style="color:#9ca3af;font-size:13px;margin-top:4px">Confronta due auto fianco a fianco</div>
+              <div style="color:#9ca3af;font-size:13px;margin-top:4px">Confronta due auto nuove — cerca sui configuratori ufficiali</div>
             </div>
-            <button id="cmpResetBtn" class="btn" style="font-size:12px;padding:7px 12px;">
-              &#10227; Reset
-            </button>
+            <button id="cmpResetBtn" class="btn" style="font-size:12px;padding:7px 12px;">&#10227; Reset</button>
           </div>
 
           <!-- Input row -->
           <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.5);display:flex;gap:10px;flex-wrap:wrap;">
-            <input id="cmpInput1" type="text" placeholder="Auto 1 — es. Jeep Compass Longitude"
+            <input id="cmpInput1" type="text" placeholder="Es: Grande Panda, Compass, Stelvio..."
               style="flex:1;min-width:180px;background:rgba(31,41,55,.6);border:1px solid #1f2937;
                 border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;
                 font-family:inherit;transition:border-color .2s"
               onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'"
             />
             <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;font-weight:700;">VS</div>
-            <input id="cmpInput2" type="text" placeholder="Auto 2 — es. Fiat Tipo Cross"
+            <input id="cmpInput2" type="text" placeholder="Es: Junior, Avenger, Ypsilon..."
               style="flex:1;min-width:180px;background:rgba(31,41,55,.6);border:1px solid #1f2937;
                 border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;
                 font-family:inherit;transition:border-color .2s"
@@ -694,62 +664,47 @@
               background:linear-gradient(135deg,#3b82f6,#60a5fa);
               border:none;border-radius:10px;padding:10px 20px;
               color:#fff;font-weight:700;font-size:14px;cursor:pointer;
-              transition:all .2s;white-space:nowrap;font-family:inherit;
-            "
+              transition:all .2s;white-space:nowrap;font-family:inherit;"
               onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 16px rgba(59,130,246,.4)'"
               onmouseout="this.style.transform='none';this.style.boxShadow='none'"
-            >
-              &#128269; Confronta
-            </button>
+            >&#128269; Confronta</button>
           </div>
 
           <!-- Quick suggestions -->
           <div style="padding:10px 20px;border-bottom:1px solid rgba(31,41,55,.4);display:flex;gap:8px;flex-wrap:wrap;">
-            <span style="color:#9ca3af;font-size:12px;align-self:center;">Esempio rapido:</span>
-            <button class="cmpSuggest" onclick="setSuggest('Jeep Compass Longitude','Jeep Compass Limited')">Compass Longitude vs Limited</button>
-            <button class="cmpSuggest" onclick="setSuggest('Fiat Panda','Fiat Tipo')">Panda vs Tipo</button>
-            <button class="cmpSuggest" onclick="setSuggest('Alfa Romeo Giulia','Alfa Romeo Stelvio')">Giulia vs Stelvio</button>
+            <span style="color:#9ca3af;font-size:12px;align-self:center;">Rapido:</span>
+            <button class="cmpSuggest" onclick="setSuggest('Grande Panda','Junior')">Grande Panda vs Junior</button>
+            <button class="cmpSuggest" onclick="setSuggest('Compass','Tonale')">Compass vs Tonale</button>
+            <button class="cmpSuggest" onclick="setSuggest('Stelvio','Renegade')">Stelvio vs Renegade</button>
+            <button class="cmpSuggest" onclick="setSuggest('Ypsilon','Avenger')">Ypsilon vs Avenger</button>
           </div>
 
           <!-- Results area -->
           <div id="cmpResults" style="padding:20px;min-height:120px;">
             <div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">
-              &#8593; Inserisci due auto e premi Confronta
+              &#8593; Scrivi il modello e premi Confronta — riconosco Fiat, Jeep, Alfa Romeo e Lancia automaticamente
             </div>
           </div>
         </div>
-
       </section>
     </div>
   </main>
 
-  <!-- ========== CHATBOT UI ========== -->
-  
-  <!-- Pulsante trigger -->
+  <!-- CHATBOT UI -->
   <div class="chatTrigger" id="chatTrigger">
-    <img 
-      src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" 
-      alt="AI Agent"
-    />
+    <img src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI Agent"/>
   </div>
 
-  <!-- Chat Box -->
   <div class="chatBox" id="chatBox">
-    <!-- Logo visibile quando minimizzato -->
     <img 
       id="chatMinimizedLogo"
       src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" 
       alt="AI Agent"
       style="display:none; width:70px; height:70px; object-fit:contain; cursor:pointer;"
     />
-    
     <div class="chatHeader">
       <div class="chatHeaderLeft">
-        <img 
-          class="chatHeaderLogo" 
-          src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" 
-          alt="AI"
-        />
+        <img class="chatHeaderLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI"/>
         <div>
           <div class="chatHeaderTitle">AI BOTT Assistant</div>
           <div class="chatHeaderSub">Esperto configurazioni</div>
@@ -762,7 +717,6 @@
     </div>
 
     <div class="chatMessages" id="chatMessages">
-      <!-- Messaggio di benvenuto -->
       <div class="message ai">
         <div class="messageBubble">Ciao! &#128075; Sono <strong>AI BOTT</strong>, il tuo assistente auto.
 
@@ -770,8 +724,9 @@
 &#8226; Auto <strong>nuove</strong> &mdash; Fiat, Jeep, Alfa, Lancia
 &#8226; Auto <strong>usate</strong> &mdash; CentroAuto VT (Ford, Jeep, Opel, VW...)
 
-&#9997; Es: <em>&ldquo;Ford usata&rdquo;</em> oppure <em>&ldquo;Compass allestimenti&rdquo;</em></div></div>
+&#9997; Es: <em>&ldquo;Ford usata&rdquo;</em> oppure <em>&ldquo;Compass allestimenti&rdquo;</em></div>
       </div>
+    </div>
 
     <div class="chatInput">
       <input 
@@ -781,9 +736,7 @@
         placeholder="Es: auto usate disponibili oppure confronta Compass Longitude e Limited"
         autocomplete="off"
       />
-      <button class="chatSendBtn" id="chatSendBtn">
-        &#10148;
-      </button>
+      <button class="chatSendBtn" id="chatSendBtn">&#10148;</button>
     </div>
   </div>
 
@@ -802,15 +755,15 @@
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-    const BACKEND_NEWS = "/api/news";
-    const BACKEND_CHAT = "https://auto-backend-three.vercel.app/api/chat";
+    const BACKEND_NEWS   = "/api/news";
+    const BACKEND_CHAT   = "https://auto-backend-three.vercel.app/api/chat";
     const BACKEND_SEARCH = "https://auto-backend-three.vercel.app/api/search";
 
     const BRAND_LINKS = {
-      Fiat: "https://www.fiat.it/omni/configuratore/#/",
-      Jeep: "https://www.jeep-official.it/omni/configuratore",
-      AlfaRomeo: "https://www.alfaromeo.it/omni/configuratore",
-      Lancia: "https://www.lancia.it/omni/configuratore"
+      Fiat:     "https://www.fiat.it/omni/configuratore/#/",
+      Jeep:     "https://www.jeep-official.it/omni/configuratore",
+      AlfaRomeo:"https://www.alfaromeo.it/omni/configuratore",
+      Lancia:   "https://www.lancia.it/omni/configuratore"
     };
 
     const firebaseConfig = {
@@ -823,26 +776,20 @@
       measurementId: "G-WYM78KQWQJ"
     };
 
-    const $ = (id) => document.getElementById(id);
-    const setStatus = (t) => { $("status").textContent = t; };
+    const $ = id => document.getElementById(id);
+    const setStatus = t => { $("status").textContent = t; };
 
     function escapeHtml(s = "") {
       return String(s ?? "").replace(/[&<>"']/g, c => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
       }[c]));
     }
-
-    function safeHost(url) {
-      try { return new URL(url).hostname; } catch { return ""; }
-    }
-
+    function safeHost(url) { try { return new URL(url).hostname; } catch { return ""; } }
     function fmtDate(d) {
       if (!d) return "";
       const dt = new Date(d);
       if (Number.isNaN(dt.getTime())) return String(d);
-      return dt.toLocaleString("it-IT", {
-        day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit"
-      });
+      return dt.toLocaleString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
     }
 
     function renderItems(items) {
@@ -852,74 +799,50 @@
         setStatus("Nessuna news trovata.");
         return;
       }
-
       box.innerHTML = items.map(n => {
-        const link = n.url || n.link || "";
+        const link  = n.url || n.link || "";
         const title = n.title || "Senza titolo";
-        const date = fmtDate(n.date || n.pubDate || "");
-        const host = safeHost(link);
-
+        const date  = fmtDate(n.date || n.pubDate || "");
+        const host  = safeHost(link);
         return `
           <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">
             <div class="newsTitle">${escapeHtml(title)}</div>
             ${host ? `<div class="newsMeta">&#128279; ${escapeHtml(host)}</div>` : ""}
             ${date ? `<div class="newsDate">&#128336; ${escapeHtml(date)}</div>` : ""}
-          </a>
-        `;
+          </a>`;
       }).join("");
-
-      setStatus(`✅ ${items.length} news caricate • ${new Date().toLocaleString("it-IT")}`);
+      setStatus("\u2705 " + items.length + " news caricate \u2022 " + new Date().toLocaleString("it-IT"));
     }
 
-    const app = initializeApp(firebaseConfig);
+    const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt:"select_account", display:"popup" });
 
     (async function initApp(){
       try { await setPersistence(auth, browserLocalPersistence); }
-      catch {
-        try { await setPersistence(auth, browserSessionPersistence); } catch {}
-      }
-
-      try{
+      catch { try { await setPersistence(auth, browserSessionPersistence); } catch {} }
+      try {
         const result = await getRedirectResult(auth);
         if (result?.user) setStatus("Login riuscito! Benvenuto " + result.user.email);
-      }catch(e){
+      } catch(e) {
         setStatus("Errore login: " + (e.code || e.message));
       }
     })();
 
     async function loadNews() {
       const user = auth.currentUser;
-      if (!user) {
-        $("newsList").innerHTML = "";
-        setStatus("🔒 Effettua il login per vedere le news.");
-        return;
-      }
-
-        setStatus("Caricamento news...");
+      if (!user) { $("newsList").innerHTML = ""; setStatus("Effettua il login per vedere le news."); return; }
+      setStatus("Caricamento news...");
       $("refreshBtn").disabled = true;
-
       try {
-        const response = await fetch(BACKEND_NEWS, {
-          method:"GET",
-          headers:{ "Cache-Control":"no-cache" },
-          cache:"no-store"
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text().catch(() => "");
-          throw new Error(`HTTP ${response.status}${errorText ? " - " + errorText : ""}`);
-        }
-
+        const response = await fetch(BACKEND_NEWS, { method:"GET", headers:{"Cache-Control":"no-cache"}, cache:"no-store" });
+        if (!response.ok) { const t = await response.text().catch(()=>""); throw new Error(`HTTP ${response.status}${t?" - "+t:""}`); }
         const data = await response.json();
-
         if (data.items && Array.isArray(data.items)) renderItems(data.items);
         else if (Array.isArray(data)) renderItems(data);
         else throw new Error("Formato dati non valido");
-      } catch (err) {
+      } catch(err) {
         $("newsList").innerHTML = '<div class="muted" style="padding:20px;text-align:center">Errore caricamento news</div>';
         setStatus("Errore: " + (err?.message || err));
       } finally {
@@ -929,88 +852,69 @@
 
     $("loginBtn").addEventListener("click", async () => {
       try {
-        setStatus("📲 Apertura login Google...");
-
+        setStatus("Apertura login Google...");
         try {
           const result = await signInWithPopup(auth, provider);
           setStatus("Login riuscito! Benvenuto " + result.user.email);
-        } catch (popupError) {
-          if (popupError.code === "auth/popup-blocked" ||
-              popupError.code === "auth/popup-closed-by-user" ||
-              popupError.code === "auth/cancelled-popup-request") {
-            setStatus("🔄 Reindirizzamento in corso...");
+        } catch(popupError) {
+          if (["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(popupError.code)) {
+            setStatus("Reindirizzamento in corso...");
             await signInWithRedirect(auth, provider);
-          } else {
-            throw popupError;
-          }
+          } else { throw popupError; }
         }
-      } catch (e) {
-        let errorMsg = "Errore sconosciuto";
-        if (e.code === "auth/unauthorized-domain") errorMsg = "Dominio non autorizzato in Firebase Console";
-        else if (e.code === "auth/popup-blocked") errorMsg = "Popup bloccato dal browser";
-        else errorMsg = e.code || e.message;
-        setStatus("âŒ " + errorMsg);
+      } catch(e) {
+        let msg = "Errore sconosciuto";
+        if (e.code === "auth/unauthorized-domain") msg = "Dominio non autorizzato in Firebase Console";
+        else if (e.code === "auth/popup-blocked") msg = "Popup bloccato dal browser";
+        else msg = e.code || e.message;
+        setStatus("Errore: " + msg);
       }
     });
 
     $("logoutBtn").addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-        $("newsList").innerHTML = "";
-        setStatus("Logout effettuato.");
-      } catch (e) {
-        setStatus("âŒ Errore logout: " + (e.code || e.message));
-      }
+      try { await signOut(auth); $("newsList").innerHTML = ""; setStatus("Logout effettuato."); }
+      catch(e) { setStatus("Errore logout: " + (e.code || e.message)); }
     });
 
     $("refreshBtn").addEventListener("click", loadNews);
+    $("fiatBtn").addEventListener("click",  () => window.open(BRAND_LINKS.Fiat,      "_blank","noopener,noreferrer"));
+    $("jeepBtn").addEventListener("click",  () => window.open(BRAND_LINKS.Jeep,      "_blank","noopener,noreferrer"));
+    $("alfaBtn").addEventListener("click",  () => window.open(BRAND_LINKS.AlfaRomeo, "_blank","noopener,noreferrer"));
+    $("lanciaBtn").addEventListener("click",() => window.open(BRAND_LINKS.Lancia,    "_blank","noopener,noreferrer"));
 
-    $("fiatBtn").addEventListener("click", () => window.open(BRAND_LINKS.Fiat, "_blank", "noopener,noreferrer"));
-    $("jeepBtn").addEventListener("click", () => window.open(BRAND_LINKS.Jeep, "_blank", "noopener,noreferrer"));
-    $("alfaBtn").addEventListener("click", () => window.open(BRAND_LINKS.AlfaRomeo, "_blank", "noopener,noreferrer"));
-    $("lanciaBtn").addEventListener("click", () => window.open(BRAND_LINKS.Lancia, "_blank", "noopener,noreferrer"));
-
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, user => {
       if (user) {
-        $("userPill").textContent = "✅ " + (user.email || "Utente");
+        $("userPill").textContent = "\u2705 " + (user.email || "Utente");
         $("userPill").classList.remove("muted");
         $("userPill").style.borderColor = "rgba(34,197,94,.5)";
-        $("userPill").style.background = "rgba(34,197,94,.1)";
-
-        $("loginBtn").style.display = "none";
+        $("userPill").style.background  = "rgba(34,197,94,.1)";
+        $("loginBtn").style.display  = "none";
         $("logoutBtn").style.display = "inline-block";
         $("refreshBtn").disabled = false;
-
         loadNews();
       } else {
         $("userPill").textContent = "Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor = "";
-        $("userPill").style.background = "";
-
-        $("loginBtn").style.display = "inline-block";
+        $("userPill").style.background  = "";
+        $("loginBtn").style.display  = "inline-block";
         $("logoutBtn").style.display = "none";
         $("refreshBtn").disabled = true;
-
         $("newsList").innerHTML = "";
         setStatus("Effettua il login per caricare le news.");
       }
     });
 
-    // ========== CHATBOT LOGIC - IMPROVED ========== 
-    
+    // ========== CHATBOT ==========
     let chatHistory = [];
     let isMinimized = false;
 
-    const chatTrigger = $("chatTrigger");
-    const chatBox = $("chatBox");
-    const chatMessages = $("chatMessages");
+    const chatTrigger    = $("chatTrigger");
+    const chatBox        = $("chatBox");
+    const chatMessages   = $("chatMessages");
     const chatInputField = $("chatInputField");
-    const chatSendBtn = $("chatSendBtn");
-    const minimizeBtn = $("minimizeBtn");
-    const closeBtn = $("closeBtn");
+    const chatSendBtn    = $("chatSendBtn");
 
-    // Toggle chat
     chatTrigger.addEventListener("click", () => {
       chatBox.classList.add("open");
       chatBox.classList.remove("minimized");
@@ -1019,22 +923,18 @@
       chatInputField.focus();
     });
 
-    // Minimize
-    minimizeBtn.addEventListener("click", () => {
+    $("minimizeBtn").addEventListener("click", () => {
       chatBox.classList.add("minimized");
       isMinimized = true;
       $("chatMinimizedLogo").style.display = "block";
     });
 
-    // Close (senza cancellare la cronologia)
-    closeBtn.addEventListener("click", () => {
-      chatBox.classList.remove("open");
-      chatBox.classList.remove("minimized");
+    $("closeBtn").addEventListener("click", () => {
+      chatBox.classList.remove("open","minimized");
       chatTrigger.style.display = "flex";
     });
 
-    // Riapertura da header o logo minimizzato
-    chatBox.querySelector(".chatHeader").addEventListener("click", (e) => {
+    chatBox.querySelector(".chatHeader").addEventListener("click", e => {
       if (isMinimized && !e.target.closest("button")) {
         chatBox.classList.remove("minimized");
         isMinimized = false;
@@ -1049,564 +949,346 @@
       chatInputField.focus();
     });
 
-    // Add message to UI
-    /** Trasforma URL e tag LINK: in anchor cliccabili */
     function linkify(text) {
-      // Prima esegui escape HTML sul testo
-      let safe = text.replace(/[&<>"']/g, c => ({
-        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-      }[c]));
-      // Poi trasforma URL raw in <a> tag
-      safe = safe.replace(
-        /(https?:\/\/[^\s<>"]+)/g,
-        '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#fff;text-decoration:underline;word-break:break-all;">$1</a>'
-      );
-      return safe;
+      let safe = text.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":'&#39;'}[c]));
+      return safe.replace(/(https?:\/\/[^\s<>"]+)/g,
+        '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#fff;text-decoration:underline;word-break:break-all;">$1</a>');
     }
 
     function addMessage(text, sender) {
-      const messageDiv = document.createElement("div");
-      messageDiv.className = `message ${sender}`;
-      
-      // Per AI: linkifica URL e mantieni formattazione con \n
-      // Per utente: solo escape HTML base
-      const content = sender === 'ai' ? linkify(text) : escapeHtml(text);
-      
-      messageDiv.innerHTML = `
-        <div class="messageBubble">${content}</div>
-      `;
-      chatMessages.appendChild(messageDiv);
+      const div = document.createElement("div");
+      div.className = "message " + sender;
+      div.innerHTML = '<div class="messageBubble">' + (sender === "ai" ? linkify(text) : escapeHtml(text)) + '</div>';
+      chatMessages.appendChild(div);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Add typing indicator
     function showTyping() {
-      const typingDiv = document.createElement("div");
-      typingDiv.className = "message ai";
-      typingDiv.id = "typingIndicator";
-      typingDiv.innerHTML = `
-        <div class="typingIndicator">
-          <div class="typingDot"></div>
-          <div class="typingDot"></div>
-          <div class="typingDot"></div>
-        </div>
-      `;
-      chatMessages.appendChild(typingDiv);
+      const d = document.createElement("div");
+      d.className = "message ai"; d.id = "typingIndicator";
+      d.innerHTML = '<div class="typingIndicator"><div class="typingDot"></div><div class="typingDot"></div><div class="typingDot"></div></div>';
+      chatMessages.appendChild(d);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+    function hideTyping() { const t = $("typingIndicator"); if (t) t.remove(); }
 
-    function hideTyping() {
-      const typing = $("typingIndicator");
-      if (typing) typing.remove();
-    }
-
-    // MAPPA MARCHE USATO - CentroAuto VT
+    // ── USATO ──────────────────────────────────────────────────────────────────
     const USED_CAR_BRANDS = [
-      { keywords: ['ford','focus','fiesta','kuga','ecosport','mustang','transit'], slug: 'ford',         label: 'Ford'       },
-      { keywords: ['jeep','renegade','compass','wrangler','cherokee','avenger'],   slug: 'jeep',         label: 'Jeep'       },
-      { keywords: ['kia','sportage','picanto','rio','ceed','niro'],                slug: 'kia',          label: 'Kia'        },
-      { keywords: ['lancia','ypsilon','delta'],                                    slug: 'lancia',       label: 'Lancia'     },
-      { keywords: ['land rover','range rover','evoque','defender','discovery'],    slug: 'land-rover',   label: 'Land Rover' },
-      { keywords: ['man'],                                                          slug: 'man',          label: 'MAN'        },
-      { keywords: ['mazda','cx-5','mx-5','mazda2','mazda3'],                       slug: 'mazda',        label: 'Mazda'      },
-      { keywords: ['mg'],                                                           slug: 'mg',           label: 'MG'         },
-      { keywords: ['opel','corsa','astra','mokka','grandland'],                    slug: 'opel',         label: 'Opel'       },
-      { keywords: ['peugeot','208','308','2008','3008','5008'],                    slug: 'peugeot',      label: 'Peugeot'    },
-      { keywords: ['renault','clio','captur','megane','kadjar'],                   slug: 'renault',      label: 'Renault'    },
-      { keywords: ['seat','ibiza','leon','arona','ateca'],                         slug: 'seat',         label: 'Seat'       },
-      { keywords: ['smart','fortwo','forfour'],                                    slug: 'smart',        label: 'Smart'      },
-      { keywords: ['suzuki','vitara','swift','ignis','jimny'],                     slug: 'suzuki',       label: 'Suzuki'     },
-      { keywords: ['volkswagen','vw','golf','polo','tiguan','passat','t-roc'],     slug: 'volkswagen',   label: 'Volkswagen' },
-      { keywords: ['audi'],                                                         slug: 'audi',         label: 'Audi'       },
-      { keywords: ['bmw'],                                                          slug: 'bmw',          label: 'BMW'        },
-      { keywords: ['mercedes'],                                                     slug: 'mercedes-benz',label: 'Mercedes'   },
-      { keywords: ['volvo'],                                                        slug: 'volvo',        label: 'Volvo'      },
-      { keywords: ['toyota'],                                                       slug: 'toyota',       label: 'Toyota'     },
-      { keywords: ['honda'],                                                        slug: 'honda',        label: 'Honda'      },
-      { keywords: ['nissan'],                                                       slug: 'nissan',       label: 'Nissan'     },
-      { keywords: ['hyundai'],                                                      slug: 'hyundai',      label: 'Hyundai'    },
-      { keywords: ['citroen','citroëhn'],                                  slug: 'citroen',      label: 'Citroen'    },
-      { keywords: ['dacia'],                                                        slug: 'dacia',        label: 'Dacia'      },
-      { keywords: ['skoda'],                                                        slug: 'skoda',        label: 'Skoda'      },
-      { keywords: ['mini'],                                                         slug: 'mini',         label: 'MINI'       },
+      { keywords:['ford','focus','fiesta','kuga','ecosport','mustang','transit'], slug:'ford',         label:'Ford'       },
+      { keywords:['jeep','renegade','compass','wrangler','cherokee','avenger'],   slug:'jeep',         label:'Jeep'       },
+      { keywords:['kia','sportage','picanto','rio','ceed','niro'],                slug:'kia',          label:'Kia'        },
+      { keywords:['lancia','ypsilon','delta'],                                    slug:'lancia',       label:'Lancia'     },
+      { keywords:['land rover','range rover','evoque','defender','discovery'],    slug:'land-rover',   label:'Land Rover' },
+      { keywords:['man'],                                                          slug:'man',          label:'MAN'        },
+      { keywords:['mazda','cx-5','mx-5','mazda2','mazda3'],                       slug:'mazda',        label:'Mazda'      },
+      { keywords:['mg'],                                                           slug:'mg',           label:'MG'         },
+      { keywords:['opel','corsa','astra','mokka','grandland'],                    slug:'opel',         label:'Opel'       },
+      { keywords:['peugeot','208','308','2008','3008','5008'],                    slug:'peugeot',      label:'Peugeot'    },
+      { keywords:['renault','clio','captur','megane','kadjar'],                   slug:'renault',      label:'Renault'    },
+      { keywords:['seat','ibiza','leon','arona','ateca'],                         slug:'seat',         label:'Seat'       },
+      { keywords:['smart','fortwo','forfour'],                                    slug:'smart',        label:'Smart'      },
+      { keywords:['suzuki','vitara','swift','ignis','jimny'],                     slug:'suzuki',       label:'Suzuki'     },
+      { keywords:['volkswagen','vw','golf','polo','tiguan','passat','t-roc'],     slug:'volkswagen',   label:'Volkswagen' },
+      { keywords:['audi'],  slug:'audi',  label:'Audi'    },
+      { keywords:['bmw'],   slug:'bmw',   label:'BMW'     },
+      { keywords:['mercedes'], slug:'mercedes-benz', label:'Mercedes' },
+      { keywords:['volvo'], slug:'volvo', label:'Volvo'   },
+      { keywords:['toyota'],slug:'toyota',label:'Toyota'  },
+      { keywords:['honda'], slug:'honda', label:'Honda'   },
+      { keywords:['nissan'],slug:'nissan',label:'Nissan'  },
+      { keywords:['hyundai'],slug:'hyundai',label:'Hyundai'},
+      { keywords:['citroen','citro\u00ebhn'],slug:'citroen',label:'Citroen'},
+      { keywords:['dacia'], slug:'dacia', label:'Dacia'   },
+      { keywords:['skoda'], slug:'skoda', label:'Skoda'   },
+      { keywords:['mini'],  slug:'mini',  label:'MINI'    },
     ];
-
     const CENTROAUTO_BASE = 'https://www.centroautovt.it/ricerca-auto/usate';
 
-    /** Rileva il brand menzionato nel testo, o null */
     function detectUsedBrand(text) {
-      const lower = text.toLowerCase();
-      return USED_CAR_BRANDS.find(b => b.keywords.some(kw => lower.includes(kw))) || null;
+      const l = text.toLowerCase();
+      return USED_CAR_BRANDS.find(b => b.keywords.some(kw => l.includes(kw))) || null;
     }
-
-    /**
-     * True se la domanda riguarda auto usate / CentroAuto.
-     * IMPORTANTE: scatta anche solo citando una marca del parco usato,
-     * senza dover scrivere "usata/o" esplicitamente.
-     */
     function isUsedCarQuery(text) {
-      const lower = text.toLowerCase();
-      const usedKeywords = [
-        'usato','usata','usati','usate','seconda mano','km zero',
-        'centroauto','centro auto','occasione','occasioni','pronta consegna',
-        'chilometri','immatricolazione','immatricolata','stock'
-      ];
-      if (usedKeywords.some(kw => lower.includes(kw))) return true;
+      const l = text.toLowerCase();
+      if (['usato','usata','usati','usate','seconda mano','km zero','centroauto','centro auto',
+           'occasione','occasioni','pronta consegna','chilometri','immatricolazione','stock']
+          .some(kw => l.includes(kw))) return true;
       return !!detectUsedBrand(text);
     }
-
-    // Verifica se la domanda riguarda auto (usate O nuove)
     function needsSearch(text) {
       if (isUsedCarQuery(text)) return true;
-      const newCarKeywords = [
-        'prezzo','costo','quanto costa','listino',
-        'allestimento','versione','dotazione','equipaggiamento','optional','serie',
-        'motore','motorizzazione','cavalli','cv','kw','cilindrata',
-        'consumi','autonomia','km/l','emissioni',
-        'dimensioni','lunghezza','larghezza','altezza','bagagliaio',
-        'colori','tinta','verniciatura','disponibilita','tempi consegna',
-        'caratteristiche','scheda tecnica','specifiche',
-        'confronto','differenza','meglio','vs',
-        'ibrida','elettrica','plug-in','mild hybrid','full hybrid',
-        'diesel','benzina','gpl','metano',
-        'trazione','integrale','4x4','awd','cambio','automatico','manuale',
-        'adas','sicurezza','airbag','frenata automatica',
-        'garanzia','manutenzione','tagliando',
-        'panda','punto','500','tipo','ducato',
-        'renegade','compass','wrangler','cherokee','avenger',
-        'giulia','stelvio','tonale','giulietta',
-        'ypsilon','delta'
-      ];
-      const lower = text.toLowerCase();
-      return newCarKeywords.some(kw => lower.includes(kw));
+      return ['prezzo','costo','listino','allestimento','versione','dotazione','optional',
+        'motore','motorizzazione','cavalli','cv','kw','consumi','autonomia','emissioni',
+        'dimensioni','bagagliaio','colori','caratteristiche','scheda tecnica','confronto',
+        'differenza','meglio','vs','ibrida','elettrica','diesel','benzina','cambio',
+        'automatico','sicurezza','garanzia','panda','punto','500','tipo','ducato',
+        'renegade','compass','wrangler','cherokee','avenger','giulia','stelvio',
+        'tonale','giulietta','ypsilon','delta']
+        .some(kw => text.toLowerCase().includes(kw));
     }
 
-    // RICERCA: CentroAuto per usato, configuratori ufficiali per nuovo
     async function searchCarInfo(query) {
       try {
         if (isUsedCarQuery(query)) {
-          // RAMO USATO - punta sempre e solo su centroautovt.it
           const brand = detectUsedBrand(query);
-          const directUrl = brand
-            ? `${CENTROAUTO_BASE}?brand=${brand.slug}`
-            : CENTROAUTO_BASE;
-
-          // Prova backend con ricerca forzata su centroautovt.it
-          const searchQuery = brand
-            ? `${brand.label} usata site:centroautovt.it`
-            : `auto usate site:centroautovt.it`;
-
-          let backendResult = null;
+          const directUrl = brand ? CENTROAUTO_BASE + '?brand=' + brand.slug : CENTROAUTO_BASE;
+          const searchQ   = brand ? brand.label + ' usata site:centroautovt.it' : 'auto usate site:centroautovt.it';
+          let result = null;
           try {
-            const resp = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(searchQuery)}`);
+            const resp = await fetch(BACKEND_SEARCH + '?q=' + encodeURIComponent(searchQ));
             if (resp.ok) {
               const data = await resp.json();
-              if (data.results && data.results.length > 0) {
-                // Tieni SOLO risultati da centroautovt.it
-                const valid = data.results.filter(r =>
-                  r.url && r.url.toLowerCase().includes('centroautovt.it')
-                );
-                if (valid.length > 0) {
-                  backendResult = valid.slice(0, 5).map(r =>
-                    `\ud83d\ude97 ${r.title}\n${r.description || ''}\n\ud83d\udd17 ${r.url}`
-                  ).join('\n\n---\n\n');
-                }
-              }
+              const valid = (data.results||[]).filter(r => r.url && r.url.toLowerCase().includes('centroautovt.it'));
+              if (valid.length) result = valid.slice(0,5).map(r => '\ud83d\ude97 ' + r.title + '\n' + (r.description||'') + '\n\ud83d\udd17 ' + r.url).join('\n\n---\n\n');
             }
-          } catch (_) { /* ignora errori backend */ }
-
-          // FALLBACK GARANTITO: link diretto CentroAuto con filtro marca
-          if (!backendResult) {
-            const brandLine = brand
-              ? `${brand.label} usata su CentroAuto VT`
-              : 'Tutte le auto usate su CentroAuto VT';
-            backendResult =
-              `\ud83d\ude97 ${brandLine}\n` +
-              `Clicca per vedere il parco auto aggiornato in tempo reale.\n` +
-              `\ud83d\udd17 ${directUrl}\n\n` +
-              `---\n` +
-              `\ud83d\udccd CentroAuto VT - Viterbo\n` +
-              `\ud83d\udd17 ${CENTROAUTO_BASE}`;
+          } catch(_) {}
+          if (!result) {
+            const line = brand ? brand.label + ' usata su CentroAuto VT' : 'Tutte le auto usate su CentroAuto VT';
+            result = '\ud83d\ude97 ' + line + '\nClicca per vedere il parco auto aggiornato.\n\ud83d\udd17 ' + directUrl + '\n\n---\n\ud83d\udccd CentroAuto VT - Viterbo\n\ud83d\udd17 ' + CENTROAUTO_BASE;
           }
-
-          return backendResult;
-
+          return result;
         } else {
-          // RAMO NUOVE - configuratori ufficiali Fiat/Jeep/Alfa/Lancia
-          const officialQuery = `${query} allestimenti versioni (site:fiat.it OR site:jeep-official.it OR site:alfaromeo.it OR site:lancia.it)`;
-          const allowedDomains = ['fiat.it','jeep-official.it','alfaromeo.it','lancia.it'];
-
-          const response = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(officialQuery)}`);
-          if (!response.ok) throw new Error("Errore ricerca");
-          const data = await response.json();
-
-          if (data.results && data.results.length > 0) {
-            const valid = data.results.filter(r => {
-              const url = (r.url || '').toLowerCase();
-              return allowedDomains.some(d => url.includes(d));
-            });
-            if (valid.length === 0) return null;
-            return valid.slice(0, 3).map(r => {
-              const brand = r.url.includes('fiat') ? 'Fiat' :
-                            r.url.includes('jeep') ? 'Jeep' :
-                            r.url.includes('alfa') ? 'Alfa Romeo' : 'Lancia';
-              return `--- ${brand.toUpperCase()} ---\n${r.title}\n\n${r.description}\n\n\ud83d\udd17 ${r.url}`;
-            }).join('\n\n');
-          }
-          return null;
+          const q = query + ' allestimenti versioni (site:fiat.it OR site:jeep-official.it OR site:alfaromeo.it OR site:lancia.it)';
+          const resp = await fetch(BACKEND_SEARCH + '?q=' + encodeURIComponent(q));
+          if (!resp.ok) throw new Error("Errore ricerca");
+          const data = await resp.json();
+          const allowed = ['fiat.it','jeep-official.it','alfaromeo.it','lancia.it'];
+          const valid = (data.results||[]).filter(r => allowed.some(d => (r.url||'').toLowerCase().includes(d)));
+          if (!valid.length) return null;
+          return valid.slice(0,3).map(r => {
+            const b = r.url.includes('fiat')?'Fiat':r.url.includes('jeep')?'Jeep':r.url.includes('alfa')?'Alfa Romeo':'Lancia';
+            return '--- ' + b.toUpperCase() + ' ---\n' + r.title + '\n\n' + r.description + '\n\n\ud83d\udd17 ' + r.url;
+          }).join('\n\n');
         }
-      } catch (err) {
-        console.error('Errore ricerca:', err);
-        return null;
-      }
+      } catch(err) { console.error('Errore ricerca:', err); return null; }
     }
 
-
-    // SISTEMA PROMPT MIGLIORATO
     const SYSTEM_PROMPT = `Sei un assistente esperto di auto NUOVE e USATE.
 
 AUTO NUOVE: Fiat, Jeep, Alfa Romeo, Lancia (configuratori ufficiali)
 AUTO USATE: CentroAuto VT (https://www.centroautovt.it/)
 
-MARCHE USATO DISPONIBILI:
-Ford (9), Jeep (13), Kia (1), Lancia (4), Land Rover (1),
-MAN (1), Mazda (2), MG (2), Opel (2), Peugeot (2),
-Renault (3), Seat (1), Smart (1), Suzuki (1), Volkswagen (4)
+MARCHE USATO: Ford(9), Jeep(13), Kia(1), Lancia(4), Land Rover(1), MAN(1), Mazda(2), MG(2), Opel(2), Peugeot(2), Renault(3), Seat(1), Smart(1), Suzuki(1), Volkswagen(4)
 
-================================
+REGOLE:
+1. Risposte CONCISE e SCHEMATICHE (max 10 righe)
+2. Usa trattini per gli elenchi
+3. Solo INFO ESSENZIALI dai dati forniti
 
-REGOLE FONDAMENTALI:
-1. Risposte SCHEMATICHE e CONCISE (max 10 righe)
-2. Usa elenchi puntati con trattino (-)
-3. Evidenzia solo INFO ESSENZIALI
-4. Basati SOLO sui dati forniti
-
-================================
-
-FORMATO AUTO NUOVE:
-
-Per INFO GENERALI:
-- Punto chiave 1
-- Punto chiave 2
-- Punto chiave 3
-
-Per CONFRONTI ALLESTIMENTI:
-[ALLESTIMENTO 1]
-- Caratteristica esclusiva 1
-- Caratteristica esclusiva 2
-
-[ALLESTIMENTO 2]
-- Caratteristica esclusiva 1
-- Caratteristica esclusiva 2
-
-Consiglio: [suggerimento breve]
-
-================================
-
-FORMATO AUTO USATE:
-
-Per ogni auto trovata usa ESATTAMENTE questo schema:
+FORMATO USATO:
 --- MARCA MODELLO ---
-Anno: XXXX
-Km: XXX.XXX
-Prezzo: euro XX.XXX
-Motore: [info motore]
-Accessori: [lista]
+Anno: XXXX | Km: XXX.XXX | Prezzo: euro XX.XXX
+Motore: [info] | Accessori: [lista]
 Link: https://www.centroautovt.it/ricerca-auto/usate?brand=SLUG
 
-REGOLE USATO:
-- Mostra SEMPRE marca, modello, prezzo, km, anno
-- Max 3-4 auto per risposta
-- Filtra per marca se richiesta
-- Scrivi i link come testo semplice (NO tag HTML)
-- Usa solo lettere normali, NO emoji nei testi strutturati
+ATTENZIONE: NO info inventate. NO emoji nei campi dati. Solo testo ASCII.`;
 
-================================
-
-ATTENZIONE:
-- NO informazioni inventate
-- NO descrizioni narrative lunghe
-- Se non hai dati precisi, dillo chiaramente
-- Usa SOLO testo ASCII nei formati strutturati (niente emoji nei campi dati)`;
-
-
-    // Send message to AI
     async function sendMessage() {
-      const userMessage = chatInputField.value.trim();
-      if (!userMessage) return;
-
-      addMessage(userMessage, "user");
+      const msg = chatInputField.value.trim();
+      if (!msg) return;
+      addMessage(msg, "user");
       chatInputField.value = "";
       chatSendBtn.disabled = true;
-
-      chatHistory.push({ role: "user", content: userMessage });
-
+      chatHistory.push({ role:"user", content:msg });
       showTyping();
-
       try {
-        let searchResults = null;
-
-        // Cerca solo se riguarda auto
-        if (needsSearch(userMessage)) {
-          searchResults = await searchCarInfo(userMessage);
-        }
-
-        // Prepara i messaggi per l'API
-        const messages = [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...chatHistory
-        ];
-
-        // Se ci sono risultati di ricerca, aggiungili al contesto
-        if (searchResults) {
-          messages.push({
-            role: "system",
-            content: `DATI DAI CONFIGURATORI UFFICIALI:\n\n${searchResults}\n\nRispondi usando SOLO questi dati ufficiali in formato schematico.`
-          });
-        }
-
-        const response = await fetch(BACKEND_CHAT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages }),
-        });
-
-        if (!response.ok) throw new Error(`Errore ${response.status}`);
-
-        const data = await response.json();
-        
+        let searchResults = needsSearch(msg) ? await searchCarInfo(msg) : null;
+        const messages = [{ role:"system", content:SYSTEM_PROMPT }, ...chatHistory];
+        if (searchResults) messages.push({ role:"system", content:"DATI UFFICIALI:\n\n" + searchResults + "\n\nRispondi usando SOLO questi dati." });
+        const resp = await fetch(BACKEND_CHAT, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({messages}) });
+        if (!resp.ok) throw new Error("Errore " + resp.status);
+        const data = await resp.json();
         hideTyping();
-
-        let aiMessage = data.choices?.[0]?.message?.content || "Scusa, non ho capito.";
-        
-        // linkify gestisce l'escape HTML - non fare doppio escape qui
-        addMessage(aiMessage, "ai");
-
-        chatHistory.push({ role: "assistant", content: aiMessage });
-
-      } catch (error) {
+        const aiMsg = data.choices?.[0]?.message?.content || "Scusa, non ho capito.";
+        addMessage(aiMsg, "ai");
+        chatHistory.push({ role:"assistant", content:aiMsg });
+      } catch(err) {
         hideTyping();
-        console.error("Errore chat:", error);
-        addMessage("âŒ Errore di connessione. Riprova tra poco.", "ai");
+        addMessage("Errore di connessione. Riprova tra poco.", "ai");
       } finally {
         chatSendBtn.disabled = false;
         chatInputField.focus();
       }
     }
 
-    // Send on button click
     chatSendBtn.addEventListener("click", sendMessage);
+    chatInputField.addEventListener("keypress", e => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
 
-    // Send on Enter
-    chatInputField.addEventListener("keypress", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
+    // ========== COMPARATORE ==========
+    // Mappa modelli → marca (riconosce il modello anche senza scrivere la marca)
+    const MODEL_BRAND_MAP = {
+      // Fiat
+      'grande panda':'fiat','panda':'fiat','600':'fiat','500x':'fiat','500l':'fiat',
+      '500e':'fiat','tipo':'fiat','bravo':'fiat','punto':'fiat','ducato':'fiat',
+      // Jeep
+      'renegade':'jeep','compass':'jeep','avenger':'jeep','wrangler':'jeep',
+      'cherokee':'jeep','grand cherokee':'jeep','commander':'jeep','gladiator':'jeep',
+      // Alfa Romeo
+      'giulia':'alfa romeo','stelvio':'alfa romeo','tonale':'alfa romeo',
+      'giulietta':'alfa romeo','junior':'alfa romeo','mito':'alfa romeo',
+      'brera':'alfa romeo','147':'alfa romeo','156':'alfa romeo',
+      // Lancia
+      'ypsilon':'lancia','delta':'lancia','lybra':'lancia','thema':'lancia',
+    };
+    const OFFICIAL_DOMAINS = ['fiat.it','jeep-official.it','alfaromeo.it','lancia.it'];
+    const BRAND_DOMAIN_MAP = { 'fiat':'fiat.it','jeep':'jeep-official.it','alfa romeo':'alfaromeo.it','lancia':'lancia.it' };
+
+    function detectNewBrand(input) {
+      const l = input.toLowerCase().trim();
+      // Controlla prima i nomi marca diretti
+      for (const b of ['fiat','jeep','alfa romeo','alfa','lancia']) {
+        if (l.includes(b)) return b === 'alfa' ? 'alfa romeo' : b;
       }
-    });
-
-    // ===== COMPARATORE AUTO =====
-    const BACKEND_CHAT_URL = "https://auto-backend-three.vercel.app/api/chat";
-
-    function setSuggest(a, b) {
-      document.getElementById('cmpInput1').value = a;
-      document.getElementById('cmpInput2').value = b;
-      document.getElementById('cmpInput1').style.borderColor = '#3b82f6';
-      document.getElementById('cmpInput2').style.borderColor = '#3b82f6';
+      // Poi la mappa modelli
+      for (const [model, brand] of Object.entries(MODEL_BRAND_MAP)) {
+        if (l.includes(model)) return brand;
+      }
+      return null;
     }
 
-    document.getElementById('cmpResetBtn').addEventListener('click', () => {
-      document.getElementById('cmpInput1').value = '';
-      document.getElementById('cmpInput2').value = '';
-      document.getElementById('cmpResults').innerHTML = `
-        <div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">
-          &#8593; Inserisci due auto e premi Confronta
-        </div>`;
+    function setSuggest(a, b) {
+      $('cmpInput1').value = a;
+      $('cmpInput2').value = b;
+      $('cmpInput1').style.borderColor = '#3b82f6';
+      $('cmpInput2').style.borderColor = '#3b82f6';
+    }
+
+    $('cmpResetBtn').addEventListener('click', () => {
+      $('cmpInput1').value = '';
+      $('cmpInput2').value = '';
+      $('cmpResults').innerHTML = '<div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">&#8593; Scrivi il modello e premi Confronta</div>';
     });
 
-    // Enter key on inputs
     ['cmpInput1','cmpInput2'].forEach(id => {
-      document.getElementById(id).addEventListener('keypress', e => {
-        if (e.key === 'Enter') startComparison();
-      });
+      $(id).addEventListener('keypress', e => { if (e.key === 'Enter') startComparison(); });
     });
+
+    async function fetchCarData(query) {
+      const brand  = detectNewBrand(query);
+      const domain = brand ? BRAND_DOMAIN_MAP[brand] : null;
+      const searchQ = domain
+        ? query + ' allestimenti versioni scheda tecnica site:' + domain
+        : query + ' allestimenti versioni scheda tecnica (site:fiat.it OR site:jeep-official.it OR site:alfaromeo.it OR site:lancia.it)';
+      try {
+        const resp = await fetch(BACKEND_SEARCH + '?q=' + encodeURIComponent(searchQ));
+        if (!resp.ok) return null;
+        const data = await resp.json();
+        const valid = (data.results||[]).filter(r => OFFICIAL_DOMAINS.some(d => (r.url||'').toLowerCase().includes(d)));
+        if (!valid.length) return null;
+        return valid.slice(0,3).map(r => 'Titolo: ' + r.title + '\nDescrizione: ' + (r.description||'') + '\nURL: ' + r.url).join('\n\n---\n\n');
+      } catch(e) { return null; }
+    }
 
     async function startComparison() {
-      const car1 = document.getElementById('cmpInput1').value.trim();
-      const car2 = document.getElementById('cmpInput2').value.trim();
-      const results = document.getElementById('cmpResults');
-      const btn = document.getElementById('cmpBtn');
+      const car1    = $('cmpInput1').value.trim();
+      const car2    = $('cmpInput2').value.trim();
+      const results = $('cmpResults');
+      const btn     = $('cmpBtn');
 
       if (!car1 || !car2) {
-        results.innerHTML = `<div style="text-align:center;color:#f87171;padding:20px;font-size:13px;">
-          &#9888; Inserisci entrambe le auto da confrontare!
-        </div>`;
+        results.innerHTML = '<div style="text-align:center;color:#f87171;padding:20px;font-size:13px;">Inserisci entrambe le auto da confrontare!</div>';
         return;
       }
 
-      // Loading
       btn.disabled = true;
-      results.innerHTML = `
-        <div class="cmpLoading">
-          <div class="cmpDot"></div>
-          <div class="cmpDot"></div>
-          <div class="cmpDot"></div>
-          <span>Analisi in corso...</span>
-        </div>`;
+      results.innerHTML = '<div class="cmpLoading"><div class="cmpDot"></div><div class="cmpDot"></div><div class="cmpDot"></div><span>Ricerca sui configuratori ufficiali...</span></div>';
 
       try {
-        const prompt = `Confronta queste due auto in modo PRECISO e STRUTTURATO.
-Restituisci SOLO un JSON valido, nessun testo fuori dal JSON.
+        // Ricerca parallela sui configuratori per entrambe le auto
+        const [data1, data2] = await Promise.all([fetchCarData(car1), fetchCarData(car2)]);
 
-Auto 1: ${car1}
-Auto 2: ${car2}
+        results.innerHTML = '<div class="cmpLoading"><div class="cmpDot"></div><div class="cmpDot"></div><div class="cmpDot"></div><span>Analisi AI in corso...</span></div>';
 
-Formato JSON richiesto (rispetta ESATTAMENTE questa struttura):
-{
-  "auto1": {
-    "nome": "Nome completo auto 1",
-    "prezzo": "es. da 22.000 euro",
-    "motore": "es. 1.6 MultiJet 130cv",
-    "consumi": "es. 5.5 L/100km",
-    "bagagliaio": "es. 440 L",
-    "dimensioni": "es. 4.51m",
-    "punti_forza": ["punto 1", "punto 2", "punto 3"],
-    "punti_deboli": ["punto 1", "punto 2"]
-  },
-  "auto2": {
-    "nome": "Nome completo auto 2",
-    "prezzo": "es. da 19.500 euro",
-    "motore": "es. 1.0 FireFly 100cv",
-    "consumi": "es. 6.0 L/100km",
-    "bagagliaio": "es. 380 L",
-    "dimensioni": "es. 4.37m",
-    "punti_forza": ["punto 1", "punto 2", "punto 3"],
-    "punti_deboli": ["punto 1", "punto 2"]
-  },
-  "verdetto": "Breve verdetto di 2-3 righe su quale scegliere e perche, in base al tipo di utilizzo.",
-  "migliore_prezzo": "auto1 o auto2",
-  "migliore_efficienza": "auto1 o auto2"
-}`;
+        let context = '';
+        if (data1) context += '=== DATI UFFICIALI: ' + car1 + ' ===\n' + data1 + '\n\n';
+        if (data2) context += '=== DATI UFFICIALI: ' + car2 + ' ===\n' + data2 + '\n\n';
 
-        const response = await fetch(BACKEND_CHAT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [
-              { role: 'system', content: 'Sei un esperto di automobili. Rispondi SOLO con JSON valido, senza markdown, senza backtick, senza testo aggiuntivo.' },
-              { role: 'user', content: prompt }
-            ]
-          })
+        const systemMsg = (context
+          ? 'Sei un esperto di auto nuove. Usa SOLO i dati ufficiali:\n\n' + context + '\nRispondi SOLO con JSON valido, senza markdown, senza backtick.'
+          : 'Sei un esperto di auto nuove Fiat, Jeep, Alfa Romeo e Lancia. Rispondi SOLO con JSON valido, senza markdown, senza backtick.');
+
+        const userMsg = 'Confronta ' + car1 + ' e ' + car2 + '. Restituisci SOLO questo JSON:\n' +
+          '{"auto1":{"nome":"nome completo","prezzo":"prezzo base","motore":"motorizzazione principale","consumi":"consumo medio","bagagliaio":"volume L","dimensioni":"lunghezza m","punti_forza":["f1","f2","f3"],"punti_deboli":["d1","d2"]},' +
+          '"auto2":{"nome":"nome completo","prezzo":"prezzo base","motore":"motorizzazione principale","consumi":"consumo medio","bagagliaio":"volume L","dimensioni":"lunghezza m","punti_forza":["f1","f2","f3"],"punti_deboli":["d1","d2"]},' +
+          '"verdetto":"2-3 frasi su quale scegliere e perche","migliore_prezzo":"auto1 o auto2","migliore_efficienza":"auto1 o auto2"}';
+
+        const resp = await fetch(BACKEND_CHAT, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ messages:[{role:'system',content:systemMsg},{role:'user',content:userMsg}] })
         });
-
-        if (!response.ok) throw new Error('Errore API');
-        const data = await response.json();
-        let raw = data.choices?.[0]?.message?.content || '';
-
-        // Strip markdown code blocks if present
-        raw = raw.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+        if (!resp.ok) throw new Error('Errore API ' + resp.status);
+        const apiData = await resp.json();
+        let raw = (apiData.choices?.[0]?.message?.content || '').replace(/```json\s*/gi,'').replace(/```\s*/gi,'').trim();
 
         let cmp;
-        try {
-          cmp = JSON.parse(raw);
-        } catch(e) {
-          throw new Error('Risposta non valida dal server');
-        }
+        try { cmp = JSON.parse(raw); }
+        catch(e) { throw new Error('Risposta non valida dal server'); }
 
         renderComparison(cmp, car1, car2);
 
       } catch(err) {
-        results.innerHTML = `<div style="text-align:center;color:#f87171;padding:24px;font-size:13px;">
-          Errore: ${err.message || 'Impossibile completare il confronto'}.<br>
-          <span style="color:#9ca3af">Riprova tra qualche secondo.</span>
-        </div>`;
+        results.innerHTML = '<div style="text-align:center;color:#f87171;padding:24px;font-size:13px;">Errore: ' + (err.message||'Impossibile completare il confronto') + '.<br><span style="color:#9ca3af">Riprova tra qualche secondo.</span></div>';
       } finally {
         btn.disabled = false;
       }
     }
 
     function renderComparison(cmp, q1, q2) {
-      const a1 = cmp.auto1;
-      const a2 = cmp.auto2;
-      const results = document.getElementById('cmpResults');
+      const a1 = cmp.auto1, a2 = cmp.auto2;
+      const results = $('cmpResults');
+      const bp = cmp.migliore_prezzo, be = cmp.migliore_efficienza;
 
-      const betterPrice = cmp.migliore_prezzo;
-      const betterEff   = cmp.migliore_efficienza;
+      const fields = [
+        {label:'Prezzo',     k:'prezzo',     winner:bp},
+        {label:'Motore',     k:'motore',     winner:null},
+        {label:'Consumi',    k:'consumi',    winner:be},
+        {label:'Bagagliaio', k:'bagagliaio', winner:null},
+        {label:'Dimensioni', k:'dimensioni', winner:null},
+      ];
 
-      function badge(which, field) {
-        return which === field ? ' cmpWin" title="Migliore">&#9733; ' : '">';
+      function tableRows() {
+        let html = '<div class="cmpRow" style="background:rgba(59,130,246,.08);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">' +
+          '<span class="cmpLabel" style="color:#9ca3af;">Caratteristica</span>' +
+          '<div style="display:flex;flex:1;justify-content:flex-end;">' +
+          '<span style="flex:1;text-align:center;color:#f87171;">&#128308; ' + (a1.nome||q1) + '</span>' +
+          '<span style="flex:1;text-align:center;color:#60a5fa;">&#128309; ' + (a2.nome||q2) + '</span>' +
+          '</div></div>';
+        fields.forEach(f => {
+          const w1 = f.winner==='auto1', w2 = f.winner==='auto2';
+          html += '<div class="cmpRow"><span class="cmpLabel">' + f.label + '</span>' +
+            '<div style="display:flex;flex:1;justify-content:flex-end;gap:4px;">' +
+            '<span class="cmpVal' + (w1?' cmpWin':'') + '" style="flex:1;text-align:center;">' + (w1?'&#9733; ':'') + (a1[f.k]||'&mdash;') + '</span>' +
+            '<span style="color:#374151;align-self:center;">|</span>' +
+            '<span class="cmpVal' + (w2?' cmpWin':'') + '" style="flex:1;text-align:center;">' + (w2?'&#9733; ':'') + (a2[f.k]||'&mdash;') + '</span>' +
+            '</div></div>';
+        });
+        return html;
       }
 
-      function rows(a1, a2) {
-        const fields = [
-          { label: 'Prezzo', k: 'prezzo', winner: betterPrice },
-          { label: 'Motore', k: 'motore', winner: null },
-          { label: 'Consumi', k: 'consumi', winner: betterEff },
-          { label: 'Bagagliaio', k: 'bagagliaio', winner: null },
-          { label: 'Dimensioni', k: 'dimensioni', winner: null },
-        ];
-
-        return fields.map(f => `
-          <div class="cmpRow">
-            <span class="cmpLabel">${f.label}</span>
-            <div style="display:flex;gap:12px;flex:1;justify-content:flex-end;">
-              <span class="cmpVal${f.winner === 'auto1' ? ' cmpWin' : ''}" style="flex:1;text-align:center">${a1[f.k] || '—'}</span>
-              <span style="color:#374151;">|</span>
-              <span class="cmpVal${f.winner === 'auto2' ? ' cmpWin' : ''}" style="flex:1;text-align:center">${a2[f.k] || '—'}</span>
-            </div>
-          </div>`).join('');
+      function procon(items, color) {
+        if (!items||!items.length) return '<li style="color:#9ca3af">&mdash;</li>';
+        return items.map(i => '<li style="color:' + color + ';margin-bottom:5px;font-size:12px;">&#8226; ' + i + '</li>').join('');
       }
 
-      function listItems(items, color) {
-        if (!items || !items.length) return '<li style="color:#9ca3af">—</li>';
-        return items.map(i => `<li style="color:${color};margin-bottom:4px">&#8226; ${i}</li>`).join('');
-      }
-
-      results.innerHTML = `
-        <!-- Header labels -->
-        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
-          <div class="cmpCard">
-            <div class="cmpCardHeader left">&#128308; ${a1.nome || q1}</div>
-            ${rows(a1, a2)}
-          </div>
-          <div style="display:flex;align-items:center;justify-content:center;padding:0 4px;">
-            <div style="width:2px;height:60px;background:linear-gradient(180deg,transparent,rgba(59,130,246,.4),transparent);"></div>
-          </div>
-          <div class="cmpCard">
-            <div class="cmpCardHeader right">&#128309; ${a2.nome || q2}</div>
-            ${rows(a2, a1)}
-          </div>
-        </div>
-
-        <!-- Pro/Contro -->
-        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-          <div style="flex:1;min-width:200px;background:rgba(31,41,55,.3);border-radius:12px;padding:12px 14px;">
-            <div style="font-weight:700;font-size:12px;color:#4ade80;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">
-              Punti forza &#128308;
-            </div>
-            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a1.punti_forza,'#d1fae5')}</ul>
-            <div style="font-weight:700;font-size:12px;color:#f87171;margin:10px 0 8px;text-transform:uppercase;letter-spacing:.5px;">
-              Punti deboli
-            </div>
-            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a1.punti_deboli,'#fecaca')}</ul>
-          </div>
-          <div style="flex:1;min-width:200px;background:rgba(31,41,55,.3);border-radius:12px;padding:12px 14px;">
-            <div style="font-weight:700;font-size:12px;color:#4ade80;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">
-              Punti forza &#128309;
-            </div>
-            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a2.punti_forza,'#d1fae5')}</ul>
-            <div style="font-weight:700;font-size:12px;color:#f87171;margin:10px 0 8px;text-transform:uppercase;letter-spacing:.5px;">
-              Punti deboli
-            </div>
-            <ul style="list-style:none;padding:0;margin:0;font-size:12px;">${listItems(a2.punti_deboli,'#fecaca')}</ul>
-          </div>
-        </div>
-
-        <!-- Verdetto -->
-        <div class="cmpVerdict">
-          <strong style="color:#60a5fa;">&#9654; Verdetto:</strong> ${cmp.verdetto || 'Nessun verdetto disponibile.'}
-        </div>
-      `;
+      results.innerHTML =
+        '<div class="cmpCard" style="width:100%;margin-bottom:14px;">' + tableRows() + '</div>' +
+        '<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">' +
+          '<div style="flex:1;min-width:180px;background:rgba(31,41,55,.35);border-radius:12px;padding:12px 14px;border:1px solid rgba(248,113,113,.15)">' +
+            '<div style="font-weight:800;font-size:11px;color:#f87171;margin-bottom:6px;">&#128308; ' + (a1.nome||q1) + '</div>' +
+            '<div style="font-size:11px;color:#4ade80;font-weight:700;margin-bottom:4px;">PUNTI FORZA</div>' +
+            '<ul style="list-style:none;padding:0;margin:0 0 8px;">' + procon(a1.punti_forza,'#d1fae5') + '</ul>' +
+            '<div style="font-size:11px;color:#f87171;font-weight:700;margin-bottom:4px;">PUNTI DEBOLI</div>' +
+            '<ul style="list-style:none;padding:0;margin:0;">' + procon(a1.punti_deboli,'#fecaca') + '</ul>' +
+          '</div>' +
+          '<div style="flex:1;min-width:180px;background:rgba(31,41,55,.35);border-radius:12px;padding:12px 14px;border:1px solid rgba(96,165,250,.15)">' +
+            '<div style="font-weight:800;font-size:11px;color:#60a5fa;margin-bottom:6px;">&#128309; ' + (a2.nome||q2) + '</div>' +
+            '<div style="font-size:11px;color:#4ade80;font-weight:700;margin-bottom:4px;">PUNTI FORZA</div>' +
+            '<ul style="list-style:none;padding:0;margin:0 0 8px;">' + procon(a2.punti_forza,'#d1fae5') + '</ul>' +
+            '<div style="font-size:11px;color:#f87171;font-weight:700;margin-bottom:4px;">PUNTI DEBOLI</div>' +
+            '<ul style="list-style:none;padding:0;margin:0;">' + procon(a2.punti_deboli,'#fecaca') + '</ul>' +
+          '</div>' +
+        '</div>' +
+        '<div class="cmpVerdict"><strong style="color:#60a5fa;">&#9654; Verdetto:</strong> ' + (cmp.verdetto||'Nessun verdetto disponibile.') + '</div>';
     }
 
   </script>
