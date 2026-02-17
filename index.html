@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>AI BOTT Automotive</title>
 
   <style>
@@ -19,6 +19,7 @@
       --accent2:#60a5fa;
     }
     *{box-sizing:border-box;margin:0;padding:0}
+
     body{
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
       color:var(--text);
@@ -28,31 +29,59 @@
         radial-gradient(900px 520px at 72% 8%, rgba(96,165,250,.14), transparent 60%),
         linear-gradient(180deg, var(--bgTop) 0%, var(--bgMid) 48%, var(--bgBot) 100%);
     }
+
     header{
-      position:relative; top:0; z-index:10;
+      position:relative;
+      top:0;
+      z-index:10;
       background:rgba(10,10,12,.72);
       backdrop-filter:blur(10px);
       border-bottom:1px solid var(--line);
     }
+
     .wrap{max-width:1200px;margin:0 auto;padding:16px}
+
     .row{
-      display:flex; gap:12px; align-items:center;
-      justify-content:space-between; flex-wrap:wrap;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
     }
+
     .brand{
-      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
       min-width: 320px;
     }
-    .brandMark{display:flex;align-items:center;gap:10px;user-select:none}
+
+    .brandMark{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      user-select:none;
+    }
     .brandLogo{
-      width:4cm; height:4cm; object-fit:contain;
-      background:transparent;border:none;outline:none;filter:none;
+      width:4cm;
+      height:4cm;
+      object-fit:contain;
+      background:transparent;
+      border:none;
+      outline:none;
+      filter:none;
       mix-blend-mode: screen;
     }
+
     .brandName{
-      font-weight:950; letter-spacing:.2px; font-size:18px; line-height:1;
+      font-weight:950;
+      letter-spacing:.2px;
+      font-size:18px;
+      line-height:1;
       background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
       white-space:nowrap;
     }
     .brandSub{opacity:.75;white-space:nowrap}
@@ -67,6 +96,7 @@
       font-size:14px;
       transition:all .2s;
       font-weight:650;
+      font-family:inherit;
     }
     .btn:hover{
       border-color:rgba(59,130,246,.6);
@@ -86,7 +116,8 @@
     .btn.brand-lancia:hover{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.1)}
 
     .centroAutoLink{
-      display:inline-flex; align-items:center;
+      display:inline-flex;
+      align-items:center;
       padding:6px 12px;
       border:2px solid rgba(34,197,94,.4);
       background:rgba(34,197,94,.08);
@@ -102,7 +133,9 @@
       box-shadow:0 4px 16px rgba(34,197,94,.3);
     }
     .centroAutoLogo{
-      height:42px; width:auto; object-fit:contain;
+      height:42px;
+      width:auto;
+      object-fit:contain;
       filter:drop-shadow(0 1px 3px rgba(0,0,0,.2));
     }
 
@@ -177,147 +210,8 @@
     .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
     .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
 
-    .chatTrigger{
-      position:fixed; bottom:24px; right:24px;
-      width:70px; height:70px; border-radius:50%;
-      background:transparent; border:none; cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      box-shadow:0 8px 24px rgba(0,0,0,.3);
-      transition:all .3s ease;
-      z-index:1000;
-    }
-    .chatTrigger:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(0,0,0,.5)}
-    .chatTrigger img{width:70px;height:70px;object-fit:contain}
-
-    .chatBox{
-      position:fixed; bottom:24px; right:24px;
-      width:420px; max-width:calc(100vw - 32px);
-      height:600px; max-height:calc(100vh - 48px);
-      background:rgba(17,24,39,.95);
-      border:1px solid var(--line);
-      border-radius:20px;
-      display:none;
-      flex-direction:column;
-      box-shadow:0 20px 60px rgba(0,0,0,.6);
-      z-index:1001;
-      overflow:hidden;
-      backdrop-filter:blur(20px);
-    }
-    .chatBox.open{display:flex}
-    .chatBox.minimized{
-      width:70px; height:70px;
-      background:transparent; border:none; border-radius:50%;
-      box-shadow:0 8px 24px rgba(0,0,0,.3);
-    }
-    .chatBox.minimized .chatHeader,
-    .chatBox.minimized .chatMessages,
-    .chatBox.minimized .chatInput{display:none}
-
-    .chatHeader{
-      background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-      padding:14px 16px;
-      display:flex; align-items:center; justify-content:space-between;
-      border-bottom:1px solid rgba(255,255,255,.15);
-    }
-    .chatHeaderLeft{display:flex;align-items:center;gap:10px}
-    .chatHeaderLogo{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);padding:4px}
-    .chatHeaderTitle{font-weight:700;font-size:16px;color:#fff}
-    .chatHeaderSub{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px}
-    .chatHeaderBtns{display:flex;gap:8px}
-    .chatHeaderBtn{
-      width:32px;height:32px;border-radius:8px;
-      background:rgba(255,255,255,.15);
-      border:none;color:#fff;cursor:pointer;font-size:18px;
-      display:flex;align-items:center;justify-content:center;
-      transition:all .2s;font-weight:700;
-    }
-    .chatHeaderBtn:hover{background:rgba(255,255,255,.25);transform:scale(1.05)}
-
-    .chatMessages{
-      flex:1; overflow-y:auto; padding:16px;
-      background:linear-gradient(180deg, rgba(26,29,35,.95) 0%, rgba(16,18,22,.95) 100%);
-      display:flex; flex-direction:column; gap:12px;
-    }
-    .message{display:flex;gap:8px}
-    .message.user{flex-direction:row-reverse}
-    .messageBubble{
-      max-width:85%;
-      padding:12px 16px;
-      border-radius:18px;
-      font-size:14px;
-      line-height:1.6;
-      word-wrap:break-word;
-      white-space:pre-line;
-    }
-    .message.ai .messageBubble{
-      background:linear-gradient(135deg, rgba(59,130,246,.85) 0%, rgba(96,165,250,.85) 100%);
-      color:#fff;
-      border-bottom-left-radius:4px;
-    }
-    .message.user .messageBubble{
-      background:rgba(255,255,255,.92);
-      color:#1a1d23;
-      border-bottom-right-radius:4px;
-    }
-
-    .chatInput{
-      padding:16px; background:rgba(10,12,18,.95);
-      border-top:1px solid var(--line);
-      display:flex; gap:10px;
-    }
-    .chatInputField{
-      flex:1;
-      background:rgba(31,41,55,.6);
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:12px 16px;
-      color:var(--text);
-      font-size:14px;
-      outline:none;
-      transition:all .2s;
-      font-family:inherit;
-    }
-    .chatInputField:focus{border-color:var(--accent);background:rgba(31,41,55,.8)}
-    .chatInputField::placeholder{color:var(--muted)}
-    .chatSendBtn{
-      width:48px;height:48px;border-radius:12px;
-      background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-      border:none;color:#fff;cursor:pointer;font-size:20px;
-      display:flex;align-items:center;justify-content:center;
-      transition:all .2s;
-    }
-    .chatSendBtn:hover:not(:disabled){transform:scale(1.05)}
-    .chatSendBtn:disabled{opacity:.5;cursor:not-allowed}
-
-    @media (max-width: 980px){
-      .layout{grid-template-columns:1fr}
-      .newsScroll{max-height:60vh}
-      .brand{min-width:unset}
-      .chatBox{
-        width:100%;max-width:100%;height:100vh;max-height:100vh;
-        bottom:0;right:0;border-radius:0;
-      }
-      .chatTrigger{bottom:16px;right:16px;width:60px;height:60px}
-    }
-
-    /* ===== COMPARATORE ===== */
-    .cmpSuggest{
-      background:rgba(59,130,246,.12);
-      border:1px solid rgba(59,130,246,.3);
-      border-radius:999px;
-      padding:4px 10px;
-      color:#93c5fd;
-      font-size:11px;
-      cursor:pointer;
-      transition:all .2s;
-      font-family:inherit;
-    }
-    .cmpSuggest:hover{background:rgba(59,130,246,.25);border-color:rgba(59,130,246,.6)}
-
-    .cmpLoading{display:flex;align-items:center;justify-content:center;gap:10px;padding:40px;color:#9ca3af;font-size:14px}
-
-    /* ===== AGENDA + MEMO ===== */
-    .widgetStack{display:grid;gap:16px;margin-top:16px}
+    /* ===== WIDGET BASE ===== */
+    .widgetStack{display:grid;gap:16px;margin-top:16px;}
     .widgetPanel{
       background:rgba(17,24,39,.78);
       border:1px solid #1f2937;
@@ -336,10 +230,11 @@
     }
     .widgetTitle{font-weight:950;font-size:18px}
     .widgetSub{color:#9ca3af;font-size:13px;margin-top:4px}
-    .widgetBody{padding:16px 20px}
-    .formRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .widgetBody{padding:16px 20px;}
+    .formRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
     .field{
-      flex:1; min-width:220px;
+      flex:1;
+      min-width:220px;
       background:rgba(31,41,55,.6);
       border:1px solid #1f2937;
       border-radius:10px;
@@ -359,12 +254,23 @@
       overflow:hidden;
     }
     .seg button{
-      border:none;background:transparent;color:#9ca3af;
-      padding:8px 10px;font-size:12px;cursor:pointer;
-      transition:all .2s;font-family:inherit;font-weight:700;white-space:nowrap;
+      border:none;
+      background:transparent;
+      color:#9ca3af;
+      padding:8px 10px;
+      font-size:12px;
+      cursor:pointer;
+      transition:all .2s;
+      font-family:inherit;
+      font-weight:700;
+      white-space:nowrap;
     }
-    .seg button.active{color:#e5e7eb;background:rgba(59,130,246,.18)}
+    .seg button.active{
+      color:#e5e7eb;
+      background:rgba(59,130,246,.18);
+    }
     .seg button:hover{background:rgba(59,130,246,.12);color:#cfe1ff}
+
     .split3{
       display:grid;
       grid-template-columns:repeat(3,1fr);
@@ -372,7 +278,13 @@
       margin-top:14px;
       align-items:start;
     }
-    @media (max-width: 980px){.split3{grid-template-columns:1fr}}
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+      .newsScroll{max-height:60vh}
+      .brand{min-width: unset}
+      .split3{grid-template-columns:1fr}
+    }
+
     .dayCol{
       background:rgba(31,41,55,.35);
       border:1px solid rgba(31,41,55,.75);
@@ -398,6 +310,10 @@
       max-height:260px;
       overflow:auto;
     }
+    .list::-webkit-scrollbar{width:8px}
+    .list::-webkit-scrollbar-thumb{background:rgba(59,130,246,.25);border-radius:999px}
+    .list::-webkit-scrollbar-track{background:rgba(0,0,0,.12)}
+
     .item{
       display:flex;
       align-items:flex-start;
@@ -408,21 +324,36 @@
       background:rgba(17,24,39,.35);
     }
     .itemMain{flex:1;min-width:0}
-    .itemText{font-size:13px;line-height:1.35;word-break:break-word}
+    .itemText{
+      font-size:13px;
+      line-height:1.35;
+      word-break:break-word;
+    }
     .itemText.done{text-decoration:line-through;opacity:.65}
     .itemActions{display:flex;gap:6px;align-items:center}
     .iconBtn{
-      width:32px;height:32px;border-radius:10px;
+      width:32px;height:32px;
+      border-radius:10px;
       border:1px solid rgba(31,41,55,.9);
       background:rgba(17,24,39,.45);
       color:#e5e7eb;
       cursor:pointer;
       transition:all .2s;
       display:flex;align-items:center;justify-content:center;
-      font-size:14px;font-weight:900;
+      font-size:14px;
+      font-weight:900;
     }
-    .iconBtn:hover{border-color:rgba(59,130,246,.55);background:rgba(17,24,39,.7);transform:translateY(-1px)}
-    .chk{width:18px;height:18px;flex:0 0 auto;accent-color:#3b82f6;margin-top:2px;cursor:pointer}
+    .iconBtn:hover{
+      border-color:rgba(59,130,246,.55);
+      background:rgba(17,24,39,.7);
+      transform:translateY(-1px);
+    }
+    .chk{
+      width:18px;height:18px;flex:0 0 auto;
+      accent-color:#3b82f6;
+      margin-top:2px;
+      cursor:pointer;
+    }
     .smallNote{margin-top:10px;color:#9ca3af;font-size:12px}
     .memoArea{width:100%;min-height:110px;resize:vertical}
 
@@ -437,6 +368,68 @@
     }
     .syncBadge.ok{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10);color:#bbf7d0}
     .syncBadge.warn{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.10);color:#fde68a}
+
+    /* ===== CALENDARIO SETTIMANALE ===== */
+    #weekGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;}
+    .weekDay{
+      border:1px solid rgba(31,41,55,.75);
+      background:rgba(17,24,39,.35);
+      border-radius:14px;
+      padding:10px;
+      cursor:pointer;
+      transition:all .2s;
+      min-height:110px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .weekDay:hover{
+      border-color:rgba(59,130,246,.55);
+      background:rgba(17,24,39,.55);
+      transform:translateY(-1px);
+    }
+    .weekDayTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:8px;
+    }
+    .weekDow{font-weight:900;font-size:12px;color:#e5e7eb}
+    .weekDate{font-size:12px;color:#9ca3af;font-weight:700}
+    .weekBadge{
+      font-size:11px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid rgba(31,41,55,.9);
+      background:rgba(0,0,0,.12);
+      color:#9ca3af;
+      white-space:nowrap;
+    }
+    .weekBadge.has{border-color:rgba(59,130,246,.45);background:rgba(59,130,246,.12);color:#bfdbfe}
+    .weekList{
+      margin-top:2px;
+      display:grid;
+      gap:5px;
+      font-size:12px;
+      color:#d1d5db;
+    }
+    .weekLine{
+      opacity:.85;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .weekDay.today{
+      border-color:rgba(34,197,94,.55);
+      background:rgba(34,197,94,.08);
+    }
+    .weekDay.selected{
+      outline:2px solid rgba(59,130,246,.55);
+      outline-offset:1px;
+    }
+    @media (max-width: 980px){
+      #weekGrid{grid-template-columns:repeat(2,1fr) !important;}
+    }
   </style>
 </head>
 
@@ -446,9 +439,11 @@
       <div class="row">
         <div class="brand">
           <div class="brandMark">
-            <img class="brandLogo"
+            <img
+              class="brandLogo"
               src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png"
-              alt="AI BOTT logo" />
+              alt="AI BOTT logo"
+            />
             <div>
               <div class="brandName">AI BOTT</div>
               <div class="brandSub">Automotive</div>
@@ -461,8 +456,11 @@
           <button id="lanciaBtn" class="btn brand-lancia">Lancia</button>
 
           <a href="https://www.centroautovt.it/" target="_blank" rel="noopener noreferrer" class="centroAutoLink">
-            <img src="https://image2url.com/r2/default/images/1770805237740-1db65b1e-5553-4b5b-b28a-750e3520a0a2.png"
-              alt="CentroAuto VT" class="centroAutoLogo" />
+            <img
+              src="https://image2url.com/r2/default/images/1770805237740-1db65b1e-5553-4b5b-b28a-750e3520a0a2.png"
+              alt="CentroAuto VT"
+              class="centroAutoLogo"
+            />
           </a>
         </div>
 
@@ -477,6 +475,7 @@
 
   <main class="wrap">
     <div class="layout">
+      <!-- NEWS -->
       <aside class="panel">
         <div class="panelHeader">
           <div>
@@ -491,53 +490,43 @@
         </div>
       </aside>
 
+      <!-- DESTRA -->
       <section style="padding:0;border:none;background:none;">
-        <!-- Comparatore -->
-        <div id="comparatorPanel" style="background:rgba(17,24,39,.78);border:1px solid #1f2937;border-radius:16px;overflow:hidden;">
-          <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <!-- (facoltativo) spazio per comparatore o altro -->
+        <div class="widgetPanel" style="margin-bottom:16px;">
+          <div class="widgetHeader">
             <div>
-              <div style="font-weight:950;font-size:18px">⚔ Comparatore Auto</div>
-              <div style="color:#9ca3af;font-size:13px;margin-top:4px">Confronta due auto nuove — cerca sui configuratori ufficiali</div>
+              <div class="widgetTitle">⚔ Comparatore</div>
+              <div class="widgetSub">Widget placeholder (puoi rimettere il tuo comparatore completo qui).</div>
             </div>
-            <button id="cmpResetBtn" class="btn" style="font-size:12px;padding:7px 12px;">↩ Reset</button>
           </div>
-
-          <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.5);display:flex;gap:10px;flex-wrap:wrap;">
-            <input id="cmpInput1" type="text" placeholder="Es: Grande Panda, Compass, Stelvio..."
-              style="flex:1;min-width:180px;background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
-              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'" />
-            <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;font-weight:700;">VS</div>
-            <input id="cmpInput2" type="text" placeholder="Es: Junior, Avenger, Ypsilon..."
-              style="flex:1;min-width:180px;background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
-              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'" />
-            <button id="cmpBtn" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);border:none;border-radius:10px;padding:10px 20px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit;">
-              🔎 Confronta
-            </button>
-          </div>
-
-          <div style="padding:10px 20px;border-bottom:1px solid rgba(31,41,55,.4);display:flex;gap:8px;flex-wrap:wrap;">
-            <span style="color:#9ca3af;font-size:12px;align-self:center;">Rapido:</span>
-            <button class="cmpSuggest" data-s1="Grande Panda" data-s2="Junior">Grande Panda vs Junior</button>
-            <button class="cmpSuggest" data-s1="Compass" data-s2="Tonale">Compass vs Tonale</button>
-            <button class="cmpSuggest" data-s1="Stelvio" data-s2="Renegade">Stelvio vs Renegade</button>
-            <button class="cmpSuggest" data-s1="Ypsilon" data-s2="Avenger">Ypsilon vs Avenger</button>
-          </div>
-
-          <div id="cmpResults" style="padding:20px;min-height:120px;">
-            <div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">
-              ↑ Scrivi il modello e premi Confronta — riconosco Fiat, Jeep, Alfa Romeo e Lancia automaticamente
-            </div>
+          <div class="widgetBody muted" style="font-size:13px;">
+            Qui è la zona grande vuota nella tua schermata.
           </div>
         </div>
 
-        <!-- Agenda + Memo -->
         <div class="widgetStack">
+          <!-- CALENDARIO SETTIMANALE (zona freccia) -->
+          <div class="widgetPanel" id="weekPanel">
+            <div class="widgetHeader">
+              <div>
+                <div class="widgetTitle">🗓 Calendario settimanale</div>
+                <div class="widgetSub">Settimana corrente. Click su un giorno: i nuovi task vanno lì.</div>
+              </div>
+              <span id="weekSelectedPill" class="pill muted">Selezione: oggi</span>
+            </div>
+            <div class="widgetBody">
+              <div id="weekGrid"></div>
+              <div class="smallNote">Sincronizzato con Agenda e con Firebase (anche da telefono).</div>
+            </div>
+          </div>
 
+          <!-- AGENDA 3 GIORNI -->
           <div class="widgetPanel" id="agendaPanel">
             <div class="widgetHeader">
               <div>
                 <div class="widgetTitle">📅 Agenda 3 giorni</div>
-                <div class="widgetSub">Task sincronizzati su Firebase. L’agenda scorre ogni giorno automaticamente.</div>
+                <div class="widgetSub">Scorre automaticamente ogni giorno (oggi, domani, +2).</div>
               </div>
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                 <span id="syncBadge" class="syncBadge warn">Sync: non attivo</span>
@@ -547,8 +536,8 @@
 
             <div class="widgetBody">
               <div class="formRow">
-                <input id="taskInput" class="field" type="text" placeholder="Scrivi un task (es: richiamare cliente, preventivo, test drive...)" />
-                <div class="seg" aria-label="Giorno task">
+                <input id="taskInput" class="field" type="text" placeholder="Scrivi un task..." />
+                <div class="seg" aria-label="Giorno task (solo se NON selezioni nel calendario)">
                   <button id="dayBtn0" class="active" type="button">Oggi</button>
                   <button id="dayBtn1" type="button">Domani</button>
                   <button id="dayBtn2" type="button">+2</button>
@@ -559,7 +548,7 @@
               <div class="split3" style="margin-top:14px;">
                 <div class="dayCol">
                   <div class="dayHead">
-                    <span id="dayLabel0">Oggi</span>
+                    <span>Oggi</span>
                     <span id="dayDate0" class="dayMeta"></span>
                   </div>
                   <div id="taskList0" class="list"></div>
@@ -567,7 +556,7 @@
 
                 <div class="dayCol">
                   <div class="dayHead" style="background:rgba(96,165,250,.08);">
-                    <span id="dayLabel1">Domani</span>
+                    <span>Domani</span>
                     <span id="dayDate1" class="dayMeta"></span>
                   </div>
                   <div id="taskList1" class="list"></div>
@@ -575,22 +564,23 @@
 
                 <div class="dayCol">
                   <div class="dayHead" style="background:rgba(59,130,246,.06);">
-                    <span id="dayLabel2">+2 giorni</span>
+                    <span>+2</span>
                     <span id="dayDate2" class="dayMeta"></span>
                   </div>
                   <div id="taskList2" class="list"></div>
                 </div>
               </div>
 
-              <div class="smallNote">Se fai login su telefono, vedi gli stessi task e memo.</div>
+              <div class="smallNote">Enter sul task = aggiungi. Selezione calendario attiva: ha priorità sui 3 pulsanti.</div>
             </div>
           </div>
 
+          <!-- MEMO -->
           <div class="widgetPanel" id="memoPanel">
             <div class="widgetHeader">
               <div>
                 <div class="widgetTitle">📝 Memo</div>
-                <div class="widgetSub">Sincronizzate su Firebase. Matita: barra o risbarra.</div>
+                <div class="widgetSub">Matita: barra/risbarra. Sync su Firebase.</div>
               </div>
               <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
             </div>
@@ -608,40 +598,10 @@
               <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
             </div>
           </div>
-
         </div>
       </section>
     </div>
   </main>
-
-  <!-- Chat UI (lasciato invariato) -->
-  <div class="chatTrigger" id="chatTrigger">
-    <img src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI Agent"/>
-  </div>
-  <div class="chatBox" id="chatBox">
-    <img id="chatMinimizedLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png"
-      alt="AI Agent" style="display:none; width:70px; height:70px; object-fit:contain; cursor:pointer;" />
-    <div class="chatHeader">
-      <div class="chatHeaderLeft">
-        <img class="chatHeaderLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI"/>
-        <div>
-          <div class="chatHeaderTitle">AI BOTT Assistant</div>
-          <div class="chatHeaderSub">Esperto configurazioni</div>
-        </div>
-      </div>
-      <div class="chatHeaderBtns">
-        <button class="chatHeaderBtn" id="minimizeBtn" title="Minimizza">−</button>
-        <button class="chatHeaderBtn" id="closeBtn" title="Chiudi">×</button>
-      </div>
-    </div>
-    <div class="chatMessages" id="chatMessages">
-      <div class="message ai"><div class="messageBubble">Ciao! Sono AI BOTT.</div></div>
-    </div>
-    <div class="chatInput">
-      <input type="text" class="chatInputField" id="chatInputField" placeholder="Scrivi..." autocomplete="off" />
-      <button class="chatSendBtn" id="chatSendBtn">➤</button>
-    </div>
-  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -666,9 +626,7 @@
       enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    const BACKEND_NEWS   = "/api/news";
-    const BACKEND_CHAT   = "https://auto-backend-three.vercel.app/api/chat";
-    const BACKEND_SEARCH = "https://auto-backend-three.vercel.app/api/search";
+    const BACKEND_NEWS = "/api/news";
 
     const BRAND_LINKS = {
       Fiat:     "https://www.fiat.it/omni/configuratore/#/",
@@ -687,8 +645,8 @@
       measurementId: "G-WYM78KQWQJ"
     };
 
-    const $ = id => document.getElementById(id);
-    const setStatus = t => { $("status").textContent = t; };
+    const $ = (id) => document.getElementById(id);
+    const setStatus = (t) => { $("status").textContent = t; };
 
     function escapeHtml(s = "") {
       return String(s ?? "").replace(/[&<>"']/g, c => ({
@@ -703,7 +661,7 @@
       return dt.toLocaleString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
     }
 
-    function renderItems(items) {
+    function renderNews(items) {
       const box = $("newsList");
       if (!items || !items.length) {
         box.innerHTML = '<div class="muted" style="padding:20px;text-align:center">Nessuna news disponibile.</div>';
@@ -728,14 +686,12 @@
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db   = getFirestore(app);
-
-    // cache offline Firestore (utile su mobile)
     enableIndexedDbPersistence(db).catch(()=>{});
 
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt:"select_account", display:"popup" });
 
-    (async function initApp(){
+    (async function initAuth(){
       try { await setPersistence(auth, browserLocalPersistence); }
       catch { try { await setPersistence(auth, browserSessionPersistence); } catch {} }
       try { await getRedirectResult(auth); } catch {}
@@ -748,11 +704,11 @@
       $("refreshBtn").disabled = true;
       try {
         const response = await fetch(BACKEND_NEWS, { method:"GET", headers:{"Cache-Control":"no-cache"}, cache:"no-store" });
-        if (!response.ok) { const t = await response.text().catch(()=>""); throw new Error(`HTTP ${response.status}${t?" - "+t:""}`); }
+        if (!response.ok) throw new Error("HTTP " + response.status);
         const data = await response.json();
-        if (data.items && Array.isArray(data.items)) renderItems(data.items);
-        else if (Array.isArray(data)) renderItems(data);
-        else throw new Error("Formato dati non valido");
+        if (data.items && Array.isArray(data.items)) renderNews(data.items);
+        else if (Array.isArray(data)) renderNews(data);
+        else renderNews([]);
       } catch(err) {
         $("newsList").innerHTML = '<div class="muted" style="padding:20px;text-align:center">Errore caricamento news</div>';
         setStatus("Errore: " + (err?.message || err));
@@ -766,7 +722,7 @@
         setStatus("Apertura login Google...");
         try {
           const result = await signInWithPopup(auth, provider);
-          setStatus("Login riuscito! Benvenuto " + result.user.email);
+          setStatus("Login riuscito! " + (result.user.email || ""));
         } catch(popupError) {
           if (["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(popupError.code)) {
             setStatus("Reindirizzamento in corso...");
@@ -774,9 +730,7 @@
           } else { throw popupError; }
         }
       } catch(e) {
-        let msg = e.code || e.message || "Errore";
-        if (e.code === "auth/unauthorized-domain") msg = "Dominio non autorizzato in Firebase Console";
-        setStatus("Errore: " + msg);
+        setStatus("Errore: " + (e.code || e.message || "login"));
       }
     });
 
@@ -792,13 +746,12 @@
     $("lanciaBtn").addEventListener("click",() => window.open(BRAND_LINKS.Lancia,    "_blank","noopener,noreferrer"));
 
     // =========================
-    // AGENDA + MEMO: FIRESTORE SYNC
+    // FIRESTORE SYNC (TASK + MEMO)
     // =========================
     const SYNC = {
       unsub: null,
-      uid: null,
       docRef: null,
-      data: { tasks: {}, memos: {} },  // map per id
+      data: { tasks: {}, memos: {} },
       ready: false
     };
 
@@ -807,7 +760,7 @@
       if(state === "ok"){
         b.className = "syncBadge ok";
         b.textContent = "Sync: attivo";
-      } else if (state === "warn"){
+      } else if(state === "warn"){
         b.className = "syncBadge warn";
         b.textContent = "Sync: non attivo";
       } else {
@@ -840,21 +793,64 @@
       return Math.random().toString(16).slice(2) + Date.now().toString(16);
     }
 
-    // Agenda scorre: sempre OGGI, DOMANI, +2 in base alla data corrente
+    function normalizePlanner(p){
+      const tasks = (p && typeof p.tasks === "object" && p.tasks) ? p.tasks : {};
+      const memos = (p && typeof p.memos === "object" && p.memos) ? p.memos : {};
+      return { tasks, memos };
+    }
+
+    function cleanupOldTasks(data){
+      const keepAfter = todayMidnight(addDays(new Date(), -30));
+      const limitKey = dateKey(keepAfter);
+      const out = { tasks: { ...data.tasks }, memos: { ...data.memos } };
+      for(const [id,t] of Object.entries(out.tasks)){
+        if(!t?.dateKey) continue;
+        if(String(t.dateKey) < limitKey) delete out.tasks[id];
+      }
+      return out;
+    }
+
+    async function writePlanner(nextData){
+      if(!SYNC.docRef) return;
+      await setDoc(SYNC.docRef, nextData, { merge:false });
+    }
+
+    async function safeWrite(mutatorFn){
+      if(!SYNC.docRef) return;
+      const current = JSON.parse(JSON.stringify(SYNC.data));
+      let next = mutatorFn(current);
+      next = cleanupOldTasks(next);
+      SYNC.data = next;
+      renderTasksAndMemos();
+      renderWeekCalendar();
+      try{ await writePlanner(next); }catch{}
+    }
+
+    // =========================
+    // AGENDA 3 GIORNI (SCORRE OGNI GIORNO)
+    // =========================
     let selectedOffset = 0;
+
+    function setDayOffset(n){
+      selectedOffset = n;
+      $("dayBtn0").classList.toggle("active", n===0);
+      $("dayBtn1").classList.toggle("active", n===1);
+      $("dayBtn2").classList.toggle("active", n===2);
+    }
+    $("dayBtn0").addEventListener("click", ()=>setDayOffset(0));
+    $("dayBtn1").addEventListener("click", ()=>setDayOffset(1));
+    $("dayBtn2").addEventListener("click", ()=>setDayOffset(2));
+    setDayOffset(0);
 
     function refreshDayHeaders(){
       const base = todayMidnight(new Date());
-      const d0 = base;
-      const d1 = addDays(base,1);
-      const d2 = addDays(base,2);
-      $("dayDate0").textContent = prettyDay(d0);
-      $("dayDate1").textContent = prettyDay(d1);
-      $("dayDate2").textContent = prettyDay(d2);
-      renderTasksAndMemos(); // ricalcola in base ai 3 giorni correnti
+      $("dayDate0").textContent = prettyDay(base);
+      $("dayDate1").textContent = prettyDay(addDays(base,1));
+      $("dayDate2").textContent = prettyDay(addDays(base,2));
+      renderTasksAndMemos();
+      renderWeekCalendar();
     }
 
-    // aggiorna a mezzanotte automaticamente
     (function scheduleMidnightRefresh(){
       const now = new Date();
       const next = new Date(now);
@@ -866,51 +862,108 @@
       }, Math.max(1000, ms));
     })();
 
-    function normalizePlanner(p){
-      const tasks = (p && typeof p.tasks === "object" && p.tasks) ? p.tasks : {};
-      const memos = (p && typeof p.memos === "object" && p.memos) ? p.memos : {};
-      return { tasks, memos };
+    // =========================
+    // CALENDARIO SETTIMANALE (collegato ai task)
+    // =========================
+    let manualTargetDateKey = null;
+
+    function startOfWeekMonday(d=new Date()){
+      const x = todayMidnight(d);
+      const day = x.getDay(); // 0=dom
+      const diff = (day === 0) ? -6 : (1 - day); // lunedì
+      x.setDate(x.getDate() + diff);
+      return x;
+    }
+    function shortDow(d){
+      return d.toLocaleDateString("it-IT",{weekday:"short"}).replace(".","");
+    }
+    function formatDM(d){
+      return d.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"});
     }
 
-    async function writePlanner(nextData){
-      if(!SYNC.docRef) return;
-      // scrittura full (semplice e robusta per piccoli dati)
-      await setDoc(SYNC.docRef, nextData, { merge: false });
-    }
-
-    async function safeWrite(mutatorFn){
-      if(!SYNC.docRef) return;
-      const current = JSON.parse(JSON.stringify(SYNC.data));
-      const next = mutatorFn(current);
-      SYNC.data = next;
-      renderTasksAndMemos();
-      try{
-        await writePlanner(next);
-      }catch{
-        // se offline, Firestore farà sync appena possibile (cache attiva)
+    function setWeekSelected(dateKeyStr){
+      manualTargetDateKey = dateKeyStr || null;
+      const pill = $("weekSelectedPill");
+      if(!manualTargetDateKey){
+        pill.textContent = "Selezione: oggi";
+        pill.classList.add("muted");
+      } else {
+        const dt = new Date(manualTargetDateKey + "T00:00:00");
+        pill.textContent = "Selezione: " + shortDow(dt) + " " + formatDM(dt);
+        pill.classList.remove("muted");
       }
+      renderWeekCalendar();
     }
 
-    // pulizia: elimina task più vecchi di 30 giorni (anche se non visibili)
-    function cleanupOldTasks(data){
-      const keepAfter = todayMidnight(addDays(new Date(), -30));
-      const limitKey = dateKey(keepAfter);
-      const out = { ...data, tasks: { ...data.tasks }, memos: { ...data.memos } };
-      for(const [id,t] of Object.entries(out.tasks)){
-        if(!t?.dateKey) continue;
-        if(String(t.dateKey) < limitKey) delete out.tasks[id];
+    function renderWeekCalendar(){
+      const grid = $("weekGrid");
+      if(!grid) return;
+
+      if(!auth.currentUser){
+        grid.innerHTML = '<div class="muted" style="grid-column:1/-1;padding:10px 6px;font-size:12px;">Login richiesto.</div>';
+        return;
       }
-      return out;
+
+      const base = startOfWeekMonday(new Date());
+      const todayKey = dateKey(new Date());
+      const allTasks = Object.values(SYNC.data.tasks || {});
+
+      const days = Array.from({length:7}, (_,i)=> addDays(base,i));
+
+      grid.innerHTML = days.map(d=>{
+        const k = dateKey(d);
+        const items = allTasks
+          .filter(t => t && t.dateKey === k)
+          .sort((a,b)=> (Number(a.done) - Number(b.done)) || ((a.createdAt||0)-(b.createdAt||0)));
+
+        const top3 = items.slice(0,3);
+        const badge = items.length
+          ? `<span class="weekBadge has">${items.length} task</span>`
+          : `<span class="weekBadge">0</span>`;
+
+        const lines = top3.length
+          ? top3.map(t=>`<div class="weekLine">${escapeHtml(t.done ? "✓ " : "• ")}${escapeHtml(t.text||"")}</div>`).join("")
+          : `<div class="weekLine muted">—</div>`;
+
+        const cls = [
+          "weekDay",
+          (k === todayKey) ? "today" : "",
+          (manualTargetDateKey === k) ? "selected" : ""
+        ].join(" ").trim();
+
+        return `
+          <div class="${cls}" data-datekey="${escapeHtml(k)}">
+            <div class="weekDayTop">
+              <div>
+                <div class="weekDow">${escapeHtml(shortDow(d))}</div>
+                <div class="weekDate">${escapeHtml(formatDM(d))}</div>
+              </div>
+              ${badge}
+            </div>
+            <div class="weekList">${lines}</div>
+          </div>
+        `;
+      }).join("");
+
+      grid.querySelectorAll(".weekDay").forEach(el=>{
+        el.addEventListener("click", ()=>{
+          const k = el.getAttribute("data-datekey");
+          setWeekSelected(k === manualTargetDateKey ? null : k);
+          $("taskInput")?.focus();
+        });
+      });
     }
 
+    // =========================
+    // RENDER TASK + MEMO
+    // =========================
     function renderTasksAndMemos(){
-      // se non loggato, mostra vuoto
-      const logged = !!auth.currentUser;
-      if(!logged){
-        $("taskList0").innerHTML = '<div class="muted" style="padding:10px 6px;font-size:12px;">Login richiesto.</div>';
-        $("taskList1").innerHTML = $("taskList0").innerHTML;
-        $("taskList2").innerHTML = $("taskList0").innerHTML;
-        $("memoList").innerHTML  = '<div class="muted" style="padding:10px 6px;font-size:12px;">Login richiesto.</div>';
+      if(!auth.currentUser){
+        const msg = '<div class="muted" style="padding:10px 6px;font-size:12px;">Login richiesto.</div>';
+        $("taskList0").innerHTML = msg;
+        $("taskList1").innerHTML = msg;
+        $("taskList2").innerHTML = msg;
+        $("memoList").innerHTML  = msg;
         return;
       }
 
@@ -923,7 +976,7 @@
         const k = keys[i];
         const items = allTasks
           .filter(t => t && t.dateKey === k)
-          .sort((a,b)=> (Number(a.done) - Number(b.done)) || ((a.createdAt||0) - (b.createdAt||0)));
+          .sort((a,b)=> (Number(a.done) - Number(b.done)) || ((a.createdAt||0)-(b.createdAt||0)));
 
         if(!items.length){
           lists[i].innerHTML = '<div class="muted" style="padding:10px 6px;font-size:12px;">Nessun task.</div>';
@@ -947,15 +1000,14 @@
         }).join("");
       }
 
-      // memos
-      const box = $("memoList");
+      const memoBox = $("memoList");
       const memos = Object.values(SYNC.data.memos || {})
-        .sort((a,b)=> (Number(a.done) - Number(b.done)) || ((a.createdAt||0) - (b.createdAt||0)));
+        .sort((a,b)=> (Number(a.done) - Number(b.done)) || ((a.createdAt||0)-(b.createdAt||0)));
 
       if(!memos.length){
-        box.innerHTML = '<div class="muted" style="padding:10px 6px;font-size:12px;">Nessuna memo.</div>';
+        memoBox.innerHTML = '<div class="muted" style="padding:10px 6px;font-size:12px;">Nessuna memo.</div>';
       } else {
-        box.innerHTML = memos.map(m => {
+        memoBox.innerHTML = memos.map(m => {
           const txtClass = m.done ? "itemText done" : "itemText";
           return `
             <div class="item" data-id="${escapeHtml(m.id)}">
@@ -971,11 +1023,12 @@
         }).join("");
       }
 
-      // wiring task events
+      // wiring TASK
       document.querySelectorAll("#agendaPanel .item").forEach(el => {
         const id = el.getAttribute("data-id");
         const chk = el.querySelector(".chk");
         const del = el.querySelector(".del");
+
         chk.addEventListener("change", () => {
           safeWrite(d => {
             if(d.tasks[id]) d.tasks[id].done = !!chk.checked;
@@ -990,11 +1043,12 @@
         });
       });
 
-      // wiring memo events
+      // wiring MEMO
       document.querySelectorAll("#memoPanel .item").forEach(el => {
         const id = el.getAttribute("data-id");
         const pencil = el.querySelector(".pencil");
         const del = el.querySelector(".del");
+
         pencil.addEventListener("click", () => {
           safeWrite(d => {
             if(d.memos[id]) d.memos[id].done = !d.memos[id].done;
@@ -1010,29 +1064,31 @@
       });
     }
 
-    function setDayOffset(n){
-      selectedOffset = n;
-      $("dayBtn0").classList.toggle("active", n===0);
-      $("dayBtn1").classList.toggle("active", n===1);
-      $("dayBtn2").classList.toggle("active", n===2);
-    }
-    $("dayBtn0").addEventListener("click", ()=>setDayOffset(0));
-    $("dayBtn1").addEventListener("click", ()=>setDayOffset(1));
-    $("dayBtn2").addEventListener("click", ()=>setDayOffset(2));
-    setDayOffset(0);
-
+    // =========================
+    // AZIONI UI (ADD/CLEAR)
+    // =========================
     $("addTaskBtn").addEventListener("click", () => {
       const text = $("taskInput").value.trim();
       if(!text) return;
+
       const base = todayMidnight(new Date());
-      const target = addDays(base, selectedOffset);
+      let targetKey = null;
+
+      if (manualTargetDateKey) {
+        targetKey = manualTargetDateKey;        // calendario settimanale
+      } else {
+        targetKey = dateKey(addDays(base, selectedOffset)); // agenda 3 giorni
+      }
+
       const id = uid();
       safeWrite(d => {
-        d.tasks[id] = { id, dateKey: dateKey(target), text, done:false, createdAt: Date.now() };
-        return cleanupOldTasks(d);
+        d.tasks[id] = { id, dateKey: targetKey, text, done:false, createdAt: Date.now() };
+        return d;
       });
+
       $("taskInput").value = "";
     });
+
     $("taskInput").addEventListener("keypress", (e)=>{
       if(e.key==="Enter"){ e.preventDefault(); $("addTaskBtn").click(); }
     });
@@ -1042,7 +1098,7 @@
         for(const [id,t] of Object.entries(d.tasks)){
           if(t && t.done) delete d.tasks[id];
         }
-        return cleanupOldTasks(d);
+        return d;
       });
     });
 
@@ -1056,6 +1112,7 @@
       });
       $("memoInput").value = "";
     });
+
     $("memoInput").addEventListener("keydown", (e)=>{
       if(e.key==="Enter" && (e.ctrlKey || e.metaKey)){
         e.preventDefault();
@@ -1072,21 +1129,24 @@
       });
     });
 
+    // =========================
+    // START/STOP SYNC
+    // =========================
     function startPlannerSync(user){
       stopPlannerSync();
-      SYNC.uid = user.uid;
       SYNC.docRef = doc(db, "users", user.uid, "planner", "main");
-
       setSyncBadge("...");
+
       SYNC.unsub = onSnapshot(SYNC.docRef, (snap) => {
         const data = snap.exists() ? snap.data() : { tasks:{}, memos:{} };
-        SYNC.data = normalizePlanner(data);
-        SYNC.data = cleanupOldTasks(SYNC.data);
+        SYNC.data = cleanupOldTasks(normalizePlanner(data));
         SYNC.ready = true;
         setSyncBadge("ok");
-        renderTasksAndMemos();
 
-        // se doc non esiste, crealo una volta
+        renderTasksAndMemos();
+        renderWeekCalendar();
+        refreshDayHeaders();
+
         if(!snap.exists()){
           setDoc(SYNC.docRef, SYNC.data, { merge:false }).catch(()=>{});
         }
@@ -1098,12 +1158,12 @@
     function stopPlannerSync(){
       if(SYNC.unsub){ try{ SYNC.unsub(); }catch{} }
       SYNC.unsub = null;
-      SYNC.uid = null;
       SYNC.docRef = null;
       SYNC.data = { tasks:{}, memos:{} };
       SYNC.ready = false;
       setSyncBadge("warn");
       renderTasksAndMemos();
+      renderWeekCalendar();
     }
 
     // =========================
@@ -1121,6 +1181,7 @@
 
         loadNews();
         refreshDayHeaders();
+        setWeekSelected(null);
         startPlannerSync(user);
       } else {
         $("userPill").textContent = "Non autenticato";
@@ -1133,54 +1194,9 @@
         $("newsList").innerHTML = "";
         setStatus("Effettua il login per caricare le news.");
 
+        setWeekSelected(null);
         stopPlannerSync();
       }
-    });
-
-    // =========================
-    // Comparatore + Chat: lasciati invariati (se ti servono, incollaci qui la tua parte originale)
-    // =========================
-
-    // mini: suggest comparatore
-    function setSuggest(a,b){
-      $("cmpInput1").value=a; $("cmpInput2").value=b;
-      $("cmpInput1").style.borderColor="#3b82f6";
-      $("cmpInput2").style.borderColor="#3b82f6";
-    }
-    document.querySelectorAll(".cmpSuggest").forEach(btn=>{
-      btn.addEventListener("click", ()=>setSuggest(btn.dataset.s1, btn.dataset.s2));
-    });
-    $("cmpResetBtn").addEventListener("click", ()=>{
-      $("cmpInput1").value=""; $("cmpInput2").value="";
-      $("cmpResults").innerHTML = '<div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">↑ Scrivi il modello e premi Confronta</div>';
-    });
-
-    // Chat open/close (base)
-    let isMinimized = false;
-    const chatTrigger    = $("chatTrigger");
-    const chatBox        = $("chatBox");
-    const chatInputField = $("chatInputField");
-    chatTrigger.addEventListener("click", () => {
-      chatBox.classList.add("open");
-      chatBox.classList.remove("minimized");
-      chatTrigger.style.display = "none";
-      $("chatMinimizedLogo").style.display = "none";
-      chatInputField.focus();
-    });
-    $("minimizeBtn").addEventListener("click", () => {
-      chatBox.classList.add("minimized");
-      isMinimized = true;
-      $("chatMinimizedLogo").style.display = "block";
-    });
-    $("closeBtn").addEventListener("click", () => {
-      chatBox.classList.remove("open","minimized");
-      chatTrigger.style.display = "flex";
-    });
-    $("chatMinimizedLogo").addEventListener("click", () => {
-      chatBox.classList.remove("minimized");
-      isMinimized = false;
-      $("chatMinimizedLogo").style.display = "none";
-      chatInputField.focus();
     });
   </script>
 </body>
