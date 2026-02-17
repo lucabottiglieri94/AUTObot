@@ -152,7 +152,7 @@
     .layout{
       margin-top:16px;
       display:grid;
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: 420px 1fr;  /* NEWS | CONTENUTO */
       gap:16px;
       align-items:start;
     }
@@ -210,8 +210,21 @@
     .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
     .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
 
+    /* ===== COLONNE A DESTRA: sinistra grande (calendario+comparatore), destra stretta (agenda+memos) ===== */
+    .rightGrid{
+      display:grid;
+      grid-template-columns: 1fr 420px;  /* COLONNA SINISTRA | COLONNA DESTRA */
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+      .newsScroll{max-height:60vh}
+      .brand{min-width: unset}
+      .rightGrid{grid-template-columns:1fr}
+    }
+
     /* ===== WIDGET BASE ===== */
-    .widgetStack{display:grid;gap:16px;margin-top:16px;}
     .widgetPanel{
       background:rgba(17,24,39,.78);
       border:1px solid #1f2937;
@@ -231,6 +244,8 @@
     .widgetTitle{font-weight:950;font-size:18px}
     .widgetSub{color:#9ca3af;font-size:13px;margin-top:4px}
     .widgetBody{padding:16px 20px;}
+    .smallNote{margin-top:10px;color:#9ca3af;font-size:12px}
+
     .formRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
     .field{
       flex:1;
@@ -265,10 +280,7 @@
       font-weight:700;
       white-space:nowrap;
     }
-    .seg button.active{
-      color:#e5e7eb;
-      background:rgba(59,130,246,.18);
-    }
+    .seg button.active{color:#e5e7eb;background:rgba(59,130,246,.18)}
     .seg button:hover{background:rgba(59,130,246,.12);color:#cfe1ff}
 
     .split3{
@@ -279,9 +291,6 @@
       align-items:start;
     }
     @media (max-width: 980px){
-      .layout{grid-template-columns:1fr}
-      .newsScroll{max-height:60vh}
-      .brand{min-width: unset}
       .split3{grid-template-columns:1fr}
     }
 
@@ -303,6 +312,7 @@
       background:rgba(59,130,246,.10);
     }
     .dayMeta{color:#9ca3af;font-weight:700;font-size:12px}
+
     .list{
       padding:10px 12px;
       display:grid;
@@ -324,11 +334,7 @@
       background:rgba(17,24,39,.35);
     }
     .itemMain{flex:1;min-width:0}
-    .itemText{
-      font-size:13px;
-      line-height:1.35;
-      word-break:break-word;
-    }
+    .itemText{font-size:13px;line-height:1.35;word-break:break-word}
     .itemText.done{text-decoration:line-through;opacity:.65}
     .itemActions{display:flex;gap:6px;align-items:center}
     .iconBtn{
@@ -343,18 +349,11 @@
       font-size:14px;
       font-weight:900;
     }
-    .iconBtn:hover{
-      border-color:rgba(59,130,246,.55);
-      background:rgba(17,24,39,.7);
-      transform:translateY(-1px);
-    }
+    .iconBtn:hover{border-color:rgba(59,130,246,.55);background:rgba(17,24,39,.7);transform:translateY(-1px)}
     .chk{
       width:18px;height:18px;flex:0 0 auto;
-      accent-color:#3b82f6;
-      margin-top:2px;
-      cursor:pointer;
+      accent-color:#3b82f6;margin-top:2px;cursor:pointer;
     }
-    .smallNote{margin-top:10px;color:#9ca3af;font-size:12px}
     .memoArea{width:100%;min-height:110px;resize:vertical}
 
     .syncBadge{
@@ -383,53 +382,39 @@
       flex-direction:column;
       gap:6px;
     }
-    .weekDay:hover{
-      border-color:rgba(59,130,246,.55);
-      background:rgba(17,24,39,.55);
-      transform:translateY(-1px);
-    }
-    .weekDayTop{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:8px;
-    }
+    .weekDay:hover{border-color:rgba(59,130,246,.55);background:rgba(17,24,39,.55);transform:translateY(-1px)}
+    .weekDayTop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
     .weekDow{font-weight:900;font-size:12px;color:#e5e7eb}
     .weekDate{font-size:12px;color:#9ca3af;font-weight:700}
     .weekBadge{
-      font-size:11px;
-      padding:3px 8px;
-      border-radius:999px;
+      font-size:11px;padding:3px 8px;border-radius:999px;
       border:1px solid rgba(31,41,55,.9);
       background:rgba(0,0,0,.12);
       color:#9ca3af;
       white-space:nowrap;
     }
     .weekBadge.has{border-color:rgba(59,130,246,.45);background:rgba(59,130,246,.12);color:#bfdbfe}
-    .weekList{
-      margin-top:2px;
-      display:grid;
-      gap:5px;
-      font-size:12px;
-      color:#d1d5db;
-    }
-    .weekLine{
-      opacity:.85;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-    .weekDay.today{
-      border-color:rgba(34,197,94,.55);
-      background:rgba(34,197,94,.08);
-    }
-    .weekDay.selected{
-      outline:2px solid rgba(59,130,246,.55);
-      outline-offset:1px;
-    }
+    .weekList{margin-top:2px;display:grid;gap:5px;font-size:12px;color:#d1d5db}
+    .weekLine{opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .weekDay.today{border-color:rgba(34,197,94,.55);background:rgba(34,197,94,.08)}
+    .weekDay.selected{outline:2px solid rgba(59,130,246,.55);outline-offset:1px}
     @media (max-width: 980px){
       #weekGrid{grid-template-columns:repeat(2,1fr) !important;}
     }
+
+    /* ===== COMPARATORE (ripristinato) ===== */
+    .cmpSuggest{
+      background:rgba(59,130,246,.12);
+      border:1px solid rgba(59,130,246,.3);
+      border-radius:999px;
+      padding:4px 10px;
+      color:#93c5fd;
+      font-size:11px;
+      cursor:pointer;
+      transition:all .2s;
+      font-family:inherit;
+    }
+    .cmpSuggest:hover{background:rgba(59,130,246,.25);border-color:rgba(59,130,246,.6)}
   </style>
 </head>
 
@@ -439,11 +424,9 @@
       <div class="row">
         <div class="brand">
           <div class="brandMark">
-            <img
-              class="brandLogo"
+            <img class="brandLogo"
               src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png"
-              alt="AI BOTT logo"
-            />
+              alt="AI BOTT logo" />
             <div>
               <div class="brandName">AI BOTT</div>
               <div class="brandSub">Automotive</div>
@@ -456,11 +439,8 @@
           <button id="lanciaBtn" class="btn brand-lancia">Lancia</button>
 
           <a href="https://www.centroautovt.it/" target="_blank" rel="noopener noreferrer" class="centroAutoLink">
-            <img
-              src="https://image2url.com/r2/default/images/1770805237740-1db65b1e-5553-4b5b-b28a-750e3520a0a2.png"
-              alt="CentroAuto VT"
-              class="centroAutoLogo"
-            />
+            <img src="https://image2url.com/r2/default/images/1770805237740-1db65b1e-5553-4b5b-b28a-750e3520a0a2.png"
+              alt="CentroAuto VT" class="centroAutoLogo" />
           </a>
         </div>
 
@@ -490,114 +470,139 @@
         </div>
       </aside>
 
-      <!-- DESTRA -->
+      <!-- CONTENUTO A DESTRA -->
       <section style="padding:0;border:none;background:none;">
-        <!-- (facoltativo) spazio per comparatore o altro -->
-        <div class="widgetPanel" style="margin-bottom:16px;">
-          <div class="widgetHeader">
-            <div>
-              <div class="widgetTitle">⚔ Comparatore</div>
-              <div class="widgetSub">Widget placeholder (puoi rimettere il tuo comparatore completo qui).</div>
-            </div>
-          </div>
-          <div class="widgetBody muted" style="font-size:13px;">
-            Qui è la zona grande vuota nella tua schermata.
-          </div>
-        </div>
-
-        <div class="widgetStack">
-          <!-- CALENDARIO SETTIMANALE (zona freccia) -->
-          <div class="widgetPanel" id="weekPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">🗓 Calendario settimanale</div>
-                <div class="widgetSub">Settimana corrente. Click su un giorno: i nuovi task vanno lì.</div>
-              </div>
-              <span id="weekSelectedPill" class="pill muted">Selezione: oggi</span>
-            </div>
-            <div class="widgetBody">
-              <div id="weekGrid"></div>
-              <div class="smallNote">Sincronizzato con Agenda e con Firebase (anche da telefono).</div>
-            </div>
-          </div>
-
-          <!-- AGENDA 3 GIORNI -->
-          <div class="widgetPanel" id="agendaPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">📅 Agenda 3 giorni</div>
-                <div class="widgetSub">Scorre automaticamente ogni giorno (oggi, domani, +2).</div>
-              </div>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                <span id="syncBadge" class="syncBadge warn">Sync: non attivo</span>
-                <button id="agendaClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci fatti</button>
-              </div>
-            </div>
-
-            <div class="widgetBody">
-              <div class="formRow">
-                <input id="taskInput" class="field" type="text" placeholder="Scrivi un task..." />
-                <div class="seg" aria-label="Giorno task (solo se NON selezioni nel calendario)">
-                  <button id="dayBtn0" class="active" type="button">Oggi</button>
-                  <button id="dayBtn1" type="button">Domani</button>
-                  <button id="dayBtn2" type="button">+2</button>
+        <div class="rightGrid">
+          <!-- COLONNA SINISTRA (grande): CALENDARIO sopra, COMPARATORE sotto (in basso a sinistra) -->
+          <div style="display:grid;gap:16px;">
+            <!-- CALENDARIO SETTIMANALE (zona freccia) -->
+            <div class="widgetPanel" id="weekPanel">
+              <div class="widgetHeader">
+                <div>
+                  <div class="widgetTitle">🗓 Calendario settimanale</div>
+                  <div class="widgetSub">Settimana corrente. Click su un giorno: i nuovi task vanno lì.</div>
                 </div>
-                <button id="addTaskBtn" class="btn primary" type="button">Aggiungi</button>
+                <span id="weekSelectedPill" class="pill muted">Selezione: oggi</span>
+              </div>
+              <div class="widgetBody">
+                <div id="weekGrid"></div>
+                <div class="smallNote">Sincronizzato con Agenda e Firebase (anche telefono).</div>
+              </div>
+            </div>
+
+            <!-- COMPARATORE (ripristinato e messo in basso a sinistra) -->
+            <div class="widgetPanel" id="comparatorPanel">
+              <div class="widgetHeader">
+                <div>
+                  <div class="widgetTitle">⚔ Comparatore Auto</div>
+                  <div class="widgetSub">Confronta 2 modelli. (Se vuoi collegarlo al tuo backend search, dimmi il JSON che ritorna.)</div>
+                </div>
+                <button id="cmpResetBtn" class="btn" style="font-size:12px;padding:7px 12px;">↩ Reset</button>
               </div>
 
-              <div class="split3" style="margin-top:14px;">
-                <div class="dayCol">
-                  <div class="dayHead">
-                    <span>Oggi</span>
-                    <span id="dayDate0" class="dayMeta"></span>
+              <div class="widgetBody" style="border-bottom:1px solid rgba(31,41,55,.5);">
+                <div class="formRow">
+                  <input id="cmpInput1" class="field" type="text" placeholder="Es: Grande Panda, Compass, Stelvio..." />
+                  <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;font-weight:800;">VS</div>
+                  <input id="cmpInput2" class="field" type="text" placeholder="Es: Junior, Avenger, Ypsilon..." />
+                  <button id="cmpBtn" class="btn primary" type="button">🔎 Confronta</button>
+                </div>
+
+                <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+                  <span style="color:#9ca3af;font-size:12px;align-self:center;">Rapido:</span>
+                  <button class="cmpSuggest" data-s1="Grande Panda" data-s2="Junior">Grande Panda vs Junior</button>
+                  <button class="cmpSuggest" data-s1="Compass" data-s2="Tonale">Compass vs Tonale</button>
+                  <button class="cmpSuggest" data-s1="Ypsilon" data-s2="Avenger">Ypsilon vs Avenger</button>
+                </div>
+              </div>
+
+              <div id="cmpResults" class="widgetBody">
+                <div class="muted" style="text-align:center;padding:18px 0;font-size:13px;">
+                  Scrivi due modelli e premi Confronta.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COLONNA DESTRA (stretta): AGENDA + MEMO -->
+          <div style="display:grid;gap:16px;">
+            <div class="widgetPanel" id="agendaPanel">
+              <div class="widgetHeader">
+                <div>
+                  <div class="widgetTitle">📅 Agenda 3 giorni</div>
+                  <div class="widgetSub">Scorre automaticamente ogni giorno (oggi, domani, +2).</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                  <span id="syncBadge" class="syncBadge warn">Sync: non attivo</span>
+                  <button id="agendaClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci fatti</button>
+                </div>
+              </div>
+
+              <div class="widgetBody">
+                <div class="formRow">
+                  <input id="taskInput" class="field" type="text" placeholder="Scrivi un task..." />
+                  <div class="seg" aria-label="Giorno task (solo se NON selezioni nel calendario)">
+                    <button id="dayBtn0" class="active" type="button">Oggi</button>
+                    <button id="dayBtn1" type="button">Domani</button>
+                    <button id="dayBtn2" type="button">+2</button>
                   </div>
-                  <div id="taskList0" class="list"></div>
+                  <button id="addTaskBtn" class="btn primary" type="button">Aggiungi</button>
                 </div>
 
-                <div class="dayCol">
-                  <div class="dayHead" style="background:rgba(96,165,250,.08);">
-                    <span>Domani</span>
-                    <span id="dayDate1" class="dayMeta"></span>
+                <div class="split3">
+                  <div class="dayCol">
+                    <div class="dayHead">
+                      <span>Oggi</span>
+                      <span id="dayDate0" class="dayMeta"></span>
+                    </div>
+                    <div id="taskList0" class="list"></div>
                   </div>
-                  <div id="taskList1" class="list"></div>
+
+                  <div class="dayCol">
+                    <div class="dayHead" style="background:rgba(96,165,250,.08);">
+                      <span>Domani</span>
+                      <span id="dayDate1" class="dayMeta"></span>
+                    </div>
+                    <div id="taskList1" class="list"></div>
+                  </div>
+
+                  <div class="dayCol">
+                    <div class="dayHead" style="background:rgba(59,130,246,.06);">
+                      <span>+2</span>
+                      <span id="dayDate2" class="dayMeta"></span>
+                    </div>
+                    <div id="taskList2" class="list"></div>
+                  </div>
                 </div>
 
-                <div class="dayCol">
-                  <div class="dayHead" style="background:rgba(59,130,246,.06);">
-                    <span>+2</span>
-                    <span id="dayDate2" class="dayMeta"></span>
-                  </div>
-                  <div id="taskList2" class="list"></div>
+                <div class="smallNote">Selezione calendario attiva: ha priorità sui 3 pulsanti.</div>
+              </div>
+            </div>
+
+            <div class="widgetPanel" id="memoPanel">
+              <div class="widgetHeader">
+                <div>
+                  <div class="widgetTitle">📝 Memo</div>
+                  <div class="widgetSub">Matita: barra/risbarra. Sync su Firebase.</div>
                 </div>
+                <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
               </div>
 
-              <div class="smallNote">Enter sul task = aggiungi. Selezione calendario attiva: ha priorità sui 3 pulsanti.</div>
+              <div class="widgetBody">
+                <div class="formRow" style="align-items:stretch;">
+                  <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
+                  <button id="addMemoBtn" class="btn primary" type="button" style="align-self:flex-start;">Aggiungi</button>
+                </div>
+
+                <div style="margin-top:14px;">
+                  <div id="memoList" class="list" style="max-height:320px;"></div>
+                </div>
+
+                <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
+              </div>
             </div>
           </div>
 
-          <!-- MEMO -->
-          <div class="widgetPanel" id="memoPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">📝 Memo</div>
-                <div class="widgetSub">Matita: barra/risbarra. Sync su Firebase.</div>
-              </div>
-              <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
-            </div>
-
-            <div class="widgetBody">
-              <div class="formRow" style="align-items:stretch;">
-                <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
-                <button id="addMemoBtn" class="btn primary" type="button" style="align-self:flex-start;">Aggiungi</button>
-              </div>
-
-              <div style="margin-top:14px;">
-                <div id="memoList" class="list" style="max-height:320px;"></div>
-              </div>
-
-              <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
-            </div>
-          </div>
         </div>
       </section>
     </div>
@@ -746,39 +751,76 @@
     $("lanciaBtn").addEventListener("click",() => window.open(BRAND_LINKS.Lancia,    "_blank","noopener,noreferrer"));
 
     // =========================
+    // COMPARATORE: UI + risultati base
+    // =========================
+    function setSuggest(a,b){ $("cmpInput1").value=a; $("cmpInput2").value=b; }
+    document.querySelectorAll(".cmpSuggest").forEach(btn=>{
+      btn.addEventListener("click", ()=>setSuggest(btn.dataset.s1, btn.dataset.s2));
+    });
+    $("cmpResetBtn").addEventListener("click", ()=>{
+      $("cmpInput1").value=""; $("cmpInput2").value="";
+      $("cmpResults").innerHTML = '<div class="muted" style="text-align:center;padding:18px 0;font-size:13px;">Scrivi due modelli e premi Confronta.</div>';
+    });
+
+    function guessBrand(model){
+      const s = (model||"").toLowerCase();
+      const fiat = ["panda","500","tipo","ducato","dobl","doblo","600","grande panda","punto"];
+      const jeep = ["avenger","renegade","compass","wrangler","grand cherokee","cherokee"];
+      const alfa = ["giulia","stelvio","tonale","junior","giulietta","mito"];
+      const lancia = ["ypsilon"];
+      if (alfa.some(x=>s.includes(x))) return "AlfaRomeo";
+      if (jeep.some(x=>s.includes(x))) return "Jeep";
+      if (lancia.some(x=>s.includes(x))) return "Lancia";
+      if (fiat.some(x=>s.includes(x))) return "Fiat";
+      return null;
+    }
+
+    $("cmpBtn").addEventListener("click", ()=>{
+      const a = $("cmpInput1").value.trim();
+      const b = $("cmpInput2").value.trim();
+      if(!a || !b){
+        $("cmpResults").innerHTML = '<div class="muted" style="text-align:center;padding:18px 0;font-size:13px;">Inserisci 2 modelli.</div>';
+        return;
+      }
+      const ba = guessBrand(a);
+      const bb = guessBrand(b);
+
+      const linkA = ba ? BRAND_LINKS[ba] : null;
+      const linkB = bb ? BRAND_LINKS[bb] : null;
+
+      $("cmpResults").innerHTML = `
+        <div style="display:grid;gap:12px;">
+          <div style="display:grid;gap:6px;padding:12px;border:1px solid rgba(31,41,55,.7);border-radius:14px;background:rgba(17,24,39,.35);">
+            <div style="font-weight:900;">${escapeHtml(a)}</div>
+            <div class="muted" style="font-size:12px;">Marca stimata: ${escapeHtml(ba || "non riconosciuta")}</div>
+            ${linkA ? `<a class="btn" style="display:inline-flex;width:max-content;text-decoration:none;" target="_blank" rel="noopener noreferrer" href="${linkA}">Apri configuratore</a>` : ""}
+          </div>
+          <div style="display:grid;gap:6px;padding:12px;border:1px solid rgba(31,41,55,.7);border-radius:14px;background:rgba(17,24,39,.35);">
+            <div style="font-weight:900;">${escapeHtml(b)}</div>
+            <div class="muted" style="font-size:12px;">Marca stimata: ${escapeHtml(bb || "non riconosciuta")}</div>
+            ${linkB ? `<a class="btn" style="display:inline-flex;width:max-content;text-decoration:none;" target="_blank" rel="noopener noreferrer" href="${linkB}">Apri configuratore</a>` : ""}
+          </div>
+          <div class="muted" style="font-size:12px;">
+            Nota: qui puoi collegare il tuo endpoint /api/search per tirare fuori prezzi/allestimenti (mi serve la risposta JSON).
+          </div>
+        </div>
+      `;
+    });
+
+    // =========================
     // FIRESTORE SYNC (TASK + MEMO)
     // =========================
-    const SYNC = {
-      unsub: null,
-      docRef: null,
-      data: { tasks: {}, memos: {} },
-      ready: false
-    };
+    const SYNC = { unsub:null, docRef:null, data:{ tasks:{}, memos:{} }, ready:false };
 
     function setSyncBadge(state){
       const b = $("syncBadge");
-      if(state === "ok"){
-        b.className = "syncBadge ok";
-        b.textContent = "Sync: attivo";
-      } else if(state === "warn"){
-        b.className = "syncBadge warn";
-        b.textContent = "Sync: non attivo";
-      } else {
-        b.className = "syncBadge";
-        b.textContent = "Sync: ...";
-      }
+      if(state === "ok"){ b.className = "syncBadge ok"; b.textContent = "Sync: attivo"; }
+      else if(state === "warn"){ b.className = "syncBadge warn"; b.textContent = "Sync: non attivo"; }
+      else { b.className = "syncBadge"; b.textContent = "Sync: ..."; }
     }
 
-    function todayMidnight(d=new Date()){
-      const x = new Date(d);
-      x.setHours(0,0,0,0);
-      return x;
-    }
-    function addDays(d, n){
-      const x = new Date(d);
-      x.setDate(x.getDate()+n);
-      return x;
-    }
+    function todayMidnight(d=new Date()){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
+    function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
     function dateKey(d){
       const x = todayMidnight(d);
       const y = x.getFullYear();
@@ -786,12 +828,8 @@
       const dd = String(x.getDate()).padStart(2,'0');
       return `${y}-${m}-${dd}`;
     }
-    function prettyDay(d){
-      return d.toLocaleDateString("it-IT",{weekday:"short",day:"2-digit",month:"2-digit"});
-    }
-    function uid(){
-      return Math.random().toString(16).slice(2) + Date.now().toString(16);
-    }
+    function prettyDay(d){ return d.toLocaleDateString("it-IT",{weekday:"short",day:"2-digit",month:"2-digit"}); }
+    function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
 
     function normalizePlanner(p){
       const tasks = (p && typeof p.tasks === "object" && p.tasks) ? p.tasks : {};
@@ -827,10 +865,9 @@
     }
 
     // =========================
-    // AGENDA 3 GIORNI (SCORRE OGNI GIORNO)
+    // AGENDA 3 GIORNI
     // =========================
     let selectedOffset = 0;
-
     function setDayOffset(n){
       selectedOffset = n;
       $("dayBtn0").classList.toggle("active", n===0);
@@ -863,7 +900,7 @@
     })();
 
     // =========================
-    // CALENDARIO SETTIMANALE (collegato ai task)
+    // CALENDARIO SETTIMANALE
     // =========================
     let manualTargetDateKey = null;
 
@@ -874,12 +911,8 @@
       x.setDate(x.getDate() + diff);
       return x;
     }
-    function shortDow(d){
-      return d.toLocaleDateString("it-IT",{weekday:"short"}).replace(".","");
-    }
-    function formatDM(d){
-      return d.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"});
-    }
+    function shortDow(d){ return d.toLocaleDateString("it-IT",{weekday:"short"}).replace(".",""); }
+    function formatDM(d){ return d.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"}); }
 
     function setWeekSelected(dateKeyStr){
       manualTargetDateKey = dateKeyStr || null;
@@ -907,7 +940,6 @@
       const base = startOfWeekMonday(new Date());
       const todayKey = dateKey(new Date());
       const allTasks = Object.values(SYNC.data.tasks || {});
-
       const days = Array.from({length:7}, (_,i)=> addDays(base,i));
 
       grid.innerHTML = days.map(d=>{
@@ -1023,69 +1055,43 @@
         }).join("");
       }
 
-      // wiring TASK
       document.querySelectorAll("#agendaPanel .item").forEach(el => {
         const id = el.getAttribute("data-id");
         const chk = el.querySelector(".chk");
         const del = el.querySelector(".del");
-
         chk.addEventListener("change", () => {
-          safeWrite(d => {
-            if(d.tasks[id]) d.tasks[id].done = !!chk.checked;
-            return d;
-          });
+          safeWrite(d => { if(d.tasks[id]) d.tasks[id].done = !!chk.checked; return d; });
         });
         del.addEventListener("click", () => {
-          safeWrite(d => {
-            delete d.tasks[id];
-            return d;
-          });
+          safeWrite(d => { delete d.tasks[id]; return d; });
         });
       });
 
-      // wiring MEMO
       document.querySelectorAll("#memoPanel .item").forEach(el => {
         const id = el.getAttribute("data-id");
         const pencil = el.querySelector(".pencil");
         const del = el.querySelector(".del");
-
         pencil.addEventListener("click", () => {
-          safeWrite(d => {
-            if(d.memos[id]) d.memos[id].done = !d.memos[id].done;
-            return d;
-          });
+          safeWrite(d => { if(d.memos[id]) d.memos[id].done = !d.memos[id].done; return d; });
         });
         del.addEventListener("click", () => {
-          safeWrite(d => {
-            delete d.memos[id];
-            return d;
-          });
+          safeWrite(d => { delete d.memos[id]; return d; });
         });
       });
     }
 
     // =========================
-    // AZIONI UI (ADD/CLEAR)
+    // ADD/CLEAR
     // =========================
     $("addTaskBtn").addEventListener("click", () => {
       const text = $("taskInput").value.trim();
       if(!text) return;
 
       const base = todayMidnight(new Date());
-      let targetKey = null;
-
-      if (manualTargetDateKey) {
-        targetKey = manualTargetDateKey;        // calendario settimanale
-      } else {
-        targetKey = dateKey(addDays(base, selectedOffset)); // agenda 3 giorni
-      }
+      let targetKey = manualTargetDateKey ? manualTargetDateKey : dateKey(addDays(base, selectedOffset));
 
       const id = uid();
-      safeWrite(d => {
-        d.tasks[id] = { id, dateKey: targetKey, text, done:false, createdAt: Date.now() };
-        return d;
-      });
-
+      safeWrite(d => { d.tasks[id] = { id, dateKey: targetKey, text, done:false, createdAt: Date.now() }; return d; });
       $("taskInput").value = "";
     });
 
@@ -1094,43 +1100,27 @@
     });
 
     $("agendaClearDoneBtn").addEventListener("click", ()=>{
-      safeWrite(d => {
-        for(const [id,t] of Object.entries(d.tasks)){
-          if(t && t.done) delete d.tasks[id];
-        }
-        return d;
-      });
+      safeWrite(d => { for(const [id,t] of Object.entries(d.tasks)) if(t && t.done) delete d.tasks[id]; return d; });
     });
 
     $("addMemoBtn").addEventListener("click", ()=>{
       const text = $("memoInput").value.trim();
       if(!text) return;
       const id = uid();
-      safeWrite(d => {
-        d.memos[id] = { id, text, done:false, createdAt: Date.now() };
-        return d;
-      });
+      safeWrite(d => { d.memos[id] = { id, text, done:false, createdAt: Date.now() }; return d; });
       $("memoInput").value = "";
     });
 
     $("memoInput").addEventListener("keydown", (e)=>{
-      if(e.key==="Enter" && (e.ctrlKey || e.metaKey)){
-        e.preventDefault();
-        $("addMemoBtn").click();
-      }
+      if(e.key==="Enter" && (e.ctrlKey || e.metaKey)){ e.preventDefault(); $("addMemoBtn").click(); }
     });
 
     $("memoClearDoneBtn").addEventListener("click", ()=>{
-      safeWrite(d => {
-        for(const [id,m] of Object.entries(d.memos)){
-          if(m && m.done) delete d.memos[id];
-        }
-        return d;
-      });
+      safeWrite(d => { for(const [id,m] of Object.entries(d.memos)) if(m && m.done) delete d.memos[id]; return d; });
     });
 
     // =========================
-    // START/STOP SYNC
+    // SYNC START/STOP
     // =========================
     function startPlannerSync(user){
       stopPlannerSync();
@@ -1150,9 +1140,7 @@
         if(!snap.exists()){
           setDoc(SYNC.docRef, SYNC.data, { merge:false }).catch(()=>{});
         }
-      }, () => {
-        setSyncBadge("warn");
-      });
+      }, () => setSyncBadge("warn"));
     }
 
     function stopPlannerSync(){
@@ -1167,7 +1155,7 @@
     }
 
     // =========================
-    // AUTH STATE
+    // AUTH
     // =========================
     onAuthStateChanged(auth, user => {
       if (user) {
