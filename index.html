@@ -301,6 +301,41 @@
       font-size:12px;color:var(--muted);font-style:italic;padding:8px 2px;
     }
 
+    /* Provvigione su card */
+    .autoProvv{
+      font-size:12px;font-weight:700;color:#4ade80;
+      background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);
+      border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0;
+    }
+    .autoProvv.zero{color:var(--muted);background:transparent;border-color:rgba(31,41,55,.5);font-weight:400}
+
+    /* Totale provvigioni mese */
+    .venditeProvvBar{
+      border-top:1px solid rgba(31,41,55,.75);
+      padding:12px 18px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+      background:rgba(34,197,94,.04);
+    }
+    .provvMeseGroup{display:flex;flex-direction:column;gap:2px}
+    .provvMeseLabel{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
+    .provvMeseNum{font-size:24px;font-weight:950;color:#4ade80;font-variant-numeric:tabular-nums}
+    .provvMeseSplit{font-size:11px;color:var(--muted);margin-top:2px}
+
+    /* Totale 2026 */
+    .vendite2026Bar{
+      border-top:2px solid rgba(251,191,36,.3);
+      padding:14px 18px;
+      background:linear-gradient(90deg,rgba(251,191,36,.07) 0%,transparent 100%);
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    }
+    .bar2026Left{display:flex;align-items:center;gap:10px}
+    .bar2026Icon{font-size:22px}
+    .bar2026Title{font-weight:900;font-size:14px}
+    .bar2026Sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .bar2026Right{text-align:right}
+    .bar2026Num{font-size:30px;font-weight:950;color:#fbbf24;font-variant-numeric:tabular-nums}
+    .bar2026Mesi{font-size:11px;color:var(--muted);margin-top:2px}
+
     /* ===== CHATBOT ===== */
     .chatTrigger{
       position:fixed;bottom:24px;right:24px;
@@ -509,7 +544,10 @@
           <!-- Form aggiungi auto -->
           <div class="venditeForm">
             <input id="vendModello" type="text" class="fld"
-              placeholder="Modello auto (es: Jeep Compass, Ford Focus…)"/>
+              placeholder="Modello auto (es: Jeep Compass, Ford Focus…)" style="min-width:160px;"/>
+            <input id="vendProvv" type="number" class="fld"
+              placeholder="Provvigione €" min="0" step="1"
+              style="max-width:140px;min-width:120px;"/>
             <div class="tipoSeg">
               <button class="tipoBtn nuova active" id="tipoBtnNuova">🆕 Nuova</button>
               <button class="tipoBtn usata"        id="tipoBtnUsata">🔄 Usata</button>
@@ -532,6 +570,30 @@
                 <span class="venditeCount usata" id="cntUsate">0</span>
               </div>
               <div class="venditeList" id="listUsate"></div>
+            </div>
+          </div>
+
+          <!-- Totale provvigioni mese corrente visualizzato -->
+          <div class="venditeProvvBar">
+            <div class="provvMeseGroup">
+              <div class="provvMeseLabel">💰 Provvigioni del mese</div>
+              <div class="provvMeseNum" id="provvMeseTot">€ 0</div>
+              <div class="provvMeseSplit" id="provvMeseSplit"></div>
+            </div>
+          </div>
+
+          <!-- Totale provvigioni anno 2026 -->
+          <div class="vendite2026Bar">
+            <div class="bar2026Left">
+              <div class="bar2026Icon">🏆</div>
+              <div>
+                <div class="bar2026Title">Totale provvigioni 2026</div>
+                <div class="bar2026Sub">Somma cumulativa di tutti i mesi</div>
+              </div>
+            </div>
+            <div class="bar2026Right">
+              <div class="bar2026Num" id="provv2026Tot">€ 0</div>
+              <div class="bar2026Mesi" id="provv2026Mesi">0 mesi con provvigioni</div>
             </div>
           </div>
 
@@ -782,6 +844,15 @@ Esempi:
       ensureMonth(TODAY_KEY);
     }
 
+    /* helper: somma provvigioni di una lista */
+    function sumProvv(list){
+      return (list || []).reduce((s, c) => s + (Number(c.provv) || 0), 0);
+    }
+
+    function fmtEur(n){
+      return "€ " + n.toLocaleString("it-IT", { minimumFractionDigits:0, maximumFractionDigits:0 });
+    }
+
     /* Render UI */
     function renderVendite(){
       const k = vendViewKey;
@@ -799,7 +870,7 @@ Esempi:
       // Freccia "avanti" disabilitata se siamo al mese corrente
       $("vendNextBtn").disabled = (k === TODAY_KEY);
 
-      // Totali
+      // Totali auto
       $("totNuove").textContent = nuove.length;
       $("totUsate").textContent = usate.length;
       $("totAll").textContent   = nuove.length + usate.length;
@@ -824,13 +895,50 @@ Esempi:
           deleteAuto(k, tipo, id);
         });
       });
+
+      // ── Provvigioni mese ──
+      const pNuove = sumProvv(nuove);
+      const pUsate = sumProvv(usate);
+      const pTot   = pNuove + pUsate;
+      $("provvMeseTot").textContent = fmtEur(pTot);
+
+      // dettaglio split nuove/usate (solo se entrambe > 0)
+      if (pNuove > 0 && pUsate > 0){
+        $("provvMeseSplit").textContent = `🆕 ${fmtEur(pNuove)}  ·  🔄 ${fmtEur(pUsate)}`;
+      } else if (pNuove > 0){
+        $("provvMeseSplit").textContent = `🆕 Tutte da auto nuove`;
+      } else if (pUsate > 0){
+        $("provvMeseSplit").textContent = `🔄 Tutte da auto usate`;
+      } else {
+        $("provvMeseSplit").textContent = "Nessuna provvigione inserita";
+      }
+
+      // ── Totale 2026 ──
+      const year2026 = "2026";
+      let tot2026  = 0;
+      let mesiCon2026 = 0;
+      Object.entries(vendState.months).forEach(([mk, mv]) => {
+        if (!mk.startsWith(year2026)) return;
+        const mP = sumProvv(mv.nuove || []) + sumProvv(mv.usate || []);
+        tot2026  += mP;
+        if (mP > 0) mesiCon2026++;
+      });
+      $("provv2026Tot").textContent  = fmtEur(tot2026);
+      $("provv2026Mesi").textContent =
+        mesiCon2026 === 0 ? "Nessun mese con provvigioni" :
+        mesiCon2026 === 1 ? "1 mese con provvigioni" :
+        mesiCon2026 + " mesi con provvigioni";
     }
 
     function autoItemHTML(c, n, tipo){
+      const p    = Number(c.provv) || 0;
+      const pStr = p > 0 ? "€ " + p.toLocaleString("it-IT") : "—";
+      const cls  = p > 0 ? "autoProvv" : "autoProvv zero";
       return `
         <div class="autoItem">
           <span class="autoN">#${n}</span>
           <span class="autoModello">${escapeHtml(c.modello)}</span>
+          <span class="${cls}">${pStr}</span>
           <button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>
         </div>`;
     }
@@ -845,13 +953,15 @@ Esempi:
     async function addAuto(){
       const modello = $("vendModello").value.trim();
       if (!modello) return;
+      const provv   = parseFloat($("vendProvv").value) || 0;
       const k = vendViewKey;
       ensureMonth(k);
       const id = vendUid();
-      const entry = { id, modello, createdAt: Date.now() };
+      const entry = { id, modello, provv, createdAt: Date.now() };
       if (vendTipo === "nuova") vendState.months[k].nuove.push(entry);
       else                      vendState.months[k].usate.push(entry);
       $("vendModello").value = "";
+      $("vendProvv").value   = "";
       renderVendite();
       await vendWrite();
     }
@@ -931,6 +1041,9 @@ Esempi:
     /* Aggiungi */
     $("vendAddBtn").addEventListener("click", addAuto);
     $("vendModello").addEventListener("keypress", e => {
+      if (e.key === "Enter"){ e.preventDefault(); addAuto(); }
+    });
+    $("vendProvv").addEventListener("keypress", e => {
       if (e.key === "Enter"){ e.preventDefault(); addAuto(); }
     });
 
