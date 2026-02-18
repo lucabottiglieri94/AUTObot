@@ -1,333 +1,176 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AI BOTT Automotive</title>
-
   <style>
     :root{
-      --bgTop:#07080b;
-      --bgMid:#101216;
-      --bgBot:#1a1d23;
-      --panel: rgba(17,24,39,.78);
-      --line:#1f2937;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --accent:#3b82f6;
-      --accent2:#60a5fa;
-      --orange:#f97316;
-      --orange2:#fb923c;
+      --bgTop:#07080b;--bgMid:#101216;--bgBot:#1a1d23;
+      --panel:rgba(17,24,39,.78);--line:#1f2937;
+      --text:#e5e7eb;--muted:#9ca3af;
+      --accent:#3b82f6;--accent2:#60a5fa;
+      --orange:#f97316;--orange2:#fb923c;
     }
-
     *{box-sizing:border-box;margin:0;padding:0}
-
     body{
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      color:var(--text);
-      min-height:100vh;
+      color:var(--text);min-height:100vh;
       background:
-        radial-gradient(1200px 700px at 18% -12%, rgba(59,130,246,.22), transparent 58%),
-        radial-gradient(900px 520px at 72% 8%, rgba(96,165,250,.14), transparent 60%),
-        linear-gradient(180deg, var(--bgTop) 0%, var(--bgMid) 48%, var(--bgBot) 100%);
+        radial-gradient(1200px 700px at 18% -12%,rgba(59,130,246,.22),transparent 58%),
+        radial-gradient(900px 520px at 72% 8%,rgba(96,165,250,.14),transparent 60%),
+        linear-gradient(180deg,var(--bgTop) 0%,var(--bgMid) 48%,var(--bgBot) 100%);
     }
-
-    header{
-      position:sticky;top:0;z-index:10;
-      background:rgba(10,10,12,.72);
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--line);
-    }
-
+    header{position:sticky;top:0;z-index:10;background:rgba(10,10,12,.72);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
     .wrap{max-width:1200px;margin:0 auto;padding:16px}
-
-    .row{
-      display:flex;gap:12px;align-items:center;
-      justify-content:space-between;flex-wrap:wrap;
-    }
-
-    .brand{
-      display:flex;gap:12px;align-items:center;flex-wrap:wrap;
-      min-width:320px;
-    }
-
+    .row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .brand{display:flex;gap:12px;align-items:center;flex-wrap:wrap;min-width:320px}
     .brandMark{display:flex;align-items:center;gap:10px;user-select:none}
-
-    .brandLogo{
-      width:4cm;height:4cm;object-fit:contain;
-      background:transparent;border:none;outline:none;filter:none;
-      mix-blend-mode:screen;
-    }
-
-    .brandName{
-      font-weight:950;letter-spacing:.2px;font-size:18px;line-height:1;
-      background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-      white-space:nowrap;
-    }
+    .brandLogo{width:4cm;height:4cm;object-fit:contain;background:transparent;border:none;outline:none;filter:none;mix-blend-mode:screen}
+    .brandName{font-weight:950;letter-spacing:.2px;font-size:18px;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
     .brandSub{opacity:.75;white-space:nowrap}
-
-    .btn{
-      border:1px solid var(--line);
-      background:rgba(17,24,39,.75);
-      color:var(--text);
-      padding:10px 14px;border-radius:12px;
-      cursor:pointer;font-size:14px;
-      transition:all .2s;font-weight:650;
-    }
-    .btn:hover{
-      border-color:rgba(59,130,246,.6);
-      background:rgba(17,24,39,.92);
-      transform:translateY(-1px);
-    }
-    .btn.primary{
-      border-color:rgba(59,130,246,.55);
-      background:rgba(37,99,235,.16);
-    }
+    .btn{border:1px solid var(--line);background:rgba(17,24,39,.75);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-size:14px;transition:all .2s;font-weight:650}
+    .btn:hover{border-color:rgba(59,130,246,.6);background:rgba(17,24,39,.92);transform:translateY(-1px)}
+    .btn.primary{border-color:rgba(59,130,246,.55);background:rgba(37,99,235,.16)}
     .btn.primary:hover{background:rgba(37,99,235,.26)}
     .btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-
     .btn.brand-fiat:hover{border-color:rgba(220,38,38,.6);background:rgba(220,38,38,.1)}
     .btn.brand-jeep:hover{border-color:rgba(34,197,94,.6);background:rgba(34,197,94,.1)}
     .btn.brand-alfa:hover{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)}
     .btn.brand-lancia:hover{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.1)}
-
-    .centroAutoLink{
-      display:inline-flex;align-items:center;
-      padding:6px 12px;
-      border:2px solid rgba(34,197,94,.4);
-      background:rgba(34,197,94,.08);
-      border-radius:12px;transition:all .3s ease;
-      text-decoration:none;
-      box-shadow:0 2px 8px rgba(34,197,94,.15);
-    }
-    .centroAutoLink:hover{
-      border-color:rgba(34,197,94,.7);background:rgba(34,197,94,.18);
-      transform:translateY(-2px);box-shadow:0 4px 16px rgba(34,197,94,.3);
-    }
+    .centroAutoLink{display:inline-flex;align-items:center;padding:6px 12px;border:2px solid rgba(34,197,94,.4);background:rgba(34,197,94,.08);border-radius:12px;transition:all .3s;text-decoration:none;box-shadow:0 2px 8px rgba(34,197,94,.15)}
+    .centroAutoLink:hover{border-color:rgba(34,197,94,.7);background:rgba(34,197,94,.18);transform:translateY(-2px);box-shadow:0 4px 16px rgba(34,197,94,.3)}
     .centroAutoLogo{height:42px;width:auto;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.2))}
-
-    .pill{
-      padding:6px 10px;border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(17,24,39,.35);
-      font-size:12px;white-space:nowrap;
-    }
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(17,24,39,.35);font-size:12px;white-space:nowrap}
     .muted{color:var(--muted)}
 
-    .layout{
-      margin-top:16px;
-      display:grid;
-      grid-template-columns:420px 1fr;
-      gap:16px;align-items:start;
-    }
-
-    .panel{
-      background:var(--panel);border:1px solid var(--line);
-      border-radius:16px;overflow:hidden;
-    }
-
-    .panelHeader{
-      padding:14px 14px 10px 14px;
-      border-bottom:1px solid rgba(31,41,55,.75);
-      background:rgba(10,12,18,.35);
-      display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
-    }
+    /* LAYOUT */
+    .layout{margin-top:16px;display:grid;grid-template-columns:420px 1fr;gap:16px;align-items:start}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+    .panelHeader{padding:14px 14px 10px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
     .panelTitle{font-weight:950;font-size:18px}
     .panelSub{margin-top:6px}
-
-    .newsScroll{
-      max-height:calc(100vh - 140px);overflow:auto;padding:12px;
-    }
+    .newsScroll{max-height:calc(100vh - 240px);overflow:auto;padding:12px}
     .newsScroll::-webkit-scrollbar{width:10px}
-    .newsScroll::-webkit-scrollbar-thumb{
-      background:rgba(59,130,246,.25);border:2px solid rgba(17,24,39,.7);border-radius:999px;
-    }
+    .newsScroll::-webkit-scrollbar-thumb{background:rgba(59,130,246,.25);border:2px solid rgba(17,24,39,.7);border-radius:999px}
     .newsScroll::-webkit-scrollbar-track{background:rgba(0,0,0,.12)}
-
-    #status{margin:10px 0 0 0}
+    #status{margin:10px 0 0}
     #newsList{display:grid;gap:12px}
-
-    .newsItem{
-      display:block;padding:14px;border:1px solid var(--line);border-radius:14px;
-      text-decoration:none;color:inherit;background:rgba(17,24,39,.35);transition:all .2s;
-    }
-    .newsItem:hover{
-      border-color:rgba(59,130,246,.6);background:rgba(17,24,39,.55);transform:translateX(4px);
-    }
+    .newsItem{display:block;padding:14px;border:1px solid var(--line);border-radius:14px;text-decoration:none;color:inherit;background:rgba(17,24,39,.35);transition:all .2s}
+    .newsItem:hover{border-color:rgba(59,130,246,.6);background:rgba(17,24,39,.55);transform:translateX(4px)}
     .newsTitle{font-weight:850;margin-bottom:8px}
     .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
     .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
 
-    /* ===== VENDITE ===== */
-    .venditePanel{
-      background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;
-    }
-    .venditeHeader{
-      padding:14px 18px;
-      border-bottom:1px solid rgba(31,41,55,.75);
-      background:rgba(10,12,18,.35);
-      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-    }
+    /* CALENDARIO SETTIMANALE */
+    .weekPanel{border-top:1px solid rgba(31,41,55,.75);padding:12px;background:rgba(10,12,18,.18)}
+    .weekHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .weekTitle{font-weight:950;font-size:16px}
+    .weekSub{color:#9ca3af;font-size:12px}
+    .weekGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .weekCell{aspect-ratio:1/1;border:1px solid rgba(31,41,55,.75);background:rgba(17,24,39,.35);border-radius:14px;padding:10px;overflow:hidden;display:flex;flex-direction:column;gap:6px}
+    .weekCell.today{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.10) inset}
+    .weekTop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+    .weekDow{font-size:11px;color:#9ca3af;font-weight:800;text-transform:uppercase}
+    .weekDay{font-size:16px;font-weight:950}
+    .weekTasks{margin-top:2px;display:grid;gap:4px;overflow:hidden}
+    .weekTask{font-size:11px;line-height:1.2;color:#e5e7eb;opacity:.95;padding:5px 7px;border-radius:10px;border:1px solid rgba(31,41,55,.65);background:rgba(31,41,55,.30);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .weekTask.done{opacity:.55;text-decoration:line-through}
+    .weekMore{font-size:11px;color:#fdba74;opacity:.9;font-weight:800}
+
+    /* COMPARATORE */
+    .cmpSuggest{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);border-radius:999px;padding:4px 10px;color:#93c5fd;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
+    .cmpSuggest:hover{background:rgba(59,130,246,.25);border-color:rgba(59,130,246,.6)}
+
+    /* AGENDA + MEMO */
+    .widgetStack{display:grid;gap:16px;margin-top:16px}
+    .widgetPanel{background:rgba(17,24,39,.78);border:1px solid #1f2937;border-radius:16px;overflow:hidden}
+    .widgetHeader{padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .widgetTitle{font-weight:950;font-size:18px}
+    .widgetSub{color:#9ca3af;font-size:13px;margin-top:4px}
+    .widgetBody{padding:16px 20px}
+    .formRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .field{flex:1;min-width:220px;background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s,background .2s}
+    .field:focus{border-color:var(--orange);background:rgba(31,41,55,.8)}
+    .seg{display:inline-flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:999px;overflow:hidden}
+    .seg button{border:none;background:transparent;color:#9ca3af;padding:8px 10px;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit;font-weight:700;white-space:nowrap}
+    .seg button.active{color:#fff;background:linear-gradient(135deg,rgba(249,115,22,.28),rgba(251,146,60,.22))}
+    .seg button:hover{background:rgba(249,115,22,.14);color:#ffe6d5}
+    .split3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;align-items:start}
+    .dayCol{background:rgba(31,41,55,.35);border:1px solid rgba(31,41,55,.75);border-radius:14px;overflow:hidden}
+    .dayHead{padding:12px 14px;font-weight:900;font-size:13px;border-bottom:1px solid rgba(31,41,55,.65);display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(59,130,246,.10)}
+    .dayMeta{color:#9ca3af;font-weight:700;font-size:12px}
+    .list{padding:10px 12px;display:grid;gap:8px;max-height:260px;overflow:auto}
+    .item{display:flex;align-items:flex-start;gap:10px;padding:10px;border:1px solid rgba(31,41,55,.7);border-radius:12px;background:rgba(17,24,39,.35)}
+    .itemMain{flex:1;min-width:0}
+    .itemText{font-size:13px;line-height:1.35;word-break:break-word}
+    .itemText.done{text-decoration:line-through;opacity:.65}
+    .itemActions{display:flex;gap:6px;align-items:center}
+    .iconBtn{width:32px;height:32px;border-radius:10px;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.45);color:#e5e7eb;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900}
+    .iconBtn:hover{border-color:rgba(249,115,22,.55);background:rgba(17,24,39,.7);transform:translateY(-1px)}
+    .chk{width:18px;height:18px;flex:0 0 auto;accent-color:var(--orange);margin-top:2px;cursor:pointer}
+    .smallNote{margin-top:10px;color:#9ca3af;font-size:12px}
+    .memoArea{width:100%;min-height:110px;resize:vertical}
+    .syncBadge{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);color:#9ca3af;white-space:nowrap}
+    .syncBadge.ok{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10);color:#bbf7d0}
+    .syncBadge.warn{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.10);color:#fde68a}
+    #agendaPanel .widgetHeader,#memoPanel .widgetHeader{background:linear-gradient(180deg,rgba(249,115,22,.09),rgba(10,12,18,.35) 70%)}
+
+    /* VENDITE */
+    .venditePanel{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:16px}
+    .venditeHeader{padding:14px 18px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     .venditeTitleRow{display:flex;align-items:center;gap:10px}
     .venditeTitle{font-weight:950;font-size:18px}
-    .venditeSyncBadge{
-      font-size:11px;padding:4px 10px;border-radius:999px;
-      border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);color:var(--muted);
-      white-space:nowrap;
-    }
+    .venditeSyncBadge{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);color:var(--muted);white-space:nowrap}
     .venditeSyncBadge.ok{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10);color:#bbf7d0}
-
-    /* Navigazione mesi */
     .venditeNav{display:flex;align-items:center;gap:8px}
-    .navArrow{
-      width:32px;height:32px;border-radius:9px;
-      border:1px solid var(--line);background:rgba(17,24,39,.6);
-      color:var(--text);cursor:pointer;font-size:18px;font-weight:700;
-      display:flex;align-items:center;justify-content:center;
-      transition:all .2s;
-    }
+    .navArrow{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:rgba(17,24,39,.6);color:var(--text);cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s}
     .navArrow:hover{border-color:rgba(59,130,246,.5);background:rgba(17,24,39,.9);transform:translateY(-1px)}
     .navArrow:disabled{opacity:.35;cursor:not-allowed;transform:none}
-    .venditeMonthLabel{
-      font-weight:900;font-size:15px;
-      min-width:140px;text-align:center;
-      padding:0 4px;
-    }
-    .venditeMonthLabel span{
-      font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;
-    }
-
-    /* Totali */
-    .venditeTotali{
-      display:grid;grid-template-columns:repeat(3,1fr);
-      border-bottom:1px solid rgba(31,41,55,.75);
-    }
-    .totCard{
-      padding:14px 18px;
-      display:flex;flex-direction:column;gap:4px;
-    }
+    .venditeMonthLabel{font-weight:900;font-size:15px;min-width:140px;text-align:center;padding:0 4px}
+    .venditeTotali{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid rgba(31,41,55,.75)}
+    .totCard{padding:14px 18px;display:flex;flex-direction:column;gap:4px}
     .totCard:not(:last-child){border-right:1px solid rgba(31,41,55,.75)}
     .totLabel{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
     .totNum{font-size:36px;font-weight:950;line-height:1}
-    .totNum.nuova{color:#60a5fa}
-    .totNum.usata{color:#f97316}
-    .totNum.all{color:#22c55e}
-
-    /* Form aggiungi */
-    .venditeForm{
-      padding:12px 18px;
-      border-bottom:1px solid rgba(31,41,55,.5);
-      display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;
-    }
-    .venditeForm .fld{
-      flex:1;min-width:180px;
-      background:rgba(31,41,55,.6);
-      border:1px solid var(--line);border-radius:10px;
-      padding:9px 13px;color:var(--text);font-size:13px;
-      outline:none;font-family:inherit;transition:border-color .2s;
-    }
+    .totNum.nuova{color:#60a5fa}.totNum.usata{color:#f97316}.totNum.all{color:#22c55e}
+    .venditeForm{padding:12px 18px;border-bottom:1px solid rgba(31,41,55,.5);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+    .venditeForm .fld{flex:1;min-width:150px;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:10px;padding:9px 13px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
     .venditeForm .fld:focus{border-color:var(--accent)}
     .venditeForm .fld::placeholder{color:var(--muted)}
-
-    /* Toggle Nuova / Usata */
-    .tipoSeg{
-      display:inline-flex;border:1px solid rgba(31,41,55,.9);
-      background:rgba(17,24,39,.35);border-radius:999px;overflow:hidden;flex-shrink:0;
-    }
-    .tipoBtn{
-      border:none;background:transparent;color:var(--muted);
-      padding:9px 14px;font-size:13px;cursor:pointer;
-      font-family:inherit;font-weight:700;transition:all .2s;white-space:nowrap;
-    }
-    .tipoBtn.nuova.active{
-      background:linear-gradient(135deg,rgba(59,130,246,.28),rgba(96,165,250,.2));color:#93c5fd;
-    }
-    .tipoBtn.usata.active{
-      background:linear-gradient(135deg,rgba(249,115,22,.28),rgba(251,146,60,.2));color:#fdba74;
-    }
+    .tipoSeg{display:inline-flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:999px;overflow:hidden;flex-shrink:0}
+    .tipoBtn{border:none;background:transparent;color:var(--muted);padding:9px 14px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;white-space:nowrap}
+    .tipoBtn.nuova.active{background:linear-gradient(135deg,rgba(59,130,246,.28),rgba(96,165,250,.2));color:#93c5fd}
+    .tipoBtn.usata.active{background:linear-gradient(135deg,rgba(249,115,22,.28),rgba(251,146,60,.2));color:#fdba74}
     .tipoBtn:hover{opacity:.85}
-
-    /* Liste auto */
-    .venditeListe{
-      display:grid;grid-template-columns:1fr 1fr;
-      min-height:180px;
-    }
+    .venditeListe{display:grid;grid-template-columns:1fr 1fr;min-height:180px}
     .venditeCol{padding:14px 16px}
     .venditeCol:first-child{border-right:1px solid rgba(31,41,55,.75)}
-    .venditeColTitle{
-      font-size:12px;font-weight:900;letter-spacing:.3px;
-      margin-bottom:10px;display:flex;align-items:center;gap:6px;
-    }
-    .venditeColTitle.nuova{color:#60a5fa}
-    .venditeColTitle.usata{color:#f97316}
-    .venditeCount{
-      font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;
-    }
+    .venditeColTitle{font-size:12px;font-weight:900;letter-spacing:.3px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .venditeColTitle.nuova{color:#60a5fa}.venditeColTitle.usata{color:#f97316}
+    .venditeCount{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700}
     .venditeCount.nuova{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd}
     .venditeCount.usata{background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);color:#fdba74}
-
-    .venditeList{
-      display:grid;gap:6px;max-height:320px;overflow-y:auto;
-    }
+    .venditeList{display:grid;gap:6px;max-height:320px;overflow-y:auto}
     .venditeList::-webkit-scrollbar{width:6px}
     .venditeList::-webkit-scrollbar-thumb{background:rgba(59,130,246,.2);border-radius:999px}
-
-    .autoItem{
-      display:flex;align-items:center;gap:8px;
-      padding:8px 10px;
-      border:1px solid rgba(31,41,55,.7);border-radius:10px;
-      background:rgba(17,24,39,.35);
-      animation:itemIn .2s ease;
-    }
+    .autoItem{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid rgba(31,41,55,.7);border-radius:10px;background:rgba(17,24,39,.35);animation:itemIn .2s ease}
     @keyframes itemIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
-    .autoN{
-      font-size:11px;font-weight:900;min-width:20px;
-      color:var(--muted);
-    }
+    .autoN{font-size:11px;font-weight:900;min-width:20px;color:var(--muted)}
     .autoModello{flex:1;font-size:13px;line-height:1.3;word-break:break-word}
-    .autoDelBtn{
-      width:24px;height:24px;border-radius:7px;
-      border:1px solid rgba(31,41,55,.9);
-      background:rgba(17,24,39,.4);color:var(--muted);
-      cursor:pointer;font-size:14px;font-weight:900;
-      display:flex;align-items:center;justify-content:center;
-      transition:all .2s;flex-shrink:0;
-    }
-    .autoDelBtn:hover{
-      border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:#fca5a5;
-    }
-    .emptyList{
-      font-size:12px;color:var(--muted);font-style:italic;padding:8px 2px;
-    }
-
-    /* Provvigione su card */
-    .autoProvv{
-      font-size:12px;font-weight:700;color:#4ade80;
-      background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);
-      border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0;
-    }
+    .autoProvv{font-size:12px;font-weight:700;color:#4ade80;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
     .autoProvv.zero{color:var(--muted);background:transparent;border-color:rgba(31,41,55,.5);font-weight:400}
-
-    /* Totale provvigioni mese */
-    .venditeProvvBar{
-      border-top:1px solid rgba(31,41,55,.75);
-      padding:12px 18px;
-      display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
-      background:rgba(34,197,94,.04);
-    }
+    .autoDelBtn{width:24px;height:24px;border-radius:7px;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.4);color:var(--muted);cursor:pointer;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+    .autoDelBtn:hover{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:#fca5a5}
+    .emptyList{font-size:12px;color:var(--muted);font-style:italic;padding:8px 2px}
+    /* Provvigioni mese */
+    .venditeProvvBar{border-top:1px solid rgba(31,41,55,.75);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:rgba(34,197,94,.04)}
     .provvMeseGroup{display:flex;flex-direction:column;gap:2px}
     .provvMeseLabel{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
     .provvMeseNum{font-size:24px;font-weight:950;color:#4ade80;font-variant-numeric:tabular-nums}
     .provvMeseSplit{font-size:11px;color:var(--muted);margin-top:2px}
-
     /* Totale 2026 */
-    .vendite2026Bar{
-      border-top:2px solid rgba(251,191,36,.3);
-      padding:14px 18px;
-      background:linear-gradient(90deg,rgba(251,191,36,.07) 0%,transparent 100%);
-      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-    }
+    .vendite2026Bar{border-top:2px solid rgba(251,191,36,.3);padding:14px 18px;background:linear-gradient(90deg,rgba(251,191,36,.07),transparent);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     .bar2026Left{display:flex;align-items:center;gap:10px}
     .bar2026Icon{font-size:22px}
     .bar2026Title{font-weight:900;font-size:14px}
@@ -335,107 +178,63 @@
     .bar2026Right{text-align:right}
     .bar2026Num{font-size:30px;font-weight:950;color:#fbbf24;font-variant-numeric:tabular-nums}
     .bar2026Mesi{font-size:11px;color:var(--muted);margin-top:2px}
+    /* Obiettivo mensile */
+    .obiettivoBar{border-top:1px solid rgba(31,41,55,.75);padding:16px 18px;background:rgba(10,12,18,.25)}
+    .obiettivoHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+    .obiettivoLeft{display:flex;align-items:center;gap:8px}
+    .obiettivoIcon{font-size:18px}
+    .obiettivoTitle{font-weight:900;font-size:14px}
+    .obiettivoSub{font-size:11px;color:var(--muted);margin-top:2px}
+    .obiettivoRight{display:flex;align-items:center;gap:8px}
+    .obiettivoInput{width:110px;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:9px;padding:7px 11px;color:var(--text);font-size:13px;font-weight:700;outline:none;font-family:inherit;transition:border-color .2s;text-align:right}
+    .obiettivoInput:focus{border-color:var(--accent)}
+    .obiettivoInputLabel{font-size:12px;color:var(--muted);white-space:nowrap}
+    .progressWrap{background:rgba(31,41,55,.5);border-radius:999px;height:14px;overflow:hidden}
+    .progressFill{height:100%;border-radius:999px;transition:width .5s cubic-bezier(.4,0,.2,1),background .4s;min-width:0}
+    .progressFill.low{background:linear-gradient(90deg,#f97316,#fb923c)}
+    .progressFill.mid{background:linear-gradient(90deg,#eab308,#fbbf24)}
+    .progressFill.high{background:linear-gradient(90deg,#22c55e,#4ade80)}
+    .progressFill.done{background:linear-gradient(90deg,#a855f7,#c084fc)}
+    .progressMeta{display:flex;align-items:center;justify-content:space-between;margin-top:7px;font-size:12px}
+    .progressPct{font-weight:900;font-size:15px}
+    .progressPct.low{color:#fb923c}.progressPct.mid{color:#fbbf24}.progressPct.high{color:#4ade80}.progressPct.done{color:#c084fc}
+    .progressManca{color:var(--muted)}
+    .progressManca.done{color:#c084fc;font-weight:700}
 
-    /* ===== CHATBOT ===== */
-    .chatTrigger{
-      position:fixed;bottom:24px;right:24px;
-      width:70px;height:70px;border-radius:50%;
-      background:transparent;border:none;cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 8px 24px rgba(0,0,0,.3);transition:all .3s ease;z-index:1000;
-    }
+    /* CHATBOT */
+    .chatTrigger{position:fixed;bottom:24px;right:24px;width:70px;height:70px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:all .3s;z-index:1000}
     .chatTrigger:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(0,0,0,.5)}
     .chatTrigger img{width:70px;height:70px;object-fit:contain}
-
-    .chatBox{
-      position:fixed;bottom:24px;right:24px;
-      width:420px;max-width:calc(100vw - 32px);
-      height:600px;max-height:calc(100vh - 48px);
-      background:rgba(17,24,39,.95);border:1px solid var(--line);
-      border-radius:20px;display:none;flex-direction:column;
-      box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:1001;overflow:hidden;backdrop-filter:blur(20px);
-    }
+    .chatBox{position:fixed;bottom:24px;right:24px;width:420px;max-width:calc(100vw - 32px);height:600px;max-height:calc(100vh - 48px);background:rgba(17,24,39,.95);border:1px solid var(--line);border-radius:20px;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:1001;overflow:hidden;backdrop-filter:blur(20px)}
     .chatBox.open{display:flex}
-    .chatBox.minimized{
-      width:70px;height:70px;background:transparent;border:none;
-      border-radius:50%;box-shadow:0 8px 24px rgba(0,0,0,.3);
-    }
-    .chatBox.minimized .chatHeader,
-    .chatBox.minimized .chatMessages,
-    .chatBox.minimized .chatInput{display:none}
-
-    .chatHeader{
-      background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-      padding:14px 16px;display:flex;align-items:center;justify-content:space-between;
-      border-bottom:1px solid rgba(255,255,255,.15);
-    }
+    .chatBox.minimized{width:70px;height:70px;background:transparent;border:none;border-radius:50%;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+    .chatBox.minimized .chatHeader,.chatBox.minimized .chatMessages,.chatBox.minimized .chatInput{display:none}
+    .chatHeader{background:linear-gradient(135deg,var(--accent),var(--accent2));padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.15)}
     .chatHeaderLeft{display:flex;align-items:center;gap:10px}
     .chatHeaderLogo{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);padding:4px}
     .chatHeaderTitle{font-weight:700;font-size:16px;color:#fff}
     .chatHeaderSub{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px}
     .chatHeaderBtns{display:flex;gap:8px}
-    .chatHeaderBtn{
-      width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.15);
-      border:none;color:#fff;cursor:pointer;font-size:18px;
-      display:flex;align-items:center;justify-content:center;transition:all .2s;font-weight:700;
-    }
+    .chatHeaderBtn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-weight:700}
     .chatHeaderBtn:hover{background:rgba(255,255,255,.25);transform:scale(1.05)}
-
-    .chatMessages{
-      flex:1;overflow-y:auto;padding:16px;
-      background:linear-gradient(180deg,rgba(26,29,35,.95) 0%,rgba(16,18,22,.95) 100%);
-      display:flex;flex-direction:column;gap:12px;
-    }
+    .chatMessages{flex:1;overflow-y:auto;padding:16px;background:linear-gradient(180deg,rgba(26,29,35,.95),rgba(16,18,22,.95));display:flex;flex-direction:column;gap:12px}
     .chatMessages::-webkit-scrollbar{width:8px}
     .chatMessages::-webkit-scrollbar-thumb{background:rgba(59,130,246,.3);border-radius:999px}
-    .chatMessages::-webkit-scrollbar-track{background:rgba(0,0,0,.2)}
-
     .message{display:flex;gap:8px;animation:slideIn .3s ease}
     @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     .message.user{flex-direction:row-reverse}
-    .messageBubble{
-      max-width:85%;padding:12px 16px;border-radius:18px;
-      font-size:14px;line-height:1.6;word-wrap:break-word;white-space:pre-line;
-    }
-    .message.ai .messageBubble{
-      background:linear-gradient(135deg,rgba(59,130,246,.85) 0%,rgba(96,165,250,.85) 100%);
-      color:#fff;border-bottom-left-radius:4px;
-    }
-    .message.user .messageBubble{
-      background:rgba(255,255,255,.92);color:#1a1d23;border-bottom-right-radius:4px;
-    }
-
-    .typingIndicator{
-      display:flex;gap:8px;padding:12px 16px;
-      background:linear-gradient(135deg,rgba(59,130,246,.85) 0%,rgba(96,165,250,.85) 100%);
-      border-radius:18px;border-bottom-left-radius:4px;max-width:75%;
-    }
-    .typingDot{
-      width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.9);
-      animation:bounce 1.4s infinite ease-in-out;
-    }
-    .typingDot:nth-child(1){animation-delay:0s}
-    .typingDot:nth-child(2){animation-delay:.2s}
-    .typingDot:nth-child(3){animation-delay:.4s}
+    .messageBubble{max-width:85%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.6;word-wrap:break-word;white-space:pre-line}
+    .message.ai .messageBubble{background:linear-gradient(135deg,rgba(59,130,246,.85),rgba(96,165,250,.85));color:#fff;border-bottom-left-radius:4px}
+    .message.user .messageBubble{background:rgba(255,255,255,.92);color:#1a1d23;border-bottom-right-radius:4px}
+    .typingIndicator{display:flex;gap:8px;padding:12px 16px;background:linear-gradient(135deg,rgba(59,130,246,.85),rgba(96,165,250,.85));border-radius:18px;border-bottom-left-radius:4px;max-width:75%}
+    .typingDot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.9);animation:bounce 1.4s infinite ease-in-out}
+    .typingDot:nth-child(1){animation-delay:0s}.typingDot:nth-child(2){animation-delay:.2s}.typingDot:nth-child(3){animation-delay:.4s}
     @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
-
-    .chatInput{
-      padding:16px;background:rgba(10,12,18,.95);
-      border-top:1px solid var(--line);display:flex;gap:10px;
-    }
-    .chatInputField{
-      flex:1;background:rgba(31,41,55,.6);border:1px solid var(--line);
-      border-radius:12px;padding:12px 16px;color:var(--text);font-size:14px;
-      outline:none;transition:all .2s;font-family:inherit;
-    }
+    .chatInput{padding:16px;background:rgba(10,12,18,.95);border-top:1px solid var(--line);display:flex;gap:10px}
+    .chatInputField{flex:1;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:12px;padding:12px 16px;color:var(--text);font-size:14px;outline:none;transition:all .2s;font-family:inherit}
     .chatInputField:focus{border-color:var(--accent);background:rgba(31,41,55,.8)}
     .chatInputField::placeholder{color:var(--muted)}
-    .chatSendBtn{
-      width:48px;height:48px;border-radius:12px;
-      background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-      border:none;color:#fff;cursor:pointer;font-size:20px;
-      display:flex;align-items:center;justify-content:center;transition:all .2s;
-    }
+    .chatSendBtn{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all .2s}
     .chatSendBtn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 4px 16px rgba(59,130,246,.4)}
     .chatSendBtn:disabled{opacity:.5;cursor:not-allowed}
 
@@ -443,11 +242,13 @@
       .layout{grid-template-columns:1fr}
       .newsScroll{max-height:60vh}
       .brand{min-width:unset}
+      .split3{grid-template-columns:1fr}
       .venditeListe{grid-template-columns:1fr}
       .venditeCol:first-child{border-right:none;border-bottom:1px solid rgba(31,41,55,.75)}
-      .venditeTotali{grid-template-columns:repeat(3,1fr)}
       .chatBox{width:100%;max-width:100%;height:100vh;max-height:100vh;bottom:0;right:0;border-radius:0}
       .chatTrigger{bottom:16px;right:16px;width:60px;height:60px}
+      .weekGrid{gap:4px}
+      .weekCell{border-radius:10px;padding:6px}
     }
     @media(max-width:768px){
       .btn{padding:8px 10px;font-size:13px}
@@ -455,29 +256,24 @@
       .brandName{font-size:16px}
       .centroAutoLogo{height:36px}
       .centroAutoLink{padding:4px 8px}
+      .weekGrid{grid-template-columns:repeat(7,1fr)}
     }
   </style>
 </head>
-
 <body>
   <header>
     <div class="wrap">
       <div class="row">
         <div class="brand">
           <div class="brandMark">
-            <img class="brandLogo"
-              src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png"
-              alt="AI BOTT logo"/>
-            <div>
-              <div class="brandName">AI BOTT</div>
-              <div class="brandSub">Automotive</div>
-            </div>
+            <img class="brandLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI BOTT logo"/>
+            <div><div class="brandName">AI BOTT</div><div class="brandSub">Automotive</div></div>
           </div>
           <button id="fiatBtn"   class="btn brand-fiat">Fiat</button>
           <button id="jeepBtn"   class="btn brand-jeep">Jeep</button>
           <button id="alfaBtn"   class="btn brand-alfa">Alfa Romeo</button>
           <button id="lanciaBtn" class="btn brand-lancia">Lancia</button>
-          <a href="https://www.centroautovt.it/" target="_blank" rel="noopener noreferrer" class="centroAutoLink" title="Visita CentroAuto VT">
+          <a href="https://www.centroautovt.it/" target="_blank" rel="noopener noreferrer" class="centroAutoLink">
             <img src="https://image2url.com/r2/default/images/1770805237740-1db65b1e-5553-4b5b-b28a-750e3520a0a2.png" alt="CentroAuto VT" class="centroAutoLogo"/>
           </a>
         </div>
@@ -493,7 +289,7 @@
   <main class="wrap">
     <div class="layout">
 
-      <!-- ===== NEWS A SINISTRA ===== -->
+      <!-- ═══ SINISTRA: NEWS + CALENDARIO ═══ -->
       <aside class="panel">
         <div class="panelHeader">
           <div>
@@ -503,77 +299,92 @@
           </div>
           <button id="refreshBtn" class="btn" disabled>🔄</button>
         </div>
-        <div class="newsScroll">
-          <div id="newsList"></div>
+        <div class="newsScroll"><div id="newsList"></div></div>
+
+        <!-- CALENDARIO SETTIMANALE -->
+        <div class="weekPanel">
+          <div class="weekHead">
+            <div>
+              <div class="weekTitle">🗓 Calendario settimanale</div>
+              <div class="weekSub">Task dell'agenda nella settimana corrente</div>
+            </div>
+            <div id="weekRange" class="pill muted">—</div>
+          </div>
+          <div id="weekGrid" class="weekGrid"></div>
         </div>
       </aside>
 
-      <!-- ===== VENDITE A DESTRA ===== -->
+      <!-- ═══ DESTRA: COMPARATORE + VENDITE + AGENDA + MEMO ═══ -->
       <section style="padding:0;border:none;background:none;">
-        <div class="venditePanel">
 
-          <!-- Header + nav mesi -->
+        <!-- COMPARATORE -->
+        <div style="background:rgba(17,24,39,.78);border:1px solid #1f2937;border-radius:16px;overflow:hidden;">
+          <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div>
+              <div style="font-weight:950;font-size:18px">⚔ Comparatore Auto</div>
+              <div style="color:#9ca3af;font-size:13px;margin-top:4px">Confronta due auto nuove — cerca sui configuratori ufficiali</div>
+            </div>
+            <button id="cmpResetBtn" class="btn" style="font-size:12px;padding:7px 12px;">↩ Reset</button>
+          </div>
+          <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.5);display:flex;gap:10px;flex-wrap:wrap;">
+            <input id="cmpInput1" type="text" placeholder="Es: Grande Panda, Compass, Stelvio..."
+              style="flex:1;min-width:180px;background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
+              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'"/>
+            <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;font-weight:700;">VS</div>
+            <input id="cmpInput2" type="text" placeholder="Es: Junior, Avenger, Ypsilon..."
+              style="flex:1;min-width:180px;background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
+              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'"/>
+            <button id="cmpBtn" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);border:none;border-radius:10px;padding:10px 20px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit;">🔎 Confronta</button>
+          </div>
+          <div style="padding:10px 20px;border-bottom:1px solid rgba(31,41,55,.4);display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="color:#9ca3af;font-size:12px;align-self:center;">Rapido:</span>
+            <button class="cmpSuggest" data-s1="Grande Panda" data-s2="Junior">Grande Panda vs Junior</button>
+            <button class="cmpSuggest" data-s1="Compass" data-s2="Tonale">Compass vs Tonale</button>
+            <button class="cmpSuggest" data-s1="Stelvio" data-s2="Renegade">Stelvio vs Renegade</button>
+            <button class="cmpSuggest" data-s1="Ypsilon" data-s2="Avenger">Ypsilon vs Avenger</button>
+          </div>
+          <div id="cmpResults" style="padding:20px;min-height:120px;">
+            <div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">↑ Scrivi il modello e premi Confronta</div>
+          </div>
+        </div>
+
+        <!-- VENDITE MENSILI -->
+        <div class="venditePanel">
           <div class="venditeHeader">
             <div class="venditeTitleRow">
               <div class="venditeTitle">🚗 Vendite mensili</div>
               <span id="venditeSyncBadge" class="venditeSyncBadge">Sync —</span>
             </div>
             <div class="venditeNav">
-              <button class="navArrow" id="vendPrevBtn" title="Mese precedente">&#8249;</button>
+              <button class="navArrow" id="vendPrevBtn">&#8249;</button>
               <div class="venditeMonthLabel" id="vendMonthLabel">—</div>
-              <button class="navArrow" id="vendNextBtn" title="Mese successivo">&#8250;</button>
+              <button class="navArrow" id="vendNextBtn">&#8250;</button>
             </div>
           </div>
-
-          <!-- Totali -->
           <div class="venditeTotali">
-            <div class="totCard">
-              <div class="totLabel">🆕 Nuove</div>
-              <div class="totNum nuova" id="totNuove">0</div>
-            </div>
-            <div class="totCard">
-              <div class="totLabel">🔄 Usate</div>
-              <div class="totNum usata" id="totUsate">0</div>
-            </div>
-            <div class="totCard">
-              <div class="totLabel">📦 Totale</div>
-              <div class="totNum all" id="totAll">0</div>
-            </div>
+            <div class="totCard"><div class="totLabel">🆕 Nuove</div><div class="totNum nuova" id="totNuove">0</div></div>
+            <div class="totCard"><div class="totLabel">🔄 Usate</div><div class="totNum usata" id="totUsate">0</div></div>
+            <div class="totCard"><div class="totLabel">📦 Totale</div><div class="totNum all"  id="totAll">0</div></div>
           </div>
-
-          <!-- Form aggiungi auto -->
           <div class="venditeForm">
-            <input id="vendModello" type="text" class="fld"
-              placeholder="Modello auto (es: Jeep Compass, Ford Focus…)" style="min-width:160px;"/>
-            <input id="vendProvv" type="number" class="fld"
-              placeholder="Provvigione €" min="0" step="1"
-              style="max-width:140px;min-width:120px;"/>
+            <input id="vendModello" type="text" class="fld" placeholder="Modello auto (es: Jeep Compass…)" style="min-width:160px;"/>
+            <input id="vendProvv"   type="number" class="fld" placeholder="Provvigione €" min="0" step="1" style="max-width:140px;min-width:110px;"/>
             <div class="tipoSeg">
               <button class="tipoBtn nuova active" id="tipoBtnNuova">🆕 Nuova</button>
               <button class="tipoBtn usata"        id="tipoBtnUsata">🔄 Usata</button>
             </div>
             <button id="vendAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
           </div>
-
-          <!-- Due colonne: nuove | usate -->
           <div class="venditeListe">
             <div class="venditeCol">
-              <div class="venditeColTitle nuova">
-                🆕 AUTO NUOVE
-                <span class="venditeCount nuova" id="cntNuove">0</span>
-              </div>
+              <div class="venditeColTitle nuova">🆕 AUTO NUOVE <span class="venditeCount nuova" id="cntNuove">0</span></div>
               <div class="venditeList" id="listNuove"></div>
             </div>
             <div class="venditeCol">
-              <div class="venditeColTitle usata">
-                🔄 AUTO USATE
-                <span class="venditeCount usata" id="cntUsate">0</span>
-              </div>
+              <div class="venditeColTitle usata">🔄 AUTO USATE <span class="venditeCount usata" id="cntUsate">0</span></div>
               <div class="venditeList" id="listUsate"></div>
             </div>
           </div>
-
-          <!-- Totale provvigioni mese corrente visualizzato -->
           <div class="venditeProvvBar">
             <div class="provvMeseGroup">
               <div class="provvMeseLabel">💰 Provvigioni del mese</div>
@@ -581,8 +392,6 @@
               <div class="provvMeseSplit" id="provvMeseSplit"></div>
             </div>
           </div>
-
-          <!-- Totale provvigioni anno 2026 -->
           <div class="vendite2026Bar">
             <div class="bar2026Left">
               <div class="bar2026Icon">🏆</div>
@@ -596,63 +405,116 @@
               <div class="bar2026Mesi" id="provv2026Mesi">0 mesi con provvigioni</div>
             </div>
           </div>
+          <div class="obiettivoBar">
+            <div class="obiettivoHead">
+              <div class="obiettivoLeft">
+                <div class="obiettivoIcon">🎯</div>
+                <div>
+                  <div class="obiettivoTitle">Obiettivo mensile</div>
+                  <div class="obiettivoSub">Imposta il tuo target provvigioni per questo mese</div>
+                </div>
+              </div>
+              <div class="obiettivoRight">
+                <span class="obiettivoInputLabel">Target €</span>
+                <input id="obiettivoInput" type="number" class="obiettivoInput" placeholder="es. 3000" min="0" step="100"/>
+              </div>
+            </div>
+            <div class="progressWrap"><div class="progressFill low" id="progressFill" style="width:0%"></div></div>
+            <div class="progressMeta">
+              <span class="progressPct low" id="progressPct">0%</span>
+              <span class="progressManca" id="progressManca">Imposta un obiettivo ↑</span>
+            </div>
+          </div>
+        </div>
 
-        </div><!-- /venditePanel -->
+        <!-- AGENDA -->
+        <div class="widgetStack">
+          <div class="widgetPanel" id="agendaPanel">
+            <div class="widgetHeader">
+              <div>
+                <div class="widgetTitle">📅 Agenda 3 giorni</div>
+                <div class="widgetSub">Task sincronizzati su Firebase. L'agenda scorre ogni giorno automaticamente.</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <span id="syncBadge" class="syncBadge warn">Sync: non attivo</span>
+                <button id="agendaClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci fatti</button>
+              </div>
+            </div>
+            <div class="widgetBody">
+              <div class="formRow">
+                <input id="taskInput" class="field" type="text" placeholder="Scrivi un task (es: richiamare cliente, preventivo, test drive...)"/>
+                <div class="seg">
+                  <button id="dayBtn0" class="active" type="button">Oggi</button>
+                  <button id="dayBtn1" type="button">Domani</button>
+                  <button id="dayBtn2" type="button">+2</button>
+                </div>
+                <button id="addTaskBtn" class="btn primary" type="button">Aggiungi</button>
+              </div>
+              <div class="split3" style="margin-top:14px;">
+                <div class="dayCol">
+                  <div class="dayHead"><span id="dayLabel0">Oggi</span><span id="dayDate0" class="dayMeta"></span></div>
+                  <div id="taskList0" class="list"></div>
+                </div>
+                <div class="dayCol">
+                  <div class="dayHead" style="background:rgba(96,165,250,.08);"><span id="dayLabel1">Domani</span><span id="dayDate1" class="dayMeta"></span></div>
+                  <div id="taskList1" class="list"></div>
+                </div>
+                <div class="dayCol">
+                  <div class="dayHead" style="background:rgba(59,130,246,.06);"><span id="dayLabel2">+2 giorni</span><span id="dayDate2" class="dayMeta"></span></div>
+                  <div id="taskList2" class="list"></div>
+                </div>
+              </div>
+              <div class="smallNote">Se fai login su telefono, vedi gli stessi task e memo.</div>
+            </div>
+          </div>
+
+          <!-- MEMO -->
+          <div class="widgetPanel" id="memoPanel">
+            <div class="widgetHeader">
+              <div>
+                <div class="widgetTitle">📝 Memo</div>
+                <div class="widgetSub">Sincronizzate su Firebase. Matita: barra o risbarra.</div>
+              </div>
+              <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
+            </div>
+            <div class="widgetBody">
+              <div class="formRow" style="align-items:stretch;">
+                <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
+                <button id="addMemoBtn" class="btn primary" type="button" style="align-self:flex-start;">Aggiungi</button>
+              </div>
+              <div style="margin-top:14px;"><div id="memoList" class="list" style="max-height:320px;"></div></div>
+              <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
+            </div>
+          </div>
+        </div>
+
       </section>
-
     </div>
   </main>
 
-  <!-- ===== CHATBOT ===== -->
+  <!-- CHATBOT -->
   <div class="chatTrigger" id="chatTrigger">
     <img src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI Agent"/>
   </div>
-
   <div class="chatBox" id="chatBox">
-    <img id="chatMinimizedLogo"
-      src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png"
-      alt="AI Agent"
-      style="display:none;width:70px;height:70px;object-fit:contain;cursor:pointer;"/>
+    <img id="chatMinimizedLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI Agent" style="display:none;width:70px;height:70px;object-fit:contain;cursor:pointer;"/>
     <div class="chatHeader">
       <div class="chatHeaderLeft">
-        <img class="chatHeaderLogo"
-          src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI"/>
-        <div>
-          <div class="chatHeaderTitle">AI BOTT Assistant</div>
-          <div class="chatHeaderSub">Esperto configurazioni</div>
-        </div>
+        <img class="chatHeaderLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI"/>
+        <div><div class="chatHeaderTitle">AI BOTT Assistant</div><div class="chatHeaderSub">Esperto configurazioni</div></div>
       </div>
       <div class="chatHeaderBtns">
-        <button class="chatHeaderBtn" id="minimizeBtn" title="Minimizza">−</button>
-        <button class="chatHeaderBtn" id="closeBtn"    title="Chiudi">×</button>
+        <button class="chatHeaderBtn" id="minimizeBtn">−</button>
+        <button class="chatHeaderBtn" id="closeBtn">×</button>
       </div>
     </div>
     <div class="chatMessages" id="chatMessages">
-      <div class="message ai">
-        <div class="messageBubble">👋 Ciao! Sono l'assistente AI BOTT specializzato in auto nuove e usate.
-
-🔍 Posso aiutarti con:
-
-🆕 AUTO NUOVE (Fiat, Jeep, Alfa, Lancia)
-• Allestimenti e versioni
-• Dotazioni e optional
-• Motorizzazioni e prezzi
-
-🚗 AUTO USATE (CentroAuto VT)
-• Ford, Jeep, Kia, Lancia, Land Rover
-• MAN, Mazda, MG, Opel, Peugeot
-• Renault, Seat, Smart, Suzuki, VW
-• Prezzi, km, anno, accessori
-
-Esempi:
-"Ford usate disponibili"
-"Confronta Compass Longitude e Limited" 💡</div>
-      </div>
+      <div class="message ai"><div class="messageBubble">👋 Ciao! Sono AI BOTT.
+Posso aiutarti con auto nuove (Fiat, Jeep, Alfa, Lancia) e usate (CentroAuto VT).
+Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div>
     </div>
     <div class="chatInput">
-      <input type="text" class="chatInputField" id="chatInputField"
-        placeholder="Es: auto usate disponibili oppure confronta Compass Longitude e Limited"
-        autocomplete="off"/>
+      <input type="text" class="chatInputField" id="chatInputField" placeholder="Scrivi..." autocomplete="off"/>
       <button class="chatSendBtn" id="chatSendBtn">➤</button>
     </div>
   </div>
@@ -671,590 +533,430 @@ Esempi:
     const BACKEND_NEWS   = "/api/news";
     const BACKEND_CHAT   = "https://auto-backend-three.vercel.app/api/chat";
     const BACKEND_SEARCH = "https://auto-backend-three.vercel.app/api/search";
-
     const BRAND_LINKS = {
-      Fiat:      "https://www.fiat.it/omni/configuratore/#/",
-      Jeep:      "https://www.jeep-official.it/omni/configuratore",
-      AlfaRomeo: "https://www.alfaromeo.it/omni/configuratore",
-      Lancia:    "https://www.lancia.it/omni/configuratore"
+      Fiat:"https://www.fiat.it/omni/configuratore/#/",
+      Jeep:"https://www.jeep-official.it/omni/configuratore",
+      AlfaRomeo:"https://www.alfaromeo.it/omni/configuratore",
+      Lancia:"https://www.lancia.it/omni/configuratore"
     };
-
     const firebaseConfig = {
-      apiKey:            "AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
-      authDomain:        "auto-1af60.firebaseapp.com",
-      projectId:         "auto-1af60",
-      storageBucket:     "auto-1af60.firebasestorage.app",
-      messagingSenderId: "498320258984",
-      appId:             "1:498320258984:web:bac67d7634273d10464f9d",
-      measurementId:     "G-WYM78KQWQJ"
+      apiKey:"AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
+      authDomain:"auto-1af60.firebaseapp.com",
+      projectId:"auto-1af60",
+      storageBucket:"auto-1af60.firebasestorage.app",
+      messagingSenderId:"498320258984",
+      appId:"1:498320258984:web:bac67d7634273d10464f9d",
+      measurementId:"G-WYM78KQWQJ"
     };
-
     const $ = id => document.getElementById(id);
     const setStatus = t => { $("status").textContent = t; };
-
-    function escapeHtml(s = "") {
-      return String(s ?? "").replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[c]));
-    }
-    function safeHost(url){ try{ return new URL(url).hostname; } catch{ return ""; } }
-    function fmtDate(d){
-      if (!d) return "";
-      const dt = new Date(d);
-      if (Number.isNaN(dt.getTime())) return String(d);
-      return dt.toLocaleString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
-    }
+    function escapeHtml(s=""){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+    function safeHost(url){try{return new URL(url).hostname}catch{return""}}
+    function fmtDate(d){if(!d)return"";const dt=new Date(d);if(Number.isNaN(dt.getTime()))return String(d);return dt.toLocaleString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}
     function renderItems(items){
-      const box = $("newsList");
-      if (!items || !items.length){
-        box.innerHTML = '<div class="muted" style="padding:20px;text-align:center">Nessuna news disponibile.</div>';
-        setStatus("Nessuna news trovata.");
-        return;
-      }
-      box.innerHTML = items.map(n => {
-        const link  = n.url || n.link || "";
-        const title = n.title || "Senza titolo";
-        const date  = fmtDate(n.date || n.pubDate || "");
-        const host  = safeHost(link);
-        return `
-          <a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">
-            <div class="newsTitle">${escapeHtml(title)}</div>
-            ${host ? `<div class="newsMeta">🔗 ${escapeHtml(host)}</div>` : ""}
-            ${date ? `<div class="newsDate">🕒 ${escapeHtml(date)}</div>` : ""}
-          </a>`;
+      const box=$("newsList");
+      if(!items||!items.length){box.innerHTML='<div class="muted" style="padding:20px;text-align:center">Nessuna news.</div>';setStatus("Nessuna news trovata.");return}
+      box.innerHTML=items.map(n=>{
+        const link=n.url||n.link||"",title=n.title||"Senza titolo",date=fmtDate(n.date||n.pubDate||""),host=safeHost(link);
+        return`<a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer"><div class="newsTitle">${escapeHtml(title)}</div>${host?`<div class="newsMeta">🔗 ${escapeHtml(host)}</div>`:""}${date?`<div class="newsDate">🕒 ${escapeHtml(date)}</div>`:""}</a>`;
       }).join("");
       setStatus(`✅ ${items.length} news caricate • ${new Date().toLocaleString("it-IT")}`);
     }
 
-    /* ── Firebase ── */
-    const app  = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db   = getFirestore(app);
+    const app=initializeApp(firebaseConfig);
+    const auth=getAuth(app);
+    const db=getFirestore(app);
     enableIndexedDbPersistence(db).catch(()=>{});
+    const provider=new GoogleAuthProvider();
+    provider.setCustomParameters({prompt:"select_account",display:"popup"});
 
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt:"select_account", display:"popup" });
-
-    (async function initApp(){
-      try { await setPersistence(auth, browserLocalPersistence); }
-      catch { try { await setPersistence(auth, browserSessionPersistence); } catch {} }
-      try {
-        const r = await getRedirectResult(auth);
-        if (r?.user) setStatus("✅ Login riuscito! Benvenuto " + r.user.email);
-      } catch(e){ setStatus("❌ Errore login: " + (e.code || e.message)); }
+    (async function(){
+      try{await setPersistence(auth,browserLocalPersistence)}catch{try{await setPersistence(auth,browserSessionPersistence)}catch{}}
+      try{await getRedirectResult(auth)}catch{}
     })();
 
     async function loadNews(){
-      const user = auth.currentUser;
-      if (!user){ $("newsList").innerHTML = ""; setStatus("🔒 Login per vedere le news."); return; }
-      setStatus("⏳ Caricamento news...");
-      $("refreshBtn").disabled = true;
-      try {
-        const r = await fetch(BACKEND_NEWS, { method:"GET", headers:{"Cache-Control":"no-cache"}, cache:"no-store" });
-        if (!r.ok){ const t = await r.text().catch(()=>""); throw new Error(`HTTP ${r.status}${t?" - "+t:""}`); }
-        const data = await r.json();
-        if (data.items && Array.isArray(data.items)) renderItems(data.items);
-        else if (Array.isArray(data)) renderItems(data);
-        else throw new Error("Formato dati non valido");
-      } catch(err){
-        $("newsList").innerHTML = '<div class="muted" style="padding:20px;text-align:center">❌ Errore caricamento news</div>';
-        setStatus("❌ Errore: " + (err?.message || err));
-      } finally {
-        $("refreshBtn").disabled = !auth.currentUser;
-      }
+      if(!auth.currentUser){$("newsList").innerHTML="";setStatus("🔒 Login per vedere le news.");return}
+      setStatus("⏳ Caricamento...");$("refreshBtn").disabled=true;
+      try{
+        const r=await fetch(BACKEND_NEWS,{method:"GET",headers:{"Cache-Control":"no-cache"},cache:"no-store"});
+        if(!r.ok)throw new Error(`HTTP ${r.status}`);
+        const data=await r.json();
+        if(data.items&&Array.isArray(data.items))renderItems(data.items);
+        else if(Array.isArray(data))renderItems(data);
+        else throw new Error("Formato non valido");
+      }catch(err){
+        $("newsList").innerHTML='<div class="muted" style="padding:20px;text-align:center">❌ Errore news</div>';
+        setStatus("❌ "+( err?.message||err));
+      }finally{$("refreshBtn").disabled=!auth.currentUser}
     }
 
-    $("loginBtn").addEventListener("click", async () => {
-      try {
-        setStatus("🔐 Apertura login Google...");
-        try {
-          const r = await signInWithPopup(auth, provider);
-          setStatus("✅ Login riuscito! Benvenuto " + r.user.email);
-        } catch(pe){
-          if (["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(pe.code)){
-            setStatus("🔄 Reindirizzamento in corso...");
-            await signInWithRedirect(auth, provider);
-          } else { throw pe; }
+    $("loginBtn").addEventListener("click",async()=>{
+      try{
+        setStatus("🔐 Apertura login...");
+        try{const r=await signInWithPopup(auth,provider);setStatus("✅ Login riuscito! "+r.user.email)}
+        catch(pe){
+          if(["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(pe.code)){setStatus("🔄 Reindirizzamento...");await signInWithRedirect(auth,provider)}
+          else throw pe;
         }
-      } catch(e){
-        let msg = "Errore sconosciuto";
-        if (e.code === "auth/unauthorized-domain") msg = "Dominio non autorizzato in Firebase Console";
-        else if (e.code === "auth/popup-blocked")  msg = "Popup bloccato dal browser";
-        else msg = e.code || e.message;
-        setStatus("❌ " + msg);
+      }catch(e){
+        let msg=e.code==="auth/unauthorized-domain"?"Dominio non autorizzato":e.code||e.message;
+        setStatus("❌ "+msg);
       }
     });
+    $("logoutBtn").addEventListener("click",async()=>{try{await signOut(auth);$("newsList").innerHTML="";setStatus("👋 Logout.")}catch(e){setStatus("❌ "+e.message)}});
+    $("refreshBtn").addEventListener("click",loadNews);
+    $("fiatBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Fiat,"_blank","noopener,noreferrer"));
+    $("jeepBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Jeep,"_blank","noopener,noreferrer"));
+    $("alfaBtn").addEventListener("click",()=>window.open(BRAND_LINKS.AlfaRomeo,"_blank","noopener,noreferrer"));
+    $("lanciaBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Lancia,"_blank","noopener,noreferrer"));
 
-    $("logoutBtn").addEventListener("click", async () => {
-      try { await signOut(auth); $("newsList").innerHTML = ""; setStatus("👋 Logout effettuato."); }
-      catch(e){ setStatus("❌ Errore logout: " + (e.code || e.message)); }
+    /* ══ AGENDA + MEMO + CALENDARIO ══ */
+    const SYNC={unsub:null,uid:null,docRef:null,data:{tasks:{},memos:{}},ready:false};
+    function setSyncBadge(state){
+      const b=$("syncBadge");
+      if(state==="ok"){b.className="syncBadge ok";b.textContent="Sync: attivo"}
+      else if(state==="warn"){b.className="syncBadge warn";b.textContent="Sync: non attivo"}
+      else{b.className="syncBadge";b.textContent="Sync: ..."}
+    }
+    function todayMidnight(d=new Date()){const x=new Date(d);x.setHours(0,0,0,0);return x}
+    function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+    function dateKey(d){const x=todayMidnight(d);return`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`}
+    function prettyDay(d){return d.toLocaleDateString("it-IT",{weekday:"short",day:"2-digit",month:"2-digit"})}
+    function mkUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
+
+    function startOfWeekMonday(d=new Date()){const x=todayMidnight(d);const day=x.getDay();x.setDate(x.getDate()+(day===0?-6:1-day));return x}
+    function fmtRange(a,b){return`${a.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"})}–${b.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"})}`}
+
+    function renderWeekCalendar(){
+      const grid=$("weekGrid"),range=$("weekRange");
+      if(!grid||!range)return;
+      if(!auth.currentUser){range.textContent="Login richiesto";grid.innerHTML="";return}
+      const base=startOfWeekMonday(new Date());
+      range.textContent=fmtRange(base,addDays(base,6));
+      const allTasks=Object.values(SYNC.data.tasks||{});
+      const todayKey=dateKey(new Date());
+      const dows=["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
+      grid.innerHTML=Array.from({length:7}).map((_,i)=>{
+        const d=addDays(base,i),k=dateKey(d);
+        const tasks=allTasks.filter(t=>t&&t.dateKey===k).sort((a,b)=>(Number(a.done)-Number(b.done))||((a.createdAt||0)-(b.createdAt||0)));
+        const show=tasks.slice(0,3).map(t=>`<div class="weekTask${t.done?" done":""}" title="${escapeHtml(t.text||"")}">${escapeHtml(t.text||"")}</div>`).join("");
+        const more=tasks.length>3?`<div class="weekMore">+${tasks.length-3} altri</div>`:"";
+        return`<div class="weekCell${k===todayKey?" today":""}"><div class="weekTop"><div class="weekDow">${dows[i]}</div><div class="weekDay">${String(d.getDate()).padStart(2,"0")}</div></div><div class="weekTasks">${tasks.length?(show+more):'<div class="muted" style="font-size:11px;opacity:.7">—</div>'}</div></div>`;
+      }).join("");
+    }
+
+    let selectedOffset=0;
+    function refreshDayHeaders(){
+      const base=todayMidnight(new Date());
+      $("dayDate0").textContent=prettyDay(base);
+      $("dayDate1").textContent=prettyDay(addDays(base,1));
+      $("dayDate2").textContent=prettyDay(addDays(base,2));
+      renderTasksAndMemos();renderWeekCalendar();
+    }
+    (function scheduleMidnightRefresh(){
+      const now=new Date(),next=new Date(now);next.setHours(24,0,0,0);
+      setTimeout(()=>{refreshDayHeaders();scheduleMidnightRefresh()},Math.max(1000,next-now));
+    })();
+
+    function normalizePlanner(p){
+      return{tasks:(p&&typeof p.tasks==="object"&&p.tasks)?p.tasks:{},memos:(p&&typeof p.memos==="object"&&p.memos)?p.memos:{}};
+    }
+    async function writePlanner(next){if(!SYNC.docRef)return;await setDoc(SYNC.docRef,next,{merge:false}).catch(()=>{})}
+    async function safeWrite(fn){
+      if(!SYNC.docRef)return;
+      const next=fn(JSON.parse(JSON.stringify(SYNC.data)));
+      SYNC.data=next;renderTasksAndMemos();renderWeekCalendar();
+      try{await writePlanner(next)}catch{}
+    }
+    function cleanupOldTasks(data){
+      const limitKey=dateKey(addDays(new Date(),-30));
+      const out={...data,tasks:{...data.tasks},memos:{...data.memos}};
+      for(const[id,t]of Object.entries(out.tasks)){if(t?.dateKey&&String(t.dateKey)<limitKey)delete out.tasks[id]}
+      return out;
+    }
+
+    function renderTasksAndMemos(){
+      if(!auth.currentUser){
+        const msg='<div class="muted" style="padding:10px 6px;font-size:12px;">Login richiesto.</div>';
+        [$("taskList0"),$("taskList1"),$("taskList2"),$("memoList")].forEach(el=>{if(el)el.innerHTML=msg});
+        return;
+      }
+      const base=todayMidnight(new Date());
+      const keys=[dateKey(base),dateKey(addDays(base,1)),dateKey(addDays(base,2))];
+      const lists=[$("taskList0"),$("taskList1"),$("taskList2")];
+      const allTasks=Object.values(SYNC.data.tasks||{});
+      for(let i=0;i<3;i++){
+        const items=allTasks.filter(t=>t&&t.dateKey===keys[i]).sort((a,b)=>(Number(a.done)-Number(b.done))||((a.createdAt||0)-(b.createdAt||0)));
+        if(!items.length){lists[i].innerHTML='<div class="muted" style="padding:10px 6px;font-size:12px;">Nessun task.</div>';continue}
+        lists[i].innerHTML=items.map(t=>`<div class="item" data-id="${escapeHtml(t.id)}"><input class="chk" type="checkbox"${t.done?" checked":""}><div class="itemMain"><div class="itemText${t.done?" done":""}">${escapeHtml(t.text||"")}</div></div><div class="itemActions"><button class="iconBtn del" title="Elimina">×</button></div></div>`).join("");
+      }
+      const memos=Object.values(SYNC.data.memos||{}).sort((a,b)=>(Number(a.done)-Number(b.done))||((a.createdAt||0)-(b.createdAt||0)));
+      const box=$("memoList");
+      box.innerHTML=!memos.length?'<div class="muted" style="padding:10px 6px;font-size:12px;">Nessuna memo.</div>':
+        memos.map(m=>`<div class="item" data-id="${escapeHtml(m.id)}"><div class="itemMain"><div class="itemText${m.done?" done":""}">${escapeHtml(m.text||"")}</div></div><div class="itemActions"><button class="iconBtn pencil" title="Matita">✎</button><button class="iconBtn del" title="Elimina">×</button></div></div>`).join("");
+
+      document.querySelectorAll("#agendaPanel .item").forEach(el=>{
+        const id=el.getAttribute("data-id"),chk=el.querySelector(".chk"),del=el.querySelector(".del");
+        chk.addEventListener("change",()=>safeWrite(d=>{if(d.tasks[id])d.tasks[id].done=!!chk.checked;return d}));
+        del.addEventListener("click",()=>safeWrite(d=>{delete d.tasks[id];return d}));
+      });
+      document.querySelectorAll("#memoPanel .item").forEach(el=>{
+        const id=el.getAttribute("data-id"),pencil=el.querySelector(".pencil"),del=el.querySelector(".del");
+        pencil.addEventListener("click",()=>safeWrite(d=>{if(d.memos[id])d.memos[id].done=!d.memos[id].done;return d}));
+        del.addEventListener("click",()=>safeWrite(d=>{delete d.memos[id];return d}));
+      });
+    }
+
+    function setDayOffset(n){
+      selectedOffset=n;
+      [0,1,2].forEach(i=>$("dayBtn"+i).classList.toggle("active",i===n));
+    }
+    [0,1,2].forEach(i=>$("dayBtn"+i).addEventListener("click",()=>setDayOffset(i)));
+    setDayOffset(0);
+
+    $("addTaskBtn").addEventListener("click",()=>{
+      const text=$("taskInput").value.trim();if(!text)return;
+      const target=addDays(todayMidnight(new Date()),selectedOffset),id=mkUid();
+      safeWrite(d=>{d.tasks[id]={id,dateKey:dateKey(target),text,done:false,createdAt:Date.now()};return cleanupOldTasks(d)});
+      $("taskInput").value="";
+    });
+    $("taskInput").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();$("addTaskBtn").click()}});
+    $("agendaClearDoneBtn").addEventListener("click",()=>safeWrite(d=>{for(const[id,t]of Object.entries(d.tasks)){if(t&&t.done)delete d.tasks[id]}return cleanupOldTasks(d)}));
+    $("addMemoBtn").addEventListener("click",()=>{
+      const text=$("memoInput").value.trim();if(!text)return;
+      const id=mkUid();
+      safeWrite(d=>{d.memos[id]={id,text,done:false,createdAt:Date.now()};return d});
+      $("memoInput").value="";
+    });
+    $("memoInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("addMemoBtn").click()}});
+    $("memoClearDoneBtn").addEventListener("click",()=>safeWrite(d=>{for(const[id,m]of Object.entries(d.memos)){if(m&&m.done)delete d.memos[id]}return d}));
+
+    function startPlannerSync(user){
+      stopPlannerSync();
+      SYNC.docRef=doc(db,"users",user.uid,"planner","main");
+      setSyncBadge("...");
+      SYNC.unsub=onSnapshot(SYNC.docRef,snap=>{
+        const data=snap.exists()?snap.data():{tasks:{},memos:{}};
+        SYNC.data=normalizePlanner(data);SYNC.data=cleanupOldTasks(SYNC.data);SYNC.ready=true;
+        setSyncBadge("ok");renderTasksAndMemos();renderWeekCalendar();
+        if(!snap.exists())setDoc(SYNC.docRef,SYNC.data,{merge:false}).catch(()=>{});
+      },()=>setSyncBadge("warn"));
+    }
+    function stopPlannerSync(){
+      if(SYNC.unsub){try{SYNC.unsub()}catch{}}
+      SYNC.unsub=null;SYNC.docRef=null;SYNC.data={tasks:{},memos:{}};SYNC.ready=false;
+      setSyncBadge("warn");renderTasksAndMemos();renderWeekCalendar();
+    }
+
+    /* ══ COMPARATORE ══ */
+    document.querySelectorAll(".cmpSuggest").forEach(btn=>btn.addEventListener("click",()=>{
+      $("cmpInput1").value=btn.dataset.s1;$("cmpInput2").value=btn.dataset.s2;
+      [$("cmpInput1"),$("cmpInput2")].forEach(el=>el.style.borderColor="#3b82f6");
+    }));
+    $("cmpResetBtn").addEventListener("click",()=>{
+      $("cmpInput1").value="";$("cmpInput2").value="";
+      $("cmpResults").innerHTML='<div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">↑ Scrivi il modello e premi Confronta</div>';
     });
 
-    $("refreshBtn").addEventListener("click", loadNews);
-    $("fiatBtn").addEventListener("click",   () => window.open(BRAND_LINKS.Fiat,      "_blank","noopener,noreferrer"));
-    $("jeepBtn").addEventListener("click",   () => window.open(BRAND_LINKS.Jeep,      "_blank","noopener,noreferrer"));
-    $("alfaBtn").addEventListener("click",   () => window.open(BRAND_LINKS.AlfaRomeo, "_blank","noopener,noreferrer"));
-    $("lanciaBtn").addEventListener("click", () => window.open(BRAND_LINKS.Lancia,    "_blank","noopener,noreferrer"));
+    /* ══ VENDITE MENSILI ══ */
+    let vendState={months:{},obiettivo:0};
+    let vendDocRef=null,vendUnsub=null,vendTipo="nuova";
+    const TODAY_KEY=(()=>{const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`})();
+    let vendViewKey=TODAY_KEY;
 
-    /* ══════════════════════════════════════════
-       VENDITE MENSILI — FIRESTORE SYNC
-    ══════════════════════════════════════════ */
+    function monthLabel(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-1,1);const l=d.toLocaleDateString("it-IT",{month:"long",year:"numeric"});return l.charAt(0).toUpperCase()+l.slice(1)}
+    function prevMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-2,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
+    function nextMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
+    function vendUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
+    function ensureMonth(k){if(!vendState.months[k])vendState.months[k]={nuove:[],usate:[]}}
+    function sumProvv(list){return(list||[]).reduce((s,c)=>s+(Number(c.provv)||0),0)}
+    function fmtEur(n){return"€ "+n.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0})}
 
-    // struttura Firestore: users/{uid}/vendite/data
-    // { months: { "2025-02": { nuove:[{id,modello,n},...], usate:[...] }, ... } }
-
-    let vendState   = { months: {} };  // stato locale completo
-    let vendDocRef  = null;
-    let vendUnsub   = null;
-    let vendTipo    = "nuova";         // tipo selezionato nel form
-
-    // Mese visualizzato: partiamo dal mese corrente
-    const TODAY_KEY = (() => {
-      const now = new Date();
-      return now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0");
-    })();
-    let vendViewKey = TODAY_KEY;  // "YYYY-MM"
-
-    /* helpers */
-    function monthLabel(k){
-      const [y,m] = k.split("-").map(Number);
-      const d = new Date(y, m-1, 1);
-      const label = d.toLocaleDateString("it-IT",{month:"long",year:"numeric"});
-      return label.charAt(0).toUpperCase() + label.slice(1);
-    }
-    function prevMonthKey(k){
-      const [y,m] = k.split("-").map(Number);
-      const d = new Date(y, m-2, 1); // m-2 perché m è 1-based
-      return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
-    }
-    function nextMonthKey(k){
-      const [y,m] = k.split("-").map(Number);
-      const d = new Date(y, m, 1);
-      return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
-    }
-    function vendUid(){
-      return Math.random().toString(16).slice(2) + Date.now().toString(16);
-    }
-    function ensureMonth(k){
-      if (!vendState.months[k]) vendState.months[k] = { nuove:[], usate:[] };
+    function renderObiettivo(provvMese){
+      const target=vendState.obiettivo||0;
+      const inp=$("obiettivoInput");
+      if(document.activeElement!==inp)inp.value=target>0?target:"";
+      const fill=$("progressFill"),pct=$("progressPct"),manca=$("progressManca");
+      if(!target||target<=0){fill.style.width="0%";fill.className="progressFill low";pct.textContent="0%";pct.className="progressPct low";manca.textContent="Imposta un obiettivo ↑";manca.className="progressManca";return}
+      const ratio=Math.min(provvMese/target,1);
+      const pctVal=Math.round(ratio*100);
+      const tier=pctVal>=100?"done":pctVal>=66?"high":pctVal>=33?"mid":"low";
+      fill.style.width=(ratio*100).toFixed(1)+"%";fill.className="progressFill "+tier;
+      pct.textContent=pctVal+"%";pct.className="progressPct "+tier;
+      if(pctVal>=100){manca.textContent="🎉 Obiettivo raggiunto! +"+fmtEur(provvMese-target)+" extra";manca.className="progressManca done"}
+      else{manca.textContent="Mancano "+fmtEur(target-provvMese)+" all'obiettivo";manca.className="progressManca"}
     }
 
-    /* verifica automatica nuovo mese: se esiste il mese corrente, crealo */
-    function autoCreateCurrentMonth(){
-      ensureMonth(TODAY_KEY);
-    }
-
-    /* helper: somma provvigioni di una lista */
-    function sumProvv(list){
-      return (list || []).reduce((s, c) => s + (Number(c.provv) || 0), 0);
-    }
-
-    function fmtEur(n){
-      return "€ " + n.toLocaleString("it-IT", { minimumFractionDigits:0, maximumFractionDigits:0 });
-    }
-
-    /* Render UI */
     function renderVendite(){
-      const k = vendViewKey;
-      ensureMonth(k);
-      const mese  = vendState.months[k];
-      const nuove = mese.nuove || [];
-      const usate = mese.usate || [];
-
-      // Etichetta mese + flag "mese corrente"
-      const isCurrentMonth = (k === TODAY_KEY);
-      $("vendMonthLabel").innerHTML =
-        escapeHtml(monthLabel(k)) +
-        (isCurrentMonth ? ' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>' : "");
-
-      // Freccia "avanti" disabilitata se siamo al mese corrente
-      $("vendNextBtn").disabled = (k === TODAY_KEY);
-
-      // Totali auto
-      $("totNuove").textContent = nuove.length;
-      $("totUsate").textContent = usate.length;
-      $("totAll").textContent   = nuove.length + usate.length;
-      $("cntNuove").textContent = nuove.length;
-      $("cntUsate").textContent = usate.length;
-
-      // Lista nuove
-      $("listNuove").innerHTML = nuove.length
-        ? nuove.map((c,i) => autoItemHTML(c, i+1, "nuova")).join("")
-        : '<div class="emptyList">Nessuna auto nuova</div>';
-
-      // Lista usate
-      $("listUsate").innerHTML = usate.length
-        ? usate.map((c,i) => autoItemHTML(c, i+1, "usata")).join("")
-        : '<div class="emptyList">Nessuna auto usata</div>';
-
-      // Bind bottoni elimina
-      document.querySelectorAll(".autoDelBtn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const id   = btn.dataset.id;
-          const tipo = btn.dataset.tipo;
-          deleteAuto(k, tipo, id);
-        });
-      });
-
-      // ── Provvigioni mese ──
-      const pNuove = sumProvv(nuove);
-      const pUsate = sumProvv(usate);
-      const pTot   = pNuove + pUsate;
-      $("provvMeseTot").textContent = fmtEur(pTot);
-
-      // dettaglio split nuove/usate (solo se entrambe > 0)
-      if (pNuove > 0 && pUsate > 0){
-        $("provvMeseSplit").textContent = `🆕 ${fmtEur(pNuove)}  ·  🔄 ${fmtEur(pUsate)}`;
-      } else if (pNuove > 0){
-        $("provvMeseSplit").textContent = `🆕 Tutte da auto nuove`;
-      } else if (pUsate > 0){
-        $("provvMeseSplit").textContent = `🔄 Tutte da auto usate`;
-      } else {
-        $("provvMeseSplit").textContent = "Nessuna provvigione inserita";
-      }
-
-      // ── Totale 2026 ──
-      const year2026 = "2026";
-      let tot2026  = 0;
-      let mesiCon2026 = 0;
-      Object.entries(vendState.months).forEach(([mk, mv]) => {
-        if (!mk.startsWith(year2026)) return;
-        const mP = sumProvv(mv.nuove || []) + sumProvv(mv.usate || []);
-        tot2026  += mP;
-        if (mP > 0) mesiCon2026++;
-      });
-      $("provv2026Tot").textContent  = fmtEur(tot2026);
-      $("provv2026Mesi").textContent =
-        mesiCon2026 === 0 ? "Nessun mese con provvigioni" :
-        mesiCon2026 === 1 ? "1 mese con provvigioni" :
-        mesiCon2026 + " mesi con provvigioni";
+      const k=vendViewKey;ensureMonth(k);
+      const mese=vendState.months[k],nuove=mese.nuove||[],usate=mese.usate||[];
+      const isCurrent=(k===TODAY_KEY);
+      $("vendMonthLabel").innerHTML=escapeHtml(monthLabel(k))+(isCurrent?' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>':"");
+      $("vendNextBtn").disabled=(k===TODAY_KEY);
+      $("totNuove").textContent=nuove.length;$("totUsate").textContent=usate.length;$("totAll").textContent=nuove.length+usate.length;
+      $("cntNuove").textContent=nuove.length;$("cntUsate").textContent=usate.length;
+      $("listNuove").innerHTML=nuove.length?nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova")).join(""):'<div class="emptyList">Nessuna auto nuova</div>';
+      $("listUsate").innerHTML=usate.length?usate.map((c,i)=>autoItemHTML(c,i+1,"usata")).join(""):'<div class="emptyList">Nessuna auto usata</div>';
+      document.querySelectorAll(".autoDelBtn").forEach(btn=>btn.addEventListener("click",()=>deleteAuto(k,btn.dataset.tipo,btn.dataset.id)));
+      const pNuove=sumProvv(nuove),pUsate=sumProvv(usate),pTot=pNuove+pUsate;
+      $("provvMeseTot").textContent=fmtEur(pTot);
+      $("provvMeseSplit").textContent=pNuove>0&&pUsate>0?`🆕 ${fmtEur(pNuove)}  ·  🔄 ${fmtEur(pUsate)}`:pNuove>0?"🆕 Tutte da auto nuove":pUsate>0?"🔄 Tutte da auto usate":"Nessuna provvigione inserita";
+      let tot2026=0,mesi2026=0;
+      Object.entries(vendState.months).forEach(([mk,mv])=>{if(!mk.startsWith("2026"))return;const mP=sumProvv(mv.nuove||[])+sumProvv(mv.usate||[]);tot2026+=mP;if(mP>0)mesi2026++});
+      $("provv2026Tot").textContent=fmtEur(tot2026);
+      $("provv2026Mesi").textContent=mesi2026===0?"Nessun mese con provvigioni":mesi2026===1?"1 mese con provvigioni":mesi2026+" mesi con provvigioni";
+      renderObiettivo(pTot);
     }
 
-    function autoItemHTML(c, n, tipo){
-      const p    = Number(c.provv) || 0;
-      const pStr = p > 0 ? "€ " + p.toLocaleString("it-IT") : "—";
-      const cls  = p > 0 ? "autoProvv" : "autoProvv zero";
-      return `
-        <div class="autoItem">
-          <span class="autoN">#${n}</span>
-          <span class="autoModello">${escapeHtml(c.modello)}</span>
-          <span class="${cls}">${pStr}</span>
-          <button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>
-        </div>`;
+    function autoItemHTML(c,n,tipo){
+      const p=Number(c.provv)||0,pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—",cls=p>0?"autoProvv":"autoProvv zero";
+      return`<div class="autoItem"><span class="autoN">#${n}</span><span class="autoModello">${escapeHtml(c.modello)}</span><span class="${cls}">${pStr}</span><button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button></div>`;
     }
 
-    /* Scrittura Firestore */
-    async function vendWrite(){
-      if (!vendDocRef) return;
-      try { await setDoc(vendDocRef, vendState, { merge:false }); } catch {}
-    }
+    async function vendWrite(){if(!vendDocRef)return;try{await setDoc(vendDocRef,vendState,{merge:false})}catch{}}
 
-    /* Aggiungi auto */
     async function addAuto(){
-      const modello = $("vendModello").value.trim();
-      if (!modello) return;
-      const provv   = parseFloat($("vendProvv").value) || 0;
-      const k = vendViewKey;
+      const modello=$("vendModello").value.trim();if(!modello)return;
+      const provv=parseFloat($("vendProvv").value)||0;
+      const k=vendViewKey;ensureMonth(k);
+      const id=vendUid(),entry={id,modello,provv,createdAt:Date.now()};
+      if(vendTipo==="nuova")vendState.months[k].nuove.push(entry);
+      else vendState.months[k].usate.push(entry);
+      $("vendModello").value="";$("vendProvv").value="";
+      renderVendite();await vendWrite();
+    }
+    async function deleteAuto(k,tipo,id){
       ensureMonth(k);
-      const id = vendUid();
-      const entry = { id, modello, provv, createdAt: Date.now() };
-      if (vendTipo === "nuova") vendState.months[k].nuove.push(entry);
-      else                      vendState.months[k].usate.push(entry);
-      $("vendModello").value = "";
-      $("vendProvv").value   = "";
-      renderVendite();
-      await vendWrite();
+      const list=tipo==="nuova"?vendState.months[k].nuove:vendState.months[k].usate;
+      const idx=list.findIndex(c=>c.id===id);if(idx!==-1)list.splice(idx,1);
+      renderVendite();await vendWrite();
     }
 
-    /* Elimina auto */
-    async function deleteAuto(k, tipo, id){
-      ensureMonth(k);
-      const list = tipo === "nuova" ? vendState.months[k].nuove : vendState.months[k].usate;
-      const idx  = list.findIndex(c => c.id === id);
-      if (idx !== -1) list.splice(idx, 1);
-      renderVendite();
-      await vendWrite();
-    }
-
-    /* Sync Firestore */
     function startVenditeSync(user){
-      if (vendUnsub){ try{ vendUnsub(); } catch{} }
-      vendDocRef = doc(db, "users", user.uid, "vendite", "data");
+      if(vendUnsub){try{vendUnsub()}catch{}}
+      vendDocRef=doc(db,"users",user.uid,"vendite","data");
       setSyncVendite("sync");
-
-      vendUnsub = onSnapshot(vendDocRef, snap => {
-        if (snap.exists()){
-          const data = snap.data();
-          vendState = { months: data.months || {} };
-        } else {
-          vendState = { months: {} };
-        }
-        autoCreateCurrentMonth();
-        setSyncVendite("ok");
-        renderVendite();
-        // crea documento se non esiste
-        if (!snap.exists()) setDoc(vendDocRef, vendState, { merge:false }).catch(()=>{});
-      }, () => setSyncVendite("warn"));
+      vendUnsub=onSnapshot(vendDocRef,snap=>{
+        if(snap.exists()){const d=snap.data();vendState={months:d.months||{},obiettivo:d.obiettivo||0}}
+        else{vendState={months:{},obiettivo:0}}
+        ensureMonth(TODAY_KEY);setSyncVendite("ok");renderVendite();
+        if(!snap.exists())setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
+      },()=>setSyncVendite("warn"));
     }
-
     function stopVenditeSync(){
-      if (vendUnsub){ try{ vendUnsub(); } catch{} }
-      vendUnsub  = null;
-      vendDocRef = null;
-      vendState  = { months: {} };
-      setSyncVendite("warn");
-      renderVendite();
+      if(vendUnsub){try{vendUnsub()}catch{}}
+      vendUnsub=null;vendDocRef=null;vendState={months:{},obiettivo:0};
+      setSyncVendite("warn");renderVendite();
+    }
+    function setSyncVendite(s){
+      const b=$("venditeSyncBadge");
+      if(s==="ok"){b.className="venditeSyncBadge ok";b.textContent="Sync ✓"}
+      else if(s==="sync"){b.className="venditeSyncBadge";b.textContent="Sync …"}
+      else{b.className="venditeSyncBadge";b.textContent="Sync —"}
     }
 
-    function setSyncVendite(state){
-      const b = $("venditeSyncBadge");
-      if (state === "ok")  { b.className = "venditeSyncBadge ok"; b.textContent = "Sync ✓"; }
-      else if (state === "sync") { b.className = "venditeSyncBadge"; b.textContent = "Sync …"; }
-      else                 { b.className = "venditeSyncBadge"; b.textContent = "Sync —"; }
-    }
-
-    /* Navigazione mesi */
-    $("vendPrevBtn").addEventListener("click", () => {
-      vendViewKey = prevMonthKey(vendViewKey);
-      ensureMonth(vendViewKey);
-      renderVendite();
-    });
-    $("vendNextBtn").addEventListener("click", () => {
-      if (vendViewKey === TODAY_KEY) return;
-      vendViewKey = nextMonthKey(vendViewKey);
-      ensureMonth(vendViewKey);
-      renderVendite();
+    $("vendPrevBtn").addEventListener("click",()=>{vendViewKey=prevMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite()});
+    $("vendNextBtn").addEventListener("click",()=>{if(vendViewKey===TODAY_KEY)return;vendViewKey=nextMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite()});
+    $("tipoBtnNuova").addEventListener("click",()=>{vendTipo="nuova";$("tipoBtnNuova").classList.add("active");$("tipoBtnUsata").classList.remove("active")});
+    $("tipoBtnUsata").addEventListener("click",()=>{vendTipo="usata";$("tipoBtnUsata").classList.add("active");$("tipoBtnNuova").classList.remove("active")});
+    $("vendAddBtn").addEventListener("click",addAuto);
+    $("vendModello").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
+    $("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
+    $("obiettivoInput").addEventListener("input",async()=>{
+      vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
+      const k=vendViewKey;ensureMonth(k);const m=vendState.months[k];
+      renderObiettivo(sumProvv(m.nuove||[])+sumProvv(m.usate||[]));
+      await vendWrite();
     });
 
-    /* Toggle tipo */
-    $("tipoBtnNuova").addEventListener("click", () => {
-      vendTipo = "nuova";
-      $("tipoBtnNuova").classList.add("active");
-      $("tipoBtnUsata").classList.remove("active");
-    });
-    $("tipoBtnUsata").addEventListener("click", () => {
-      vendTipo = "usata";
-      $("tipoBtnUsata").classList.add("active");
-      $("tipoBtnNuova").classList.remove("active");
-    });
-
-    /* Aggiungi */
-    $("vendAddBtn").addEventListener("click", addAuto);
-    $("vendModello").addEventListener("keypress", e => {
-      if (e.key === "Enter"){ e.preventDefault(); addAuto(); }
-    });
-    $("vendProvv").addEventListener("keypress", e => {
-      if (e.key === "Enter"){ e.preventDefault(); addAuto(); }
-    });
-
-    /* Render iniziale (offline, mese corrente) */
-    autoCreateCurrentMonth();
-    renderVendite();
-
-    /* Auto-switch a nuovo mese a mezzanotte */
+    ensureMonth(TODAY_KEY);renderVendite();
     (function scheduleMonthCheck(){
-      const now  = new Date();
-      const next = new Date(now.getFullYear(), now.getMonth()+1, 1, 0, 0, 5); // 1° del mese prossimo + 5s
-      const ms   = next.getTime() - now.getTime();
-      setTimeout(() => {
-        // Se l'utente sta guardando il mese corrente, spostalo al nuovo
-        if (vendViewKey === TODAY_KEY) vendViewKey = nextMonthKey(TODAY_KEY);
-        autoCreateCurrentMonth();
-        renderVendite();
-        scheduleMonthCheck();
-      }, Math.max(5000, ms));
+      const now=new Date(),next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,5);
+      setTimeout(()=>{if(vendViewKey===TODAY_KEY)vendViewKey=nextMonthKey(TODAY_KEY);ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck()},Math.max(5000,next-now));
     })();
 
-    /* ══════════════════════════════════════════
-       AUTH STATE
-    ══════════════════════════════════════════ */
-    onAuthStateChanged(auth, user => {
-      if (user){
-        $("userPill").textContent = "✅ " + (user.email || "Utente");
+    /* ══ AUTH STATE ══ */
+    onAuthStateChanged(auth,user=>{
+      if(user){
+        $("userPill").textContent="✅ "+(user.email||"Utente");
         $("userPill").classList.remove("muted");
-        $("userPill").style.borderColor = "rgba(34,197,94,.5)";
-        $("userPill").style.background  = "rgba(34,197,94,.1)";
-        $("loginBtn").style.display  = "none";
-        $("logoutBtn").style.display = "inline-block";
-        $("refreshBtn").disabled = false;
-        loadNews();
-        startVenditeSync(user);
-      } else {
-        $("userPill").textContent = "🔒 Non autenticato";
+        $("userPill").style.borderColor="rgba(34,197,94,.5)";
+        $("userPill").style.background="rgba(34,197,94,.1)";
+        $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";$("refreshBtn").disabled=false;
+        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);
+      }else{
+        $("userPill").textContent="🔒 Non autenticato";
         $("userPill").classList.add("muted");
-        $("userPill").style.borderColor = "";
-        $("userPill").style.background  = "";
-        $("loginBtn").style.display  = "inline-block";
-        $("logoutBtn").style.display = "none";
-        $("refreshBtn").disabled = true;
-        $("newsList").innerHTML = "";
-        setStatus("🔒 Effettua il login per caricare le news.");
-        stopVenditeSync();
+        $("userPill").style.borderColor="";$("userPill").style.background="";
+        $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";$("refreshBtn").disabled=true;
+        $("newsList").innerHTML="";setStatus("🔒 Effettua il login per caricare le news.");
+        stopPlannerSync();stopVenditeSync();
       }
     });
 
-    /* ══════════════════════════════════════════
-       CHATBOT
-    ══════════════════════════════════════════ */
-    let chatHistory = [];
-    let isMinimized = false;
+    /* ══ CHATBOT ══ */
+    let chatHistory=[],isMinimized=false;
+    const chatTrigger=$("chatTrigger"),chatBox=$("chatBox"),chatMessages=$("chatMessages"),chatInputField=$("chatInputField"),chatSendBtn=$("chatSendBtn");
+    chatTrigger.addEventListener("click",()=>{chatBox.classList.add("open");chatBox.classList.remove("minimized");chatTrigger.style.display="none";$("chatMinimizedLogo").style.display="none";chatInputField.focus()});
+    $("minimizeBtn").addEventListener("click",()=>{chatBox.classList.add("minimized");isMinimized=true;$("chatMinimizedLogo").style.display="block"});
+    $("closeBtn").addEventListener("click",()=>{chatBox.classList.remove("open","minimized");chatTrigger.style.display="flex"});
+    chatBox.querySelector(".chatHeader").addEventListener("click",e=>{if(isMinimized&&!e.target.closest("button")){chatBox.classList.remove("minimized");isMinimized=false;$("chatMinimizedLogo").style.display="none"}});
+    $("chatMinimizedLogo").addEventListener("click",()=>{chatBox.classList.remove("minimized");isMinimized=false;$("chatMinimizedLogo").style.display="none";chatInputField.focus()});
 
-    const chatTrigger    = $("chatTrigger");
-    const chatBox        = $("chatBox");
-    const chatMessages   = $("chatMessages");
-    const chatInputField = $("chatInputField");
-    const chatSendBtn    = $("chatSendBtn");
-    const minimizeBtn    = $("minimizeBtn");
-    const closeBtn       = $("closeBtn");
-
-    chatTrigger.addEventListener("click", () => {
-      chatBox.classList.add("open");
-      chatBox.classList.remove("minimized");
-      chatTrigger.style.display = "none";
-      $("chatMinimizedLogo").style.display = "none";
-      chatInputField.focus();
-    });
-    minimizeBtn.addEventListener("click", () => {
-      chatBox.classList.add("minimized");
-      isMinimized = true;
-      $("chatMinimizedLogo").style.display = "block";
-    });
-    closeBtn.addEventListener("click", () => {
-      chatBox.classList.remove("open","minimized");
-      chatTrigger.style.display = "flex";
-    });
-    chatBox.querySelector(".chatHeader").addEventListener("click", e => {
-      if (isMinimized && !e.target.closest("button")){
-        chatBox.classList.remove("minimized");
-        isMinimized = false;
-        $("chatMinimizedLogo").style.display = "none";
-      }
-    });
-    $("chatMinimizedLogo").addEventListener("click", () => {
-      chatBox.classList.remove("minimized");
-      isMinimized = false;
-      $("chatMinimizedLogo").style.display = "none";
-      chatInputField.focus();
-    });
-
-    function addMessage(text, sender){
-      const div = document.createElement("div");
-      div.className = `message ${sender}`;
-      const content = sender === "ai" ? text : escapeHtml(text);
-      div.innerHTML = `<div class="messageBubble">${content}</div>`;
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+    function addMessage(text,sender){
+      const div=document.createElement("div");div.className=`message ${sender}`;
+      div.innerHTML=`<div class="messageBubble">${sender==="ai"?text:escapeHtml(text)}</div>`;
+      chatMessages.appendChild(div);chatMessages.scrollTop=chatMessages.scrollHeight;
     }
-    function showTyping(){
-      const d = document.createElement("div");
-      d.className = "message ai"; d.id = "typingIndicator";
-      d.innerHTML = `<div class="typingIndicator"><div class="typingDot"></div><div class="typingDot"></div><div class="typingDot"></div></div>`;
-      chatMessages.appendChild(d);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-    function hideTyping(){ const t = $("typingIndicator"); if(t) t.remove(); }
+    function showTyping(){const d=document.createElement("div");d.className="message ai";d.id="typingIndicator";d.innerHTML='<div class="typingIndicator"><div class="typingDot"></div><div class="typingDot"></div><div class="typingDot"></div></div>';chatMessages.appendChild(d);chatMessages.scrollTop=chatMessages.scrollHeight}
+    function hideTyping(){const t=$("typingIndicator");if(t)t.remove()}
 
     function needsSearch(text){
-      const kw = [
-        'prezzo','costo','quanto costa','listino','allestimento','versione','dotazione',
-        'equipaggiamento','optional','serie','motore','motorizzazione','cavalli','cv','kw',
-        'consumi','autonomia','emissioni','dimensioni','bagagliaio','colori','tinta',
-        'caratteristiche','scheda tecnica','confronto','differenza','meglio','vs',
-        'ibrida','elettrica','plug-in','mild hybrid','diesel','benzina','gpl','metano',
-        'trazione','integrale','4x4','cambio','automatico','manuale',
-        'garanzia','manutenzione','tagliando',
-        'panda','punto','500','tipo','ducato',
-        'renegade','compass','wrangler','cherokee','avenger',
-        'giulia','stelvio','tonale','giulietta','ypsilon','delta',
-        'usato','usata','usati','usate','seconda mano','km zero',
-        'centroauto','occasione','pronta consegna',
-        'ford','kia','lancia','land rover','man','mazda','mg','opel','peugeot',
-        'renault','seat','smart','suzuki','volkswagen','audi','bmw','mercedes',
-        'volvo','toyota','honda','nissan','hyundai','citroen','dacia','skoda','mini',
-        'focus','fiesta','kuga','sportage','picanto','defender','discovery',
-        'corsa','astra','mokka','208','308','2008','3008','clio','captur','megane',
-        'ibiza','leon','vitara','swift','golf','polo','tiguan'
-      ];
-      const low = text.toLowerCase();
-      return kw.some(k => low.includes(k));
+      const kw=['prezzo','costo','listino','allestimento','versione','dotazione','optional','motore','cavalli','cv','kw','consumi','autonomia','dimensioni','bagagliaio','colori','confronto','differenza','meglio','vs','ibrida','elettrica','plug-in','diesel','benzina','gpl','trazione','integrale','cambio','automatico','garanzia','manutenzione','panda','punto','500','tipo','ducato','renegade','compass','wrangler','cherokee','avenger','giulia','stelvio','tonale','giulietta','ypsilon','delta','usato','usata','usati','usate','seconda mano','km zero','centroauto','occasione','ford','kia','lancia','land rover','man','mazda','mg','opel','peugeot','renault','seat','smart','suzuki','volkswagen','audi','bmw','mercedes','volvo','toyota','honda','nissan','hyundai','citroen','dacia','skoda','mini','focus','fiesta','kuga','sportage','picanto','defender','corsa','astra','mokka','208','308','2008','clio','captur','megane','ibiza','leon','vitara','swift','golf','polo','tiguan'];
+      const low=text.toLowerCase();return kw.some(k=>low.includes(k));
     }
-
     async function searchCarInfo(query){
-      try {
-        const low = query.toLowerCase();
-        const usedBrands = ['ford','jeep','kia','lancia','land rover','man','mazda','mg',
-          'opel','peugeot','renault','seat','smart','suzuki','volkswagen','audi','bmw',
-          'mercedes','volvo','toyota','honda','nissan','hyundai','citroen','dacia','skoda','mini'];
-        const isUsed = ['usato','usata','usati','usate','seconda mano','km zero','centroauto','occasione']
-          .some(k => low.includes(k)) || usedBrands.some(b => low.includes(b));
-
-        let enhancedQuery, allowedDomains;
-        if (isUsed){
-          const mb = usedBrands.find(b => low.includes(b));
-          enhancedQuery = `${mb?mb+" ":""}${query} site:centroautovt.it/ricerca-auto/usate`;
-          allowedDomains = ['centroautovt.it'];
-        } else {
-          enhancedQuery = `${query} allestimenti versioni site:fiat.it OR site:jeep-official.it OR site:alfaromeo.it OR site:lancia.it`;
-          allowedDomains = ['fiat.it','jeep-official.it','alfaromeo.it','lancia.it'];
-        }
-        const r = await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(enhancedQuery)}`);
-        if (!r.ok) throw new Error("Errore ricerca");
-        const data = await r.json();
-        if (data.results && data.results.length){
-          const valid = data.results.filter(r => allowedDomains.some(d => r.url.toLowerCase().includes(d)));
-          if (!valid.length) return null;
-          if (isUsed) return valid.slice(0,6).map(r => `🚗 ${r.title}\n${r.description}\n🔗 ${r.url}`).join("\n\n────────────────\n\n");
-          return valid.slice(0,3).map(r => {
-            const b = r.url.includes('fiat')?'Fiat':r.url.includes('jeep')?'Jeep':r.url.includes('alfa')?'Alfa Romeo':'Lancia';
-            return `━━━ ${b.toUpperCase()} ━━━\n${r.title}\n\n${r.description}\n\n🔗 ${r.url}`;
-          }).join("\n\n");
+      try{
+        const low=query.toLowerCase();
+        const usedBrands=['ford','jeep','kia','lancia','land rover','man','mazda','mg','opel','peugeot','renault','seat','smart','suzuki','volkswagen','audi','bmw','mercedes','volvo','toyota','honda','nissan','hyundai','citroen','dacia','skoda','mini'];
+        const isUsed=['usato','usata','usati','usate','seconda mano','km zero','centroauto','occasione'].some(k=>low.includes(k))||usedBrands.some(b=>low.includes(b));
+        let eQ,aD;
+        if(isUsed){const mb=usedBrands.find(b=>low.includes(b));eQ=`${mb?mb+" ":""}${query} site:centroautovt.it/ricerca-auto/usate`;aD=['centroautovt.it']}
+        else{eQ=`${query} allestimenti versioni site:fiat.it OR site:jeep-official.it OR site:alfaromeo.it OR site:lancia.it`;aD=['fiat.it','jeep-official.it','alfaromeo.it','lancia.it']}
+        const r=await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(eQ)}`);
+        if(!r.ok)throw new Error();
+        const data=await r.json();
+        if(data.results?.length){
+          const valid=data.results.filter(r=>aD.some(d=>r.url.toLowerCase().includes(d)));
+          if(!valid.length)return null;
+          if(isUsed)return valid.slice(0,6).map(r=>`🚗 ${r.title}\n${r.description}\n🔗 ${r.url}`).join("\n\n────────────────\n\n");
+          return valid.slice(0,3).map(r=>{const b=r.url.includes('fiat')?'Fiat':r.url.includes('jeep')?'Jeep':r.url.includes('alfa')?'Alfa Romeo':'Lancia';return`━━━ ${b.toUpperCase()} ━━━\n${r.title}\n\n${r.description}\n\n🔗 ${r.url}`}).join("\n\n");
         }
         return null;
-      } catch { return null; }
+      }catch{return null}
     }
-
-    const SYSTEM_PROMPT = `Sei un assistente esperto di auto NUOVE e USATE.
-AUTO NUOVE: Fiat, Jeep, Alfa Romeo, Lancia (configuratori ufficiali)
-AUTO USATE: CentroAuto VT (https://www.centroautovt.it/)
-📋 Risposte SCHEMATICHE e CONCISE (max 10 righe), usa elenchi puntati, solo INFO ESSENZIALI.
-⚠️ NO informazioni generiche, SÌ a dati concreti e verificabili.`;
+    const SYSTEM_PROMPT=`Sei un assistente esperto di auto NUOVE e USATE. AUTO NUOVE: Fiat, Jeep, Alfa Romeo, Lancia. AUTO USATE: CentroAuto VT. Risposte SCHEMATICHE e CONCISE (max 10 righe), usa elenchi puntati, solo dati concreti e verificabili.`;
 
     async function sendMessage(){
-      const msg = chatInputField.value.trim();
-      if (!msg) return;
-      addMessage(msg, "user");
-      chatInputField.value = "";
-      chatSendBtn.disabled = true;
-      chatHistory.push({ role:"user", content:msg });
-      showTyping();
-      try {
-        let searchResults = needsSearch(msg) ? await searchCarInfo(msg) : null;
-        const messages = [{ role:"system", content:SYSTEM_PROMPT }, ...chatHistory];
-        if (searchResults) messages.push({ role:"system", content:`DATI UFFICIALI:\n\n${searchResults}\n\nRispondi usando SOLO questi dati in formato schematico.` });
-        const r = await fetch(BACKEND_CHAT, {
-          method:"POST", headers:{"Content-Type":"application/json"},
-          body: JSON.stringify({ messages })
-        });
-        if (!r.ok) throw new Error(`Errore ${r.status}`);
-        const data = await r.json();
-        hideTyping();
-        let ai = data.choices?.[0]?.message?.content || "Scusa, non ho capito.";
-        ai = ai.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-        addMessage(ai, "ai");
-        chatHistory.push({ role:"assistant", content:ai });
-      } catch(err){
-        hideTyping();
-        addMessage("❌ Errore di connessione. Riprova tra poco.", "ai");
-      } finally {
-        chatSendBtn.disabled = false;
-        chatInputField.focus();
-      }
+      const msg=chatInputField.value.trim();if(!msg)return;
+      addMessage(msg,"user");chatInputField.value="";chatSendBtn.disabled=true;
+      chatHistory.push({role:"user",content:msg});showTyping();
+      try{
+        const sr=needsSearch(msg)?await searchCarInfo(msg):null;
+        const messages=[{role:"system",content:SYSTEM_PROMPT},...chatHistory];
+        if(sr)messages.push({role:"system",content:`DATI UFFICIALI:\n\n${sr}\n\nRispondi usando SOLO questi dati in formato schematico.`});
+        const r=await fetch(BACKEND_CHAT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages})});
+        if(!r.ok)throw new Error();
+        const data=await r.json();hideTyping();
+        let ai=data.choices?.[0]?.message?.content||"Scusa, non ho capito.";
+        ai=ai.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+        addMessage(ai,"ai");chatHistory.push({role:"assistant",content:ai});
+      }catch{hideTyping();addMessage("❌ Errore di connessione. Riprova tra poco.","ai")}
+      finally{chatSendBtn.disabled=false;chatInputField.focus()}
     }
-
-    chatSendBtn.addEventListener("click", sendMessage);
-    chatInputField.addEventListener("keypress", e => {
-      if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); sendMessage(); }
-    });
+    chatSendBtn.addEventListener("click",sendMessage);
+    chatInputField.addEventListener("keypress",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});
   </script>
 </body>
 </html>
