@@ -28,15 +28,15 @@
       transition:transform .3s cubic-bezier(.4,0,.2,1);
     }
     header.header-hidden{transform:translateY(-110%)}
-    body{padding-top:84px}
-    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    body{padding-top:56px}
+    .wrap{max-width:1200px;margin:0 auto;padding:8px 16px}
+    .brand{display:flex;gap:10px;align-items:center;flex-wrap:wrap;min-width:unset}
+    .brandLogo{width:36px;height:36px;object-fit:contain;background:transparent;border:none;outline:none;filter:none;mix-blend-mode:screen}
+    .brandName{font-weight:950;letter-spacing:.2px;font-size:16px;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+    .brandSub{opacity:.75;white-space:nowrap;font-size:12px}
     .row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .brand{display:flex;gap:12px;align-items:center;flex-wrap:wrap;min-width:320px}
-    .brandMark{display:flex;align-items:center;gap:10px;user-select:none}
-    .brandLogo{width:4cm;height:4cm;object-fit:contain;background:transparent;border:none;outline:none;filter:none;mix-blend-mode:screen}
-    .brandName{font-weight:950;letter-spacing:.2px;font-size:18px;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
-    .brandSub{opacity:.75;white-space:nowrap}
-    .btn{border:1px solid var(--line);background:rgba(17,24,39,.75);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-size:14px;transition:all .2s;font-weight:650}
+    .brandMark{display:flex;align-items:center;gap:8px;user-select:none}
+    .btn{border:1px solid var(--line);background:rgba(17,24,39,.75);color:var(--text);padding:7px 12px;border-radius:10px;cursor:pointer;font-size:13px;transition:all .2s;font-weight:650}
     .btn:hover{border-color:rgba(59,130,246,.6);background:rgba(17,24,39,.92);transform:translateY(-1px)}
     .btn.primary{border-color:rgba(59,130,246,.55);background:rgba(37,99,235,.16)}
     .btn.primary:hover{background:rgba(37,99,235,.26)}
@@ -45,10 +45,10 @@
     .btn.brand-jeep:hover{border-color:rgba(34,197,94,.6);background:rgba(34,197,94,.1)}
     .btn.brand-alfa:hover{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)}
     .btn.brand-lancia:hover{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.1)}
-    .centroAutoLink{display:inline-flex;align-items:center;padding:6px 12px;border:2px solid rgba(34,197,94,.4);background:rgba(34,197,94,.08);border-radius:12px;transition:all .3s;text-decoration:none;box-shadow:0 2px 8px rgba(34,197,94,.15)}
+    .centroAutoLink{display:inline-flex;align-items:center;padding:4px 10px;border:2px solid rgba(34,197,94,.4);background:rgba(34,197,94,.08);border-radius:10px;transition:all .3s;text-decoration:none;box-shadow:0 2px 8px rgba(34,197,94,.15)}
     .centroAutoLink:hover{border-color:rgba(34,197,94,.7);background:rgba(34,197,94,.18);transform:translateY(-2px);box-shadow:0 4px 16px rgba(34,197,94,.3)}
-    .centroAutoLogo{height:42px;width:auto;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.2))}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(17,24,39,.35);font-size:12px;white-space:nowrap}
+    .centroAutoLogo{height:32px;width:auto;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.2))}
+    .pill{padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(17,24,39,.35);font-size:12px;white-space:nowrap}
     .muted{color:var(--muted)}
 
     /* LAYOUT */
