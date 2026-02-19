@@ -208,6 +208,50 @@
     .progressManca{color:var(--muted)}
     .progressManca.done{color:#c084fc;font-weight:700}
 
+    /* ══ COLPI DI TELEFONO ══ */
+    #telefonoPanel .widgetHeader{background:linear-gradient(180deg,rgba(168,85,247,.09),rgba(10,12,18,.35) 70%)}
+    .telFormRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+    .telInput{flex:1;min-width:120px;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:10px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
+    .telInput:focus{border-color:#a855f7}
+    .telInput::placeholder{color:var(--muted)}
+    /* Segmented stato */
+    .telSeg{display:inline-flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:999px;overflow:hidden;flex-shrink:0}
+    .telBtn{border:none;background:transparent;color:var(--muted);padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;white-space:nowrap}
+    .telBtn.caldo.active {background:rgba(239,68,68,.25);color:#fca5a5}
+    .telBtn.tiepido.active{background:rgba(251,191,36,.2);color:#fde68a}
+    .telBtn.freddo.active {background:rgba(59,130,246,.2);color:#93c5fd}
+    .telBtn:hover{opacity:.8}
+    /* Quando aggiungere */
+    .telWhenSeg{display:inline-flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:999px;overflow:hidden;flex-shrink:0}
+    .telWhenBtn{border:none;background:transparent;color:var(--muted);padding:8px 10px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;white-space:nowrap}
+    .telWhenBtn.active{background:rgba(168,85,247,.22);color:#d8b4fe}
+    /* Lista contatti */
+    .telList{display:grid;gap:8px;max-height:360px;overflow-y:auto}
+    .telList::-webkit-scrollbar{width:6px}
+    .telList::-webkit-scrollbar-thumb{background:rgba(168,85,247,.25);border-radius:999px}
+    .telCard{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid rgba(31,41,55,.7);border-radius:12px;background:rgba(17,24,39,.35);animation:itemIn .2s ease;transition:border-color .2s}
+    .telCard.caldo {border-left:3px solid rgba(239,68,68,.7)}
+    .telCard.tiepido{border-left:3px solid rgba(251,191,36,.7)}
+    .telCard.freddo {border-left:3px solid rgba(59,130,246,.7)}
+    .telCard.chiamato{opacity:.5}
+    .telCardMain{flex:1;min-width:0}
+    .telCardName{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .telCardName.chiamato{text-decoration:line-through}
+    .telCardMeta{display:flex;gap:8px;align-items:center;margin-top:3px;flex-wrap:wrap}
+    .telCardModello{font-size:12px;color:var(--muted)}
+    .telStatoBadge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
+    .telStatoBadge.caldo {background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.35);color:#fca5a5}
+    .telStatoBadge.tiepido{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.35);color:#fde68a}
+    .telStatoBadge.freddo {background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.35);color:#93c5fd}
+    .telWhenBadge{font-size:11px;color:var(--muted)}
+    .telCardActions{display:flex;gap:6px;flex-shrink:0}
+    .telDoneBtn{font-size:16px;cursor:pointer;background:none;border:none;line-height:1;opacity:.7;transition:opacity .2s}
+    .telDoneBtn:hover{opacity:1}
+    /* Sezione quando */
+    .telSection{margin-top:14px}
+    .telSectionLabel{font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding:0 2px;display:flex;align-items:center;gap:6px}
+    .telEmpty{font-size:12px;color:var(--muted);font-style:italic;padding:6px 2px}
+
     /* CHATBOT */
     .chatTrigger{position:fixed;bottom:24px;right:24px;width:70px;height:70px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:all .3s;z-index:1000}
     .chatTrigger:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(0,0,0,.5)}
@@ -493,7 +537,59 @@
               <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
             </div>
           </div>
-        </div>
+
+          <!-- COLPI DI TELEFONO -->
+          <div class="widgetPanel" id="telefonoPanel">
+            <div class="widgetHeader">
+              <div>
+                <div class="widgetTitle">📞 Colpi di telefono</div>
+                <div class="widgetSub">Chi spingere oggi, domani, prossima settimana. Niente dati sensibili.</div>
+              </div>
+              <button id="telClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci chiamati</button>
+            </div>
+            <div class="widgetBody">
+
+              <!-- Form aggiungi -->
+              <div class="telFormRow">
+                <input id="telNome"    class="telInput" type="text"   placeholder="Nome (es: Marco R.)"/>
+                <input id="telModello" class="telInput" type="text"   placeholder="Modello interesse" style="max-width:160px"/>
+                <div class="telSeg">
+                  <button class="telBtn caldo  active" id="telBtnCaldo"  >🔥 Caldo</button>
+                  <button class="telBtn tiepido"       id="telBtnTiepido">🌡 Tiepido</button>
+                  <button class="telBtn freddo"        id="telBtnFreddo" >❄ Freddo</button>
+                </div>
+              </div>
+              <div class="telFormRow">
+                <div class="telWhenSeg">
+                  <button class="telWhenBtn active" id="telWhenOggi">📅 Oggi</button>
+                  <button class="telWhenBtn"        id="telWhenDomani">Domani</button>
+                  <button class="telWhenBtn"        id="telWhenSettimana">Settimana</button>
+                </div>
+                <button id="telAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
+              </div>
+
+              <!-- Oggi -->
+              <div class="telSection">
+                <div class="telSectionLabel">📅 Da chiamare oggi <span id="telCntOggi" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
+                <div id="telListOggi" class="telList"></div>
+              </div>
+
+              <!-- Domani -->
+              <div class="telSection">
+                <div class="telSectionLabel">🌅 Domani <span id="telCntDomani" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
+                <div id="telListDomani" class="telList"></div>
+              </div>
+
+              <!-- Settimana -->
+              <div class="telSection">
+                <div class="telSectionLabel">📆 Prossima settimana <span id="telCntSettimana" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
+                <div id="telListSettimana" class="telList"></div>
+              </div>
+
+            </div>
+          </div>
+
+        </div><!-- /widgetStack -->
 
       </section>
     </div>
@@ -739,6 +835,111 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     $("memoInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("addMemoBtn").click()}});
     $("memoClearDoneBtn").addEventListener("click",()=>safeWrite(d=>{for(const[id,m]of Object.entries(d.memos)){if(m&&m.done)delete d.memos[id]}return d}));
 
+    /* ══ COLPI DI TELEFONO ══ */
+    let telState = { contatti: {} };
+    let telDocRef = null, telUnsub = null;
+    let telStato = "caldo", telWhen = "oggi";
+
+    function telUid(){ return Math.random().toString(16).slice(2)+Date.now().toString(16) }
+    function normalizeTel(d){ return { contatti: (d&&typeof d.contatti==="object"&&d.contatti) ? d.contatti : {} } }
+    async function telWrite(){ if(!telDocRef)return; try{ await setDoc(telDocRef, telState, {merge:false}) }catch{} }
+    async function telSafeWrite(fn){
+      if(!telDocRef)return;
+      const next = fn(JSON.parse(JSON.stringify(telState)));
+      telState = next; renderTelefono(); try{ await telWrite() }catch{}
+    }
+
+    const STATO_EMOJI = { caldo:"🔥 Caldo", tiepido:"🌡 Tiepido", freddo:"❄ Freddo" };
+    const WHEN_LABELS = { oggi:"oggi", domani:"domani", settimana:"settimana" };
+
+    function telCardHTML(c){
+      const sc = escapeHtml(c.stato||"freddo");
+      return `<div class="telCard ${sc}${c.chiamato?" chiamato":""}" data-id="${escapeHtml(c.id)}">
+        <div class="telCardMain">
+          <div class="telCardName${c.chiamato?" chiamato":""}">${escapeHtml(c.nome||"")}</div>
+          <div class="telCardMeta">
+            ${c.modello?`<span class="telCardModello">🚗 ${escapeHtml(c.modello)}</span>`:""}
+            <span class="telStatoBadge ${sc}">${STATO_EMOJI[c.stato]||c.stato}</span>
+          </div>
+        </div>
+        <div class="telCardActions">
+          <button class="iconBtn telChiamato" title="${c.chiamato?"Riattiva":"Segna chiamato"}" style="font-size:15px;">${c.chiamato?"↩":"✅"}</button>
+          <button class="iconBtn telDel" title="Elimina" style="font-size:14px;font-weight:900;">×</button>
+        </div>
+      </div>`;
+    }
+
+    function renderTelefono(){
+      if(!auth.currentUser){
+        ["telListOggi","telListDomani","telListSettimana"].forEach(id=>{
+          const el=$(id); if(el) el.innerHTML='<div class="telEmpty">Login richiesto.</div>';
+        });
+        return;
+      }
+      const all = Object.values(telState.contatti||{});
+      const groups = { oggi: [], domani: [], settimana: [] };
+      all.forEach(c=>{ if(groups[c.quando]) groups[c.quando].push(c) });
+      // Ordina: prima non chiamati, poi per stato (caldo>tiepido>freddo), poi per data
+      const statoOrd = { caldo:0, tiepido:1, freddo:2 };
+      const sort = arr => arr.sort((a,b)=> (Number(a.chiamato)-Number(b.chiamato)) || (statoOrd[a.stato]||2)-(statoOrd[b.stato]||2) || ((a.createdAt||0)-(b.createdAt||0)));
+
+      ["oggi","domani","settimana"].forEach(w=>{
+        const el = $("telList"+w.charAt(0).toUpperCase()+w.slice(1));
+        const cnt = $("telCnt"+w.charAt(0).toUpperCase()+w.slice(1));
+        const items = sort(groups[w]);
+        const attivi = items.filter(c=>!c.chiamato).length;
+        if(cnt) cnt.textContent = attivi;
+        if(!items.length){ el.innerHTML='<div class="telEmpty">Nessuno.</div>'; return; }
+        el.innerHTML = items.map(telCardHTML).join("");
+      });
+
+      // Bind eventi
+      document.querySelectorAll("#telefonoPanel .telCard").forEach(card=>{
+        const id = card.getAttribute("data-id");
+        card.querySelector(".telChiamato")?.addEventListener("click",()=>telSafeWrite(d=>{ if(d.contatti[id]) d.contatti[id].chiamato=!d.contatti[id].chiamato; return d }));
+        card.querySelector(".telDel")?.addEventListener("click",()=>telSafeWrite(d=>{ delete d.contatti[id]; return d }));
+      });
+    }
+
+    // Toggle stato
+    ["Caldo","Tiepido","Freddo"].forEach(s=>{
+      $("telBtn"+s).addEventListener("click",()=>{
+        telStato = s.toLowerCase();
+        ["Caldo","Tiepido","Freddo"].forEach(x=>$("telBtn"+x).classList.toggle("active", x===s));
+      });
+    });
+    // Toggle quando
+    ["Oggi","Domani","Settimana"].forEach(w=>{
+      $("telWhen"+w).addEventListener("click",()=>{
+        telWhen = w.toLowerCase();
+        ["Oggi","Domani","Settimana"].forEach(x=>$("telWhen"+x).classList.toggle("active", x===w));
+      });
+    });
+
+    $("telAddBtn").addEventListener("click",()=>{
+      const nome = $("telNome").value.trim(); if(!nome) return;
+      const modello = $("telModello").value.trim();
+      const id = telUid();
+      telSafeWrite(d=>{ d.contatti[id]={id, nome, modello, stato:telStato, quando:telWhen, chiamato:false, createdAt:Date.now()}; return d });
+      $("telNome").value=""; $("telModello").value="";
+    });
+    $("telNome").addEventListener("keypress", e=>{ if(e.key==="Enter"){e.preventDefault(); $("telAddBtn").click()} });
+    $("telClearDoneBtn").addEventListener("click",()=>telSafeWrite(d=>{ for(const[id,c]of Object.entries(d.contatti)){if(c?.chiamato)delete d.contatti[id]} return d }));
+
+    function startTelSync(user){
+      if(telUnsub){try{telUnsub()}catch{}}
+      telDocRef = doc(db, "users", user.uid, "telefono", "data");
+      telUnsub = onSnapshot(telDocRef, snap=>{
+        telState = normalizeTel(snap.exists()?snap.data():null);
+        renderTelefono();
+        if(!snap.exists()) setDoc(telDocRef, telState, {merge:false}).catch(()=>{});
+      }, ()=>renderTelefono());
+    }
+    function stopTelSync(){
+      if(telUnsub){try{telUnsub()}catch{}}
+      telUnsub=null; telDocRef=null; telState={contatti:{}}; renderTelefono();
+    }
+
     function startPlannerSync(user){
       stopPlannerSync();
       SYNC.docRef=doc(db,"users",user.uid,"planner","main");
@@ -891,14 +1092,14 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
         $("userPill").style.borderColor="rgba(34,197,94,.5)";
         $("userPill").style.background="rgba(34,197,94,.1)";
         $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";$("refreshBtn").disabled=false;
-        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);
+        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);
       }else{
         $("userPill").textContent="🔒 Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor="";$("userPill").style.background="";
         $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";$("refreshBtn").disabled=true;
         $("newsList").innerHTML="";setStatus("🔒 Effettua il login per caricare le news.");
-        stopPlannerSync();stopVenditeSync();
+        stopPlannerSync();stopVenditeSync();stopTelSync();
       }
     });
 
