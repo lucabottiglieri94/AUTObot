@@ -921,57 +921,188 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     }
 
     /* ══ COMPARATORE ══ */
-    const COMPARATORE_SYSTEM=`Sei un esperto di auto nuove (Fiat, Jeep, Alfa Romeo, Lancia).
-Quando confronti due modelli usa questo formato:
+
+    // Mappa modello → URL scheda ufficiale (pagine statiche, non configuratore SPA)
+    const MODELLO_URLS = {
+      // FIAT
+      "grande panda":  ["https://www.fiat.it/grande-panda.html","https://www.fiat.it/fiat-grande-panda"],
+      "panda":         ["https://www.fiat.it/panda.html","https://www.fiat.it/fiat-panda"],
+      "500":           ["https://www.fiat.it/500.html","https://www.fiat.it/fiat-500"],
+      "500x":          ["https://www.fiat.it/500x.html"],
+      "500e":          ["https://www.fiat.it/500-electric.html"],
+      "tipo":          ["https://www.fiat.it/tipo.html"],
+      "ducato":        ["https://www.fiat.it/ducato.html"],
+      // JEEP
+      "avenger":       ["https://www.jeep-official.it/veicoli/jeep-avenger.html","https://www.jeep-official.it/jeep-avenger"],
+      "renegade":      ["https://www.jeep-official.it/veicoli/jeep-renegade.html","https://www.jeep-official.it/jeep-renegade"],
+      "compass":       ["https://www.jeep-official.it/veicoli/jeep-compass.html","https://www.jeep-official.it/jeep-compass"],
+      "wrangler":      ["https://www.jeep-official.it/veicoli/jeep-wrangler.html"],
+      "gladiator":     ["https://www.jeep-official.it/veicoli/jeep-gladiator.html"],
+      "grand cherokee":["https://www.jeep-official.it/veicoli/jeep-grand-cherokee.html"],
+      // ALFA ROMEO
+      "junior":        ["https://www.alfaromeo.it/junior.html","https://www.alfaromeo.it/alfa-junior"],
+      "tonale":        ["https://www.alfaromeo.it/tonale.html","https://www.alfaromeo.it/alfa-romeo-tonale"],
+      "stelvio":       ["https://www.alfaromeo.it/stelvio.html","https://www.alfaromeo.it/alfa-romeo-stelvio"],
+      "giulia":        ["https://www.alfaromeo.it/giulia.html","https://www.alfaromeo.it/alfa-romeo-giulia"],
+      "giulietta":     ["https://www.alfaromeo.it/giulietta.html"],
+      // LANCIA
+      "ypsilon":       ["https://www.lancia.it/ypsilon.html","https://www.lancia.it/nuova-ypsilon"],
+      "delta":         ["https://www.lancia.it/delta.html"],
+    };
+
+    // Trova URL per un modello
+    function getModelUrls(modelName){
+      const low=modelName.toLowerCase().trim();
+      // match esatto
+      if(MODELLO_URLS[low]) return MODELLO_URLS[low];
+      // match parziale
+      for(const[key,urls] of Object.entries(MODELLO_URLS)){
+        if(low.includes(key)||key.includes(low)) return urls;
+      }
+      return [];
+    }
+
+    // Determina marca di un modello
+    function getMarca(modelName){
+      const low=modelName.toLowerCase();
+      const fiat=["grande panda","panda","500","tipo","ducato"];
+      const jeep=["avenger","renegade","compass","wrangler","gladiator","grand cherokee","cherokee"];
+      const alfa=["junior","tonale","stelvio","giulia","giulietta"];
+      const lancia=["ypsilon","delta"];
+      if(fiat.some(m=>low.includes(m))) return "Fiat";
+      if(jeep.some(m=>low.includes(m))) return "Jeep";
+      if(alfa.some(m=>low.includes(m))) return "Alfa Romeo";
+      if(lancia.some(m=>low.includes(m))) return "Lancia";
+      return null;
+    }
+
+    // Fetch contenuto da un URL tramite backend search (usa come proxy)
+    async function fetchModelPage(modelName){
+      const urls = getModelUrls(modelName);
+      // Prima prova: fetch diretto sulle URL ufficiali
+      for(const url of urls){
+        try{
+          const r=await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent("site:"+new URL(url).hostname+" "+modelName+" allestimenti versioni motori prezzo dotazioni")}`);
+          if(!r.ok) continue;
+          const d=await r.json();
+          if(d.results?.length){
+            const host=new URL(url).hostname;
+            const valid=d.results.filter(res=>res.url&&res.url.includes(host));
+            if(valid.length){
+              return valid.slice(0,3).map(res=>`[${res.title}]\n${res.description}\nFonte: ${res.url}`).join("\n---\n");
+            }
+          }
+        }catch{}
+      }
+      // Seconda prova: ricerca Google senza site:
+      try{
+        const marca=getMarca(modelName)||"";
+        const q=`${marca} ${modelName} allestimenti versioni motori prezzo dotazioni 2024 2025`;
+        const r=await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(q)}`);
+        if(r.ok){
+          const d=await r.json();
+          if(d.results?.length){
+            return "[Fonte: ricerca web]\n"+d.results.slice(0,4).map(res=>`[${res.title}]\n${res.description}\nFonte: ${res.url}`).join("\n---\n");
+          }
+        }
+      }catch{}
+      return null;
+    }
+
+    function setLoadingStatus(msg){
+      $("cmpResults").innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:20px;color:#60a5fa;font-size:13px;">🔍 ${escapeHtml(msg)}</div>`;
+    }
+
+    const COMPARATORE_SYSTEM=`Sei un esperto di auto nuove italiane (Fiat, Jeep, Alfa Romeo, Lancia).
+Ti vengono forniti dati reali estratti dai siti ufficiali o dal web.
+Usa SOLO i dati forniti. Se un dato non è presente nelle fonti, scrivi "dato non disponibile".
+Non inventare prezzi o dotazioni.
+
+Usa SEMPRE questo formato di risposta:
 
 ⚔ CONFRONTO: [MODELLO1] vs [MODELLO2]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🔵 [MODELLO1]
-• Punto forza 1
-• Punto forza 2
-💰 Prezzo da: €XX.XXX
-⚙ Motori: [lista]
+• [punto forza basato sui dati]
+• [punto forza basato sui dati]
+• [punto forza basato sui dati]
+💰 Prezzo da: €XX.XXX (o "dato non disponibile")
+⚙ Motori: [lista da dati]
+📋 Allestimenti: [lista da dati]
 
 🟠 [MODELLO2]
-• Punto forza 1
-• Punto forza 2
-💰 Prezzo da: €XX.XXX
-⚙ Motori: [lista]
+• [punto forza basato sui dati]
+• [punto forza basato sui dati]
+• [punto forza basato sui dati]
+💰 Prezzo da: €XX.XXX (o "dato non disponibile")
+⚙ Motori: [lista da dati]
+📋 Allestimenti: [lista da dati]
 
 📊 DIFFERENZE CHIAVE:
-• Dimensioni: [chi è più grande]
-• Tecnologia: [chi ha più dotazioni]
+• Dimensioni: [da dati]
+• Motorizzazioni: [da dati]
+• Tecnologia/Dotazioni: [da dati]
+• Prezzo: [da dati]
 
-🏆 CONSIGLIO: [breve suggerimento]
-
-Solo questo schema, niente testo extra.`;
+🏆 CONSIGLIO: [max 2 righe basate sui dati]`;
 
     async function runComparatore(){
       const m1=$("cmpInput1").value.trim(),m2=$("cmpInput2").value.trim();
-      if(!m1||!m2){$("cmpResults").innerHTML='<div style="color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">⚠ Inserisci entrambi i modelli!</div>';return}
+      if(!m1||!m2){
+        $("cmpResults").innerHTML='<div style="color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">⚠ Inserisci entrambi i modelli!</div>';
+        return;
+      }
       const btn=$("cmpBtn");
       btn.disabled=true;btn.textContent="⏳ Ricerca...";
-      $("cmpResults").innerHTML='<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:30px 0;color:#60a5fa;font-size:14px;"><span>🔍 Ricerca in corso...</span></div>';
+
       try{
+        // Step 1: cerca info modello 1
+        setLoadingStatus(`Cerco info su ${m1}...`);
+        const data1=await fetchModelPage(m1);
+
+        // Step 2: cerca info modello 2
+        setLoadingStatus(`Cerco info su ${m2}...`);
+        const data2=await fetchModelPage(m2);
+
+        // Step 3: se entrambi vuoti → ultima spiaggia: ricerca combinata
         let searchContext="";
-        try{
-          const sq=`${m1} vs ${m2} allestimenti caratteristiche prezzo site:fiat.it OR site:jeep-official.it OR site:alfaromeo.it OR site:lancia.it`;
-          const sr=await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(sq)}`);
-          if(sr.ok){const sd=await sr.json();if(sd.results?.length){const allowed=['fiat.it','jeep-official.it','alfaromeo.it','lancia.it'];const valid=sd.results.filter(r=>allowed.some(d=>r.url.toLowerCase().includes(d)));if(valid.length)searchContext=valid.slice(0,4).map(r=>`${r.title}\n${r.description}\n${r.url}`).join("\n\n---\n\n")}}
-        }catch{}
+        if(data1) searchContext+=`=== DATI ${m1.toUpperCase()} ===\n${data1}\n\n`;
+        if(data2) searchContext+=`=== DATI ${m2.toUpperCase()} ===\n${data2}\n\n`;
+
+        if(!searchContext){
+          setLoadingStatus(`Ricerca alternativa su ${m1} vs ${m2}...`);
+          try{
+            const r=await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(m1+" "+m2+" confronto allestimenti prezzo motori 2025")}`);
+            if(r.ok){const d=await r.json();if(d.results?.length)searchContext=d.results.slice(0,5).map(res=>`[${res.title}]\n${res.description}`).join("\n---\n")}
+          }catch{}
+        }
+
+        setLoadingStatus("Elaboro il confronto...");
+
         const messages=[
           {role:"system",content:COMPARATORE_SYSTEM},
-          ...(searchContext?[{role:"system",content:`DATI DAI CONFIGURATORI UFFICIALI:\n\n${searchContext}`}]:[]),
-          {role:"user",content:`Confronta ${m1} vs ${m2}`}
+          {role:"system",content:searchContext
+            ?`DATI REALI TROVATI:\n\n${searchContext}\n\nUsa SOLO questi dati per il confronto. Non inventare nulla.`
+            :`Nessun dato specifico trovato online. Usa le tue conoscenze generali su ${m1} e ${m2} ma specifica chiaramente "dato da conoscenza generale" per ogni informazione.`
+          },
+          {role:"user",content:`Confronta ${m1} vs ${m2} seguendo esattamente il formato del sistema.`}
         ];
+
         const res=await fetch(BACKEND_CHAT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages})});
         if(!res.ok)throw new Error(`HTTP ${res.status}`);
-        const data=await res.json();
-        let ai=data.choices?.[0]?.message?.content||"Nessuna risposta.";
+        const d=await res.json();
+        let ai=d.choices?.[0]?.message?.content||"Nessuna risposta.";
         ai=ai.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-        $("cmpResults").innerHTML=`<div style="background:rgba(31,41,55,.35);border:1px solid rgba(31,41,55,.7);border-radius:12px;padding:14px 16px;white-space:pre-line;font-size:13px;line-height:1.65">${ai}</div>`;
+
+        const srcBadge=searchContext
+          ?`<div style="font-size:11px;color:#6ee7b7;margin-bottom:10px;padding:5px 10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;">✅ Dati da: configuratori ufficiali / web</div>`
+          :`<div style="font-size:11px;color:#fde68a;margin-bottom:10px;padding:5px 10px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;">⚠ Nessun dato online trovato — risposta basata su conoscenza generale</div>`;
+
+        $("cmpResults").innerHTML=`<div style="background:rgba(31,41,55,.35);border:1px solid rgba(31,41,55,.7);border-radius:12px;padding:14px 16px;">${srcBadge}<div style="white-space:pre-line;font-size:13px;line-height:1.7">${ai}</div></div>`;
+
       }catch(err){
-        $("cmpResults").innerHTML=`<div style="color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">❌ Errore di connessione. Riprova tra poco.</div>`;
+        $("cmpResults").innerHTML=`<div style="color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">❌ Errore: ${escapeHtml(err?.message||"connessione fallita")}. Riprova tra poco.</div>`;
       }finally{
         btn.disabled=false;btn.textContent="🔎 Confronta";
       }
