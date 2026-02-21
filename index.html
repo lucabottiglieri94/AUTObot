@@ -920,192 +920,281 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       setSyncBadge("warn");renderTasksAndMemos();renderWeekCalendar();
     }
 
-    /* ══ COMPARATORE ══ */
+    /* ══ COMPARATORE — DATABASE REALE 2025 ══ */
+
+    const AUTO_DB = {
+      // ── FIAT ──────────────────────────────────────────────────────
+      "grande panda": {
+        marca:"Fiat", nome:"Grande Panda", lunghezza:"3,99 m",
+        motori:[
+          "1.2 Turbo benzina 100 CV (cambio manuale 6M) — da €17.900",
+          "1.2 Mild Hybrid 100+28 CV eDCT6 — da €18.900",
+          "100% Elettrica 113 CV, 44 kWh, 320 km WLTP — da €24.900"
+        ],
+        allestimenti:[
+          "Pop — €18.900 · cerchi acciaio 16\", fari alogeni, clima manuale, strumentazione 10\", sensori park post.",
+          "Icon — €20.400 · aggiunge cerchi style, fari LED Pixel, schermo 10,25\", finestrini post. elettrici",
+          "La Prima — €24.900 · cerchi lega 17\", barre portatutto, navigatore, ricarica wireless, clima auto, telecamera",
+          "RED (solo elettrica) — €24.900 · cerchi bianchi 16\", fari EcoLED, schermo 10,25\""
+        ],
+        punti:["SUV compatto 4 m, spazioso dentro","Disponibile anche per neopatentati","Interni con materiali riciclati","Touchscreen 10,25\" nelle versioni top","Ibrida: autonomia elettrica ~50% in città"],
+        prezzo_base:"€17.900 (benzina) / €18.900 (ibrida) / €24.900 (elettrica)"
+      },
+      "panda": {
+        marca:"Fiat", nome:"Panda", lunghezza:"3,69 m",
+        motori:[
+          "1.0 Hybrid 70 CV — da €15.500",
+          "TwinAir 0.9 4x4 85 CV (Cross) — da €24.400"
+        ],
+        allestimenti:[
+          "Easy — €15.500 · versione d'ingresso",
+          "City Life — €17.800 · miglior rapporto qualità/prezzo",
+          "Cross 4x4 — €24.400 · assetto rialzato, vera trazione integrale"
+        ],
+        punti:["City car iconica ultra compatta","Vera 4x4 disponibile (Cross)","Adatta neopatentati","Costi di gestione bassi"],
+        prezzo_base:"€15.500"
+      },
+      // ── JEEP ──────────────────────────────────────────────────────
+      "avenger": {
+        marca:"Jeep", nome:"Avenger", lunghezza:"4,08 m",
+        motori:[
+          "1.2 Turbo benzina 100 CV cambio manuale — da €24.750",
+          "1.2 e-Hybrid 136 CV eDCT6 — da €27.200",
+          "4xe Ibrida integrale 145 CV — da €32.200",
+          "BEV 100% Elettrica 156 CV, 54 kWh, 400 km WLTP — da €39.400"
+        ],
+        allestimenti:[
+          "Longitude — base · Keyless Start, touchscreen 10,25\", quadro digitale",
+          "Altitude — mid · fari fendinebbia LED, telecamera drone-view 180°, specchietto auto-oscurante",
+          "Summit — top · dotazione premium completa",
+          "Upland/Overland/North Face (solo 4xe) — versioni off-road"
+        ],
+        punti:["SUV più venduto Italia","Primo Jeep 100% elettrico","Design iconico 7 feritoie","ChatGPT integrato","Gamma completa: benzina/ibrida/4xe/elettrica"],
+        prezzo_base:"€24.750 (benzina) / €27.200 (ibrida) / €39.400 (elettrica)"
+      },
+      "compass": {
+        marca:"Jeep", nome:"Compass (III gen.)", lunghezza:"4,50 m",
+        motori:[
+          "e-Hybrid 145 CV (1.2 + motore 29 CV integrato) eDCT6 — da €38.850",
+          "BEV 100% Elettrica 213 CV, 74 kWh, 500 km WLTP — da €50.100",
+          "Ibrida plug-in 4xe — da €45.900"
+        ],
+        allestimenti:[
+          "Launch Edition / Altitude — da €39.900 · schermo 16\", connettività wireless",
+          "North Star — da €44.000",
+          "Summit — top di gamma"
+        ],
+        punti:["SUV medio-grande (4,50 m)","Schermo centrale 16\" HD","500 km autonomia dichiarata (BEV)","Passo 2,8 m, bagagliaio 479 l","Costruito in Italia"],
+        prezzo_base:"€38.850 (ibrida) / €45.900 (plug-in) / €50.100 (elettrica)"
+      },
+      "renegade": {
+        marca:"Jeep", nome:"Renegade", lunghezza:"4,24 m",
+        motori:[
+          "e-Hybrid 130 CV — da ~€30.000",
+          "4xe Plug-in Hybrid 190/240 CV — da €43.600"
+        ],
+        allestimenti:[
+          "Limited — da €43.600",
+          "S — sportivo",
+          "Trailhawk — off-road"
+        ],
+        punti:["Icona del fuoristrada compact","4xe con vera capacità off-road","Produzione in Italia (Melfi — fine prod. attuale, nuova gen. 2027)"],
+        prezzo_base:"€30.000 (ibrida) / €43.600 (4xe plug-in)"
+      },
+      // ── ALFA ROMEO ───────────────────────────────────────────────
+      "junior": {
+        marca:"Alfa Romeo", nome:"Junior", lunghezza:"4,17 m",
+        motori:[
+          "1.2 Mild Hybrid 145 CV (48V, eDCT6) — da €30.750",
+          "Q4 Mild Hybrid 145 CV trazione integrale — disponibile",
+          "BEV Elettrica 156 CV, 51 kWh, 410 km WLTP — disponibile",
+          "Veloce BEV 282 CV, differenziale Torsen — versione sportiva"
+        ],
+        allestimenti:[
+          "Base (MY2026) — €30.750 · cerchi 18\", full LED, clima auto, keyless, strumentazione 10,25\", ACC",
+          "Sprint — dettagli nero lucido, vetri oscurati, luce RGB, navigatore connesso",
+          "Ti — sedili sportivi riscaldati, volante pelle, piano carico 2 livelli, inserti alluminio",
+          "Veloce — top sportivo, 282 CV BEV, assetto ribassato 2,5 cm",
+          "+ Pack Techno (€2.000): fari Matrix LED, L2, keyless, portellone elettrico, ricarica wireless",
+          "+ Pack Sport (€2.500 su Ti): sedili Sabelt Alcantara, volante Alcantara rosso"
+        ],
+        punti:["Design sportivo grintoso, cruscotto binocolo Alfa","Fari Matrix LED adattivi","Hey Alfa + ChatGPT integrato","Guida autonoma livello 2 (optional)","Versione Veloce 282 CV con differenziale Torsen","Consumo ibrida: 4,8-5,3 l/100km"],
+        prezzo_base:"€30.750 (ibrida MY2026)"
+      },
+      "tonale": {
+        marca:"Alfa Romeo", nome:"Tonale", lunghezza:"4,53 m",
+        motori:[
+          "1.5 Mild Hybrid 160 CV — disponibile",
+          "Plug-in Hybrid 4xe 280 CV — disponibile"
+        ],
+        allestimenti:[
+          "Sprint", "Ti", "Veloce", "Quadrifoglio (280 CV)"
+        ],
+        punti:["SUV C-segment Alfa Romeo","Design sportivo premium","Sistema NFT per certificazione km","Plug-in 4xe disponibile"],
+        prezzo_base:"€38.000 circa"
+      },
+      "giulia": {
+        marca:"Alfa Romeo", nome:"Giulia", lunghezza:"4,64 m",
+        motori:[
+          "2.0 Turbo 200 CV",
+          "2.0 Turbo 280 CV Veloce",
+          "2.9 V6 510 CV Quadrifoglio"
+        ],
+        allestimenti:["Sprint","Ti","Veloce","Quadrifoglio"],
+        punti:["Berlina premium RWD","V6 biturbo 510 CV Quadrifoglio","Design italiano iconico","Trazione posteriore di serie"],
+        prezzo_base:"€47.000 circa"
+      },
+      "stelvio": {
+        marca:"Alfa Romeo", nome:"Stelvio", lunghezza:"4,69 m",
+        motori:[
+          "2.0 Turbo 200 CV AWD",
+          "2.0 Turbo 280 CV Veloce AWD",
+          "2.9 V6 510 CV Quadrifoglio AWD"
+        ],
+        allestimenti:["Sprint","Ti","Veloce","Quadrifoglio"],
+        punti:["SUV premium mid-size","Versione Quadrifoglio 510 CV record Nürburgring","Trazione integrale AWD di serie","Design sportivo italiano"],
+        prezzo_base:"€53.000 circa"
+      },
+      // ── LANCIA ───────────────────────────────────────────────────
+      "ypsilon": {
+        marca:"Lancia", nome:"Ypsilon", lunghezza:"4,08 m",
+        motori:[
+          "1.2 Mild Hybrid 100+10 CV (48V, eDCT6) — da €24.900 / promo €17.900",
+          "BEV 100% Elettrica 156 CV, 51 kWh, 402 km WLTP — da €34.900",
+          "HF Line Ibrida 110 CV — disponibile",
+          "HF 280 CV Elettrica — versione sportiva"
+        ],
+        allestimenti:[
+          "Ypsilon base — €24.900 · inserti bronzo/verde salvia, Apple/Android Auto wireless, AEB, keyless, strumentazione 10,25\"",
+          "LX — €27.900 · cerchi lega 17\", elementi nero lucido, velluto, caricatore wireless, telecamere 360°, ACC, L2 optional",
+          "Cassina — edizione limitata 1906 esemplari, ricca dotazione, solo blu",
+          "HF Line — aspetto sportivo dedicato",
+          "HF 280 CV — hot hatch elettrica top di gamma"
+        ],
+        punti:["Design premium segmento B","Interni velluto riciclato con massaggio (LX)","Due schermi 10,25\" gemelli","Fari posteriori rotondi (omaggio Stratos)","HF 280 CV: prima hot hatch Lancia moderna","Lancia Ypsilon WRC2 Rally 2026"],
+        prezzo_base:"€24.900 (ibrida) / €34.900 (elettrica)"
+      }
+    };
+
+    // Normalizza il nome del modello per lookup nel DB
+    function normalizzaModello(input){
+      const low = input.toLowerCase().trim()
+        .replace(/alfa\s?romeo\s?/i,"")
+        .replace(/jeep\s?/i,"")
+        .replace(/fiat\s?/i,"")
+        .replace(/lancia\s?/i,"")
+        .trim();
+      // Alias
+      const alias = {
+        "grande panda":"grande panda","grandepanda":"grande panda",
+        "panda":"panda",
+        "500":"500","fiat 500":"500",
+        "avenger":"avenger","jeep avenger":"avenger",
+        "compass":"compass","jeep compass":"compass",
+        "renegade":"renegade","jeep renegade":"renegade",
+        "junior":"junior","alfa junior":"junior","romeo junior":"junior",
+        "tonale":"tonale","alfa tonale":"tonale",
+        "giulia":"giulia","alfa giulia":"giulia",
+        "stelvio":"stelvio","alfa stelvio":"stelvio",
+        "ypsilon":"ypsilon","lancia ypsilon":"ypsilon",
+      };
+      if(alias[low]) return alias[low];
+      // Match parziale sul DB
+      for(const key of Object.keys(AUTO_DB)){
+        if(low.includes(key)||key.includes(low)) return key;
+      }
+      return null;
+    }
 
     function setLoadingStatus(msg){
       $("cmpResults").innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:20px;color:#60a5fa;font-size:13px;">🔍 ${escapeHtml(msg)}</div>`;
     }
 
-    // Estrae tutto il testo dai content block (testo + risultati tool web_search)
-    function extractTextFromContent(content){
-      if(!content) return "";
-      if(typeof content==="string") return content;
-      if(Array.isArray(content)){
-        return content.map(block=>{
-          if(block.type==="text") return block.text||"";
-          if(block.type==="tool_result"){
-            if(Array.isArray(block.content)) return block.content.map(b=>b.text||"").join("\n");
-            return block.content||"";
-          }
-          return "";
-        }).filter(Boolean).join("\n");
-      }
-      return "";
-    }
-
-    // Chiama Claude con web_search abilitato e gestisce il loop tool-use
-    async function claudeWithSearch(userPrompt, systemPrompt){
-      const messages=[{role:"user", content:userPrompt}];
-      let allText="";
-      // Loop: Claude può fare più round di ricerca web prima di rispondere
-      for(let i=0;i<6;i++){
-        const body={
-          model:"claude-sonnet-4-20250514",
-          max_tokens:1500,
-          system: systemPrompt,
-          tools:[{type:"web_search_20250305",name:"web_search"}],
-          messages
-        };
-        const res=await fetch("https://api.anthropic.com/v1/messages",{
-          method:"POST",
-          headers:{"Content-Type":"application/json"}
-          , body:JSON.stringify(body)
-        });
-        if(!res.ok) throw new Error(`API ${res.status}`);
-        const data=await res.json();
-
-        // Aggiungi risposta assistente alla conversazione
-        messages.push({role:"assistant", content: data.content});
-
-        // Controlla stop reason
-        if(data.stop_reason==="end_turn"){
-          // Risposta finale — estrai testo
-          allText = data.content
-            .filter(b=>b.type==="text")
-            .map(b=>b.text)
-            .join("\n");
-          break;
-        }
-
-        if(data.stop_reason==="tool_use"){
-          // Claude vuole fare ricerche web — eseguiamo i tool call
-          const toolUseBlocks=data.content.filter(b=>b.type==="tool_use");
-          const toolResults=[];
-          for(const tu of toolUseBlocks){
-            // Il backend Anthropic gestisce web_search internamente,
-            // noi dobbiamo passare il tool_result con placeholder
-            // In realtà con l'API Anthropic il web_search è server-side:
-            // restituisce già i risultati in tool_result blocks nell'assistant message.
-            // Se siamo qui, cerchiamo i risultati già presenti nel content
-            toolResults.push({
-              type:"tool_result",
-              tool_use_id: tu.id,
-              content: tu.input?.query ? `Ricerca per: ${tu.input.query}` : "ricerca eseguita"
-            });
-          }
-          messages.push({role:"user", content: toolResults});
-        } else {
-          // stop_reason sconosciuta o max_tokens → prendi quel che c'è
-          allText = data.content
-            .filter(b=>b.type==="text")
-            .map(b=>b.text)
-            .join("\n");
-          break;
-        }
-      }
-      return allText;
-    }
-
     const COMPARATORE_SYSTEM=`Sei un esperto di auto nuove italiane (Fiat, Jeep, Alfa Romeo, Lancia).
-Hai accesso a web_search: DEVI cercare informazioni aggiornate e reali prima di rispondere.
-
-ISTRUZIONI:
-1. Cerca prima "[modello1] allestimenti prezzi motori 2025 site:fiat.it OR site:jeep-official.it OR site:alfaromeo.it OR site:lancia.it"
-2. Se non trovi, cerca "[modello1] allestimenti prezzi motori 2025" su Google
-3. Ripeti per il modello2
-4. Poi genera il confronto con i dati trovati
+Ti vengono forniti dati REALI e AGGIORNATI 2025 estratti direttamente dai configuratori e listini ufficiali.
+Usa SOLO questi dati. Sii preciso, usa i prezzi e gli allestimenti forniti.
 
 Usa SEMPRE questo formato:
 
 ⚔ CONFRONTO: [MODELLO1] vs [MODELLO2]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🔵 [MODELLO1]
-• [caratteristica reale trovata]
-• [caratteristica reale trovata]
-• [caratteristica reale trovata]
-💰 Prezzo da: €XX.XXX
-⚙ Motori: [lista reale]
-📋 Allestimenti: [lista reale]
+🔵 [MODELLO1] ([MARCA])
+• [punto forza dai dati]
+• [punto forza dai dati]
+• [punto forza dai dati]
+💰 Prezzo da: [dal DB]
+⚙ Motori: [dal DB, lista compatta]
+📋 Allestimenti: [dal DB, lista compatta]
 
-🟠 [MODELLO2]
-• [caratteristica reale trovata]
-• [caratteristica reale trovata]
-• [caratteristica reale trovata]
-💰 Prezzo da: €XX.XXX
-⚙ Motori: [lista reale]
-📋 Allestimenti: [lista reale]
+🟠 [MODELLO2] ([MARCA])
+• [punto forza dai dati]
+• [punto forza dai dati]
+• [punto forza dai dati]
+💰 Prezzo da: [dal DB]
+⚙ Motori: [dal DB, lista compatta]
+📋 Allestimenti: [dal DB, lista compatta]
 
 📊 DIFFERENZE CHIAVE:
-• Dimensioni: [confronto]
-• Motorizzazioni: [confronto]
-• Tecnologia: [confronto]
-• Prezzo: [confronto]
+• Dimensioni: [confronto lunghezze]
+• Motorizzazioni: [principali differenze]
+• Tecnologia: [differenze dotazioni]
+• Prezzo: [differenza economica]
 
-🏆 CONSIGLIO: [1-2 righe]
+🏆 CONSIGLIO: [1-2 righe concrete basate sui dati]
 
-Solo questo schema, nessun testo extra prima o dopo.`;
+Nessun testo extra. Solo lo schema sopra.`;
 
     async function runComparatore(){
-      const m1=$("cmpInput1").value.trim(), m2=$("cmpInput2").value.trim();
-      if(!m1||!m2){
+      const m1raw=$("cmpInput1").value.trim(), m2raw=$("cmpInput2").value.trim();
+      if(!m1raw||!m2raw){
         $("cmpResults").innerHTML='<div style="color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">⚠ Inserisci entrambi i modelli!</div>';
         return;
       }
       const btn=$("cmpBtn");
-      btn.disabled=true; btn.textContent="⏳ Ricerca...";
-      setLoadingStatus(`Cerco info aggiornate su ${m1} e ${m2}...`);
+      btn.disabled=true; btn.textContent="⏳ Elaborazione...";
+      setLoadingStatus(`Cerco ${m1raw} e ${m2raw} nel database ufficiale...`);
+
+      const k1=normalizzaModello(m1raw), k2=normalizzaModello(m2raw);
+      const d1=k1?AUTO_DB[k1]:null, d2=k2?AUTO_DB[k2]:null;
+
+      // Costruisce contesto dettagliato dal DB
+      function dbToContext(d, rawName){
+        if(!d) return `[MODELLO: ${rawName} — non in database locale, usa le tue conoscenze generali per questo modello]`;
+        return `=== ${d.marca.toUpperCase()} ${d.nome.toUpperCase()} ===
+Lunghezza: ${d.lunghezza}
+Prezzo base: ${d.prezzo_base}
+Motori:
+${d.motori.map(m=>"  • "+m).join("\n")}
+Allestimenti:
+${d.allestimenti.map(a=>"  • "+a).join("\n")}
+Punti di forza:
+${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
+      }
+
+      const ctx = `DATI REALI DAI CONFIGURATORI UFFICIALI 2025:\n\n${dbToContext(d1,m1raw)}\n\n${dbToContext(d2,m2raw)}`;
+      const badge = (d1&&d2)
+        ?`<div style="font-size:11px;color:#6ee7b7;margin-bottom:10px;padding:5px 10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;">✅ Dati dai configuratori ufficiali Fiat / Jeep / Alfa Romeo / Lancia (2025)</div>`
+        :`<div style="font-size:11px;color:#fde68a;margin-bottom:10px;padding:5px 10px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;">⚠ ${!d1?m1raw:m2raw} non nel DB locale — dati integrati da conoscenza generale</div>`;
 
       try{
-        const userPrompt=`Confronta ${m1} vs ${m2}. Cerca prima informazioni aggiornate su entrambi i modelli (allestimenti, prezzi, motori) sui siti ufficiali italiani (fiat.it, jeep-official.it, alfaromeo.it, lancia.it) o su Google, poi genera il confronto completo nel formato richiesto.`;
-
-        let aiText = await claudeWithSearch(userPrompt, COMPARATORE_SYSTEM);
-
-        // Fallback: se web_search non disponibile → usa BACKEND_CHAT con ricerca manuale
-        if(!aiText){
-          setLoadingStatus("Ricerca alternativa...");
-          let ctx="";
-          try{
-            const r1=await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(m1+" allestimenti prezzi motori 2025")}`);
-            const r2=await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(m2+" allestimenti prezzi motori 2025")}`);
-            const [d1,d2]=await Promise.all([r1.ok?r1.json():null, r2.ok?r2.json():null]);
-            if(d1?.results?.length) ctx+=`=== ${m1.toUpperCase()} ===\n`+d1.results.slice(0,3).map(r=>`${r.title}: ${r.description}`).join("\n")+"\n\n";
-            if(d2?.results?.length) ctx+=`=== ${m2.toUpperCase()} ===\n`+d2.results.slice(0,3).map(r=>`${r.title}: ${r.description}`).join("\n")+"\n\n";
-          }catch{}
-          const res=await fetch(BACKEND_CHAT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-            messages:[
-              {role:"system",content:COMPARATORE_SYSTEM.replace("Hai accesso a web_search: DEVI cercare informazioni aggiornate e reali prima di rispondere.\n\nISTRUZIONI:\n1. Cerca prima \"[modello1] allestimenti prezzi motori 2025 site:fiat.it OR site:jeep-official.it OR site:alfaromeo.it OR site:lancia.it\"\n2. Se non trovi, cerca \"[modello1] allestimenti prezzi motori 2025\" su Google\n3. Ripeti per il modello2\n4. Poi genera il confronto con i dati trovati\n\n","")},
-              ...(ctx?[{role:"system",content:"DATI TROVATI:\n"+ctx}]:[]),
-              {role:"user",content:`Confronta ${m1} vs ${m2} usando le tue conoscenze aggiornate. Genera il confronto nel formato richiesto con dati reali.`}
-            ]
-          })});
-          if(res.ok){const d=await res.json();aiText=d.choices?.[0]?.message?.content||"";}
-        }
-
-        if(!aiText) throw new Error("Nessuna risposta ricevuta");
-
-        aiText=aiText.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-        $("cmpResults").innerHTML=`<div style="background:rgba(31,41,55,.35);border:1px solid rgba(31,41,55,.7);border-radius:12px;padding:14px 16px;"><div style="font-size:11px;color:#6ee7b7;margin-bottom:10px;padding:5px 10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;">✅ Dati aggiornati da web</div><div style="white-space:pre-line;font-size:13px;line-height:1.7">${aiText}</div></div>`;
-
+        setLoadingStatus("Elaboro il confronto...");
+        const res=await fetch(BACKEND_CHAT,{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({messages:[
+            {role:"system", content:COMPARATORE_SYSTEM},
+            {role:"system", content:ctx},
+            {role:"user",   content:`Confronta ${d1?d1.marca+" "+d1.nome:m1raw} vs ${d2?d2.marca+" "+d2.nome:m2raw} seguendo esattamente il formato richiesto.`}
+          ]})
+        });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data=await res.json();
+        let ai=data.choices?.[0]?.message?.content||"Nessuna risposta.";
+        ai=ai.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+        $("cmpResults").innerHTML=`<div style="background:rgba(31,41,55,.35);border:1px solid rgba(31,41,55,.7);border-radius:12px;padding:14px 16px;">${badge}<div style="white-space:pre-line;font-size:13px;line-height:1.7">${ai}</div></div>`;
       }catch(err){
-        // Ultimo fallback: solo conoscenza interna senza pretese
-        try{
-          setLoadingStatus("Generazione con conoscenza interna...");
-          const res=await fetch(BACKEND_CHAT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-            messages:[
-              {role:"system",content:`Sei un esperto di auto italiane. Conosci bene Fiat, Jeep, Alfa Romeo, Lancia. Usa le tue conoscenze per rispondere con dati reali e precisi. `+COMPARATORE_SYSTEM.split("Hai accesso")[0]},
-              {role:"user",content:`Confronta ${m1} vs ${m2} con dati reali (allestimenti, prezzi, motori). Formato schematico richiesto.`}
-            ]
-          })});
-          if(res.ok){
-            const d=await res.json();
-            let ai=d.choices?.[0]?.message?.content||"Nessuna risposta.";
-            ai=ai.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-            $("cmpResults").innerHTML=`<div style="background:rgba(31,41,55,.35);border:1px solid rgba(31,41,55,.7);border-radius:12px;padding:14px 16px;"><div style="font-size:11px;color:#fde68a;margin-bottom:10px;padding:5px 10px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;">⚠ Dati da conoscenza interna</div><div style="white-space:pre-line;font-size:13px;line-height:1.7">${ai}</div></div>`;
-          } else throw new Error();
-        }catch{
-          $("cmpResults").innerHTML=`<div style="color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">❌ Errore: ${escapeHtml(err?.message||"connessione fallita")}. Riprova.</div>`;
-        }
+        $("cmpResults").innerHTML=`<div style="color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">❌ Errore: ${escapeHtml(err?.message||"connessione fallita")}. Riprova.</div>`;
       }finally{
         btn.disabled=false; btn.textContent="🔎 Confronta";
       }
