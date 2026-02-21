@@ -1621,15 +1621,16 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         const pct = checks.length ? Math.round(doneCnt/checks.length*100) : 0;
         const dcls = consegnaDateClass(con.data);
         return `<div class="consegnaCard open" id="cc_${con.id}">
-          <div class="consegnaHead" style="cursor:default;">
+          <div class="consegnaHead" onclick="toggleConsegna('${con.id}')" style="cursor:pointer;">
             <div class="consegnaDate ${dcls}">${dcls==="oggi"?"📦 OGGI":dcls==="scaduta"?"⚠ SCADUTA":"📅"} ${consegnaFmtDate(con.data)}</div>
             <div style="flex:1;min-width:0">
               <div class="consegnaModello">${escapeHtml(con.modello||"")}</div>
               <div class="consegnaCliente">${escapeHtml(con.cliente||"")}</div>
             </div>
-            <div style="font-size:11px;color:#9ca3af;white-space:nowrap">${doneCnt}/${checks.length} ✓</div>
+            <div style="font-size:11px;color:#9ca3af;white-space:nowrap;margin-right:6px">${doneCnt}/${checks.length} ✓</div>
+            <div class="consegnaChevron" id="chev_${con.id}">▲</div>
           </div>
-          <div class="consegnaBody" style="display:block;">
+          <div class="consegnaBody" id="cbody_${con.id}" style="display:block;">
             <div class="consegnaChecks">
               ${checks.map((ch,i) => `
                 <div class="consegnaCheckItem" style="display:flex;align-items:center;gap:8px;">
@@ -1660,6 +1661,15 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       }).join("");
       renderOggi();
     }
+
+    window.toggleConsegna = function(id){
+      const body  = document.getElementById("cbody_"+id);
+      const chev  = document.getElementById("chev_"+id);
+      if(!body) return;
+      const open = body.style.display !== "none";
+      body.style.display = open ? "none" : "block";
+      if(chev) chev.textContent = open ? "▼" : "▲";
+    };
 
     window.toggleConsegnaCheck = function(id, idx, val){
       if(!consegneState.consegne[id]) return;
