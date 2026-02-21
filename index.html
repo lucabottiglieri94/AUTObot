@@ -412,9 +412,12 @@
             <div class="muted panelSub">Visibili solo dopo login.</div>
             <div id="status" class="muted">Effettua il login per caricare le news.</div>
           </div>
-          <button id="refreshBtn" class="btn" disabled>🔄</button>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button id="refreshBtn" class="btn" disabled>🔄</button>
+            <button id="newsToggleBtn" class="btn" title="Mostra/Nascondi news" style="font-size:16px;font-weight:900;padding:6px 10px;min-width:32px;">−</button>
+          </div>
         </div>
-        <div class="newsScroll"><div id="newsList"></div></div>
+        <div class="newsScroll" id="newsScrollBox"><div id="newsList"></div></div>
 
         <!-- CALENDARIO SETTIMANALE -->
         <div class="weekPanel">
@@ -1632,6 +1635,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
                 <div class="consegnaCheckItem" style="display:flex;align-items:center;gap:8px;">
                   <input type="checkbox" class="consegnaCheckBox" ${ch.done?"checked":""} onchange="toggleConsegnaCheck('${con.id}',${i},this.checked)"/>
                   <span class="consegnaCheckLabel${ch.done?" done":""}" style="flex:1;">${escapeHtml(ch.text)}</span>
+                  <button onclick="toggleConsegnaCheck('${con.id}',${i},!${ch.done})" title="${ch.done?'Segna non fatto':'Segna fatto'}" style="width:22px;height:22px;border-radius:6px;border:1px solid ${ch.done?'rgba(34,197,94,.5)':'rgba(34,197,94,.25)'};background:${ch.done?'rgba(34,197,94,.18)':'rgba(34,197,94,.06)'};color:#6ee7b7;cursor:pointer;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</button>
                   <button onclick="deleteConsegnaCheck('${con.id}',${i})" title="Rimuovi voce" style="width:22px;height:22px;border-radius:6px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.07);color:#fca5a5;cursor:pointer;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
                 </div>`).join("")}
             </div>
@@ -1984,6 +1988,20 @@ Sii diretto, pratico, motivante. Max 20 righe totali.`},
         btn.textContent = "🤖 Chiedi all'AI: \"Cosa devo fare oggi?\"";
       }
     });
+
+    /* ══ NEWS TOGGLE ══ */
+    (function(){
+      const btn = $("newsToggleBtn");
+      const box = $("newsScrollBox");
+      if(!btn||!box) return;
+      let visible = true;
+      btn.addEventListener("click", ()=>{
+        visible = !visible;
+        box.style.display = visible ? "" : "none";
+        btn.textContent   = visible ? "−" : "+";
+        btn.title         = visible ? "Nascondi news" : "Mostra news";
+      });
+    })();
 
     /* ══ SMART HEADER ══ */
     (function(){
