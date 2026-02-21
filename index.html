@@ -53,11 +53,11 @@
 
     /* LAYOUT */
     .layout{margin-top:16px;display:grid;grid-template-columns:420px 1fr;gap:16px;align-items:start}
-    .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow-y:auto;max-height:calc(100vh - 72px);position:sticky;top:72px}
     .panelHeader{padding:14px 14px 10px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
     .panelTitle{font-weight:950;font-size:18px}
     .panelSub{margin-top:6px}
-    .newsScroll{max-height:calc(100vh - 240px);overflow:auto;padding:12px}
+    .newsScroll{max-height:260px;overflow:auto;padding:12px}
     .newsScroll::-webkit-scrollbar{width:10px}
     .newsScroll::-webkit-scrollbar-thumb{background:rgba(59,130,246,.25);border:2px solid rgba(17,24,39,.7);border-radius:999px}
     .newsScroll::-webkit-scrollbar-track{background:rgba(0,0,0,.12)}
@@ -427,6 +427,37 @@
           </div>
           <div id="weekGrid" class="weekGrid"></div>
         </div>
+
+        <!-- ══ PRE-CONSEGNA ══ -->
+        <div style="border-top:2px solid rgba(34,197,94,.25);background:rgba(10,12,18,.35);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:950;font-size:16px;">🚗 Pre-Consegna</div>
+            <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Checklist consegne — sempre visibile</div>
+          </div>
+          <button id="consegnaClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completate</button>
+        </div>
+        <div style="padding:12px;">
+          <div class="consegnaFormRow">
+            <input id="consegnaCliente" class="consegnaInput" type="text" placeholder="Nome cliente"/>
+            <input id="consegnaModello" class="consegnaInput" type="text" placeholder="Modello"/>
+            <input id="consegnaData"    class="consegnaInput" type="date"/>
+            <button id="consegnaAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;white-space:nowrap;">+ Aggiungi</button>
+          </div>
+          <div id="consegnaList"></div>
+        </div>
+
+        <!-- ══ POST VENDITA ══ -->
+        <div style="border-top:2px solid rgba(251,191,36,.25);background:rgba(10,12,18,.35);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:950;font-size:16px;">⭐ Post-Vendita</div>
+            <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Follow-up: intervista (2gg) · recensione (3gg)</div>
+          </div>
+          <button id="postClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completati</button>
+        </div>
+        <div style="padding:12px 12px 16px;">
+          <div id="postList"></div>
+        </div>
+
       </aside>
 
       <!-- DESTRA: COMPARATORE + VENDITE + AGENDA + MEMO + TELEFONO -->
@@ -699,41 +730,6 @@
                 <div class="telSectionLabel">📆 Prossima settimana <span id="telCntSettimana" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
                 <div id="telListSettimana" class="telList"></div>
               </div>
-            </div>
-          </div>
-
-          <!-- ══ CONSEGNE IN ARRIVO ══ -->
-          <div class="widgetPanel consegnePanel" id="consegnePanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">🚗 Pre-Consegna</div>
-                <div class="widgetSub">Lista consegne in arrivo con checklist completa</div>
-              </div>
-              <button id="consegnaClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci consegnate</button>
-            </div>
-            <div class="widgetBody">
-              <div class="consegnaFormRow">
-                <input id="consegnaCliente" class="consegnaInput" type="text" placeholder="Nome cliente"/>
-                <input id="consegnaModello" class="consegnaInput" type="text" placeholder="Modello auto"/>
-                <input id="consegnaData"    class="consegnaInput" type="date"/>
-                <button id="consegnaAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
-              </div>
-              <div id="consegnaList"></div>
-            </div>
-          </div>
-
-          <!-- ══ POST VENDITA ══ -->
-          <div class="widgetPanel postPanel" id="postPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">⭐ Post-Vendita</div>
-                <div class="widgetSub">Follow-up automatico: intervista (2gg) e recensione (3gg) dopo consegna</div>
-              </div>
-              <button id="postClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completati</button>
-            </div>
-            <div class="widgetBody">
-              <div id="postList"></div>
-              <div class="smallNote">I clienti appaiono qui automaticamente dopo la consegna.</div>
             </div>
           </div>
 
@@ -1612,53 +1608,68 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
 
     function renderConsegne(){
       const box = $("consegnaList");
-      if(!auth.currentUser){ box.innerHTML = '<div class="oggiEmpty">Login richiesto.</div>'; return; }
+      if(!auth.currentUser){ box.innerHTML = '<div class="oggiEmpty" style="padding:10px 0">Login richiesto.</div>'; return; }
       const list = Object.values(consegneState.consegne || {})
         .sort((a,b) => (a.data||"").localeCompare(b.data||""));
-      if(!list.length){ box.innerHTML = '<div class="oggiEmpty">Nessuna consegna programmata. Aggiungine una sopra.</div>'; return; }
-      box.innerHTML = list.map(c => {
-        const checks = c.checks || CHECKLIST_DEFAULT.map(t => ({text:t, done:false}));
+      if(!list.length){ box.innerHTML = '<div class="oggiEmpty" style="padding:10px 0">Nessuna consegna programmata.</div>'; return; }
+      box.innerHTML = list.map(con => {
+        const checks = con.checks || CHECKLIST_DEFAULT.map(t => ({text:t, done:false}));
         const doneCnt = checks.filter(ch => ch.done).length;
         const pct = checks.length ? Math.round(doneCnt/checks.length*100) : 0;
-        const dcls = consegnaDateClass(c.data);
-        return `<div class="consegnaCard" id="cc_${c.id}">
-          <div class="consegnaHead" onclick="toggleConsegna('${c.id}')">
-            <div class="consegnaDate ${dcls}">${dcls==="oggi"?"📦 OGGI":dcls==="scaduta"?"⚠ SCADUTA":""} ${consegnaFmtDate(c.data)}</div>
-            <div>
-              <div class="consegnaModello">${escapeHtml(c.modello||"")}</div>
-              <div class="consegnaCliente">${escapeHtml(c.cliente||"")}</div>
+        const dcls = consegnaDateClass(con.data);
+        return `<div class="consegnaCard open" id="cc_${con.id}">
+          <div class="consegnaHead" style="cursor:default;">
+            <div class="consegnaDate ${dcls}">${dcls==="oggi"?"📦 OGGI":dcls==="scaduta"?"⚠ SCADUTA":"📅"} ${consegnaFmtDate(con.data)}</div>
+            <div style="flex:1;min-width:0">
+              <div class="consegnaModello">${escapeHtml(con.modello||"")}</div>
+              <div class="consegnaCliente">${escapeHtml(con.cliente||"")}</div>
             </div>
-            <div style="margin-left:auto;font-size:11px;color:#9ca3af;white-space:nowrap">${doneCnt}/${checks.length} ✓</div>
-            <div class="consegnaChevron">▼</div>
+            <div style="font-size:11px;color:#9ca3af;white-space:nowrap">${doneCnt}/${checks.length} ✓</div>
           </div>
-          <div class="consegnaBody">
+          <div class="consegnaBody" style="display:block;">
             <div class="consegnaChecks">
               ${checks.map((ch,i) => `
-                <div class="consegnaCheckItem">
-                  <input type="checkbox" class="consegnaCheckBox" ${ch.done?"checked":""} onchange="toggleConsegnaCheck('${c.id}',${i},this.checked)"/>
-                  <span class="consegnaCheckLabel${ch.done?" done":""}">${escapeHtml(ch.text)}</span>
+                <div class="consegnaCheckItem" style="display:flex;align-items:center;gap:8px;">
+                  <input type="checkbox" class="consegnaCheckBox" ${ch.done?"checked":""} onchange="toggleConsegnaCheck('${con.id}',${i},this.checked)"/>
+                  <span class="consegnaCheckLabel${ch.done?" done":""}" style="flex:1;">${escapeHtml(ch.text)}</span>
+                  <button onclick="deleteConsegnaCheck('${con.id}',${i})" title="Rimuovi voce" style="width:22px;height:22px;border-radius:6px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.07);color:#fca5a5;cursor:pointer;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
                 </div>`).join("")}
             </div>
             <div class="consegnaProgress">
               <div class="consegnaProgressBar"><div class="consegnaProgressFill" style="width:${pct}%"></div></div>
               <span>${pct}% completato</span>
             </div>
-            <button class="consegnaDelBtn" onclick="deleteConsegna('${c.id}')">🗑 Rimuovi consegna</button>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+              <button onclick="consegnataPostVendita('${con.id}')"
+                style="flex:1;padding:8px;border:1px solid rgba(34,197,94,.4);background:rgba(34,197,94,.1);border-radius:9px;color:#6ee7b7;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;"
+                onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
+                ✅ Consegnata! → Sposta in Post-Vendita
+              </button>
+              <button onclick="deleteConsegna('${con.id}')"
+                style="padding:8px 14px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);border-radius:9px;color:#fca5a5;font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s;"
+                onmouseover="this.style.background='rgba(239,68,68,.14)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">
+                🗑 Elimina
+              </button>
+            </div>
           </div>
         </div>`;
       }).join("");
       renderOggi();
     }
 
-    window.toggleConsegna = function(id){
-      const card = document.getElementById("cc_"+id);
-      if(card) card.classList.toggle("open");
-    };
     window.toggleConsegnaCheck = function(id, idx, val){
       if(!consegneState.consegne[id]) return;
-      const c = consegneState.consegne[id];
-      if(!c.checks) c.checks = CHECKLIST_DEFAULT.map(t=>({text:t,done:false}));
-      c.checks[idx].done = val;
+      const con = consegneState.consegne[id];
+      if(!con.checks) con.checks = CHECKLIST_DEFAULT.map(t=>({text:t,done:false}));
+      con.checks[idx].done = val;
+      consegneWrite();
+      renderConsegne();
+    };
+    window.deleteConsegnaCheck = function(id, idx){
+      if(!consegneState.consegne[id]) return;
+      const con = consegneState.consegne[id];
+      if(!con.checks) con.checks = CHECKLIST_DEFAULT.map(t=>({text:t,done:false}));
+      con.checks.splice(idx, 1);
       consegneWrite();
       renderConsegne();
     };
@@ -1667,6 +1678,29 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       consegneWrite();
       renderConsegne();
       renderPostVendita();
+    };
+    // Sposta la consegna nel post-vendita con data di consegna = oggi
+    window.consegnataPostVendita = function(id){
+      const con = consegneState.consegne[id];
+      if(!con) return;
+      // Crea il follow-up nel postState con data consegna = oggi
+      const postId = "cons_"+id;
+      postState.followup[postId] = {
+        id: postId,
+        cliente: con.cliente || con.modello || "Cliente",
+        modello: con.modello || "",
+        dataConsegna: dateKey(new Date()),
+        intervistaFatta: false,
+        recensioneFatta: false,
+        _isConsegna: true
+      };
+      // Rimuovi dal pre-consegna
+      delete consegneState.consegne[id];
+      consegneWrite();
+      postWrite();
+      renderConsegne();
+      renderPostVendita();
+      renderOggi();
     };
 
     async function consegneWrite(){
