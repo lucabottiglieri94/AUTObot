@@ -279,6 +279,80 @@
     .chatSendBtn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 4px 16px rgba(59,130,246,.4)}
     .chatSendBtn:disabled{opacity:.5;cursor:not-allowed}
 
+    /* ══ VISTA OGGI ══ */
+    .oggiPanel{background:linear-gradient(135deg,rgba(17,24,39,.92),rgba(10,12,18,.95));border:1px solid rgba(59,130,246,.3);border-radius:16px;overflow:hidden;margin-bottom:16px}
+    .oggiHeader{padding:16px 20px;background:linear-gradient(90deg,rgba(59,130,246,.15),rgba(96,165,250,.08));border-bottom:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .oggiTitle{font-weight:950;font-size:20px;background:linear-gradient(135deg,#60a5fa,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .oggiDate{font-size:12px;color:#9ca3af;margin-top:3px}
+    .oggiKpiRow{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(31,41,55,.6)}
+    .oggiKpi{padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-right:1px solid rgba(31,41,55,.5)}
+    .oggiKpi:last-child{border-right:none}
+    .oggiKpiLabel{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#9ca3af}
+    .oggiKpiNum{font-size:28px;font-weight:950;line-height:1}
+    .oggiKpiSub{font-size:11px;color:#9ca3af;margin-top:2px}
+    .oggiKpiNum.blue{color:#60a5fa}.oggiKpiNum.orange{color:#f97316}.oggiKpiNum.green{color:#22c55e}.oggiKpiNum.purple{color:#a855f7}
+    .oggiSummary{padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.6);background:rgba(59,130,246,.03)}
+    .oggiSummaryText{font-size:13px;line-height:1.75;color:#e5e7eb;white-space:pre-line}
+    .oggiAskBtn{background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(96,165,250,.15));border:1px solid rgba(59,130,246,.4);border-radius:10px;padding:9px 18px;color:#93c5fd;font-size:13px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;display:flex;align-items:center;gap:8px}
+    .oggiAskBtn:hover{background:linear-gradient(135deg,rgba(59,130,246,.3),rgba(96,165,250,.25));transform:translateY(-1px)}
+    .oggiGrid{display:grid;grid-template-columns:1fr 1fr}
+    .oggiCol{padding:16px 20px;border-right:1px solid rgba(31,41,55,.5)}
+    .oggiCol:last-child{border-right:none}
+    .oggiColTitle{font-size:12px;font-weight:900;letter-spacing:.3px;text-transform:uppercase;color:#9ca3af;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .oggiItem{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid rgba(31,41,55,.5);border-radius:10px;background:rgba(17,24,39,.4);margin-bottom:6px;font-size:12px;line-height:1.4}
+    .oggiDot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
+    .oggiDot.red{background:#ef4444}.oggiDot.yellow{background:#eab308}.oggiDot.blue{background:#3b82f6}.oggiDot.green{background:#22c55e}.oggiDot.purple{background:#a855f7}
+    .oggiEmpty{font-size:12px;color:#6b7280;font-style:italic;padding:6px 2px}
+
+    /* ══ CONSEGNE ══ */
+    .consegnePanel{background:var(--panel);border:1px solid rgba(34,197,94,.25);border-radius:16px;overflow:hidden}
+    #consegnePanel .widgetHeader{background:linear-gradient(180deg,rgba(34,197,94,.09),rgba(10,12,18,.35) 70%)}
+    .consegnaCard{border:1px solid rgba(31,41,55,.7);border-radius:14px;background:rgba(17,24,39,.4);margin-bottom:10px;overflow:hidden;animation:itemIn .2s ease}
+    .consegnaHead{padding:12px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(31,41,55,.5);cursor:pointer;user-select:none}
+    .consegnaHead:hover{background:rgba(34,197,94,.05)}
+    .consegnaDate{font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#6ee7b7;white-space:nowrap;flex-shrink:0}
+    .consegnaDate.oggi{background:rgba(249,115,22,.18);border-color:rgba(249,115,22,.4);color:#fdba74}
+    .consegnaDate.scaduta{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.35);color:#fca5a5}
+    .consegnaModello{font-size:14px;font-weight:700;flex:1}
+    .consegnaCliente{font-size:12px;color:#9ca3af}
+    .consegnaChevron{font-size:12px;color:#9ca3af;transition:transform .2s;flex-shrink:0}
+    .consegnaCard.open .consegnaChevron{transform:rotate(180deg)}
+    .consegnaBody{display:none;padding:12px 14px}
+    .consegnaCard.open .consegnaBody{display:block}
+    .consegnaChecks{display:grid;gap:6px}
+    .consegnaCheckItem{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid rgba(31,41,55,.6);border-radius:10px;background:rgba(17,24,39,.3);transition:all .2s}
+    .consegnaCheckItem:hover{background:rgba(17,24,39,.5);border-color:rgba(34,197,94,.3)}
+    .consegnaCheckBox{width:18px;height:18px;flex-shrink:0;accent-color:#22c55e;cursor:pointer}
+    .consegnaCheckLabel{font-size:13px;flex:1}
+    .consegnaCheckLabel.done{text-decoration:line-through;color:#9ca3af}
+    .consegnaProgress{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:#9ca3af}
+    .consegnaProgressBar{flex:1;height:6px;background:rgba(31,41,55,.8);border-radius:999px;overflow:hidden}
+    .consegnaProgressFill{height:100%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#4ade80);transition:width .4s}
+    .consegnaDelBtn{margin-top:10px;width:100%;padding:7px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);border-radius:9px;color:#fca5a5;font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s}
+    .consegnaDelBtn:hover{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.5)}
+    .consegnaFormRow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+    .consegnaInput{flex:1;min-width:120px;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
+    .consegnaInput:focus{border-color:#22c55e}
+    .consegnaInput[type="date"]{color-scheme:dark;max-width:160px}
+
+    /* ══ POST VENDITA ══ */
+    .postPanel{background:var(--panel);border:1px solid rgba(251,191,36,.25);border-radius:16px;overflow:hidden}
+    #postPanel .widgetHeader{background:linear-gradient(180deg,rgba(251,191,36,.09),rgba(10,12,18,.35) 70%)}
+    .postCard{border:1px solid rgba(31,41,55,.7);border-radius:12px;background:rgba(17,24,39,.4);padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;animation:itemIn .2s ease;transition:border-color .2s}
+    .postCard.urgente{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04)}
+    .postCardLeft{flex:1;min-width:0}
+    .postCardCliente{font-size:14px;font-weight:700}
+    .postCardModello{font-size:12px;color:#9ca3af;margin-top:2px}
+    .postCardBadges{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+    .postBadge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;cursor:pointer;transition:all .2s;border:1px solid}
+    .postBadge.intervista{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.35);color:#fde68a}
+    .postBadge.intervista.done{opacity:.4;text-decoration:line-through;cursor:default}
+    .postBadge.recensione{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:#6ee7b7}
+    .postBadge.recensione.done{opacity:.4;text-decoration:line-through;cursor:default}
+    .postBadge.scaduto{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+    .postDays{font-size:11px;color:#9ca3af;margin-top:5px}
+
     @media(max-width:980px){
       .layout{grid-template-columns:1fr}
       .newsScroll{max-height:60vh}
@@ -357,6 +431,65 @@
 
       <!-- DESTRA: COMPARATORE + VENDITE + AGENDA + MEMO + TELEFONO -->
       <section style="padding:0;border:none;background:none;">
+
+        <!-- ══ VISTA OGGI ══ -->
+        <div class="oggiPanel" id="oggiPanel">
+          <div class="oggiHeader">
+            <div>
+              <div class="oggiTitle">☀ Buongiorno! Vista di Oggi</div>
+              <div class="oggiDate" id="oggiDateLabel"></div>
+            </div>
+            <button class="oggiAskBtn" id="oggiRiepilogoBtn">🤖 Chiedi all'AI: "Cosa devo fare oggi?"</button>
+          </div>
+          <!-- KPI row -->
+          <div class="oggiKpiRow">
+            <div class="oggiKpi">
+              <div class="oggiKpiLabel">📞 Chiamate</div>
+              <div class="oggiKpiNum blue" id="oggiKpiChiamate">0</div>
+              <div class="oggiKpiSub">Da fare oggi</div>
+            </div>
+            <div class="oggiKpi">
+              <div class="oggiKpiLabel">🔥 Caldi</div>
+              <div class="oggiKpiNum orange" id="oggiKpiCaldi">0</div>
+              <div class="oggiKpiSub">Lead caldi attivi</div>
+            </div>
+            <div class="oggiKpi">
+              <div class="oggiKpiLabel">🚗 Consegne</div>
+              <div class="oggiKpiNum green" id="oggiKpiConsegne">0</div>
+              <div class="oggiKpiSub">Oggi/imminenti</div>
+            </div>
+            <div class="oggiKpi">
+              <div class="oggiKpiLabel">📅 Task</div>
+              <div class="oggiKpiNum purple" id="oggiKpiTask">0</div>
+              <div class="oggiKpiSub">In agenda oggi</div>
+            </div>
+          </div>
+          <!-- AI summary -->
+          <div class="oggiSummary" id="oggiSummaryBox" style="display:none">
+            <div class="oggiSummaryText" id="oggiSummaryText"></div>
+          </div>
+          <!-- Mini grid tutto-in-uno -->
+          <div class="oggiGrid">
+            <div class="oggiCol">
+              <div class="oggiColTitle">📞 Telefonate di oggi</div>
+              <div id="oggiListaTel"></div>
+            </div>
+            <div class="oggiCol">
+              <div class="oggiColTitle">📅 Task + Consegne</div>
+              <div id="oggiListaTask"></div>
+            </div>
+          </div>
+          <div class="oggiGrid" style="border-top:1px solid rgba(31,41,55,.5)">
+            <div class="oggiCol">
+              <div class="oggiColTitle">⭐ Follow-up post-vendita</div>
+              <div id="oggiListaPost"></div>
+            </div>
+            <div class="oggiCol">
+              <div class="oggiColTitle">💰 Mese in corso</div>
+              <div id="oggiListaVendite"></div>
+            </div>
+          </div>
+        </div>
 
         <!-- COMPARATORE -->
         <div style="background:rgba(17,24,39,.78);border:1px solid #1f2937;border-radius:16px;overflow:hidden;">
@@ -568,6 +701,42 @@
               </div>
             </div>
           </div>
+
+          <!-- ══ CONSEGNE IN ARRIVO ══ -->
+          <div class="widgetPanel consegnePanel" id="consegnePanel">
+            <div class="widgetHeader">
+              <div>
+                <div class="widgetTitle">🚗 Pre-Consegna</div>
+                <div class="widgetSub">Lista consegne in arrivo con checklist completa</div>
+              </div>
+              <button id="consegnaClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci consegnate</button>
+            </div>
+            <div class="widgetBody">
+              <div class="consegnaFormRow">
+                <input id="consegnaCliente" class="consegnaInput" type="text" placeholder="Nome cliente"/>
+                <input id="consegnaModello" class="consegnaInput" type="text" placeholder="Modello auto"/>
+                <input id="consegnaData"    class="consegnaInput" type="date"/>
+                <button id="consegnaAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
+              </div>
+              <div id="consegnaList"></div>
+            </div>
+          </div>
+
+          <!-- ══ POST VENDITA ══ -->
+          <div class="widgetPanel postPanel" id="postPanel">
+            <div class="widgetHeader">
+              <div>
+                <div class="widgetTitle">⭐ Post-Vendita</div>
+                <div class="widgetSub">Follow-up automatico: intervista (2gg) e recensione (3gg) dopo consegna</div>
+              </div>
+              <button id="postClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completati</button>
+            </div>
+            <div class="widgetBody">
+              <div id="postList"></div>
+              <div class="smallNote">I clienti appaiono qui automaticamente dopo la consegna.</div>
+            </div>
+          </div>
+
         </div>
       </section>
     </div>
@@ -1336,14 +1505,14 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         $("userPill").style.borderColor="rgba(34,197,94,.5)";
         $("userPill").style.background="rgba(34,197,94,.1)";
         $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";$("refreshBtn").disabled=false;
-        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);
+        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();
       }else{
         $("userPill").textContent="🔒 Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor="";$("userPill").style.background="";
         $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";$("refreshBtn").disabled=true;
         $("newsList").innerHTML="";setStatus("🔒 Effettua il login per caricare le news.");
-        stopPlannerSync();stopVenditeSync();stopTelSync();
+        stopPlannerSync();stopVenditeSync();stopTelSync();stopConsegneSync();stopPostSync();renderOggi();
       }
     });
 
@@ -1409,6 +1578,378 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     }
     chatSendBtn.addEventListener("click",sendMessage);
     chatInputField.addEventListener("keypress",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});
+
+    /* ══ CONSEGNE IN ARRIVO ══ */
+    const CHECKLIST_DEFAULT = [
+      "Modulo ACI (cambio proprietà)",
+      "Documento consegna firmato",
+      "Modulo ritiro veicolo usato",
+      "Documento presa in carico",
+      "Doppie chiavi consegnate",
+      "App connessa (verifica)",
+      "Spiegazione ADAS (sistemi sicurezza)",
+      "QR code recensione Google"
+    ];
+
+    let consegneState = { consegne: {} };
+    let consegneDocRef = null, consegneUnsub = null;
+
+    function consegnaUid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16) }
+
+    function consegnaDateClass(dateStr){
+      if(!dateStr) return "";
+      const today = dateKey(new Date());
+      if(dateStr < today) return "scaduta";
+      if(dateStr === today) return "oggi";
+      return "";
+    }
+
+    function consegnaFmtDate(dateStr){
+      if(!dateStr) return "—";
+      const [y,m,d] = dateStr.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
+    function renderConsegne(){
+      const box = $("consegnaList");
+      if(!auth.currentUser){ box.innerHTML = '<div class="oggiEmpty">Login richiesto.</div>'; return; }
+      const list = Object.values(consegneState.consegne || {})
+        .sort((a,b) => (a.data||"").localeCompare(b.data||""));
+      if(!list.length){ box.innerHTML = '<div class="oggiEmpty">Nessuna consegna programmata. Aggiungine una sopra.</div>'; return; }
+      box.innerHTML = list.map(c => {
+        const checks = c.checks || CHECKLIST_DEFAULT.map(t => ({text:t, done:false}));
+        const doneCnt = checks.filter(ch => ch.done).length;
+        const pct = checks.length ? Math.round(doneCnt/checks.length*100) : 0;
+        const dcls = consegnaDateClass(c.data);
+        return `<div class="consegnaCard" id="cc_${c.id}">
+          <div class="consegnaHead" onclick="toggleConsegna('${c.id}')">
+            <div class="consegnaDate ${dcls}">${dcls==="oggi"?"📦 OGGI":dcls==="scaduta"?"⚠ SCADUTA":""} ${consegnaFmtDate(c.data)}</div>
+            <div>
+              <div class="consegnaModello">${escapeHtml(c.modello||"")}</div>
+              <div class="consegnaCliente">${escapeHtml(c.cliente||"")}</div>
+            </div>
+            <div style="margin-left:auto;font-size:11px;color:#9ca3af;white-space:nowrap">${doneCnt}/${checks.length} ✓</div>
+            <div class="consegnaChevron">▼</div>
+          </div>
+          <div class="consegnaBody">
+            <div class="consegnaChecks">
+              ${checks.map((ch,i) => `
+                <div class="consegnaCheckItem">
+                  <input type="checkbox" class="consegnaCheckBox" ${ch.done?"checked":""} onchange="toggleConsegnaCheck('${c.id}',${i},this.checked)"/>
+                  <span class="consegnaCheckLabel${ch.done?" done":""}">${escapeHtml(ch.text)}</span>
+                </div>`).join("")}
+            </div>
+            <div class="consegnaProgress">
+              <div class="consegnaProgressBar"><div class="consegnaProgressFill" style="width:${pct}%"></div></div>
+              <span>${pct}% completato</span>
+            </div>
+            <button class="consegnaDelBtn" onclick="deleteConsegna('${c.id}')">🗑 Rimuovi consegna</button>
+          </div>
+        </div>`;
+      }).join("");
+      renderOggi();
+    }
+
+    window.toggleConsegna = function(id){
+      const card = document.getElementById("cc_"+id);
+      if(card) card.classList.toggle("open");
+    };
+    window.toggleConsegnaCheck = function(id, idx, val){
+      if(!consegneState.consegne[id]) return;
+      const c = consegneState.consegne[id];
+      if(!c.checks) c.checks = CHECKLIST_DEFAULT.map(t=>({text:t,done:false}));
+      c.checks[idx].done = val;
+      consegneWrite();
+      renderConsegne();
+    };
+    window.deleteConsegna = function(id){
+      delete consegneState.consegne[id];
+      consegneWrite();
+      renderConsegne();
+      renderPostVendita();
+    };
+
+    async function consegneWrite(){
+      if(!consegneDocRef) return;
+      try{ await setDoc(consegneDocRef, consegneState, {merge:false}); }catch{}
+    }
+
+    $("consegnaAddBtn").addEventListener("click", () => {
+      const cliente = $("consegnaCliente").value.trim();
+      const modello = $("consegnaModello").value.trim();
+      const data    = $("consegnaData").value;
+      if(!cliente && !modello) return;
+      const id = consegnaUid();
+      consegneState.consegne[id] = {
+        id, cliente, modello, data,
+        checks: CHECKLIST_DEFAULT.map(t => ({text:t, done:false})),
+        createdAt: Date.now()
+      };
+      $("consegnaCliente").value = "";
+      $("consegnaModello").value = "";
+      $("consegnaData").value    = "";
+      consegneWrite();
+      renderConsegne();
+      renderPostVendita();
+    });
+    $("consegnaCliente").addEventListener("keypress", e=>{ if(e.key==="Enter") $("consegnaAddBtn").click(); });
+    $("consegnaClearDoneBtn").addEventListener("click", () => {
+      // Rimuovi consegne con checklist 100% completata
+      for(const [id,c] of Object.entries(consegneState.consegne)){
+        const checks = c.checks || [];
+        if(checks.length && checks.every(ch=>ch.done)) delete consegneState.consegne[id];
+      }
+      consegneWrite(); renderConsegne(); renderPostVendita();
+    });
+
+    function startConsegneSync(user){
+      if(consegneUnsub){try{consegneUnsub()}catch{}}
+      consegneDocRef = doc(db,"users",user.uid,"consegne","data");
+      consegneUnsub = onSnapshot(consegneDocRef, snap => {
+        consegneState = snap.exists() ? snap.data() : {consegne:{}};
+        if(!consegneState.consegne) consegneState.consegne = {};
+        renderConsegne(); renderPostVendita();
+        if(!snap.exists()) setDoc(consegneDocRef, consegneState, {merge:false}).catch(()=>{});
+      }, () => { renderConsegne(); renderPostVendita(); });
+    }
+    function stopConsegneSync(){
+      if(consegneUnsub){try{consegneUnsub()}catch{}}
+      consegneUnsub=null; consegneDocRef=null; consegneState={consegne:{}};
+      renderConsegne(); renderPostVendita();
+    }
+
+    /* ══ POST VENDITA ══ */
+    let postState = { followup: {} };
+    let postDocRef = null, postUnsub = null;
+
+    function postUid(){ return Math.random().toString(16).slice(2)+Date.now().toString(16) }
+    function daysDiff(dateStr){
+      if(!dateStr) return null;
+      const now = new Date(); now.setHours(0,0,0,0);
+      const d   = new Date(dateStr+"T00:00:00");
+      return Math.round((now-d)/(1000*60*60*24));
+    }
+
+    function renderPostVendita(){
+      const box = $("postList");
+      if(!auth.currentUser){ box.innerHTML='<div class="oggiEmpty">Login richiesto.</div>'; return; }
+
+      // Costruiamo la lista da CONSEGNE con data passata
+      const oggi = dateKey(new Date());
+      const consList = Object.values(consegneState.consegne||{}).filter(c=>c.data && c.data<=oggi);
+      // + eventuali post manuali (backward compat)
+      const manual  = Object.values(postState.followup||{});
+
+      // Merge: per ogni consegna con data passata, crea un "followup"
+      const followups = [...consList.map(c=>({
+        id: "cons_"+c.id,
+        cliente: c.cliente||c.modello||"Cliente",
+        modello: c.modello,
+        dataConsegna: c.data,
+        intervistaFatta: (postState.followup["cons_"+c.id]||{}).intervistaFatta||false,
+        recensioneFatta: (postState.followup["cons_"+c.id]||{}).recensioneFatta||false,
+        _isConsegna: true
+      })), ...manual.filter(m=>!m._isConsegna)];
+
+      if(!followups.length){ box.innerHTML='<div class="oggiEmpty">Nessun follow-up. Le consegne effettuate appariranno qui automaticamente.</div>'; return; }
+
+      box.innerHTML = followups.map(f => {
+        const diff = daysDiff(f.dataConsegna);
+        const needIntervista  = diff !== null && diff >= 2  && !f.intervistaFatta;
+        const needRecensione  = diff !== null && diff >= 3  && !f.recensioneFatta;
+        const urgente = needIntervista || needRecensione;
+        let diffTxt = diff===null?"—" : diff===0?"oggi" : diff===1?"ieri" : `${diff}gg fa`;
+        return `<div class="postCard${urgente?" urgente":""}" data-post-id="${f.id}">
+          <div class="postCardLeft">
+            <div class="postCardCliente">${escapeHtml(f.cliente)}</div>
+            <div class="postCardModello">🚗 ${escapeHtml(f.modello||"—")}</div>
+            <div class="postCardBadges">
+              <span class="postBadge intervista${f.intervistaFatta?" done":needIntervista?" scaduto":""}"
+                onclick="togglePost('${f.id}','intervista')">${f.intervistaFatta?"✓ Intervista fatta":"📞 Intervista 2gg"}</span>
+              <span class="postBadge recensione${f.recensioneFatta?" done":needRecensione?" scaduto":""}"
+                onclick="togglePost('${f.id}','recensione')">${f.recensioneFatta?"✓ Recensione fatta":"⭐ Recensione 3gg"}</span>
+            </div>
+            <div class="postDays">📅 Consegna: ${consegnaFmtDate(f.dataConsegna)} — ${diffTxt}</div>
+          </div>
+          <button class="iconBtn" onclick="deletePost('${f.id}')" title="Rimuovi" style="flex-shrink:0;font-size:14px;">×</button>
+        </div>`;
+      }).join("");
+      renderOggi();
+    }
+
+    window.togglePost = function(id, tipo){
+      if(!postState.followup[id]) postState.followup[id] = {id};
+      postState.followup[id][tipo==="intervista"?"intervistaFatta":"recensioneFatta"] =
+        !postState.followup[id][tipo==="intervista"?"intervistaFatta":"recensioneFatta"];
+      postWrite(); renderPostVendita();
+    };
+    window.deletePost = function(id){
+      delete postState.followup[id];
+      postWrite(); renderPostVendita();
+    };
+
+    async function postWrite(){
+      if(!postDocRef) return;
+      try{ await setDoc(postDocRef, postState, {merge:false}); }catch{}
+    }
+
+    $("postClearDoneBtn").addEventListener("click", ()=>{
+      for(const[id,f] of Object.entries(postState.followup)){
+        if(f.intervistaFatta && f.recensioneFatta) delete postState.followup[id];
+      }
+      postWrite(); renderPostVendita();
+    });
+
+    function startPostSync(user){
+      if(postUnsub){try{postUnsub()}catch{}}
+      postDocRef = doc(db,"users",user.uid,"postvendita","data");
+      postUnsub = onSnapshot(postDocRef, snap=>{
+        postState = snap.exists() ? snap.data() : {followup:{}};
+        if(!postState.followup) postState.followup={};
+        renderPostVendita();
+        if(!snap.exists()) setDoc(postDocRef, postState, {merge:false}).catch(()=>{});
+      }, ()=>renderPostVendita());
+    }
+    function stopPostSync(){
+      if(postUnsub){try{postUnsub()}catch{}}
+      postUnsub=null; postDocRef=null; postState={followup:{}};
+      renderPostVendita();
+    }
+
+    /* ══ VISTA OGGI ══ */
+    function renderOggi(){
+      // Data label
+      const dl = $("oggiDateLabel");
+      if(dl) dl.textContent = new Date().toLocaleDateString("it-IT",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
+
+      const todayK = dateKey(new Date());
+
+      // KPI: chiamate oggi
+      const telOggi = Object.values(telState.contatti||{}).filter(c=>c.quando==="oggi"&&!c.chiamato);
+      const kpiChiamate = $("oggiKpiChiamate"); if(kpiChiamate) kpiChiamate.textContent = telOggi.length;
+
+      // KPI: lead caldi attivi
+      const caldi = Object.values(telState.contatti||{}).filter(c=>c.stato==="caldo"&&!c.chiamato);
+      const kpiCaldi = $("oggiKpiCaldi"); if(kpiCaldi) kpiCaldi.textContent = caldi.length;
+
+      // KPI: consegne oggi o imminenti (nei prossimi 3gg)
+      const in3gg = dateKey(new Date(Date.now()+3*864e5));
+      const consegneOggi = Object.values(consegneState.consegne||{}).filter(c=>c.data && c.data >= todayK && c.data <= in3gg);
+      const kpiCons = $("oggiKpiConsegne"); if(kpiCons) kpiCons.textContent = consegneOggi.length;
+
+      // KPI: task oggi
+      const taskOggi = Object.values(SYNC.data.tasks||{}).filter(t=>t.dateKey===todayK&&!t.done);
+      const kpiTask = $("oggiKpiTask"); if(kpiTask) kpiTask.textContent = taskOggi.length;
+
+      // Lista telefonate oggi
+      const lt = $("oggiListaTel");
+      if(lt){
+        const statoEmoji = {caldo:"🔥",tiepido:"🌡",freddo:"❄"};
+        lt.innerHTML = telOggi.length
+          ? telOggi.slice(0,6).map(c=>`<div class="oggiItem"><span class="oggiDot ${c.stato==="caldo"?"red":c.stato==="tiepido"?"yellow":"blue"}"></span><span><strong>${escapeHtml(c.nome)}</strong> ${c.modello?`· ${escapeHtml(c.modello)}`:""} <span style="opacity:.7">${statoEmoji[c.stato]||""}</span></span></div>`).join("")
+          : '<div class="oggiEmpty">Nessuna telefonata programmata oggi</div>';
+      }
+
+      // Lista task + consegne oggi
+      const lta = $("oggiListaTask");
+      if(lta){
+        const tasksHtml = taskOggi.slice(0,4).map(t=>`<div class="oggiItem"><span class="oggiDot purple"></span><span>${escapeHtml(t.text)}</span></div>`).join("");
+        const consHtml  = consegneOggi.slice(0,3).map(c=>`<div class="oggiItem"><span class="oggiDot green"></span><span>🚗 <strong>${escapeHtml(c.cliente||c.modello)}</strong> · ${consegnaFmtDate(c.data)}</span></div>`).join("");
+        lta.innerHTML = (tasksHtml+consHtml) || '<div class="oggiEmpty">Nessun task o consegna oggi</div>';
+      }
+
+      // Lista post-vendita urgenti
+      const lp = $("oggiListaPost");
+      if(lp){
+        const oggi2 = dateKey(new Date(Date.now()-2*864e5));
+        const urgPost = Object.values(consegneState.consegne||{}).filter(c=>c.data && c.data<=todayK && c.data>=oggi2);
+        lp.innerHTML = urgPost.length
+          ? urgPost.map(c=>`<div class="oggiItem"><span class="oggiDot yellow"></span><span>⭐ <strong>${escapeHtml(c.cliente||c.modello)}</strong> — follow-up da fare!</span></div>`).join("")
+          : '<div class="oggiEmpty">Nessun follow-up urgente</div>';
+      }
+
+      // Vendite mini-riepilogo mese
+      const lv = $("oggiListaVendite");
+      if(lv){
+        const k = TODAY_KEY;
+        const m = vendState.months[k]||{nuove:[],usate:[]};
+        const tot = (m.nuove||[]).length + (m.usate||[]).length;
+        const prov = sumProvv(m.nuove||[])+sumProvv(m.usate||[]);
+        lv.innerHTML = `<div class="oggiItem"><span class="oggiDot green"></span><span>Auto vendute: <strong>${tot}</strong></span></div>
+          <div class="oggiItem"><span class="oggiDot blue"></span><span>Provvigioni: <strong>${fmtEur(prov)}</strong></span></div>
+          ${vendState.obiettivo>0?`<div class="oggiItem"><span class="oggiDot purple"></span><span>Obiettivo: <strong>${Math.round(Math.min(prov/vendState.obiettivo,1)*100)}%</strong> raggiunto</span></div>`:""}`;
+      }
+    }
+
+    // AI Riepilogo giornaliero
+    $("oggiRiepilogoBtn").addEventListener("click", async ()=>{
+      const btn = $("oggiRiepilogoBtn");
+      const box = $("oggiSummaryBox");
+      const txt = $("oggiSummaryText");
+      btn.disabled = true; btn.textContent = "⏳ Generazione...";
+      box.style.display = "block";
+      txt.textContent = "🤖 Sto analizzando la tua giornata...";
+
+      const todayK = dateKey(new Date());
+      const telOggi = Object.values(telState.contatti||{}).filter(c=>c.quando==="oggi"&&!c.chiamato);
+      const caldi   = Object.values(telState.contatti||{}).filter(c=>c.stato==="caldo"&&!c.chiamato);
+      const taskOggi= Object.values(SYNC.data.tasks||{}).filter(t=>t.dateKey===todayK&&!t.done);
+      const in3gg   = dateKey(new Date(Date.now()+3*864e5));
+      const consOggi= Object.values(consegneState.consegne||{}).filter(c=>c.data&&c.data>=todayK&&c.data<=in3gg);
+      const k       = TODAY_KEY;
+      const mese    = vendState.months[k]||{nuove:[],usate:[]};
+      const totVend  = (mese.nuove||[]).length+(mese.usate||[]).length;
+      const provv    = sumProvv(mese.nuove||[])+sumProvv(mese.usate||[]);
+
+      const ctx = `DATI DI OGGI (${new Date().toLocaleDateString("it-IT")}):
+Telefonate programmate oggi: ${telOggi.length} (${telOggi.map(c=>`${c.nome} - ${c.stato}`).join(", ")||"nessuna"})
+Lead caldi attivi: ${caldi.length} (${caldi.slice(0,3).map(c=>c.nome).join(", ")||"nessuno"})
+Task in agenda oggi: ${taskOggi.length} (${taskOggi.map(t=>t.text).join(", ")||"nessuno"})
+Consegne imminenti (3gg): ${consOggi.length} (${consOggi.map(c=>`${c.cliente||c.modello} il ${consegnaFmtDate(c.data)}`).join(", ")||"nessuna"})
+Vendite mese corrente: ${totVend} auto, ${fmtEur(provv)} provvigioni
+${vendState.obiettivo>0?`Obiettivo mensile: ${Math.round(Math.min(provv/vendState.obiettivo,1)*100)}% raggiunto`:"Nessun obiettivo impostato"}`;
+
+      try{
+        const res = await fetch(BACKEND_CHAT, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({messages:[
+          {role:"system", content:`Sei un assistente personale per un venditore di auto.
+Quando ti viene chiesto "Cosa devo fare oggi?" rispondi con un BRIEFING GIORNALIERO conciso e motivante.
+Formato:
+🌅 BUONGIORNO! Ecco il tuo piano per oggi:
+
+📞 CHIAMATE (X da fare):
+• [nome] — [stato lead] → azione consigliata
+...
+
+🚗 CONSEGNE:
+• [cliente] — [modello] — [data]
+...
+
+📅 TASK AGENDA:
+• [task]
+...
+
+💰 MESE:
+• [stato vendite e obiettivo]
+
+🎯 FOCUS DEL GIORNO:
+[1-2 righe di consiglio strategico personalizzato]
+
+Sii diretto, pratico, motivante. Max 20 righe totali.`},
+          {role:"system", content:ctx},
+          {role:"user",   content:"Cosa devo fare oggi?"}
+        ]})});
+        if(!res.ok) throw new Error();
+        const d = await res.json();
+        let ai = d.choices?.[0]?.message?.content || "Nessuna risposta.";
+        ai = ai.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+        txt.innerHTML = ai;
+      }catch{
+        txt.textContent = "❌ Errore generazione riepilogo. Controlla la connessione.";
+      }finally{
+        btn.disabled = false;
+        btn.textContent = "🤖 Chiedi all'AI: \"Cosa devo fare oggi?\"";
+      }
+    });
 
     /* ══ SMART HEADER ══ */
     (function(){
