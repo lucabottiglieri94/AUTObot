@@ -1766,8 +1766,9 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       const box = $("postList");
       if(!auth.currentUser){ box.innerHTML='<div class="oggiEmpty">Login richiesto.</div>'; return; }
 
-      // Prende tutti i followup manuali (inclusi quelli spostati da pre-consegna con _isConsegna:false)
-      const manual = Object.values(postState.followup || {});
+      // Mostra SOLO i followup aggiunti manualmente col pulsante "✅ Consegnata!"
+      // Filtra via eventuali entry create automaticamente da versioni precedenti (_isConsegna: true)
+      const manual = Object.values(postState.followup || {}).filter(f => f._isConsegna !== true);
 
       if(!manual.length){
         box.innerHTML='<div class="oggiEmpty">Nessun follow-up. Usa "✅ Consegnata!" nella Pre-Consegna per aggiungere clienti qui.</div>';
@@ -1834,6 +1835,12 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       postUnsub = onSnapshot(postDocRef, snap=>{
         postState = snap.exists() ? snap.data() : {followup:{}};
         if(!postState.followup) postState.followup={};
+        // Pulizia automatica: rimuove entry create dalla vecchia logica automatica (_isConsegna:true = bug)
+        let needsClean = false;
+        for(const [id, f] of Object.entries(postState.followup)){
+          if(f && f._isConsegna === true){ delete postState.followup[id]; needsClean = true; }
+        }
+        if(needsClean) setDoc(postDocRef, postState, {merge:false}).catch(()=>{});
         renderPostVendita();
         if(!snap.exists()) setDoc(postDocRef, postState, {merge:false}).catch(()=>{});
       }, ()=>renderPostVendita());
