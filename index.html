@@ -51,7 +51,6 @@
     .pill{padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(17,24,39,.35);font-size:12px;white-space:nowrap}
     .muted{color:var(--muted)}
 
-    /* LAYOUT */
     .layout{margin-top:16px;display:grid;grid-template-columns:420px 1fr;gap:16px;align-items:start}
     .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow-y:auto;max-height:calc(100vh - 72px);position:sticky;top:72px}
     .panelHeader{padding:14px 14px 10px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
@@ -69,7 +68,6 @@
     .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
     .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
 
-    /* CALENDARIO SETTIMANALE */
     .weekPanel{border-top:1px solid rgba(31,41,55,.75);padding:12px;background:rgba(10,12,18,.18)}
     .weekHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
     .weekTitle{font-weight:950;font-size:16px}
@@ -85,11 +83,9 @@
     .weekTask.done{opacity:.55;text-decoration:line-through}
     .weekMore{font-size:11px;color:#fdba74;opacity:.9;font-weight:800}
 
-    /* COMPARATORE */
     .cmpSuggest{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);border-radius:999px;padding:4px 10px;color:#93c5fd;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
     .cmpSuggest:hover{background:rgba(59,130,246,.25);border-color:rgba(59,130,246,.6)}
 
-    /* AGENDA + MEMO */
     .widgetStack{display:grid;gap:16px;margin-top:16px}
     .widgetPanel{background:rgba(17,24,39,.78);border:1px solid #1f2937;border-radius:16px;overflow:hidden}
     .widgetHeader{padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -123,7 +119,6 @@
     .syncBadge.warn{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.10);color:#fde68a}
     #agendaPanel .widgetHeader,#memoPanel .widgetHeader{background:linear-gradient(180deg,rgba(249,115,22,.09),rgba(10,12,18,.35) 70%)}
 
-    /* VENDITE */
     .venditePanel{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:16px}
     .venditeHeader{padding:14px 18px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     .venditeTitleRow{display:flex;align-items:center;gap:10px}
@@ -205,7 +200,6 @@
     .progressManca{color:var(--muted)}
     .progressManca.done{color:#c084fc;font-weight:700}
 
-    /* COLPI DI TELEFONO */
     #telefonoPanel .widgetHeader{background:linear-gradient(180deg,rgba(168,85,247,.09),rgba(10,12,18,.35) 70%)}
     .telFormRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
     .telInput{flex:1;min-width:120px;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:10px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
@@ -242,7 +236,6 @@
     .telSectionLabel{font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding:0 2px;display:flex;align-items:center;gap:6px}
     .telEmpty{font-size:12px;color:var(--muted);font-style:italic;padding:6px 2px}
 
-    /* CHATBOT */
     .chatTrigger{position:fixed;bottom:24px;right:24px;width:70px;height:70px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:all .3s;z-index:1000}
     .chatTrigger:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(0,0,0,.5)}
     .chatTrigger img{width:70px;height:70px;object-fit:contain}
@@ -279,7 +272,6 @@
     .chatSendBtn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 4px 16px rgba(59,130,246,.4)}
     .chatSendBtn:disabled{opacity:.5;cursor:not-allowed}
 
-    /* ══ VISTA OGGI ══ */
     .oggiPanel{background:linear-gradient(135deg,rgba(17,24,39,.92),rgba(10,12,18,.95));border:1px solid rgba(59,130,246,.3);border-radius:16px;overflow:hidden;margin-bottom:16px}
     .oggiHeader{padding:16px 20px;background:linear-gradient(90deg,rgba(59,130,246,.15),rgba(96,165,250,.08));border-bottom:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     .oggiTitle{font-weight:950;font-size:20px;background:linear-gradient(135deg,#60a5fa,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -304,7 +296,6 @@
     .oggiDot.red{background:#ef4444}.oggiDot.yellow{background:#eab308}.oggiDot.blue{background:#3b82f6}.oggiDot.green{background:#22c55e}.oggiDot.purple{background:#a855f7}
     .oggiEmpty{font-size:12px;color:#6b7280;font-style:italic;padding:6px 2px}
 
-    /* ══ CONSEGNE ══ */
     .consegnePanel{background:var(--panel);border:1px solid rgba(34,197,94,.25);border-radius:16px;overflow:hidden}
     #consegnePanel .widgetHeader{background:linear-gradient(180deg,rgba(34,197,94,.09),rgba(10,12,18,.35) 70%)}
     .consegnaCard{border:1px solid rgba(31,41,55,.7);border-radius:14px;background:rgba(17,24,39,.4);margin-bottom:10px;overflow:hidden;animation:itemIn .2s ease}
@@ -335,7 +326,6 @@
     .consegnaInput:focus{border-color:#22c55e}
     .consegnaInput[type="date"]{color-scheme:dark;max-width:160px}
 
-    /* ══ POST VENDITA ══ */
     .postPanel{background:var(--panel);border:1px solid rgba(251,191,36,.25);border-radius:16px;overflow:hidden}
     #postPanel .widgetHeader{background:linear-gradient(180deg,rgba(251,191,36,.09),rgba(10,12,18,.35) 70%)}
     .postCard{border:1px solid rgba(31,41,55,.7);border-radius:12px;background:rgba(17,24,39,.4);padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;animation:itemIn .2s ease;transition:border-color .2s}
@@ -431,7 +421,7 @@
           <div id="weekGrid" class="weekGrid"></div>
         </div>
 
-        <!-- ══ PRE-CONSEGNA ══ -->
+        <!-- PRE-CONSEGNA -->
         <div style="border-top:2px solid rgba(34,197,94,.25);background:rgba(10,12,18,.35);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
           <div>
             <div style="font-weight:950;font-size:16px;">🚗 Pre-Consegna</div>
@@ -449,7 +439,7 @@
           <div id="consegnaList"></div>
         </div>
 
-        <!-- ══ POST VENDITA ══ -->
+        <!-- POST VENDITA -->
         <div style="border-top:2px solid rgba(251,191,36,.25);background:rgba(10,12,18,.35);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
           <div>
             <div style="font-weight:950;font-size:16px;">⭐ Post-Vendita</div>
@@ -463,10 +453,10 @@
 
       </aside>
 
-      <!-- DESTRA: COMPARATORE + VENDITE + AGENDA + MEMO + TELEFONO -->
+      <!-- DESTRA -->
       <section style="padding:0;border:none;background:none;">
 
-        <!-- ══ VISTA OGGI ══ -->
+        <!-- VISTA OGGI -->
         <div class="oggiPanel" id="oggiPanel">
           <div class="oggiHeader">
             <div>
@@ -475,7 +465,6 @@
             </div>
             <button class="oggiAskBtn" id="oggiRiepilogoBtn">🤖 Chiedi all'AI: "Cosa devo fare oggi?"</button>
           </div>
-          <!-- KPI row -->
           <div class="oggiKpiRow">
             <div class="oggiKpi">
               <div class="oggiKpiLabel">📞 Chiamate</div>
@@ -498,11 +487,9 @@
               <div class="oggiKpiSub">In agenda oggi</div>
             </div>
           </div>
-          <!-- AI summary -->
           <div class="oggiSummary" id="oggiSummaryBox" style="display:none">
             <div class="oggiSummaryText" id="oggiSummaryText"></div>
           </div>
-          <!-- Mini grid tutto-in-uno -->
           <div class="oggiGrid">
             <div class="oggiCol">
               <div class="oggiColTitle">📞 Telefonate di oggi</div>
@@ -1089,9 +1076,7 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     }
 
     /* ══ COMPARATORE — DATABASE REALE 2025 ══ */
-
     const AUTO_DB = {
-      // ── FIAT ──────────────────────────────────────────────────────
       "grande panda": {
         marca:"Fiat", nome:"Grande Panda", lunghezza:"3,99 m",
         motori:[
@@ -1122,7 +1107,6 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
         punti:["City car iconica ultra compatta","Vera 4x4 disponibile (Cross)","Adatta neopatentati","Costi di gestione bassi"],
         prezzo_base:"€15.500"
       },
-      // ── JEEP ──────────────────────────────────────────────────────
       "avenger": {
         marca:"Jeep", nome:"Avenger", lunghezza:"4,08 m",
         motori:[
@@ -1169,7 +1153,6 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
         punti:["Icona del fuoristrada compact","4xe con vera capacità off-road","Produzione in Italia (Melfi — fine prod. attuale, nuova gen. 2027)"],
         prezzo_base:"€30.000 (ibrida) / €43.600 (4xe plug-in)"
       },
-      // ── ALFA ROMEO ───────────────────────────────────────────────
       "junior": {
         marca:"Alfa Romeo", nome:"Junior", lunghezza:"4,17 m",
         motori:[
@@ -1195,9 +1178,7 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
           "1.5 Mild Hybrid 160 CV — disponibile",
           "Plug-in Hybrid 4xe 280 CV — disponibile"
         ],
-        allestimenti:[
-          "Sprint", "Ti", "Veloce", "Quadrifoglio (280 CV)"
-        ],
+        allestimenti:["Sprint", "Ti", "Veloce", "Quadrifoglio (280 CV)"],
         punti:["SUV C-segment Alfa Romeo","Design sportivo premium","Sistema NFT per certificazione km","Plug-in 4xe disponibile"],
         prezzo_base:"€38.000 circa"
       },
@@ -1223,7 +1204,6 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
         punti:["SUV premium mid-size","Versione Quadrifoglio 510 CV record Nürburgring","Trazione integrale AWD di serie","Design sportivo italiano"],
         prezzo_base:"€53.000 circa"
       },
-      // ── LANCIA ───────────────────────────────────────────────────
       "ypsilon": {
         marca:"Lancia", nome:"Ypsilon", lunghezza:"4,08 m",
         motori:[
@@ -1244,7 +1224,6 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       }
     };
 
-    // Normalizza il nome del modello per lookup nel DB
     function normalizzaModello(input){
       const low = input.toLowerCase().trim()
         .replace(/alfa\s?romeo\s?/i,"")
@@ -1252,7 +1231,6 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
         .replace(/fiat\s?/i,"")
         .replace(/lancia\s?/i,"")
         .trim();
-      // Alias
       const alias = {
         "grande panda":"grande panda","grandepanda":"grande panda",
         "panda":"panda",
@@ -1267,7 +1245,6 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
         "ypsilon":"ypsilon","lancia ypsilon":"ypsilon",
       };
       if(alias[low]) return alias[low];
-      // Match parziale sul DB
       for(const key of Object.keys(AUTO_DB)){
         if(low.includes(key)||key.includes(low)) return key;
       }
@@ -1326,7 +1303,6 @@ Nessun testo extra. Solo lo schema sopra.`;
       const k1=normalizzaModello(m1raw), k2=normalizzaModello(m2raw);
       const d1=k1?AUTO_DB[k1]:null, d2=k2?AUTO_DB[k2]:null;
 
-      // Costruisce contesto dettagliato dal DB
       function dbToContext(d, rawName){
         if(!d) return `[MODELLO: ${rawName} — non in database locale, usa le tue conoscenze generali per questo modello]`;
         return `=== ${d.marca.toUpperCase()} ${d.nome.toUpperCase()} ===
@@ -1693,21 +1669,30 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       renderConsegne();
       renderPostVendita();
     };
-    // Sposta la consegna nel post-vendita con data di consegna = oggi
+
+    // ══════════════════════════════════════════════════════════
+    // FIX: consegnataPostVendita — _isConsegna: false + data reale
+    // ══════════════════════════════════════════════════════════
     window.consegnataPostVendita = function(id){
       const con = consegneState.consegne[id];
       if(!con) return;
-      // Crea il follow-up nel postState con data consegna = oggi
-      const postId = "cons_"+id;
-      postState.followup[postId] = {
-        id: postId,
-        cliente: con.cliente || con.modello || "Cliente",
-        modello: con.modello || "",
-        dataConsegna: dateKey(new Date()),
-        intervistaFatta: false,
-        recensioneFatta: false,
-        _isConsegna: true
-      };
+
+      const postId = "cons_" + id;
+
+      // Crea l'entry in postState solo se non esiste già
+      // (preserva eventuali stati intervista/recensione già salvati)
+      if(!postState.followup[postId]) {
+        postState.followup[postId] = {
+          id: postId,
+          cliente: con.cliente || con.modello || "Cliente",
+          modello: con.modello || "",
+          dataConsegna: con.data || dateKey(new Date()), // ← usa la data reale della consegna
+          intervistaFatta: false,
+          recensioneFatta: false,
+          _isConsegna: false  // ← FIX: false → viene inclusa nel render del post-vendita
+        };
+      }
+
       // Rimuovi dal pre-consegna
       delete consegneState.consegne[id];
       consegneWrite();
@@ -1742,7 +1727,6 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     });
     $("consegnaCliente").addEventListener("keypress", e=>{ if(e.key==="Enter") $("consegnaAddBtn").click(); });
     $("consegnaClearDoneBtn").addEventListener("click", () => {
-      // Rimuovi consegne con checklist 100% completata
       for(const [id,c] of Object.entries(consegneState.consegne)){
         const checks = c.checks || [];
         if(checks.length && checks.every(ch=>ch.done)) delete consegneState.consegne[id];
@@ -1782,26 +1766,22 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       const box = $("postList");
       if(!auth.currentUser){ box.innerHTML='<div class="oggiEmpty">Login richiesto.</div>'; return; }
 
-      // Costruiamo la lista da CONSEGNE con data passata
-      const oggi = dateKey(new Date());
-      const consList = Object.values(consegneState.consegne||{}).filter(c=>c.data && c.data<=oggi);
-      // + eventuali post manuali (backward compat)
-      const manual  = Object.values(postState.followup||{});
+      // Prende tutti i followup manuali (inclusi quelli spostati da pre-consegna con _isConsegna:false)
+      const manual = Object.values(postState.followup || {});
 
-      // Merge: per ogni consegna con data passata, crea un "followup"
-      const followups = [...consList.map(c=>({
-        id: "cons_"+c.id,
-        cliente: c.cliente||c.modello||"Cliente",
-        modello: c.modello,
-        dataConsegna: c.data,
-        intervistaFatta: (postState.followup["cons_"+c.id]||{}).intervistaFatta||false,
-        recensioneFatta: (postState.followup["cons_"+c.id]||{}).recensioneFatta||false,
-        _isConsegna: true
-      })), ...manual.filter(m=>!m._isConsegna)];
+      if(!manual.length){
+        box.innerHTML='<div class="oggiEmpty">Nessun follow-up. Usa "✅ Consegnata!" nella Pre-Consegna per aggiungere clienti qui.</div>';
+        return;
+      }
 
-      if(!followups.length){ box.innerHTML='<div class="oggiEmpty">Nessun follow-up. Le consegne effettuate appariranno qui automaticamente.</div>'; return; }
+      // Ordina: prima urgenti (non completati), poi per data consegna più recente
+      const sorted = manual.sort((a,b) => {
+        const aUrgente = (!a.intervistaFatta || !a.recensioneFatta) ? 0 : 1;
+        const bUrgente = (!b.intervistaFatta || !b.recensioneFatta) ? 0 : 1;
+        return aUrgente - bUrgente || (b.dataConsegna||"").localeCompare(a.dataConsegna||"");
+      });
 
-      box.innerHTML = followups.map(f => {
+      box.innerHTML = sorted.map(f => {
         const diff = daysDiff(f.dataConsegna);
         const needIntervista  = diff !== null && diff >= 2  && !f.intervistaFatta;
         const needRecensione  = diff !== null && diff >= 3  && !f.recensioneFatta;
@@ -1866,30 +1846,24 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
 
     /* ══ VISTA OGGI ══ */
     function renderOggi(){
-      // Data label
       const dl = $("oggiDateLabel");
       if(dl) dl.textContent = new Date().toLocaleDateString("it-IT",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
 
       const todayK = dateKey(new Date());
 
-      // KPI: chiamate oggi
       const telOggi = Object.values(telState.contatti||{}).filter(c=>c.quando==="oggi"&&!c.chiamato);
       const kpiChiamate = $("oggiKpiChiamate"); if(kpiChiamate) kpiChiamate.textContent = telOggi.length;
 
-      // KPI: lead caldi attivi
       const caldi = Object.values(telState.contatti||{}).filter(c=>c.stato==="caldo"&&!c.chiamato);
       const kpiCaldi = $("oggiKpiCaldi"); if(kpiCaldi) kpiCaldi.textContent = caldi.length;
 
-      // KPI: consegne oggi o imminenti (nei prossimi 3gg)
       const in3gg = dateKey(new Date(Date.now()+3*864e5));
       const consegneOggi = Object.values(consegneState.consegne||{}).filter(c=>c.data && c.data >= todayK && c.data <= in3gg);
       const kpiCons = $("oggiKpiConsegne"); if(kpiCons) kpiCons.textContent = consegneOggi.length;
 
-      // KPI: task oggi
       const taskOggi = Object.values(SYNC.data.tasks||{}).filter(t=>t.dateKey===todayK&&!t.done);
       const kpiTask = $("oggiKpiTask"); if(kpiTask) kpiTask.textContent = taskOggi.length;
 
-      // Lista telefonate oggi
       const lt = $("oggiListaTel");
       if(lt){
         const statoEmoji = {caldo:"🔥",tiepido:"🌡",freddo:"❄"};
@@ -1898,7 +1872,6 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
           : '<div class="oggiEmpty">Nessuna telefonata programmata oggi</div>';
       }
 
-      // Lista task + consegne oggi
       const lta = $("oggiListaTask");
       if(lta){
         const tasksHtml = taskOggi.slice(0,4).map(t=>`<div class="oggiItem"><span class="oggiDot purple"></span><span>${escapeHtml(t.text)}</span></div>`).join("");
@@ -1906,17 +1879,15 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         lta.innerHTML = (tasksHtml+consHtml) || '<div class="oggiEmpty">Nessun task o consegna oggi</div>';
       }
 
-      // Lista post-vendita urgenti
       const lp = $("oggiListaPost");
       if(lp){
-        const oggi2 = dateKey(new Date(Date.now()-2*864e5));
-        const urgPost = Object.values(consegneState.consegne||{}).filter(c=>c.data && c.data<=todayK && c.data>=oggi2);
+        // Mostra follow-up urgenti dal post-vendita (non completati)
+        const urgPost = Object.values(postState.followup||{}).filter(f => !f.intervistaFatta || !f.recensioneFatta);
         lp.innerHTML = urgPost.length
-          ? urgPost.map(c=>`<div class="oggiItem"><span class="oggiDot yellow"></span><span>⭐ <strong>${escapeHtml(c.cliente||c.modello)}</strong> — follow-up da fare!</span></div>`).join("")
+          ? urgPost.slice(0,4).map(f=>`<div class="oggiItem"><span class="oggiDot yellow"></span><span>⭐ <strong>${escapeHtml(f.cliente||f.modello||"—")}</strong>${!f.intervistaFatta?" · 📞 intervista":""} ${!f.recensioneFatta?"· ⭐ recensione":""}</span></div>`).join("")
           : '<div class="oggiEmpty">Nessun follow-up urgente</div>';
       }
 
-      // Vendite mini-riepilogo mese
       const lv = $("oggiListaVendite");
       if(lv){
         const k = TODAY_KEY;
@@ -1929,7 +1900,6 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       }
     }
 
-    // AI Riepilogo giornaliero
     $("oggiRiepilogoBtn").addEventListener("click", async ()=>{
       const btn = $("oggiRiepilogoBtn");
       const box = $("oggiSummaryBox");
@@ -1944,6 +1914,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       const taskOggi= Object.values(SYNC.data.tasks||{}).filter(t=>t.dateKey===todayK&&!t.done);
       const in3gg   = dateKey(new Date(Date.now()+3*864e5));
       const consOggi= Object.values(consegneState.consegne||{}).filter(c=>c.data&&c.data>=todayK&&c.data<=in3gg);
+      const postUrgenti = Object.values(postState.followup||{}).filter(f=>!f.intervistaFatta||!f.recensioneFatta);
       const k       = TODAY_KEY;
       const mese    = vendState.months[k]||{nuove:[],usate:[]};
       const totVend  = (mese.nuove||[]).length+(mese.usate||[]).length;
@@ -1954,6 +1925,7 @@ Telefonate programmate oggi: ${telOggi.length} (${telOggi.map(c=>`${c.nome} - ${
 Lead caldi attivi: ${caldi.length} (${caldi.slice(0,3).map(c=>c.nome).join(", ")||"nessuno"})
 Task in agenda oggi: ${taskOggi.length} (${taskOggi.map(t=>t.text).join(", ")||"nessuno"})
 Consegne imminenti (3gg): ${consOggi.length} (${consOggi.map(c=>`${c.cliente||c.modello} il ${consegnaFmtDate(c.data)}`).join(", ")||"nessuna"})
+Follow-up post-vendita da fare: ${postUrgenti.length} (${postUrgenti.slice(0,3).map(f=>f.cliente||f.modello).join(", ")||"nessuno"})
 Vendite mese corrente: ${totVend} auto, ${fmtEur(provv)} provvigioni
 ${vendState.obiettivo>0?`Obiettivo mensile: ${Math.round(Math.min(provv/vendState.obiettivo,1)*100)}% raggiunto`:"Nessun obiettivo impostato"}`;
 
@@ -1976,13 +1948,17 @@ Formato:
 • [task]
 ...
 
+⭐ FOLLOW-UP POST-VENDITA:
+• [cliente] — [cosa fare]
+...
+
 💰 MESE:
 • [stato vendite e obiettivo]
 
 🎯 FOCUS DEL GIORNO:
 [1-2 righe di consiglio strategico personalizzato]
 
-Sii diretto, pratico, motivante. Max 20 righe totali.`},
+Sii diretto, pratico, motivante. Max 25 righe totali.`},
           {role:"system", content:ctx},
           {role:"user",   content:"Cosa devo fare oggi?"}
         ]})});
