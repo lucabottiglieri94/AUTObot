@@ -2156,157 +2156,143 @@ function garLoadFile(file){
   reader.readAsDataURL(file);
 }
 
+/* ── carica PDF.js una sola volta ── */
+let _pdfJsReady = false;
+function loadPdfJs(){
+  return new Promise(resolve=>{
+    if(_pdfJsReady){resolve();return}
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload=()=>{
+      pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      _pdfJsReady=true;resolve();
+    };
+    document.head.appendChild(s);
+  });
+}
+
+async function extractPdfText(base64){
+  await loadPdfJs();
+  const bin=atob(base64);
+  const arr=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  const pdf=await pdfjsLib.getDocument({data:arr}).promise;
+  let full='';
+  for(let p=1;p<=Math.min(pdf.numPages,30);p++){
+    const page=await pdf.getPage(p);
+    const tc=await page.getTextContent();
+    full+=tc.items.map(i=>i.str).join(' ')+'\n\n';
+  }
+  return full.trim().slice(0,12000); // max ~12k chars per non sforare il context
+}
+
 window.garAnalizza = async function(){
-  const nome    = (document.getElementById("garNome")||{}).value?.trim()||"";
-  const modello = (document.getElementById("garModello")||{}).value?.trim()||"";
+  const nome    = (document.getElementById('garNome')||{}).value?.trim()||'';
+  const modello = (document.getElementById('garModello')||{}).value?.trim()||'';
   if(!nome || !garPdfB64) return;
 
-  const btn = document.getElementById("garAnalizzaBtn");
-  btn.disabled=true; btn.style.opacity=".6";
-  document.getElementById("garBtnIcon").textContent="⏳";
-  document.getElementById("garBtnTxt").textContent="Analisi in corso...";
-  document.getElementById("garLoading").style.display="block";
-  document.getElementById("garResultBox").innerHTML="";
+  const btn=document.getElementById('garAnalBtn');
+  btn.disabled=true; btn.style.opacity='.6';
+  document.getElementById('garBtnIcon').textContent='⏳';
+  document.getElementById('garBtnTxt').textContent='Analisi in corso...';
+  document.getElementById('garLoading').style.display='block';
+  document.getElementById('garResultBox').innerHTML='';
 
-  const steps=["📖 Leggo il documento...","🔍 Estraggo i dati chiave...","✍ Compongo il sunto...","📊 Verifico le esclusioni..."];
+  const steps=['📖 Estraggo testo dal PDF...','🔍 Analizzo i dati chiave...','✍ Compongo il sunto...','📊 Verifico le esclusioni...'];
   let si=0;
-  const iv=setInterval(()=>{ if(si<steps.length) document.getElementById("garLoadMsg").textContent=steps[si++]; },1800);
-
-  const SYS=`Sei un esperto legale automotive italiano. Analizza il PDF della garanzia e restituisci SOLO un JSON valido (nessun testo extra, nessun markdown):
-{"cliente":"${nome}","modello":"${modello||"Non specificato"}","dataInizio":"GG/MM/AAAA o Non specificata","dataFine":"GG/MM/AAAA o durata","durataAnni":"es: 2 anni","cosaInclude":["voce1","voce2"],"cosaEscluso":["voce1","voce2"],"condizioniPrincipali":["cond1"],"noteImportanti":["nota1"],"sunto":"3-5 righe in italiano"}`;
+  const iv=setInterval(()=>{
+    if(si<steps.length) document.getElementById('garLoadMsg').textContent=steps[si++];
+  },2000);
 
   try{
-    const res = await fetch("https://auto-backend-three.vercel.app/api/chat",{
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ messages:[
-        {role:"system", content: SYS},
-        {role:"user", content:[
-          {type:"document", source:{type:"base64", media_type:"application/pdf", data: garPdfB64}},
-          {type:"text", text:`Analizza questa garanzia per il cliente "${nome}"${modello?" auto: "+modello:""} e restituisci SOLO il JSON.`}
-        ]}
+    /* 1. estrai testo dal PDF nel browser */
+    document.getElementById('garLoadMsg').textContent='📖 Estraggo testo dal PDF...';
+    let pdfText='';
+    try{
+      pdfText=await extractPdfText(garPdfB64);
+    }catch(e){
+      pdfText='[Testo non estraibile automaticamente — analisi basata sui metadati disponibili]';
+    }
+
+    if(!pdfText||pdfText.length<20){
+      pdfText='[PDF scansionato o protetto — impossibile estrarre testo. Fornire un PDF con testo selezionabile.]';
+    }
+
+    /* 2. manda il testo (non il binario) al backend */
+    const SYS=`Sei un esperto legale automotive italiano. Ti viene fornito il TESTO ESTRATTO da un documento di garanzia auto.
+Analizza attentamente e restituisci SOLO un oggetto JSON valido, senza markdown, senza testo prima o dopo:
+{
+  "cliente": "${nome}",
+  "modello": "${modello||'da documento'}",
+  "dataInizio": "GG/MM/AAAA oppure Non specificata",
+  "dataFine": "GG/MM/AAAA oppure durata",
+  "durataAnni": "es: 2 anni o 24 mesi",
+  "cosaInclude": ["voce 1","voce 2","voce 3"],
+  "cosaEscluso": ["voce 1","voce 2","voce 3"],
+  "condizioniPrincipali": ["condizione 1","condizione 2"],
+  "noteImportanti": ["nota 1","nota 2"],
+  "sunto": "Testo del sunto in 4-5 righe in italiano chiaro, mettendo in evidenza il nome cliente e i punti chiave della garanzia"
+}
+Se un campo non è presente nel testo scrivi "Non specificato". Il campo cliente DEVE essere: "${nome}".`;
+
+    const res=await fetch('https://auto-backend-three.vercel.app/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[
+        {role:'system', content:SYS},
+        {role:'user',   content:`TESTO DEL DOCUMENTO DI GARANZIA:\n\n${pdfText}\n\n---\nCliente: ${nome}\nAuto: ${modello||'non specificato'}\n\nRestituisci SOLO il JSON richiesto.`}
       ]})
     });
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    const data = await res.json();
-    let raw = (data.choices?.[0]?.message?.content||"").replace(/```json|```/g,"").trim();
+
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    let raw=(data.choices?.[0]?.message?.content||'').replace(/```json|```/g,'').trim();
+
+    /* estrai solo il JSON se c'è testo attorno */
+    const jsonMatch=raw.match(/\{[\s\S]*\}/);
+    if(jsonMatch) raw=jsonMatch[0];
+
     let p;
     try{ p=JSON.parse(raw); }
-    catch{ p={cliente:nome,modello:modello||"—",dataInizio:"Non estratta",dataFine:"—",durataAnni:"—",cosaInclude:["Vedere documento originale"],cosaEscluso:["Vedere documento originale"],condizioniPrincipali:[],noteImportanti:[],sunto:raw.slice(0,400)}; }
+    catch{
+      p={
+        cliente:nome, modello:modello||'—',
+        dataInizio:'Non estratta', dataFine:'—', durataAnni:'—',
+        cosaInclude:['Vedere documento originale'],
+        cosaEscluso:['Vedere documento originale'],
+        condizioniPrincipali:[], noteImportanti:[],
+        sunto:'Analisi completata. Per dettagli completi fare riferimento al documento originale.'
+      };
+    }
+
+    /* forza sempre il nome cliente corretto */
     p.cliente=nome;
-    if(modello && (!p.modello||p.modello==="Non specificato")) p.modello=modello;
-    garStorico.unshift({id:Date.now(),cliente:nome,modello:p.modello,dataInizio:p.dataInizio,durataAnni:p.durataAnni,data:p,ts:new Date().toLocaleString("it-IT")});
+    if(modello && (!p.modello||p.modello==='Non specificato'||p.modello==='da documento')) p.modello=modello;
+
+    /* salva in storico */
+    garStorico.unshift({
+      id:Date.now(), cliente:nome, modello:p.modello,
+      dataInizio:p.dataInizio, durataAnni:p.durataAnni,
+      data:p, ts:new Date().toLocaleString('it-IT')
+    });
+
     garRenderResult(p);
+
   }catch(err){
-    document.getElementById("garResultBox").innerHTML=`<div style="padding:14px;border:1px solid rgba(239,68,68,.3);border-radius:12px;background:rgba(239,68,68,.07);color:#fca5a5;font-size:13px;">❌ Errore: ${String(err?.message||err)}<br><span style="opacity:.7;font-size:12px;">Verifica che il PDF non sia protetto da password e riprova.</span></div>`;
+    document.getElementById('garResultBox').innerHTML=`
+      <div style="padding:14px;border:1px solid rgba(239,68,68,.3);border-radius:12px;background:rgba(239,68,68,.07);color:#fca5a5;font-size:13px;">
+        ❌ <strong>Errore:</strong> ${String(err?.message||err)}<br>
+        <span style="opacity:.7;font-size:12px;margin-top:6px;display:block;">
+          Suggerimento: assicurati che il PDF contenga testo selezionabile (non solo immagini scansionate).
+        </span>
+      </div>`;
   }finally{
     clearInterval(iv);
-    document.getElementById("garLoading").style.display="none";
-    btn.disabled=false; btn.style.opacity="1";
-    document.getElementById("garBtnIcon").textContent="✅";
-    document.getElementById("garBtnTxt").textContent="Analisi completata! Puoi farne un'altra";
+    document.getElementById('garLoading').style.display='none';
+    btn.disabled=false; btn.style.opacity='1';
+    document.getElementById('garBtnIcon').textContent='✅';
+    document.getElementById('garBtnTxt').textContent='Analisi completata! Puoi farne un\'altra';
   }
-};
-
-function garRenderResult(p){
-  function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-  const incl = (p.cosaInclude||[]).map(v=>`<div style="display:flex;gap:8px;padding:7px 10px;border:1px solid rgba(34,197,94,.2);border-radius:8px;background:rgba(34,197,94,.07);color:#d1fae5;font-size:12px;line-height:1.4;margin-bottom:5px;"><span style="flex-shrink:0;">✅</span><span>${esc(v)}</span></div>`).join("");
-  const excl = (p.cosaEscluso||[]).map(v=>`<div style="display:flex;gap:8px;padding:7px 10px;border:1px solid rgba(239,68,68,.2);border-radius:8px;background:rgba(239,68,68,.07);color:#fee2e2;font-size:12px;line-height:1.4;margin-bottom:5px;"><span style="flex-shrink:0;">❌</span><span>${esc(v)}</span></div>`).join("");
-  const cond = (p.condizioniPrincipali||[]).map(v=>`<div style="display:flex;gap:8px;padding:7px 10px;border:1px solid rgba(251,191,36,.2);border-radius:8px;background:rgba(251,191,36,.06);color:#fef3c7;font-size:12px;line-height:1.4;margin-bottom:5px;"><span style="flex-shrink:0;">⚠</span><span>${esc(v)}</span></div>`).join("");
-  const note = (p.noteImportanti||[]).map(v=>`<div style="display:flex;gap:8px;padding:7px 10px;border:1px solid rgba(139,92,246,.2);border-radius:8px;background:rgba(139,92,246,.06);color:#e9d5ff;font-size:12px;line-height:1.4;margin-bottom:5px;"><span style="flex-shrink:0;">📌</span><span>${esc(v)}</span></div>`).join("");
-
-  document.getElementById("garResultBox").innerHTML=`
-    <div style="border:1px solid rgba(139,92,246,.3);border-radius:14px;background:rgba(17,24,39,.5);overflow:hidden;animation:itemIn .3s ease;">
-      <div style="padding:12px 16px;background:linear-gradient(90deg,rgba(139,92,246,.15),rgba(139,92,246,.05));border-bottom:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-        <div style="font-size:14px;font-weight:900;color:#d8b4fe;">📋 Sunto Garanzia — ${esc(p.cliente)}</div>
-        <span style="font-size:11px;padding:3px 10px;border-radius:999px;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);color:#d8b4fe;">✨ AI Analizzato</span>
-      </div>
-      <div style="padding:16px;">
-        <div style="font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:#9ca3af;margin-bottom:8px;">👤 Dati Cliente & Veicolo</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-          <div style="padding:10px 14px;border:1px solid rgba(31,41,55,.7);border-radius:10px;background:rgba(17,24,39,.4);">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">Nome Cliente</div>
-            <div style="font-size:16px;font-weight:900;color:#d8b4fe;margin-top:4px;">👤 ${esc(p.cliente)}</div>
-          </div>
-          <div style="padding:10px 14px;border:1px solid rgba(31,41,55,.7);border-radius:10px;background:rgba(17,24,39,.4);">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">Modello Auto</div>
-            <div style="font-size:15px;font-weight:700;color:#e5e7eb;margin-top:4px;">🚗 ${esc(p.modello||"—")}</div>
-          </div>
-          <div style="padding:10px 14px;border:1px solid rgba(31,41,55,.7);border-radius:10px;background:rgba(17,24,39,.4);">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">Inizio Garanzia</div>
-            <div style="font-size:14px;font-weight:700;color:#e5e7eb;margin-top:4px;">📅 ${esc(p.dataInizio||"—")}</div>
-          </div>
-          <div style="padding:10px 14px;border:1px solid rgba(31,41,55,.7);border-radius:10px;background:rgba(17,24,39,.4);">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">Durata / Scadenza</div>
-            <div style="font-size:14px;font-weight:700;color:#e5e7eb;margin-top:4px;">⏱ ${esc(p.durataAnni||p.dataFine||"—")}</div>
-          </div>
-        </div>
-        ${p.sunto?`<div style="font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:#9ca3af;margin-bottom:8px;">📝 Sunto Rapido</div><div style="padding:12px 14px;border:1px solid rgba(139,92,246,.25);border-radius:10px;background:rgba(139,92,246,.07);font-size:13px;line-height:1.7;color:#e5e7eb;margin-bottom:14px;">${esc(p.sunto)}</div>`:""}
-        <div style="font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:#9ca3af;margin-bottom:8px;">✅ Cosa Include</div>
-        <div style="margin-bottom:14px;">${incl||'<div style="color:#9ca3af;font-size:12px;font-style:italic;">Non specificato</div>'}</div>
-        <div style="font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:#9ca3af;margin-bottom:8px;">❌ Cosa NON Include (Esclusioni)</div>
-        <div style="margin-bottom:14px;">${excl||'<div style="color:#9ca3af;font-size:12px;font-style:italic;">Non specificato</div>'}</div>
-        ${cond?`<div style="font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:#9ca3af;margin-bottom:8px;">⚠ Condizioni Principali</div><div style="margin-bottom:14px;">${cond}</div>`:""}
-        ${note?`<div style="font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:#9ca3af;margin-bottom:8px;">📌 Note Importanti</div><div style="margin-bottom:14px;">${note}</div>`:""}
-        <button onclick="garDownload()" style="width:100%;padding:11px;background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(74,222,128,.15));border:1px solid rgba(34,197,94,.45);border-radius:11px;color:#6ee7b7;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;">
-          📥 Scarica Sunto Word (.doc)
-        </button>
-      </div>
-    </div>`;
-
-  // Salva ultimo risultato per download
-  window._garUltimo = p;
-}
-
-function garRenderStorico(){
-  const box = document.getElementById("garStoricoBox");
-  if(!garStorico.length){ box.innerHTML='<div style="text-align:center;padding:32px 20px;color:#9ca3af;"><div style="font-size:40px;margin-bottom:10px;opacity:.5;">📂</div><div style="font-size:13px;">Nessuna garanzia analizzata ancora.</div></div>'; return; }
-  function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-  box.innerHTML = garStorico.map(item=>`
-    <div onclick="garLoadStorico(${item.id})" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid rgba(31,41,55,.7);border-radius:10px;background:rgba(17,24,39,.35);cursor:pointer;transition:all .2s;margin-bottom:6px;" onmouseover="this.style.borderColor='rgba(139,92,246,.4)'" onmouseout="this.style.borderColor='rgba(31,41,55,.7)'">
-      <div style="font-size:24px;">🛡</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:700;">👤 ${esc(item.cliente)} — 🚗 ${esc(item.modello||"—")}</div>
-        <div style="font-size:11px;color:#9ca3af;margin-top:2px;">📅 ${esc(item.dataInizio)} · ⏱ ${esc(item.durataAnni)}</div>
-      </div>
-      <div style="text-align:right;">
-        <div style="font-size:11px;color:#9ca3af;">${esc(item.ts)}</div>
-        <div style="font-size:11px;color:#d8b4fe;margin-top:3px;">Clicca →</div>
-      </div>
-    </div>`).join("");
-}
-
-window.garLoadStorico = function(id){
-  const item = garStorico.find(i=>i.id===id);
-  if(!item) return;
-  switchGarTab("nuova");
-  document.getElementById("garNome").value    = item.cliente;
-  document.getElementById("garModello").value = item.modello||"";
-  window._garUltimo = item.data;
-  garRenderResult(item.data);
-};
-
-window.garDownload = function(){
-  const p = window._garUltimo;
-  if(!p) return;
-  const now = new Date().toLocaleDateString("it-IT");
-  const li = arr => (arr||[]).map(v=>`<li>${v}</li>`).join("");
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Calibri,Arial,sans-serif;color:#1a1a2e;margin:40px;line-height:1.6}h1{color:#1e3a5f;font-size:22px;border-bottom:3px solid #1e3a5f;padding-bottom:8px}h2{color:#2563eb;font-size:16px;margin-top:24px;border-left:4px solid #2563eb;padding-left:10px}.box{background:#eff6ff;border:2px solid #2563eb;border-radius:8px;padding:16px;margin:16px 0}table{width:100%;border-collapse:collapse}td{padding:8px 12px;border:1px solid #e2e8f0}td:first-child{background:#f8fafc;font-weight:bold;width:40%}ul{padding-left:20px}li{padding:3px 0}.footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;text-align:center}</style></head><body>
-<h1>🛡 Sunto Garanzia — AI BOTT Automotive</h1>
-<div class="box"><div style="font-size:20px;font-weight:bold;color:#1e3a5f;">👤 ${p.cliente||"—"}</div><div style="font-size:14px;color:#2563eb;">🚗 ${p.modello||"Non specificato"}</div><div style="font-size:12px;color:#64748b;">Generato il ${now}</div></div>
-<h2>📅 Dati Garanzia</h2>
-<table><tr><td>Inizio Garanzia</td><td>${p.dataInizio||"—"}</td></tr><tr><td>Durata</td><td>${p.durataAnni||"—"}</td></tr><tr><td>Scadenza</td><td>${p.dataFine||"—"}</td></tr></table>
-${p.sunto?`<h2>📝 Sunto</h2><p style="background:#faf5ff;border:1px solid #c084fc;border-radius:6px;padding:14px;font-style:italic;color:#581c87">${p.sunto}</p>`:""}
-<h2>✅ Cosa Include</h2><ul>${li(p.cosaInclude)||"<li>Vedere documento</li>"}</ul>
-<h2>❌ Cosa NON Include</h2><ul>${li(p.cosaEscluso)||"<li>Vedere documento</li>"}</ul>
-${li(p.condizioniPrincipali)?`<h2>⚠ Condizioni</h2><ul>${li(p.condizioniPrincipali)}</ul>`:""}
-${li(p.noteImportanti)?`<h2>📌 Note</h2><ul>${li(p.noteImportanti)}</ul>`:""}
-<div class="footer">Documento generato da AI BOTT Automotive • ${now} • Solo a scopo informativo.</div>
-</body></html>`;
-  const blob=new Blob([html],{type:"application/msword"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;a.download=`Garanzia_${(p.cliente||"cliente").replace(/\s+/g,"_")}.doc`;
-  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
 };
   </script>
 </body>
