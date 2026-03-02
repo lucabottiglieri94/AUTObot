@@ -1,388 +1,457 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI BOTT Automotive</title>
+
   <style>
     :root{
-      --bgTop:#07080b;--bgMid:#101216;--bgBot:#1a1d23;
-      --panel:rgba(17,24,39,.78);--line:#1f2937;
-      --text:#e5e7eb;--muted:#9ca3af;
-      --accent:#3b82f6;--accent2:#60a5fa;
-      --orange:#f97316;--orange2:#fb923c;
+      --bgTop:#07080b;
+      --bgMid:#101216;
+      --bgBot:#1a1d23;
+      --panel:rgba(17,24,39,.78);
+      --line:#1f2937;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#3b82f6;
+      --accent2:#60a5fa;
+      --green:#22c55e;
+      --orange:#f97316;
     }
+
     *{box-sizing:border-box;margin:0;padding:0}
+
     body{
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      color:var(--text);min-height:100vh;
+      color:var(--text);
+      min-height:100vh;
       background:
         radial-gradient(1200px 700px at 18% -12%,rgba(59,130,246,.22),transparent 58%),
         radial-gradient(900px 520px at 72% 8%,rgba(96,165,250,.14),transparent 60%),
         linear-gradient(180deg,var(--bgTop) 0%,var(--bgMid) 48%,var(--bgBot) 100%);
     }
+
+    /* ═══ HEADER ═══ */
     header{
-      position:fixed;top:0;left:0;right:0;z-index:10;
-      background:rgba(10,10,12,.72);backdrop-filter:blur(10px);
+      position:sticky;
+      top:0;
+      z-index:100;
+      background:rgba(10,10,12,.82);
+      backdrop-filter:blur(12px);
       border-bottom:1px solid var(--line);
-      transition:transform .3s cubic-bezier(.4,0,.2,1);
     }
-    header.header-hidden{transform:translateY(-110%)}
-    body{padding-top:56px}
-    .wrap{max-width:1200px;margin:0 auto;padding:8px 16px}
-    .brand{display:flex;gap:10px;align-items:center;flex-wrap:wrap;min-width:unset}
-    .brandLogo{width:36px;height:36px;object-fit:contain;background:transparent;border:none;outline:none;filter:none;mix-blend-mode:screen}
-    .brandName{font-weight:950;letter-spacing:.2px;font-size:16px;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
-    .brandSub{opacity:.75;white-space:nowrap;font-size:12px}
-    .row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .brandMark{display:flex;align-items:center;gap:8px;user-select:none}
-    .btn{border:1px solid var(--line);background:rgba(17,24,39,.75);color:var(--text);padding:7px 12px;border-radius:10px;cursor:pointer;font-size:13px;transition:all .2s;font-weight:650}
+    .wrap{max-width:1200px;margin:0 auto;padding:10px 14px}
+
+    .headerRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .brandMark{display:flex;align-items:center;gap:8px;user-select:none;text-decoration:none}
+    .brandLogo{
+      width:38px;height:38px;
+      object-fit:contain;
+      background:transparent;
+      mix-blend-mode:screen;
+    }
+    .brandName{
+      font-weight:950;font-size:17px;line-height:1;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      white-space:nowrap;
+    }
+    .brandSub{opacity:.7;font-size:11px;white-space:nowrap}
+
+    .brandBtns{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .btn{
+      border:1px solid var(--line);
+      background:rgba(17,24,39,.75);
+      color:var(--text);
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:13px;
+      transition:all .2s;
+      font-weight:650;
+      white-space:nowrap;
+    }
     .btn:hover{border-color:rgba(59,130,246,.6);background:rgba(17,24,39,.92);transform:translateY(-1px)}
     .btn.primary{border-color:rgba(59,130,246,.55);background:rgba(37,99,235,.16)}
     .btn.primary:hover{background:rgba(37,99,235,.26)}
     .btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
     .btn.brand-fiat:hover{border-color:rgba(220,38,38,.6);background:rgba(220,38,38,.1)}
     .btn.brand-jeep:hover{border-color:rgba(34,197,94,.6);background:rgba(34,197,94,.1)}
     .btn.brand-alfa:hover{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)}
     .btn.brand-lancia:hover{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.1)}
-    .centroAutoLink{display:inline-flex;align-items:center;padding:4px 10px;border:2px solid rgba(34,197,94,.4);background:rgba(34,197,94,.08);border-radius:10px;transition:all .3s;text-decoration:none;box-shadow:0 2px 8px rgba(34,197,94,.15)}
-    .centroAutoLink:hover{border-color:rgba(34,197,94,.7);background:rgba(34,197,94,.18);transform:translateY(-2px);box-shadow:0 4px 16px rgba(34,197,94,.3)}
-    .centroAutoLogo{height:32px;width:auto;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.2))}
-    .pill{padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(17,24,39,.35);font-size:12px;white-space:nowrap}
+
+    .centroAutoLink{
+      display:inline-flex;align-items:center;
+      padding:4px 10px;border:2px solid rgba(34,197,94,.4);
+      background:rgba(34,197,94,.08);border-radius:10px;
+      transition:all .3s;text-decoration:none;
+    }
+    .centroAutoLink:hover{border-color:rgba(34,197,94,.7);background:rgba(34,197,94,.18);transform:translateY(-2px)}
+    .centroAutoLogo{height:30px;width:auto;object-fit:contain}
+
+    .headerAuth{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .pill{padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(17,24,39,.35);font-size:12px;white-space:nowrap}
     .muted{color:var(--muted)}
 
-    .layout{margin-top:16px;display:grid;grid-template-columns:420px 1fr;gap:16px;align-items:start}
-    .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow-y:auto;max-height:calc(100vh - 72px);position:sticky;top:72px}
-    .panelHeader{padding:14px 14px 10px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-    .panelTitle{font-weight:950;font-size:18px}
-    .panelSub{margin-top:6px}
-    .newsScroll{max-height:260px;overflow:auto;padding:12px}
-    .newsScroll::-webkit-scrollbar{width:10px}
-    .newsScroll::-webkit-scrollbar-thumb{background:rgba(59,130,246,.25);border:2px solid rgba(17,24,39,.7);border-radius:999px}
+    /* ═══ LAYOUT ═══ */
+    .layout{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:380px 1fr;
+      gap:14px;
+      align-items:start;
+    }
+
+    /* ═══ PANEL (NEWS) ═══ */
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      position:sticky;
+      top:66px;
+    }
+
+    .panelHeader{
+      padding:12px 14px 10px;
+      border-bottom:1px solid rgba(31,41,55,.75);
+      background:rgba(10,12,18,.35);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .panelTitle{font-weight:950;font-size:17px}
+    .panelSub{margin-top:5px;font-size:12px}
+    #status{margin:6px 0 0;font-size:12px}
+
+    .panelHeaderBtns{display:flex;gap:6px;align-items:center;flex-shrink:0}
+
+    /* NEWS COLLASSABILE */
+    .newsScroll{
+      overflow:hidden;
+      max-height:0;
+      transition:max-height .35s cubic-bezier(.4,0,.2,1);
+      padding:0 12px;
+    }
+    .newsScroll.open{
+      max-height:65vh;
+      overflow-y:auto;
+      padding:12px;
+    }
+    .newsScroll::-webkit-scrollbar{width:8px}
+    .newsScroll::-webkit-scrollbar-thumb{background:rgba(59,130,246,.25);border-radius:999px}
     .newsScroll::-webkit-scrollbar-track{background:rgba(0,0,0,.12)}
-    #status{margin:10px 0 0}
-    #newsList{display:grid;gap:12px}
-    .newsItem{display:block;padding:14px;border:1px solid var(--line);border-radius:14px;text-decoration:none;color:inherit;background:rgba(17,24,39,.35);transition:all .2s}
-    .newsItem:hover{border-color:rgba(59,130,246,.6);background:rgba(17,24,39,.55);transform:translateX(4px)}
-    .newsTitle{font-weight:850;margin-bottom:8px}
-    .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
-    .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
 
-    .weekPanel{border-top:1px solid rgba(31,41,55,.75);padding:12px;background:rgba(10,12,18,.18)}
-    .weekHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-    .weekTitle{font-weight:950;font-size:16px}
-    .weekSub{color:#9ca3af;font-size:12px}
-    .weekGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-    .weekCell{aspect-ratio:1/1;border:1px solid rgba(31,41,55,.75);background:rgba(17,24,39,.35);border-radius:14px;padding:10px;overflow:hidden;display:flex;flex-direction:column;gap:6px}
-    .weekCell.today{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.10) inset}
-    .weekTop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-    .weekDow{font-size:11px;color:#9ca3af;font-weight:800;text-transform:uppercase}
-    .weekDay{font-size:16px;font-weight:950}
-    .weekTasks{margin-top:2px;display:grid;gap:4px;overflow:hidden}
-    .weekTask{font-size:11px;line-height:1.2;color:#e5e7eb;opacity:.95;padding:5px 7px;border-radius:10px;border:1px solid rgba(31,41,55,.65);background:rgba(31,41,55,.30);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .weekTask.done{opacity:.55;text-decoration:line-through}
-    .weekMore{font-size:11px;color:#fdba74;opacity:.9;font-weight:800}
+    #newsList{display:grid;gap:10px}
+    .newsItem{
+      display:block;padding:12px;
+      border:1px solid var(--line);border-radius:12px;
+      text-decoration:none;color:inherit;
+      background:rgba(17,24,39,.35);transition:all .2s;
+    }
+    .newsItem:hover{border-color:rgba(59,130,246,.6);background:rgba(17,24,39,.55);transform:translateX(3px)}
+    .newsTitle{font-weight:800;margin-bottom:6px;font-size:14px;line-height:1.4}
+    .newsMeta{opacity:.7;font-size:11px;margin-top:4px}
+    .newsDate{opacity:.7;font-size:11px;margin-top:4px;font-style:italic}
 
-    .cmpSuggest{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);border-radius:999px;padding:4px 10px;color:#93c5fd;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
-    .cmpSuggest:hover{background:rgba(59,130,246,.25);border-color:rgba(59,130,246,.6)}
+    /* ═══ SEZIONE DESTRA ═══ */
+    .rightCol{display:grid;gap:14px}
 
-    .widgetStack{display:grid;gap:16px;margin-top:16px}
-    .widgetPanel{background:rgba(17,24,39,.78);border:1px solid #1f2937;border-radius:16px;overflow:hidden}
-    .widgetHeader{padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .widgetTitle{font-weight:950;font-size:18px}
-    .widgetSub{color:#9ca3af;font-size:13px;margin-top:4px}
-    .widgetBody{padding:16px 20px}
-    .formRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .field{flex:1;min-width:220px;background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s,background .2s}
-    .field:focus{border-color:var(--orange);background:rgba(31,41,55,.8)}
-    .seg{display:inline-flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:999px;overflow:hidden}
-    .seg button{border:none;background:transparent;color:#9ca3af;padding:8px 10px;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit;font-weight:700;white-space:nowrap}
-    .seg button.active{color:#fff;background:linear-gradient(135deg,rgba(249,115,22,.28),rgba(251,146,60,.22))}
-    .seg button:hover{background:rgba(249,115,22,.14);color:#ffe6d5}
-    .split3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;align-items:start}
-    .dayCol{background:rgba(31,41,55,.35);border:1px solid rgba(31,41,55,.75);border-radius:14px;overflow:hidden}
-    .dayHead{padding:12px 14px;font-weight:900;font-size:13px;border-bottom:1px solid rgba(31,41,55,.65);display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(59,130,246,.10)}
-    .dayMeta{color:#9ca3af;font-weight:700;font-size:12px}
-    .list{padding:10px 12px;display:grid;gap:8px;max-height:260px;overflow:auto}
-    .item{display:flex;align-items:flex-start;gap:10px;padding:10px;border:1px solid rgba(31,41,55,.7);border-radius:12px;background:rgba(17,24,39,.35)}
-    .itemMain{flex:1;min-width:0}
-    .itemText{font-size:13px;line-height:1.35;word-break:break-word}
-    .itemText.done{text-decoration:line-through;opacity:.65}
-    .itemActions{display:flex;gap:6px;align-items:center}
-    .iconBtn{width:32px;height:32px;border-radius:10px;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.45);color:#e5e7eb;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900}
-    .iconBtn:hover{border-color:rgba(249,115,22,.55);background:rgba(17,24,39,.7);transform:translateY(-1px)}
-    .chk{width:18px;height:18px;flex:0 0 auto;accent-color:var(--orange);margin-top:2px;cursor:pointer}
-    .smallNote{margin-top:10px;color:#9ca3af;font-size:12px}
-    .memoArea{width:100%;min-height:110px;resize:vertical}
-    .syncBadge{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);color:#9ca3af;white-space:nowrap}
-    .syncBadge.ok{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10);color:#bbf7d0}
-    .syncBadge.warn{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.10);color:#fde68a}
-    #agendaPanel .widgetHeader,#memoPanel .widgetHeader{background:linear-gradient(180deg,rgba(249,115,22,.09),rgba(10,12,18,.35) 70%)}
+    /* ═══ GARANZIE PANEL ═══ */
+    .garanziePanel{
+      background:var(--panel);
+      border:1px solid rgba(168,85,247,.35);
+      border-radius:16px;
+      overflow:hidden;
+    }
+    .garanzieHeader{
+      padding:14px 18px;
+      background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(139,92,246,.08));
+      border-bottom:1px solid rgba(168,85,247,.25);
+      display:flex;align-items:center;gap:12px;
+    }
+    .garanzieIcon{font-size:24px}
+    .garanzieTitle{font-weight:950;font-size:17px}
+    .garanzieSub{color:var(--muted);font-size:12px;margin-top:3px}
 
-    .venditePanel{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:16px}
-    .venditeHeader{padding:14px 18px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .venditeTitleRow{display:flex;align-items:center;gap:10px}
-    .venditeTitle{font-weight:950;font-size:18px}
-    .venditeSyncBadge{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);color:var(--muted);white-space:nowrap}
-    .venditeSyncBadge.ok{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10);color:#bbf7d0}
-    .venditeNav{display:flex;align-items:center;gap:8px}
-    .navArrow{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:rgba(17,24,39,.6);color:var(--text);cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s}
-    .navArrow:hover{border-color:rgba(59,130,246,.5);background:rgba(17,24,39,.9);transform:translateY(-1px)}
-    .navArrow:disabled{opacity:.35;cursor:not-allowed;transform:none}
-    .venditeMonthLabel{font-weight:900;font-size:15px;min-width:140px;text-align:center;padding:0 4px}
-    .venditeTotali{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid rgba(31,41,55,.75)}
-    .totCard{padding:14px 18px;display:flex;flex-direction:column;gap:4px}
-    .totCard:not(:last-child){border-right:1px solid rgba(31,41,55,.75)}
-    .totLabel{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
-    .totNum{font-size:36px;font-weight:950;line-height:1}
-    .totNum.nuova{color:#60a5fa}.totNum.usata{color:#f97316}.totNum.all{color:#22c55e}
-    .venditeForm{padding:12px 18px;border-bottom:1px solid rgba(31,41,55,.5);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
-    .venditeForm .fld{flex:1;min-width:150px;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:10px;padding:9px 13px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
-    .venditeForm .fld:focus{border-color:var(--accent)}
-    .venditeForm .fld::placeholder{color:var(--muted)}
-    .tipoSeg{display:inline-flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:999px;overflow:hidden;flex-shrink:0}
-    .tipoBtn{border:none;background:transparent;color:var(--muted);padding:9px 14px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;white-space:nowrap}
-    .tipoBtn.nuova.active{background:linear-gradient(135deg,rgba(59,130,246,.28),rgba(96,165,250,.2));color:#93c5fd}
-    .tipoBtn.usata.active{background:linear-gradient(135deg,rgba(249,115,22,.28),rgba(251,146,60,.2));color:#fdba74}
-    .tipoBtn:hover{opacity:.85}
-    .venditeListe{display:grid;grid-template-columns:1fr 1fr;min-height:180px}
-    .venditeCol{padding:14px 16px}
-    .venditeCol:first-child{border-right:1px solid rgba(31,41,55,.75)}
-    .venditeColTitle{font-size:12px;font-weight:900;letter-spacing:.3px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-    .venditeColTitle.nuova{color:#60a5fa}.venditeColTitle.usata{color:#f97316}
-    .venditeCount{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700}
-    .venditeCount.nuova{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd}
-    .venditeCount.usata{background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);color:#fdba74}
-    .venditeList{display:grid;gap:6px;max-height:320px;overflow-y:auto}
-    .venditeList::-webkit-scrollbar{width:6px}
-    .venditeList::-webkit-scrollbar-thumb{background:rgba(59,130,246,.2);border-radius:999px}
-    .autoItem{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid rgba(31,41,55,.7);border-radius:10px;background:rgba(17,24,39,.35);animation:itemIn .2s ease}
-    @keyframes itemIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
-    .autoN{font-size:11px;font-weight:900;min-width:20px;color:var(--muted)}
-    .autoModello{flex:1;font-size:13px;line-height:1.3;word-break:break-word}
-    .autoProvv{font-size:12px;font-weight:700;color:#4ade80;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
-    .autoProvv.zero{color:var(--muted);background:transparent;border-color:rgba(31,41,55,.5);font-weight:400}
-    .autoDelBtn{width:24px;height:24px;border-radius:7px;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.4);color:var(--muted);cursor:pointer;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
-    .autoDelBtn:hover{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:#fca5a5}
-    .emptyList{font-size:12px;color:var(--muted);font-style:italic;padding:8px 2px}
-    .venditeProvvBar{border-top:1px solid rgba(31,41,55,.75);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:rgba(34,197,94,.04)}
-    .provvMeseGroup{display:flex;flex-direction:column;gap:2px}
-    .provvMeseLabel{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
-    .provvMeseNum{font-size:24px;font-weight:950;color:#4ade80;font-variant-numeric:tabular-nums}
-    .provvMeseSplit{font-size:11px;color:var(--muted);margin-top:2px}
-    .vendite2026Bar{border-top:2px solid rgba(251,191,36,.3);padding:14px 18px;background:linear-gradient(90deg,rgba(251,191,36,.07),transparent);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .bar2026Left{display:flex;align-items:center;gap:10px}
-    .bar2026Icon{font-size:22px}
-    .bar2026Title{font-weight:900;font-size:14px}
-    .bar2026Sub{font-size:11px;color:var(--muted);margin-top:2px}
-    .bar2026Right{text-align:right}
-    .bar2026Num{font-size:30px;font-weight:950;color:#fbbf24;font-variant-numeric:tabular-nums}
-    .bar2026Mesi{font-size:11px;color:var(--muted);margin-top:2px}
-    .obiettivoBar{border-top:1px solid rgba(31,41,55,.75);padding:16px 18px;background:rgba(10,12,18,.25)}
-    .obiettivoHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-    .obiettivoLeft{display:flex;align-items:center;gap:8px}
-    .obiettivoIcon{font-size:18px}
-    .obiettivoTitle{font-weight:900;font-size:14px}
-    .obiettivoSub{font-size:11px;color:var(--muted);margin-top:2px}
-    .obiettivoRight{display:flex;align-items:center;gap:8px}
-    .obiettivoInput{width:110px;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:9px;padding:7px 11px;color:var(--text);font-size:13px;font-weight:700;outline:none;font-family:inherit;transition:border-color .2s;text-align:right}
-    .obiettivoInput:focus{border-color:var(--accent)}
-    .obiettivoInputLabel{font-size:12px;color:var(--muted);white-space:nowrap}
-    .progressWrap{background:rgba(31,41,55,.5);border-radius:999px;height:14px;overflow:hidden}
-    .progressFill{height:100%;border-radius:999px;transition:width .5s cubic-bezier(.4,0,.2,1),background .4s;min-width:0}
-    .progressFill.low{background:linear-gradient(90deg,#f97316,#fb923c)}
-    .progressFill.mid{background:linear-gradient(90deg,#eab308,#fbbf24)}
-    .progressFill.high{background:linear-gradient(90deg,#22c55e,#4ade80)}
-    .progressFill.done{background:linear-gradient(90deg,#a855f7,#c084fc)}
-    .progressMeta{display:flex;align-items:center;justify-content:space-between;margin-top:7px;font-size:12px}
-    .progressPct{font-weight:900;font-size:15px}
-    .progressPct.low{color:#fb923c}.progressPct.mid{color:#fbbf24}.progressPct.high{color:#4ade80}.progressPct.done{color:#c084fc}
-    .progressManca{color:var(--muted)}
-    .progressManca.done{color:#c084fc;font-weight:700}
+    .garanzieBody{padding:18px}
 
-    #telefonoPanel .widgetHeader{background:linear-gradient(180deg,rgba(168,85,247,.09),rgba(10,12,18,.35) 70%)}
-    .telFormRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-    .telInput{flex:1;min-width:120px;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:10px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
-    .telInput:focus{border-color:#a855f7}
-    .telInput::placeholder{color:var(--muted)}
-    .telSeg{display:inline-flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:999px;overflow:hidden;flex-shrink:0}
-    .telBtn{border:none;background:transparent;color:var(--muted);padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;white-space:nowrap}
-    .telBtn.caldo.active{background:rgba(239,68,68,.25);color:#fca5a5}
-    .telBtn.tiepido.active{background:rgba(251,191,36,.2);color:#fde68a}
-    .telBtn.freddo.active{background:rgba(59,130,246,.2);color:#93c5fd}
-    .telBtn:hover{opacity:.8}
-    .telWhenSeg{display:inline-flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:999px;overflow:hidden;flex-shrink:0}
-    .telWhenBtn{border:none;background:transparent;color:var(--muted);padding:8px 10px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;white-space:nowrap}
-    .telWhenBtn.active{background:rgba(168,85,247,.22);color:#d8b4fe}
-    .telList{display:grid;gap:8px;max-height:360px;overflow-y:auto}
-    .telList::-webkit-scrollbar{width:6px}
-    .telList::-webkit-scrollbar-thumb{background:rgba(168,85,247,.25);border-radius:999px}
-    .telCard{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid rgba(31,41,55,.7);border-radius:12px;background:rgba(17,24,39,.35);animation:itemIn .2s ease;transition:border-color .2s}
-    .telCard.caldo{border-left:3px solid rgba(239,68,68,.7)}
-    .telCard.tiepido{border-left:3px solid rgba(251,191,36,.7)}
-    .telCard.freddo{border-left:3px solid rgba(59,130,246,.7)}
-    .telCard.chiamato{opacity:.5}
-    .telCardMain{flex:1;min-width:0}
-    .telCardName{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .telCardName.chiamato{text-decoration:line-through}
-    .telCardMeta{display:flex;gap:8px;align-items:center;margin-top:3px;flex-wrap:wrap}
-    .telCardModello{font-size:12px;color:var(--muted)}
-    .telStatoBadge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
-    .telStatoBadge.caldo{background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.35);color:#fca5a5}
-    .telStatoBadge.tiepido{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.35);color:#fde68a}
-    .telStatoBadge.freddo{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.35);color:#93c5fd}
-    .telCardActions{display:flex;gap:6px;flex-shrink:0}
-    .telSection{margin-top:14px}
-    .telSectionLabel{font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding:0 2px;display:flex;align-items:center;gap:6px}
-    .telEmpty{font-size:12px;color:var(--muted);font-style:italic;padding:6px 2px}
+    /* Steps */
+    .garanzieSteps{display:grid;gap:12px}
 
-    .chatTrigger{position:fixed;bottom:24px;right:24px;width:70px;height:70px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:all .3s;z-index:1000}
-    .chatTrigger:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(0,0,0,.5)}
-    .chatTrigger img{width:70px;height:70px;object-fit:contain}
-    .chatBox{position:fixed;bottom:24px;right:24px;width:420px;max-width:calc(100vw - 32px);height:600px;max-height:calc(100vh - 48px);background:rgba(17,24,39,.95);border:1px solid var(--line);border-radius:20px;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:1001;overflow:hidden;backdrop-filter:blur(20px)}
+    .garanzieStep{
+      display:flex;align-items:flex-start;gap:12px;
+      background:rgba(31,41,55,.35);
+      border:1px solid rgba(31,41,55,.7);
+      border-radius:14px;
+      padding:14px 16px;
+      transition:border-color .2s;
+    }
+    .garanzieStep:hover{border-color:rgba(168,85,247,.4)}
+
+    .stepNum{
+      width:30px;height:30px;flex-shrink:0;
+      border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a855f7);
+      color:#fff;font-size:13px;font-weight:900;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .stepContent{flex:1;min-width:0}
+    .stepLabel{font-size:13px;font-weight:800;margin-bottom:8px;color:#d8b4fe}
+    .stepInput{
+      width:100%;background:rgba(17,24,39,.6);
+      border:1px solid rgba(31,41,55,.9);border-radius:10px;
+      padding:10px 14px;color:var(--text);font-size:13px;
+      outline:none;font-family:inherit;
+      transition:border-color .2s;
+    }
+    .stepInput:focus{border-color:#a855f7}
+    .stepInput::placeholder{color:var(--muted)}
+
+    /* Upload zone */
+    .uploadZone{
+      width:100%;
+      border:2px dashed rgba(168,85,247,.4);
+      border-radius:12px;
+      padding:20px;
+      text-align:center;
+      cursor:pointer;
+      transition:all .25s;
+      background:rgba(168,85,247,.04);
+      position:relative;
+    }
+    .uploadZone:hover,.uploadZone.drag{
+      border-color:rgba(168,85,247,.75);
+      background:rgba(168,85,247,.10);
+    }
+    .uploadZone input[type="file"]{
+      position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+    }
+    .uploadIcon{font-size:28px;margin-bottom:6px}
+    .uploadText{font-size:13px;font-weight:700;color:#d8b4fe}
+    .uploadSub{font-size:11px;color:var(--muted);margin-top:3px}
+    .uploadFileName{
+      margin-top:8px;font-size:12px;color:#4ade80;font-weight:700;
+      background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);
+      border-radius:7px;padding:5px 10px;display:none;
+    }
+
+    /* Elabora btn */
+    .elaboraBtn{
+      width:100%;margin-top:12px;
+      padding:13px;border:none;border-radius:12px;
+      background:linear-gradient(135deg,#7c3aed,#a855f7);
+      color:#fff;font-size:15px;font-weight:800;
+      cursor:pointer;transition:all .25s;font-family:inherit;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .elaboraBtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(168,85,247,.4)}
+    .elaboraBtn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+    /* Progress elaborazione */
+    .garanzieProgress{
+      margin-top:14px;
+      background:rgba(31,41,55,.35);border:1px solid rgba(31,41,55,.7);
+      border-radius:12px;padding:14px;display:none;
+    }
+    .garanzieProgress.show{display:block}
+    .progressBar{height:8px;background:rgba(31,41,55,.8);border-radius:999px;overflow:hidden;margin:10px 0}
+    .progressFill{height:100%;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#a855f7);transition:width .5s ease;width:0%}
+    .progressMsg{font-size:13px;color:#d8b4fe;font-weight:600}
+
+    /* Download area */
+    .downloadArea{
+      margin-top:14px;
+      background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.3);
+      border-radius:12px;padding:14px;display:none;
+    }
+    .downloadArea.show{display:block;animation:fadeIn .4s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+    .downloadTitle{font-weight:800;font-size:14px;color:#4ade80;margin-bottom:4px}
+    .downloadSub{font-size:12px;color:var(--muted);margin-bottom:12px}
+    .downloadBtn{
+      display:flex;align-items:center;gap:10px;
+      width:100%;padding:12px 16px;border-radius:10px;
+      border:1px solid rgba(34,197,94,.4);
+      background:rgba(34,197,94,.1);
+      color:#4ade80;font-size:14px;font-weight:700;
+      cursor:pointer;transition:all .2s;font-family:inherit;
+      text-decoration:none;
+    }
+    .downloadBtn:hover{background:rgba(34,197,94,.2);border-color:rgba(34,197,94,.6);transform:translateY(-1px)}
+
+    /* ═══ AREA CONTENUTI ═══ */
+    .rightSpace{
+      padding:18px;
+      border:1px dashed rgba(31,41,55,.7);
+      border-radius:16px;
+      background:rgba(0,0,0,.12);
+    }
+
+    /* ═══ CHATBOT ═══ */
+    .chatTrigger{
+      position:fixed;bottom:20px;right:20px;
+      width:64px;height:64px;border-radius:50%;
+      background:transparent;border:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 20px rgba(0,0,0,.35);
+      transition:all .3s;z-index:1000;
+    }
+    .chatTrigger:hover{transform:scale(1.1);box-shadow:0 10px 28px rgba(0,0,0,.5)}
+    .chatTrigger img{width:64px;height:64px;object-fit:contain}
+
+    .chatBox{
+      position:fixed;bottom:20px;right:20px;
+      width:400px;max-width:calc(100vw - 28px);
+      height:580px;max-height:calc(100vh - 40px);
+      background:rgba(17,24,39,.97);
+      border:1px solid var(--line);border-radius:20px;
+      display:none;flex-direction:column;
+      box-shadow:0 20px 60px rgba(0,0,0,.65);
+      z-index:1001;overflow:hidden;backdrop-filter:blur(20px);
+    }
     .chatBox.open{display:flex}
-    .chatBox.minimized{width:70px;height:70px;background:transparent;border:none;border-radius:50%;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+    .chatBox.minimized{width:64px;height:64px;background:transparent;border:none;border-radius:50%;box-shadow:0 6px 20px rgba(0,0,0,.3)}
     .chatBox.minimized .chatHeader,.chatBox.minimized .chatMessages,.chatBox.minimized .chatInput{display:none}
-    .chatHeader{background:linear-gradient(135deg,var(--accent),var(--accent2));padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.15)}
+
+    .chatHeader{
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      padding:12px 14px;display:flex;align-items:center;justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.15);flex-shrink:0;
+    }
     .chatHeaderLeft{display:flex;align-items:center;gap:10px}
-    .chatHeaderLogo{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);padding:4px}
-    .chatHeaderTitle{font-weight:700;font-size:16px;color:#fff}
-    .chatHeaderSub{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px}
-    .chatHeaderBtns{display:flex;gap:8px}
-    .chatHeaderBtn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-weight:700}
+    .chatHeaderLogo{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);padding:4px}
+    .chatHeaderTitle{font-weight:700;font-size:15px;color:#fff}
+    .chatHeaderSub{font-size:11px;color:rgba(255,255,255,.75);margin-top:1px}
+    .chatHeaderBtns{display:flex;gap:6px}
+    .chatHeaderBtn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-weight:700}
     .chatHeaderBtn:hover{background:rgba(255,255,255,.25);transform:scale(1.05)}
-    .chatMessages{flex:1;overflow-y:auto;padding:16px;background:linear-gradient(180deg,rgba(26,29,35,.95),rgba(16,18,22,.95));display:flex;flex-direction:column;gap:12px}
-    .chatMessages::-webkit-scrollbar{width:8px}
+
+    .chatMessages{
+      flex:1;overflow-y:auto;padding:14px;
+      background:linear-gradient(180deg,rgba(26,29,35,.97),rgba(16,18,22,.97));
+      display:flex;flex-direction:column;gap:10px;
+    }
+    .chatMessages::-webkit-scrollbar{width:6px}
     .chatMessages::-webkit-scrollbar-thumb{background:rgba(59,130,246,.3);border-radius:999px}
+
     .message{display:flex;gap:8px;animation:slideIn .3s ease}
-    @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
     .message.user{flex-direction:row-reverse}
-    .messageBubble{max-width:85%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.6;word-wrap:break-word;white-space:pre-line}
+    .messageBubble{max-width:85%;padding:11px 14px;border-radius:16px;font-size:13px;line-height:1.6;word-wrap:break-word;white-space:pre-line}
     .message.ai .messageBubble{background:linear-gradient(135deg,rgba(59,130,246,.85),rgba(96,165,250,.85));color:#fff;border-bottom-left-radius:4px}
     .message.user .messageBubble{background:rgba(255,255,255,.92);color:#1a1d23;border-bottom-right-radius:4px}
-    .typingIndicator{display:flex;gap:8px;padding:12px 16px;background:linear-gradient(135deg,rgba(59,130,246,.85),rgba(96,165,250,.85));border-radius:18px;border-bottom-left-radius:4px;max-width:75%}
-    .typingDot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.9);animation:bounce 1.4s infinite ease-in-out}
+
+    .typingIndicator{display:flex;gap:6px;padding:11px 14px;background:linear-gradient(135deg,rgba(59,130,246,.85),rgba(96,165,250,.85));border-radius:16px;border-bottom-left-radius:4px;max-width:70%}
+    .typingDot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.9);animation:bounce 1.4s infinite ease-in-out}
     .typingDot:nth-child(1){animation-delay:0s}.typingDot:nth-child(2){animation-delay:.2s}.typingDot:nth-child(3){animation-delay:.4s}
     @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
-    .chatInput{padding:16px;background:rgba(10,12,18,.95);border-top:1px solid var(--line);display:flex;gap:10px}
-    .chatInputField{flex:1;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:12px;padding:12px 16px;color:var(--text);font-size:14px;outline:none;transition:all .2s;font-family:inherit}
+
+    .chatInput{padding:12px 14px;background:rgba(10,12,18,.97);border-top:1px solid var(--line);display:flex;gap:8px;flex-shrink:0}
+    .chatInputField{flex:1;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;transition:all .2s;font-family:inherit}
     .chatInputField:focus{border-color:var(--accent);background:rgba(31,41,55,.8)}
     .chatInputField::placeholder{color:var(--muted)}
-    .chatSendBtn{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all .2s}
-    .chatSendBtn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 4px 16px rgba(59,130,246,.4)}
+    .chatSendBtn{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+    .chatSendBtn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 4px 14px rgba(59,130,246,.4)}
     .chatSendBtn:disabled{opacity:.5;cursor:not-allowed}
 
-    .oggiPanel{background:linear-gradient(135deg,rgba(17,24,39,.92),rgba(10,12,18,.95));border:1px solid rgba(59,130,246,.3);border-radius:16px;overflow:hidden;margin-bottom:16px}
-    .oggiHeader{padding:16px 20px;background:linear-gradient(90deg,rgba(59,130,246,.15),rgba(96,165,250,.08));border-bottom:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .oggiTitle{font-weight:950;font-size:20px;background:linear-gradient(135deg,#60a5fa,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .oggiDate{font-size:12px;color:#9ca3af;margin-top:3px}
-    .oggiKpiRow{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(31,41,55,.6)}
-    .oggiKpi{padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-right:1px solid rgba(31,41,55,.5)}
-    .oggiKpi:last-child{border-right:none}
-    .oggiKpiLabel{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#9ca3af}
-    .oggiKpiNum{font-size:28px;font-weight:950;line-height:1}
-    .oggiKpiSub{font-size:11px;color:#9ca3af;margin-top:2px}
-    .oggiKpiNum.blue{color:#60a5fa}.oggiKpiNum.orange{color:#f97316}.oggiKpiNum.green{color:#22c55e}.oggiKpiNum.purple{color:#a855f7}
-    .oggiSummary{padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.6);background:rgba(59,130,246,.03)}
-    .oggiSummaryText{font-size:13px;line-height:1.75;color:#e5e7eb;white-space:pre-line}
-    .oggiAskBtn{background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(96,165,250,.15));border:1px solid rgba(59,130,246,.4);border-radius:10px;padding:9px 18px;color:#93c5fd;font-size:13px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;display:flex;align-items:center;gap:8px}
-    .oggiAskBtn:hover{background:linear-gradient(135deg,rgba(59,130,246,.3),rgba(96,165,250,.25));transform:translateY(-1px)}
-    .oggiGrid{display:grid;grid-template-columns:1fr 1fr}
-    .oggiCol{padding:16px 20px;border-right:1px solid rgba(31,41,55,.5)}
-    .oggiCol:last-child{border-right:none}
-    .oggiColTitle{font-size:12px;font-weight:900;letter-spacing:.3px;text-transform:uppercase;color:#9ca3af;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-    .oggiItem{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid rgba(31,41,55,.5);border-radius:10px;background:rgba(17,24,39,.4);margin-bottom:6px;font-size:12px;line-height:1.4}
-    .oggiDot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
-    .oggiDot.red{background:#ef4444}.oggiDot.yellow{background:#eab308}.oggiDot.blue{background:#3b82f6}.oggiDot.green{background:#22c55e}.oggiDot.purple{background:#a855f7}
-    .oggiEmpty{font-size:12px;color:#6b7280;font-style:italic;padding:6px 2px}
-
-    .consegnePanel{background:var(--panel);border:1px solid rgba(34,197,94,.25);border-radius:16px;overflow:hidden}
-    #consegnePanel .widgetHeader{background:linear-gradient(180deg,rgba(34,197,94,.09),rgba(10,12,18,.35) 70%)}
-    .consegnaCard{border:1px solid rgba(31,41,55,.7);border-radius:14px;background:rgba(17,24,39,.4);margin-bottom:10px;overflow:hidden;animation:itemIn .2s ease}
-    .consegnaHead{padding:12px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(31,41,55,.5);cursor:pointer;user-select:none}
-    .consegnaHead:hover{background:rgba(34,197,94,.05)}
-    .consegnaDate{font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#6ee7b7;white-space:nowrap;flex-shrink:0}
-    .consegnaDate.oggi{background:rgba(249,115,22,.18);border-color:rgba(249,115,22,.4);color:#fdba74}
-    .consegnaDate.scaduta{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.35);color:#fca5a5}
-    .consegnaModello{font-size:14px;font-weight:700;flex:1}
-    .consegnaCliente{font-size:12px;color:#9ca3af}
-    .consegnaChevron{font-size:12px;color:#9ca3af;transition:transform .2s;flex-shrink:0}
-    .consegnaCard.open .consegnaChevron{transform:rotate(180deg)}
-    .consegnaBody{display:none;padding:12px 14px}
-    .consegnaCard.open .consegnaBody{display:block}
-    .consegnaChecks{display:grid;gap:6px}
-    .consegnaCheckItem{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid rgba(31,41,55,.6);border-radius:10px;background:rgba(17,24,39,.3);transition:all .2s}
-    .consegnaCheckItem:hover{background:rgba(17,24,39,.5);border-color:rgba(34,197,94,.3)}
-    .consegnaCheckBox{width:18px;height:18px;flex-shrink:0;accent-color:#22c55e;cursor:pointer}
-    .consegnaCheckLabel{font-size:13px;flex:1}
-    .consegnaCheckLabel.done{text-decoration:line-through;color:#9ca3af}
-    .consegnaProgress{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:#9ca3af}
-    .consegnaProgressBar{flex:1;height:6px;background:rgba(31,41,55,.8);border-radius:999px;overflow:hidden}
-    .consegnaProgressFill{height:100%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#4ade80);transition:width .4s}
-    .consegnaDelBtn{margin-top:10px;width:100%;padding:7px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);border-radius:9px;color:#fca5a5;font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s}
-    .consegnaDelBtn:hover{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.5)}
-    .consegnaFormRow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-    .consegnaInput{flex:1;min-width:120px;background:rgba(31,41,55,.6);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
-    .consegnaInput:focus{border-color:#22c55e}
-    .consegnaInput[type="date"]{color-scheme:dark;max-width:160px}
-
-    .postPanel{background:var(--panel);border:1px solid rgba(251,191,36,.25);border-radius:16px;overflow:hidden}
-    #postPanel .widgetHeader{background:linear-gradient(180deg,rgba(251,191,36,.09),rgba(10,12,18,.35) 70%)}
-    .postCard{border:1px solid rgba(31,41,55,.7);border-radius:12px;background:rgba(17,24,39,.4);padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;animation:itemIn .2s ease;transition:border-color .2s}
-    .postCard.urgente{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04)}
-    .postCardLeft{flex:1;min-width:0}
-    .postCardCliente{font-size:14px;font-weight:700}
-    .postCardModello{font-size:12px;color:#9ca3af;margin-top:2px}
-    .postCardBadges{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-    .postBadge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;cursor:pointer;transition:all .2s;border:1px solid}
-    .postBadge.intervista{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.35);color:#fde68a}
-    .postBadge.intervista.done{opacity:.4;text-decoration:line-through;cursor:default}
-    .postBadge.recensione{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:#6ee7b7}
-    .postBadge.recensione.done{opacity:.4;text-decoration:line-through;cursor:default}
-    .postBadge.scaduto{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5;animation:pulse 1.5s infinite}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-    .postDays{font-size:11px;color:#9ca3af;margin-top:5px}
-
-    @media(max-width:980px){
+    /* ═══ RESPONSIVE MOBILE ═══ */
+    @media (max-width:900px){
       .layout{grid-template-columns:1fr}
-      .newsScroll{max-height:60vh}
-      .brand{min-width:unset}
-      .split3{grid-template-columns:1fr}
-      .venditeListe{grid-template-columns:1fr}
-      .venditeCol:first-child{border-right:none;border-bottom:1px solid rgba(31,41,55,.75)}
-      .chatBox{width:100%;max-width:100%;height:100vh;max-height:100vh;bottom:0;right:0;border-radius:0}
-      .chatTrigger{bottom:16px;right:16px;width:60px;height:60px}
-      .weekGrid{gap:4px}
-      .weekCell{border-radius:10px;padding:6px}
+      .panel{position:static;top:auto}
+      .newsScroll.open{max-height:55vh}
+      .headerRow{gap:8px}
+      .brandBtns{gap:5px}
     }
-    @media(max-width:768px){
-      .btn{padding:8px 10px;font-size:13px}
-      .brandLogo{width:30px;height:30px}
-      .brandName{font-size:16px}
-      .centroAutoLogo{height:36px}
-      .centroAutoLink{padding:4px 8px}
-      .weekGrid{grid-template-columns:repeat(7,1fr)}
+
+    @media (max-width:600px){
+      .wrap{padding:8px 10px}
+      .brand{gap:6px}
+      .brandLogo{width:32px;height:32px}
+      .brandName{font-size:15px}
+      .btn{padding:7px 9px;font-size:12px}
+      .centroAutoLogo{height:24px}
+      .centroAutoLink{padding:3px 7px}
+      .pill{font-size:11px;padding:4px 8px}
+      .chatBox{
+        width:100%;max-width:100%;
+        height:100dvh;max-height:100dvh;
+        bottom:0;right:0;border-radius:0;
+      }
+      .chatTrigger{bottom:14px;right:14px;width:54px;height:54px}
+      .chatTrigger img{width:54px;height:54px}
+      .garanzieBody{padding:12px}
+      .headerAuth{gap:5px}
+    }
+
+    @media (max-width:400px){
+      .brandBtns{display:none}
+      .brandBtnsCompact{display:flex !important}
+    }
+
+    .brandBtnsCompact{
+      display:none;
+      gap:5px;
+      flex-wrap:wrap;
+      width:100%;
+      margin-top:4px;
     }
   </style>
 </head>
+
 <body>
   <header>
     <div class="wrap">
-      <div class="row">
+      <div class="headerRow">
         <div class="brand">
           <div class="brandMark">
-            <img class="brandLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI BOTT logo"/>
-            <div><div class="brandName">AI BOTT</div><div class="brandSub">Automotive</div></div>
+            <img class="brandLogo"
+              src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png"
+              alt="AI BOTT logo"/>
+            <div>
+              <div class="brandName">AI BOTT</div>
+              <div class="brandSub">Automotive</div>
+            </div>
           </div>
-          <button id="fiatBtn"   class="btn brand-fiat">Fiat</button>
-          <button id="jeepBtn"   class="btn brand-jeep">Jeep</button>
-          <button id="alfaBtn"   class="btn brand-alfa">Alfa Romeo</button>
-          <button id="lanciaBtn" class="btn brand-lancia">Lancia</button>
-          <a href="https://www.centroautovt.it/" target="_blank" rel="noopener noreferrer" class="centroAutoLink">
-            <img src="https://image2url.com/r2/default/images/1770805237740-1db65b1e-5553-4b5b-b28a-750e3520a0a2.png" alt="CentroAuto VT" class="centroAutoLogo"/>
-          </a>
+
+          <div class="brandBtns">
+            <button id="fiatBtn"   class="btn brand-fiat">Fiat</button>
+            <button id="jeepBtn"   class="btn brand-jeep">Jeep</button>
+            <button id="alfaBtn"   class="btn brand-alfa">Alfa Romeo</button>
+            <button id="lanciaBtn" class="btn brand-lancia">Lancia</button>
+            <a href="https://www.centroautovt.it/" target="_blank" rel="noopener noreferrer" class="centroAutoLink">
+              <img src="https://image2url.com/r2/default/images/1770805237740-1db65b1e-5553-4b5b-b28a-750e3520a0a2.png"
+                   alt="CentroAuto VT" class="centroAutoLogo"/>
+            </a>
+          </div>
         </div>
-        <div class="row" style="gap:10px">
+
+        <!-- Pulsanti brand compatti su schermi ultra-piccoli -->
+        <div class="brandBtnsCompact">
+          <button id="fiatBtn2"   class="btn brand-fiat">Fiat</button>
+          <button id="jeepBtn2"   class="btn brand-jeep">Jeep</button>
+          <button id="alfaBtn2"   class="btn brand-alfa">Alfa</button>
+          <button id="lanciaBtn2" class="btn brand-lancia">Lancia</button>
+        </div>
+
+        <div class="headerAuth">
           <span id="userPill" class="pill muted">Non autenticato</span>
           <button id="loginBtn"  class="btn primary">Login Google</button>
           <button id="logoutBtn" class="btn" style="display:none">Logout</button>
@@ -394,366 +463,168 @@
   <main class="wrap">
     <div class="layout">
 
-      <!-- SINISTRA: NEWS + CALENDARIO -->
+      <!-- ═══ SINISTRA: NEWS ═══ -->
       <aside class="panel">
         <div class="panelHeader">
-          <div>
+          <div style="flex:1;min-width:0">
             <div class="panelTitle">📰 Ultime News</div>
             <div class="muted panelSub">Visibili solo dopo login.</div>
             <div id="status" class="muted">Effettua il login per caricare le news.</div>
           </div>
-          <div style="display:flex;gap:6px;align-items:center;">
-            <button id="refreshBtn" class="btn" disabled>🔄</button>
-            <button id="newsToggleBtn" class="btn" title="Mostra/Nascondi news" style="font-size:16px;font-weight:900;padding:6px 10px;min-width:32px;">−</button>
+          <div class="panelHeaderBtns">
+            <button id="refreshBtn" class="btn" disabled title="Ricarica">🔄</button>
+            <button id="newsToggleBtn" class="btn" style="font-weight:800;min-width:64px;" title="Mostra/Nascondi news">📖 Leggi</button>
           </div>
         </div>
-        <div class="newsScroll" id="newsScrollBox"><div id="newsList"></div></div>
-
-        <!-- CALENDARIO SETTIMANALE -->
-        <div class="weekPanel">
-          <div class="weekHead">
-            <div>
-              <div class="weekTitle">🗓 Calendario settimanale</div>
-              <div class="weekSub">Task dell'agenda nella settimana corrente</div>
-            </div>
-            <div id="weekRange" class="pill muted">—</div>
-          </div>
-          <div id="weekGrid" class="weekGrid"></div>
+        <!-- NEWS: CHIUSE DI DEFAULT, si aprono col bottone -->
+        <div class="newsScroll" id="newsScrollBox">
+          <div id="newsList"></div>
         </div>
-
-        <!-- PRE-CONSEGNA -->
-        <div style="border-top:2px solid rgba(34,197,94,.25);background:rgba(10,12,18,.35);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-          <div>
-            <div style="font-weight:950;font-size:16px;">🚗 Pre-Consegna</div>
-            <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Checklist consegne — sempre visibile</div>
-          </div>
-          <button id="consegnaClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completate</button>
-        </div>
-        <div style="padding:12px;">
-          <div class="consegnaFormRow">
-            <input id="consegnaCliente" class="consegnaInput" type="text" placeholder="Nome cliente"/>
-            <input id="consegnaModello" class="consegnaInput" type="text" placeholder="Modello"/>
-            <input id="consegnaData"    class="consegnaInput" type="date"/>
-            <button id="consegnaAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;white-space:nowrap;">+ Aggiungi</button>
-          </div>
-          <div id="consegnaList"></div>
-        </div>
-
-        <!-- POST VENDITA -->
-        <div style="border-top:2px solid rgba(251,191,36,.25);background:rgba(10,12,18,.35);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-          <div>
-            <div style="font-weight:950;font-size:16px;">⭐ Post-Vendita</div>
-            <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Follow-up: intervista (2gg) · recensione (3gg)</div>
-          </div>
-          <button id="postClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completati</button>
-        </div>
-        <div style="padding:12px 12px 16px;">
-          <div id="postList"></div>
-        </div>
-
       </aside>
 
-      <!-- DESTRA -->
-      <section style="padding:0;border:none;background:none;">
+      <!-- ═══ DESTRA: GARANZIE + CONTENUTI ═══ -->
+      <div class="rightCol">
 
-        <!-- VISTA OGGI -->
-        <div class="oggiPanel" id="oggiPanel">
-          <div class="oggiHeader">
+        <!-- GARANZIE PDF -->
+        <div class="garanziePanel">
+          <div class="garanzieHeader">
+            <div class="garanzieIcon">🛡️</div>
             <div>
-              <div class="oggiTitle">☀ Buongiorno! Vista di Oggi</div>
-              <div class="oggiDate" id="oggiDateLabel"></div>
-            </div>
-            <button class="oggiAskBtn" id="oggiRiepilogoBtn">🤖 Chiedi all'AI: "Cosa devo fare oggi?"</button>
-          </div>
-          <div class="oggiKpiRow">
-            <div class="oggiKpi">
-              <div class="oggiKpiLabel">📞 Chiamate</div>
-              <div class="oggiKpiNum blue" id="oggiKpiChiamate">0</div>
-              <div class="oggiKpiSub">Da fare oggi</div>
-            </div>
-            <div class="oggiKpi">
-              <div class="oggiKpiLabel">🔥 Caldi</div>
-              <div class="oggiKpiNum orange" id="oggiKpiCaldi">0</div>
-              <div class="oggiKpiSub">Lead caldi attivi</div>
-            </div>
-            <div class="oggiKpi">
-              <div class="oggiKpiLabel">🚗 Consegne</div>
-              <div class="oggiKpiNum green" id="oggiKpiConsegne">0</div>
-              <div class="oggiKpiSub">Oggi/imminenti</div>
-            </div>
-            <div class="oggiKpi">
-              <div class="oggiKpiLabel">📅 Task</div>
-              <div class="oggiKpiNum purple" id="oggiKpiTask">0</div>
-              <div class="oggiKpiSub">In agenda oggi</div>
+              <div class="garanzieTitle">Analisi Garanzie PDF</div>
+              <div class="garanzieSub">Carica il contratto/libretto garanzie e ottieni un sunto Word per il cliente</div>
             </div>
           </div>
-          <div class="oggiSummary" id="oggiSummaryBox" style="display:none">
-            <div class="oggiSummaryText" id="oggiSummaryText"></div>
-          </div>
-          <div class="oggiGrid">
-            <div class="oggiCol">
-              <div class="oggiColTitle">📞 Telefonate di oggi</div>
-              <div id="oggiListaTel"></div>
-            </div>
-            <div class="oggiCol">
-              <div class="oggiColTitle">📅 Task + Consegne</div>
-              <div id="oggiListaTask"></div>
-            </div>
-          </div>
-          <div class="oggiGrid" style="border-top:1px solid rgba(31,41,55,.5)">
-            <div class="oggiCol">
-              <div class="oggiColTitle">⭐ Follow-up post-vendita</div>
-              <div id="oggiListaPost"></div>
-            </div>
-            <div class="oggiCol">
-              <div class="oggiColTitle">💰 Mese in corso</div>
-              <div id="oggiListaVendite"></div>
-            </div>
-          </div>
-        </div>
 
-        <!-- COMPARATORE -->
-        <div style="background:rgba(17,24,39,.78);border:1px solid #1f2937;border-radius:16px;overflow:hidden;">
-          <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.75);background:rgba(10,12,18,.35);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-            <div>
-              <div style="font-weight:950;font-size:18px">⚔ Comparatore Auto</div>
-              <div style="color:#9ca3af;font-size:13px;margin-top:4px">Confronta due auto nuove — cerca sui configuratori ufficiali</div>
-            </div>
-            <button id="cmpResetBtn" class="btn" style="font-size:12px;padding:7px 12px;">↩ Reset</button>
-          </div>
-          <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.5);display:flex;gap:10px;flex-wrap:wrap;">
-            <input id="cmpInput1" type="text" placeholder="Es: Grande Panda, Compass, Stelvio..."
-              style="flex:1;min-width:180px;background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
-              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'"/>
-            <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;font-weight:700;">VS</div>
-            <input id="cmpInput2" type="text" placeholder="Es: Junior, Avenger, Ypsilon..."
-              style="flex:1;min-width:180px;background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:10px 14px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
-              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'"/>
-            <button id="cmpBtn" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);border:none;border-radius:10px;padding:10px 20px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit;">🔎 Confronta</button>
-          </div>
-          <div style="padding:10px 20px;border-bottom:1px solid rgba(31,41,55,.4);display:flex;gap:8px;flex-wrap:wrap;">
-            <span style="color:#9ca3af;font-size:12px;align-self:center;">Rapido:</span>
-            <button class="cmpSuggest" data-s1="Grande Panda" data-s2="Junior">Grande Panda vs Junior</button>
-            <button class="cmpSuggest" data-s1="Compass" data-s2="Tonale">Compass vs Tonale</button>
-            <button class="cmpSuggest" data-s1="Stelvio" data-s2="Renegade">Stelvio vs Renegade</button>
-            <button class="cmpSuggest" data-s1="Ypsilon" data-s2="Avenger">Ypsilon vs Avenger</button>
-          </div>
-          <div id="cmpResults" style="padding:20px;min-height:120px;">
-            <div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">↑ Scrivi il modello e premi Confronta</div>
-          </div>
-        </div>
+          <div class="garanzieBody">
+            <div class="garanzieSteps">
 
-        <!-- VENDITE MENSILI -->
-        <div class="venditePanel">
-          <div class="venditeHeader">
-            <div class="venditeTitleRow">
-              <div class="venditeTitle">🚗 Vendite mensili</div>
-              <span id="venditeSyncBadge" class="venditeSyncBadge">Sync —</span>
-            </div>
-            <div class="venditeNav">
-              <button class="navArrow" id="vendPrevBtn">&#8249;</button>
-              <div class="venditeMonthLabel" id="vendMonthLabel">—</div>
-              <button class="navArrow" id="vendNextBtn">&#8250;</button>
-            </div>
-          </div>
-          <div class="venditeTotali">
-            <div class="totCard"><div class="totLabel">🆕 Nuove</div><div class="totNum nuova" id="totNuove">0</div></div>
-            <div class="totCard"><div class="totLabel">🔄 Usate</div><div class="totNum usata" id="totUsate">0</div></div>
-            <div class="totCard"><div class="totLabel">📦 Totale</div><div class="totNum all"  id="totAll">0</div></div>
-          </div>
-          <div class="venditeForm">
-            <input id="vendModello" type="text" class="fld" placeholder="Modello auto (es: Jeep Compass…)" style="min-width:160px;"/>
-            <input id="vendProvv"   type="number" class="fld" placeholder="Provvigione €" min="0" step="1" style="max-width:140px;min-width:110px;"/>
-            <div class="tipoSeg">
-              <button class="tipoBtn nuova active" id="tipoBtnNuova">🆕 Nuova</button>
-              <button class="tipoBtn usata"        id="tipoBtnUsata">🔄 Usata</button>
-            </div>
-            <button id="vendAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
-          </div>
-          <div class="venditeListe">
-            <div class="venditeCol">
-              <div class="venditeColTitle nuova">🆕 AUTO NUOVE <span class="venditeCount nuova" id="cntNuove">0</span></div>
-              <div class="venditeList" id="listNuove"></div>
-            </div>
-            <div class="venditeCol">
-              <div class="venditeColTitle usata">🔄 AUTO USATE <span class="venditeCount usata" id="cntUsate">0</span></div>
-              <div class="venditeList" id="listUsate"></div>
-            </div>
-          </div>
-          <div class="venditeProvvBar">
-            <div class="provvMeseGroup">
-              <div class="provvMeseLabel">💰 Provvigioni del mese</div>
-              <div class="provvMeseNum" id="provvMeseTot">€ 0</div>
-              <div class="provvMeseSplit" id="provvMeseSplit"></div>
-            </div>
-          </div>
-          <div class="vendite2026Bar">
-            <div class="bar2026Left">
-              <div class="bar2026Icon">🏆</div>
-              <div>
-                <div class="bar2026Title">Totale provvigioni 2026</div>
-                <div class="bar2026Sub">Somma cumulativa di tutti i mesi</div>
+              <!-- STEP 1: Nome Cliente -->
+              <div class="garanzieStep">
+                <div class="stepNum">1</div>
+                <div class="stepContent">
+                  <div class="stepLabel">👤 Nome Cliente</div>
+                  <input type="text" id="garanzieCliente" class="stepInput"
+                         placeholder="Es: Mario Rossi"/>
+                </div>
               </div>
+
+              <!-- STEP 2: Carica PDF -->
+              <div class="garanzieStep">
+                <div class="stepNum">2</div>
+                <div class="stepContent">
+                  <div class="stepLabel">📄 Carica il PDF delle garanzie</div>
+                  <label class="uploadZone" id="uploadZone">
+                    <input type="file" id="garanzieFile" accept=".pdf" />
+                    <div class="uploadIcon">📁</div>
+                    <div class="uploadText">Clicca o trascina qui il PDF</div>
+                    <div class="uploadSub">Formato: .pdf — max 10 MB</div>
+                    <div class="uploadFileName" id="uploadFileName"></div>
+                  </label>
+                </div>
+              </div>
+
             </div>
-            <div class="bar2026Right">
-              <div class="bar2026Num" id="provv2026Tot">€ 0</div>
-              <div class="bar2026Mesi" id="provv2026Mesi">0 mesi con provvigioni</div>
+
+            <!-- CTA elabora -->
+            <button class="elaboraBtn" id="elaboraBtn" disabled>
+              🤖 Analizza e genera riepilogo Word
+            </button>
+
+            <!-- Progress -->
+            <div class="garanzieProgress" id="garanzieProgress">
+              <div class="progressMsg" id="progressMsg">⏳ Lettura PDF in corso...</div>
+              <div class="progressBar"><div class="progressFill" id="progressFill"></div></div>
             </div>
-          </div>
-          <div class="obiettivoBar">
-            <div class="obiettivoHead">
-              <div class="obiettivoLeft">
-                <div class="obiettivoIcon">🎯</div>
+
+            <!-- STEP 3: Download -->
+            <div class="downloadArea" id="downloadArea">
+              <div class="downloadTitle">✅ Riepilogo pronto!</div>
+              <div class="downloadSub" id="downloadSub">Il documento Word con le garanzie è pronto per il download.</div>
+              <a class="downloadBtn" id="downloadBtn" href="#" download>
+                <span style="font-size:20px">📥</span>
                 <div>
-                  <div class="obiettivoTitle">Obiettivo mensile</div>
-                  <div class="obiettivoSub">Imposta il tuo target provvigioni per questo mese</div>
+                  <div style="font-size:14px;font-weight:800">Scarica Riepilogo Word</div>
+                  <div style="font-size:11px;color:#9ca3af;margin-top:1px" id="downloadName">Garanzie_Cliente.docx</div>
                 </div>
-              </div>
-              <div class="obiettivoRight">
-                <span class="obiettivoInputLabel">Target €</span>
-                <input id="obiettivoInput" type="number" class="obiettivoInput" placeholder="es. 3000" min="0" step="100"/>
-              </div>
+              </a>
+              <button id="nuovaAnalisiBtn" class="btn" style="width:100%;margin-top:10px;justify-content:center;">🔄 Nuova analisi</button>
             </div>
-            <div class="progressWrap"><div class="progressFill low" id="progressFill" style="width:0%"></div></div>
-            <div class="progressMeta">
-              <span class="progressPct low" id="progressPct">0%</span>
-              <span class="progressManca" id="progressManca">Imposta un obiettivo ↑</span>
-            </div>
+
           </div>
         </div>
 
-        <!-- AGENDA + MEMO + TELEFONO -->
-        <div class="widgetStack">
-          <div class="widgetPanel" id="agendaPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">📅 Agenda 3 giorni</div>
-                <div class="widgetSub">Task sincronizzati su Firebase.</div>
-              </div>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                <span id="syncBadge" class="syncBadge warn">Sync: non attivo</span>
-                <button id="agendaClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci fatti</button>
-              </div>
-            </div>
-            <div class="widgetBody">
-              <div class="formRow">
-                <input id="taskInput" class="field" type="text" placeholder="Scrivi un task..."/>
-                <div class="seg">
-                  <button id="dayBtn0" class="active" type="button">Oggi</button>
-                  <button id="dayBtn1" type="button">Domani</button>
-                  <button id="dayBtn2" type="button">+2</button>
-                </div>
-                <button id="addTaskBtn" class="btn primary" type="button">Aggiungi</button>
-              </div>
-              <div class="split3" style="margin-top:14px;">
-                <div class="dayCol">
-                  <div class="dayHead"><span id="dayLabel0">Oggi</span><span id="dayDate0" class="dayMeta"></span></div>
-                  <div id="taskList0" class="list"></div>
-                </div>
-                <div class="dayCol">
-                  <div class="dayHead" style="background:rgba(96,165,250,.08);"><span id="dayLabel1">Domani</span><span id="dayDate1" class="dayMeta"></span></div>
-                  <div id="taskList1" class="list"></div>
-                </div>
-                <div class="dayCol">
-                  <div class="dayHead" style="background:rgba(59,130,246,.06);"><span id="dayLabel2">+2 giorni</span><span id="dayDate2" class="dayMeta"></span></div>
-                  <div id="taskList2" class="list"></div>
-                </div>
-              </div>
-              <div class="smallNote">Se fai login su telefono, vedi gli stessi task e memo.</div>
-            </div>
+        <!-- AREA CONTENUTI LIBERA -->
+        <div class="rightSpace">
+          <div style="font-weight:950;font-size:18px">Area contenuti</div>
+          <div class="muted" style="margin-top:8px;line-height:1.45">
+            Qui puoi aggiungere KPI, link rapidi, note o altri contenuti personalizzati.
           </div>
-
-          <div class="widgetPanel" id="memoPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">📝 Memo</div>
-                <div class="widgetSub">Sincronizzate su Firebase.</div>
-              </div>
-              <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
-            </div>
-            <div class="widgetBody">
-              <div class="formRow" style="align-items:stretch;">
-                <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
-                <button id="addMemoBtn" class="btn primary" type="button" style="align-self:flex-start;">Aggiungi</button>
-              </div>
-              <div style="margin-top:14px;"><div id="memoList" class="list" style="max-height:320px;"></div></div>
-              <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
-            </div>
-          </div>
-
-          <!-- COLPI DI TELEFONO -->
-          <div class="widgetPanel" id="telefonoPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">📞 Colpi di telefono</div>
-                <div class="widgetSub">Chi spingere oggi, domani, prossima settimana.</div>
-              </div>
-              <button id="telClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci chiamati</button>
-            </div>
-            <div class="widgetBody">
-              <div class="telFormRow">
-                <input id="telNome"    class="telInput" type="text" placeholder="Nome (es: Marco R.)"/>
-                <input id="telModello" class="telInput" type="text" placeholder="Modello interesse" style="max-width:160px"/>
-                <div class="telSeg">
-                  <button class="telBtn caldo   active" id="telBtnCaldo"  >🔥 Caldo</button>
-                  <button class="telBtn tiepido"        id="telBtnTiepido">🌡 Tiepido</button>
-                  <button class="telBtn freddo"         id="telBtnFreddo" >❄ Freddo</button>
-                </div>
-              </div>
-              <div class="telFormRow">
-                <div class="telWhenSeg">
-                  <button class="telWhenBtn active" id="telWhenOggi">📅 Oggi</button>
-                  <button class="telWhenBtn"        id="telWhenDomani">Domani</button>
-                  <button class="telWhenBtn"        id="telWhenSettimana">Settimana</button>
-                </div>
-                <button id="telAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
-              </div>
-              <div class="telSection">
-                <div class="telSectionLabel">📅 Da chiamare oggi <span id="telCntOggi" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
-                <div id="telListOggi" class="telList"></div>
-              </div>
-              <div class="telSection">
-                <div class="telSectionLabel">🌅 Domani <span id="telCntDomani" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
-                <div id="telListDomani" class="telList"></div>
-              </div>
-              <div class="telSection">
-                <div class="telSectionLabel">📆 Prossima settimana <span id="telCntSettimana" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
-                <div id="telListSettimana" class="telList"></div>
-              </div>
-            </div>
-          </div>
-
         </div>
-      </section>
+
+      </div><!-- fine rightCol -->
     </div>
   </main>
 
-  <!-- CHATBOT -->
+  <!-- ═══ CHATBOT ═══ -->
   <div class="chatTrigger" id="chatTrigger">
     <img src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI Agent"/>
   </div>
+
   <div class="chatBox" id="chatBox">
-    <img id="chatMinimizedLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI Agent" style="display:none;width:70px;height:70px;object-fit:contain;cursor:pointer;"/>
+    <img id="chatMinimizedLogo"
+      src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png"
+      alt="AI Agent"
+      style="display:none;width:64px;height:64px;object-fit:contain;cursor:pointer;"/>
+
     <div class="chatHeader">
       <div class="chatHeaderLeft">
-        <img class="chatHeaderLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI"/>
-        <div><div class="chatHeaderTitle">AI BOTT Assistant</div><div class="chatHeaderSub">Esperto configurazioni</div></div>
+        <img class="chatHeaderLogo"
+          src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png"
+          alt="AI"/>
+        <div>
+          <div class="chatHeaderTitle">AI BOTT Assistant</div>
+          <div class="chatHeaderSub">Esperto configurazioni</div>
+        </div>
       </div>
       <div class="chatHeaderBtns">
-        <button class="chatHeaderBtn" id="minimizeBtn">−</button>
-        <button class="chatHeaderBtn" id="closeBtn">×</button>
+        <button class="chatHeaderBtn" id="minimizeBtn" title="Minimizza">−</button>
+        <button class="chatHeaderBtn" id="closeBtn" title="Chiudi">×</button>
       </div>
     </div>
+
     <div class="chatMessages" id="chatMessages">
-      <div class="message ai"><div class="messageBubble">👋 Ciao! Sono AI BOTT.
-Posso aiutarti con auto nuove (Fiat, Jeep, Alfa, Lancia) e usate (CentroAuto VT).
-Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div>
+      <div class="message ai">
+        <div class="messageBubble">👋 Ciao! Sono l'assistente AI BOTT specializzato in auto nuove e usate.
+
+🔍 Posso aiutarti con:
+
+🆕 AUTO NUOVE (Fiat, Jeep, Alfa, Lancia)
+• Allestimenti e versioni
+• Dotazioni e optional
+• Motorizzazioni e prezzi
+
+🚗 AUTO USATE (CentroAuto VT)
+• Ford, Jeep, Kia, Lancia, Land Rover
+• MAN, Mazda, MG, Opel, Peugeot
+• Renault, Seat, Smart, Suzuki, VW
+• Prezzi, km, anno, accessori
+
+Esempi:
+"Ford usate disponibili"
+"Confronta Compass Longitude e Limited" 💡</div>
+      </div>
     </div>
+
     <div class="chatInput">
-      <input type="text" class="chatInputField" id="chatInputField" placeholder="Scrivi..." autocomplete="off"/>
+      <input type="text" class="chatInputField" id="chatInputField"
+        placeholder="Es: auto usate disponibili oppure confronta Compass…"
+        autocomplete="off"/>
       <button class="chatSendBtn" id="chatSendBtn">➤</button>
     </div>
   </div>
+
+  <!-- ═══ docx.js (per generare Word) ═══ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.min.js"></script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -762,10 +633,8 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
       signOut, onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import {
-      getFirestore, doc, onSnapshot, setDoc, enableIndexedDbPersistence
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
+    /* ══ CONFIG ══ */
     const BACKEND_NEWS   = "/api/news";
     const BACKEND_CHAT   = "https://auto-backend-three.vercel.app/api/chat";
     const BACKEND_SEARCH = "https://auto-backend-three.vercel.app/api/search";
@@ -781,39 +650,56 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       projectId:"auto-1af60",
       storageBucket:"auto-1af60.firebasestorage.app",
       messagingSenderId:"498320258984",
-      appId:"1:498320258984:web:bac67d7634273d10464f9d",
-      measurementId:"G-WYM78KQWQJ"
+      appId:"1:498320258984:web:bac67d7634273d10464f9d"
     };
+
     const $ = id => document.getElementById(id);
     const setStatus = t => { $("status").textContent = t; };
-    function escapeHtml(s=""){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+    function escapeHtml(s=""){
+      return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
     function safeHost(url){try{return new URL(url).hostname}catch{return""}}
-    function fmtDate(d){if(!d)return"";const dt=new Date(d);if(Number.isNaN(dt.getTime()))return String(d);return dt.toLocaleString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}
+    function fmtDate(d){
+      if(!d)return"";const dt=new Date(d);
+      if(Number.isNaN(dt.getTime()))return String(d);
+      return dt.toLocaleString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+    }
+
+    /* ══ FIREBASE AUTH ══ */
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({prompt:"select_account",display:"popup"});
+
+    (async()=>{
+      try{await setPersistence(auth,browserLocalPersistence)}
+      catch{try{await setPersistence(auth,browserSessionPersistence)}catch{}}
+      try{await getRedirectResult(auth)}catch{}
+    })();
+
+    /* ══ NEWS ══ */
     function renderItems(items){
       const box=$("newsList");
-      if(!items||!items.length){box.innerHTML='<div class="muted" style="padding:20px;text-align:center">Nessuna news.</div>';setStatus("Nessuna news trovata.");return}
+      if(!items||!items.length){
+        box.innerHTML='<div class="muted" style="padding:20px;text-align:center">Nessuna news disponibile.</div>';
+        setStatus("Nessuna news trovata.");return;
+      }
       box.innerHTML=items.map(n=>{
-        const link=n.url||n.link||"",title=n.title||"Senza titolo",date=fmtDate(n.date||n.pubDate||""),host=safeHost(link);
-        return`<a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer"><div class="newsTitle">${escapeHtml(title)}</div>${host?`<div class="newsMeta">🔗 ${escapeHtml(host)}</div>`:""}${date?`<div class="newsDate">🕒 ${escapeHtml(date)}</div>`:""}</a>`;
+        const link=n.url||n.link||"",title=n.title||"Senza titolo";
+        const date=fmtDate(n.date||n.pubDate||""),host=safeHost(link);
+        return`<a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">
+          <div class="newsTitle">${escapeHtml(title)}</div>
+          ${host?`<div class="newsMeta">🔗 ${escapeHtml(host)}</div>`:""}
+          ${date?`<div class="newsDate">🕒 ${escapeHtml(date)}</div>`:""}
+        </a>`;
       }).join("");
       setStatus(`✅ ${items.length} news caricate • ${new Date().toLocaleString("it-IT")}`);
     }
 
-    const app=initializeApp(firebaseConfig);
-    const auth=getAuth(app);
-    const db=getFirestore(app);
-    enableIndexedDbPersistence(db).catch(()=>{});
-    const provider=new GoogleAuthProvider();
-    provider.setCustomParameters({prompt:"select_account",display:"popup"});
-
-    (async function(){
-      try{await setPersistence(auth,browserLocalPersistence)}catch{try{await setPersistence(auth,browserSessionPersistence)}catch{}}
-      try{await getRedirectResult(auth)}catch{}
-    })();
-
     async function loadNews(){
-      if(!auth.currentUser){$("newsList").innerHTML="";setStatus("🔒 Login per vedere le news.");return}
-      setStatus("⏳ Caricamento...");$("refreshBtn").disabled=true;
+      if(!auth.currentUser){$("newsList").innerHTML="";setStatus("🔒 Effettua il login per vedere le news.");return}
+      setStatus("⏳ Caricamento news...");$("refreshBtn").disabled=true;
       try{
         const r=await fetch(BACKEND_NEWS,{method:"GET",headers:{"Cache-Control":"no-cache"},cache:"no-store"});
         if(!r.ok)throw new Error(`HTTP ${r.status}`);
@@ -822,655 +708,46 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
         else if(Array.isArray(data))renderItems(data);
         else throw new Error("Formato non valido");
       }catch(err){
-        $("newsList").innerHTML='<div class="muted" style="padding:20px;text-align:center">❌ Errore news</div>';
+        $("newsList").innerHTML='<div class="muted" style="padding:20px;text-align:center">❌ Errore caricamento news</div>';
         setStatus("❌ "+(err?.message||err));
       }finally{$("refreshBtn").disabled=!auth.currentUser}
     }
 
+    /* ══ NEWS TOGGLE: chiuse di default, si aprono col "Leggi" ══ */
+    let newsVisible = false;
+    $("newsToggleBtn").addEventListener("click",()=>{
+      newsVisible = !newsVisible;
+      const box = $("newsScrollBox");
+      box.classList.toggle("open", newsVisible);
+      $("newsToggleBtn").textContent = newsVisible ? "➖ Chiudi" : "📖 Leggi";
+    });
+
+    /* ══ LOGIN / LOGOUT ══ */
     $("loginBtn").addEventListener("click",async()=>{
       try{
-        setStatus("🔐 Apertura login...");
-        try{const r=await signInWithPopup(auth,provider);setStatus("✅ Login riuscito! "+r.user.email)}
+        setStatus("🔐 Apertura login Google...");
+        try{const r=await signInWithPopup(auth,provider);setStatus("✅ Login riuscito! Benvenuto "+r.user.email)}
         catch(pe){
-          if(["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(pe.code)){setStatus("🔄 Reindirizzamento...");await signInWithRedirect(auth,provider)}
-          else throw pe;
+          if(["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(pe.code)){
+            setStatus("🔄 Reindirizzamento...");await signInWithRedirect(auth,provider);
+          }else throw pe;
         }
       }catch(e){
-        let msg=e.code==="auth/unauthorized-domain"?"Dominio non autorizzato":e.code||e.message;
+        const msg=e.code==="auth/unauthorized-domain"?"Dominio non autorizzato":e.code||e.message;
         setStatus("❌ "+msg);
       }
     });
-    $("logoutBtn").addEventListener("click",async()=>{try{await signOut(auth);$("newsList").innerHTML="";setStatus("👋 Logout.")}catch(e){setStatus("❌ "+e.message)}});
+    $("logoutBtn").addEventListener("click",async()=>{
+      try{await signOut(auth);$("newsList").innerHTML="";setStatus("👋 Logout effettuato.")}
+      catch(e){setStatus("❌ "+e.message)}
+    });
     $("refreshBtn").addEventListener("click",loadNews);
-    $("fiatBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Fiat,"_blank","noopener,noreferrer"));
-    $("jeepBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Jeep,"_blank","noopener,noreferrer"));
-    $("alfaBtn").addEventListener("click",()=>window.open(BRAND_LINKS.AlfaRomeo,"_blank","noopener,noreferrer"));
-    $("lanciaBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Lancia,"_blank","noopener,noreferrer"));
 
-    /* ══ AGENDA + MEMO + CALENDARIO ══ */
-    const SYNC={unsub:null,uid:null,docRef:null,data:{tasks:{},memos:{}},ready:false};
-    function setSyncBadge(state){
-      const b=$("syncBadge");
-      if(state==="ok"){b.className="syncBadge ok";b.textContent="Sync: attivo"}
-      else if(state==="warn"){b.className="syncBadge warn";b.textContent="Sync: non attivo"}
-      else{b.className="syncBadge";b.textContent="Sync: ..."}
-    }
-    function todayMidnight(d=new Date()){const x=new Date(d);x.setHours(0,0,0,0);return x}
-    function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
-    function dateKey(d){const x=todayMidnight(d);return`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`}
-    function prettyDay(d){return d.toLocaleDateString("it-IT",{weekday:"short",day:"2-digit",month:"2-digit"})}
-    function mkUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
-
-    function startOfWeekMonday(d=new Date()){const x=todayMidnight(d);const day=x.getDay();x.setDate(x.getDate()+(day===0?-6:1-day));return x}
-    function fmtRange(a,b){return`${a.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"})}–${b.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"})}`}
-
-    function renderWeekCalendar(){
-      const grid=$("weekGrid"),range=$("weekRange");
-      if(!grid||!range)return;
-      if(!auth.currentUser){range.textContent="Login richiesto";grid.innerHTML="";return}
-      const base=startOfWeekMonday(new Date());
-      range.textContent=fmtRange(base,addDays(base,6));
-      const allTasks=Object.values(SYNC.data.tasks||{});
-      const todayKey=dateKey(new Date());
-      const dows=["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
-      grid.innerHTML=Array.from({length:7}).map((_,i)=>{
-        const d=addDays(base,i),k=dateKey(d);
-        const tasks=allTasks.filter(t=>t&&t.dateKey===k).sort((a,b)=>(Number(a.done)-Number(b.done))||((a.createdAt||0)-(b.createdAt||0)));
-        const show=tasks.slice(0,3).map(t=>`<div class="weekTask${t.done?" done":""}" title="${escapeHtml(t.text||"")}">${escapeHtml(t.text||"")}</div>`).join("");
-        const more=tasks.length>3?`<div class="weekMore">+${tasks.length-3} altri</div>`:"";
-        return`<div class="weekCell${k===todayKey?" today":""}"><div class="weekTop"><div class="weekDow">${dows[i]}</div><div class="weekDay">${String(d.getDate()).padStart(2,"0")}</div></div><div class="weekTasks">${tasks.length?(show+more):'<div class="muted" style="font-size:11px;opacity:.7">—</div>'}</div></div>`;
-      }).join("");
-    }
-
-    let selectedOffset=0;
-    function refreshDayHeaders(){
-      const base=todayMidnight(new Date());
-      $("dayDate0").textContent=prettyDay(base);
-      $("dayDate1").textContent=prettyDay(addDays(base,1));
-      $("dayDate2").textContent=prettyDay(addDays(base,2));
-      renderTasksAndMemos();renderWeekCalendar();
-    }
-    (function scheduleMidnightRefresh(){
-      const now=new Date(),next=new Date(now);next.setHours(24,0,0,0);
-      setTimeout(()=>{refreshDayHeaders();scheduleMidnightRefresh()},Math.max(1000,next-now));
-    })();
-
-    function normalizePlanner(p){
-      return{tasks:(p&&typeof p.tasks==="object"&&p.tasks)?p.tasks:{},memos:(p&&typeof p.memos==="object"&&p.memos)?p.memos:{}};
-    }
-    async function writePlanner(next){if(!SYNC.docRef)return;await setDoc(SYNC.docRef,next,{merge:false}).catch(()=>{})}
-    async function safeWrite(fn){
-      if(!SYNC.docRef)return;
-      const next=fn(JSON.parse(JSON.stringify(SYNC.data)));
-      SYNC.data=next;renderTasksAndMemos();renderWeekCalendar();
-      try{await writePlanner(next)}catch{}
-    }
-    function cleanupOldTasks(data){
-      const limitKey=dateKey(addDays(new Date(),-30));
-      const out={...data,tasks:{...data.tasks},memos:{...data.memos}};
-      for(const[id,t]of Object.entries(out.tasks)){if(t?.dateKey&&String(t.dateKey)<limitKey)delete out.tasks[id]}
-      return out;
-    }
-
-    function renderTasksAndMemos(){
-      if(!auth.currentUser){
-        const msg='<div class="muted" style="padding:10px 6px;font-size:12px;">Login richiesto.</div>';
-        [$("taskList0"),$("taskList1"),$("taskList2"),$("memoList")].forEach(el=>{if(el)el.innerHTML=msg});
-        return;
-      }
-      const base=todayMidnight(new Date());
-      const keys=[dateKey(base),dateKey(addDays(base,1)),dateKey(addDays(base,2))];
-      const lists=[$("taskList0"),$("taskList1"),$("taskList2")];
-      const allTasks=Object.values(SYNC.data.tasks||{});
-      for(let i=0;i<3;i++){
-        const items=allTasks.filter(t=>t&&t.dateKey===keys[i]).sort((a,b)=>(Number(a.done)-Number(b.done))||((a.createdAt||0)-(b.createdAt||0)));
-        if(!items.length){lists[i].innerHTML='<div class="muted" style="padding:10px 6px;font-size:12px;">Nessun task.</div>';continue}
-        lists[i].innerHTML=items.map(t=>`<div class="item" data-id="${escapeHtml(t.id)}"><input class="chk" type="checkbox"${t.done?" checked":""}><div class="itemMain"><div class="itemText${t.done?" done":""}">${escapeHtml(t.text||"")}</div></div><div class="itemActions"><button class="iconBtn del" title="Elimina">×</button></div></div>`).join("");
-      }
-      const memos=Object.values(SYNC.data.memos||{}).sort((a,b)=>(Number(a.done)-Number(b.done))||((a.createdAt||0)-(b.createdAt||0)));
-      const box=$("memoList");
-      box.innerHTML=!memos.length?'<div class="muted" style="padding:10px 6px;font-size:12px;">Nessuna memo.</div>':
-        memos.map(m=>`<div class="item" data-id="${escapeHtml(m.id)}"><div class="itemMain"><div class="itemText${m.done?" done":""}">${escapeHtml(m.text||"")}</div></div><div class="itemActions"><button class="iconBtn pencil" title="Matita">✎</button><button class="iconBtn del" title="Elimina">×</button></div></div>`).join("");
-
-      document.querySelectorAll("#agendaPanel .item").forEach(el=>{
-        const id=el.getAttribute("data-id"),chk=el.querySelector(".chk"),del=el.querySelector(".del");
-        chk.addEventListener("change",()=>safeWrite(d=>{if(d.tasks[id])d.tasks[id].done=!!chk.checked;return d}));
-        del.addEventListener("click",()=>safeWrite(d=>{delete d.tasks[id];return d}));
-      });
-      document.querySelectorAll("#memoPanel .item").forEach(el=>{
-        const id=el.getAttribute("data-id"),pencil=el.querySelector(".pencil"),del=el.querySelector(".del");
-        pencil.addEventListener("click",()=>safeWrite(d=>{if(d.memos[id])d.memos[id].done=!d.memos[id].done;return d}));
-        del.addEventListener("click",()=>safeWrite(d=>{delete d.memos[id];return d}));
-      });
-    }
-
-    function setDayOffset(n){
-      selectedOffset=n;
-      [0,1,2].forEach(i=>$("dayBtn"+i).classList.toggle("active",i===n));
-    }
-    [0,1,2].forEach(i=>$("dayBtn"+i).addEventListener("click",()=>setDayOffset(i)));
-    setDayOffset(0);
-
-    $("addTaskBtn").addEventListener("click",()=>{
-      const text=$("taskInput").value.trim();if(!text)return;
-      const target=addDays(todayMidnight(new Date()),selectedOffset),id=mkUid();
-      safeWrite(d=>{d.tasks[id]={id,dateKey:dateKey(target),text,done:false,createdAt:Date.now()};return cleanupOldTasks(d)});
-      $("taskInput").value="";
-    });
-    $("taskInput").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();$("addTaskBtn").click()}});
-    $("agendaClearDoneBtn").addEventListener("click",()=>safeWrite(d=>{for(const[id,t]of Object.entries(d.tasks)){if(t&&t.done)delete d.tasks[id]}return cleanupOldTasks(d)}));
-    $("addMemoBtn").addEventListener("click",()=>{
-      const text=$("memoInput").value.trim();if(!text)return;
-      const id=mkUid();
-      safeWrite(d=>{d.memos[id]={id,text,done:false,createdAt:Date.now()};return d});
-      $("memoInput").value="";
-    });
-    $("memoInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("addMemoBtn").click()}});
-    $("memoClearDoneBtn").addEventListener("click",()=>safeWrite(d=>{for(const[id,m]of Object.entries(d.memos)){if(m&&m.done)delete d.memos[id]}return d}));
-
-    /* ══ COLPI DI TELEFONO ══ */
-    let telState={contatti:{}};
-    let telDocRef=null,telUnsub=null;
-    let telStato="caldo",telWhen="oggi";
-    function telUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
-    function normalizeTel(d){return{contatti:(d&&typeof d.contatti==="object"&&d.contatti)?d.contatti:{}}}
-    async function telWrite(){if(!telDocRef)return;try{await setDoc(telDocRef,telState,{merge:false})}catch{}}
-    async function telSafeWrite(fn){
-      if(!telDocRef)return;
-      const next=fn(JSON.parse(JSON.stringify(telState)));
-      telState=next;renderTelefono();try{await telWrite()}catch{}
-    }
-    const STATO_EMOJI={caldo:"🔥 Caldo",tiepido:"🌡 Tiepido",freddo:"❄ Freddo"};
-    function telCardHTML(c){
-      const sc=escapeHtml(c.stato||"freddo");
-      return`<div class="telCard ${sc}${c.chiamato?" chiamato":""}" data-id="${escapeHtml(c.id)}">
-        <div class="telCardMain">
-          <div class="telCardName${c.chiamato?" chiamato":""}">${escapeHtml(c.nome||"")}</div>
-          <div class="telCardMeta">
-            ${c.modello?`<span class="telCardModello">🚗 ${escapeHtml(c.modello)}</span>`:""}
-            <span class="telStatoBadge ${sc}">${STATO_EMOJI[c.stato]||c.stato}</span>
-          </div>
-        </div>
-        <div class="telCardActions">
-          <button class="iconBtn telChiamato" title="${c.chiamato?"Riattiva":"Segna chiamato"}" style="font-size:15px;">${c.chiamato?"↩":"✅"}</button>
-          <button class="iconBtn telDel" title="Elimina" style="font-size:14px;font-weight:900;">×</button>
-        </div>
-      </div>`;
-    }
-    function renderTelefono(){
-      if(!auth.currentUser){
-        ["telListOggi","telListDomani","telListSettimana"].forEach(id=>{const el=$(id);if(el)el.innerHTML='<div class="telEmpty">Login richiesto.</div>'});
-        return;
-      }
-      const all=Object.values(telState.contatti||{});
-      const groups={oggi:[],domani:[],settimana:[]};
-      all.forEach(c=>{if(groups[c.quando])groups[c.quando].push(c)});
-      const statoOrd={caldo:0,tiepido:1,freddo:2};
-      const sort=arr=>arr.sort((a,b)=>(Number(a.chiamato)-Number(b.chiamato))||(statoOrd[a.stato]||2)-(statoOrd[b.stato]||2)||((a.createdAt||0)-(b.createdAt||0)));
-      ["oggi","domani","settimana"].forEach(w=>{
-        const el=$("telList"+w.charAt(0).toUpperCase()+w.slice(1));
-        const cnt=$("telCnt"+w.charAt(0).toUpperCase()+w.slice(1));
-        const items=sort(groups[w]);
-        const attivi=items.filter(c=>!c.chiamato).length;
-        if(cnt)cnt.textContent=attivi;
-        if(!items.length){el.innerHTML='<div class="telEmpty">Nessuno.</div>';return}
-        el.innerHTML=items.map(telCardHTML).join("");
-      });
-      document.querySelectorAll("#telefonoPanel .telCard").forEach(card=>{
-        const id=card.getAttribute("data-id");
-        card.querySelector(".telChiamato")?.addEventListener("click",()=>telSafeWrite(d=>{if(d.contatti[id])d.contatti[id].chiamato=!d.contatti[id].chiamato;return d}));
-        card.querySelector(".telDel")?.addEventListener("click",()=>telSafeWrite(d=>{delete d.contatti[id];return d}));
-      });
-    }
-    ["Caldo","Tiepido","Freddo"].forEach(s=>{
-      $("telBtn"+s).addEventListener("click",()=>{
-        telStato=s.toLowerCase();
-        ["Caldo","Tiepido","Freddo"].forEach(x=>$("telBtn"+x).classList.toggle("active",x===s));
-      });
-    });
-    ["Oggi","Domani","Settimana"].forEach(w=>{
-      $("telWhen"+w).addEventListener("click",()=>{
-        telWhen=w.toLowerCase();
-        ["Oggi","Domani","Settimana"].forEach(x=>$("telWhen"+x).classList.toggle("active",x===w));
-      });
-    });
-    $("telAddBtn").addEventListener("click",()=>{
-      const nome=$("telNome").value.trim();if(!nome)return;
-      const modello=$("telModello").value.trim();
-      const id=telUid();
-      telSafeWrite(d=>{d.contatti[id]={id,nome,modello,stato:telStato,quando:telWhen,chiamato:false,createdAt:Date.now()};return d});
-      $("telNome").value="";$("telModello").value="";
-    });
-    $("telNome").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();$("telAddBtn").click()}});
-    $("telClearDoneBtn").addEventListener("click",()=>telSafeWrite(d=>{for(const[id,c]of Object.entries(d.contatti)){if(c?.chiamato)delete d.contatti[id]}return d}));
-
-    function startTelSync(user){
-      if(telUnsub){try{telUnsub()}catch{}}
-      telDocRef=doc(db,"users",user.uid,"telefono","data");
-      telUnsub=onSnapshot(telDocRef,snap=>{
-        telState=normalizeTel(snap.exists()?snap.data():null);
-        renderTelefono();
-        if(!snap.exists())setDoc(telDocRef,telState,{merge:false}).catch(()=>{});
-      },()=>renderTelefono());
-    }
-    function stopTelSync(){
-      if(telUnsub){try{telUnsub()}catch{}}
-      telUnsub=null;telDocRef=null;telState={contatti:{}};renderTelefono();
-    }
-
-    function startPlannerSync(user){
-      stopPlannerSync();
-      SYNC.docRef=doc(db,"users",user.uid,"planner","main");
-      setSyncBadge("...");
-      SYNC.unsub=onSnapshot(SYNC.docRef,snap=>{
-        const data=snap.exists()?snap.data():{tasks:{},memos:{}};
-        SYNC.data=normalizePlanner(data);SYNC.data=cleanupOldTasks(SYNC.data);SYNC.ready=true;
-        setSyncBadge("ok");renderTasksAndMemos();renderWeekCalendar();
-        if(!snap.exists())setDoc(SYNC.docRef,SYNC.data,{merge:false}).catch(()=>{});
-      },()=>setSyncBadge("warn"));
-    }
-    function stopPlannerSync(){
-      if(SYNC.unsub){try{SYNC.unsub()}catch{}}
-      SYNC.unsub=null;SYNC.docRef=null;SYNC.data={tasks:{},memos:{}};SYNC.ready=false;
-      setSyncBadge("warn");renderTasksAndMemos();renderWeekCalendar();
-    }
-
-    /* ══ COMPARATORE — DATABASE REALE 2025 ══ */
-    const AUTO_DB = {
-      "grande panda": {
-        marca:"Fiat", nome:"Grande Panda", lunghezza:"3,99 m",
-        motori:[
-          "1.2 Turbo benzina 100 CV (cambio manuale 6M) — da €17.900",
-          "1.2 Mild Hybrid 100+28 CV eDCT6 — da €18.900",
-          "100% Elettrica 113 CV, 44 kWh, 320 km WLTP — da €24.900"
-        ],
-        allestimenti:[
-          "Pop — €18.900 · cerchi acciaio 16\", fari alogeni, clima manuale, strumentazione 10\", sensori park post.",
-          "Icon — €20.400 · aggiunge cerchi style, fari LED Pixel, schermo 10,25\", finestrini post. elettrici",
-          "La Prima — €24.900 · cerchi lega 17\", barre portatutto, navigatore, ricarica wireless, clima auto, telecamera",
-          "RED (solo elettrica) — €24.900 · cerchi bianchi 16\", fari EcoLED, schermo 10,25\""
-        ],
-        punti:["SUV compatto 4 m, spazioso dentro","Disponibile anche per neopatentati","Interni con materiali riciclati","Touchscreen 10,25\" nelle versioni top","Ibrida: autonomia elettrica ~50% in città"],
-        prezzo_base:"€17.900 (benzina) / €18.900 (ibrida) / €24.900 (elettrica)"
-      },
-      "panda": {
-        marca:"Fiat", nome:"Panda", lunghezza:"3,69 m",
-        motori:[
-          "1.0 Hybrid 70 CV — da €15.500",
-          "TwinAir 0.9 4x4 85 CV (Cross) — da €24.400"
-        ],
-        allestimenti:[
-          "Easy — €15.500 · versione d'ingresso",
-          "City Life — €17.800 · miglior rapporto qualità/prezzo",
-          "Cross 4x4 — €24.400 · assetto rialzato, vera trazione integrale"
-        ],
-        punti:["City car iconica ultra compatta","Vera 4x4 disponibile (Cross)","Adatta neopatentati","Costi di gestione bassi"],
-        prezzo_base:"€15.500"
-      },
-      "avenger": {
-        marca:"Jeep", nome:"Avenger", lunghezza:"4,08 m",
-        motori:[
-          "1.2 Turbo benzina 100 CV cambio manuale — da €24.750",
-          "1.2 e-Hybrid 136 CV eDCT6 — da €27.200",
-          "4xe Ibrida integrale 145 CV — da €32.200",
-          "BEV 100% Elettrica 156 CV, 54 kWh, 400 km WLTP — da €39.400"
-        ],
-        allestimenti:[
-          "Longitude — base · Keyless Start, touchscreen 10,25\", quadro digitale",
-          "Altitude — mid · fari fendinebbia LED, telecamera drone-view 180°, specchietto auto-oscurante",
-          "Summit — top · dotazione premium completa",
-          "Upland/Overland/North Face (solo 4xe) — versioni off-road"
-        ],
-        punti:["SUV più venduto Italia","Primo Jeep 100% elettrico","Design iconico 7 feritoie","ChatGPT integrato","Gamma completa: benzina/ibrida/4xe/elettrica"],
-        prezzo_base:"€24.750 (benzina) / €27.200 (ibrida) / €39.400 (elettrica)"
-      },
-      "compass": {
-        marca:"Jeep", nome:"Compass (III gen.)", lunghezza:"4,50 m",
-        motori:[
-          "e-Hybrid 145 CV (1.2 + motore 29 CV integrato) eDCT6 — da €38.850",
-          "BEV 100% Elettrica 213 CV, 74 kWh, 500 km WLTP — da €50.100",
-          "Ibrida plug-in 4xe — da €45.900"
-        ],
-        allestimenti:[
-          "Launch Edition / Altitude — da €39.900 · schermo 16\", connettività wireless",
-          "North Star — da €44.000",
-          "Summit — top di gamma"
-        ],
-        punti:["SUV medio-grande (4,50 m)","Schermo centrale 16\" HD","500 km autonomia dichiarata (BEV)","Passo 2,8 m, bagagliaio 479 l","Costruito in Italia"],
-        prezzo_base:"€38.850 (ibrida) / €45.900 (plug-in) / €50.100 (elettrica)"
-      },
-      "renegade": {
-        marca:"Jeep", nome:"Renegade", lunghezza:"4,24 m",
-        motori:[
-          "e-Hybrid 130 CV — da ~€30.000",
-          "4xe Plug-in Hybrid 190/240 CV — da €43.600"
-        ],
-        allestimenti:[
-          "Limited — da €43.600",
-          "S — sportivo",
-          "Trailhawk — off-road"
-        ],
-        punti:["Icona del fuoristrada compact","4xe con vera capacità off-road","Produzione in Italia (Melfi — fine prod. attuale, nuova gen. 2027)"],
-        prezzo_base:"€30.000 (ibrida) / €43.600 (4xe plug-in)"
-      },
-      "junior": {
-        marca:"Alfa Romeo", nome:"Junior", lunghezza:"4,17 m",
-        motori:[
-          "1.2 Mild Hybrid 145 CV (48V, eDCT6) — da €30.750",
-          "Q4 Mild Hybrid 145 CV trazione integrale — disponibile",
-          "BEV Elettrica 156 CV, 51 kWh, 410 km WLTP — disponibile",
-          "Veloce BEV 282 CV, differenziale Torsen — versione sportiva"
-        ],
-        allestimenti:[
-          "Base (MY2026) — €30.750 · cerchi 18\", full LED, clima auto, keyless, strumentazione 10,25\", ACC",
-          "Sprint — dettagli nero lucido, vetri oscurati, luce RGB, navigatore connesso",
-          "Ti — sedili sportivi riscaldati, volante pelle, piano carico 2 livelli, inserti alluminio",
-          "Veloce — top sportivo, 282 CV BEV, assetto ribassato 2,5 cm",
-          "+ Pack Techno (€2.000): fari Matrix LED, L2, keyless, portellone elettrico, ricarica wireless",
-          "+ Pack Sport (€2.500 su Ti): sedili Sabelt Alcantara, volante Alcantara rosso"
-        ],
-        punti:["Design sportivo grintoso, cruscotto binocolo Alfa","Fari Matrix LED adattivi","Hey Alfa + ChatGPT integrato","Guida autonoma livello 2 (optional)","Versione Veloce 282 CV con differenziale Torsen","Consumo ibrida: 4,8-5,3 l/100km"],
-        prezzo_base:"€30.750 (ibrida MY2026)"
-      },
-      "tonale": {
-        marca:"Alfa Romeo", nome:"Tonale", lunghezza:"4,53 m",
-        motori:[
-          "1.5 Mild Hybrid 160 CV — disponibile",
-          "Plug-in Hybrid 4xe 280 CV — disponibile"
-        ],
-        allestimenti:["Sprint", "Ti", "Veloce", "Quadrifoglio (280 CV)"],
-        punti:["SUV C-segment Alfa Romeo","Design sportivo premium","Sistema NFT per certificazione km","Plug-in 4xe disponibile"],
-        prezzo_base:"€38.000 circa"
-      },
-      "giulia": {
-        marca:"Alfa Romeo", nome:"Giulia", lunghezza:"4,64 m",
-        motori:[
-          "2.0 Turbo 200 CV",
-          "2.0 Turbo 280 CV Veloce",
-          "2.9 V6 510 CV Quadrifoglio"
-        ],
-        allestimenti:["Sprint","Ti","Veloce","Quadrifoglio"],
-        punti:["Berlina premium RWD","V6 biturbo 510 CV Quadrifoglio","Design italiano iconico","Trazione posteriore di serie"],
-        prezzo_base:"€47.000 circa"
-      },
-      "stelvio": {
-        marca:"Alfa Romeo", nome:"Stelvio", lunghezza:"4,69 m",
-        motori:[
-          "2.0 Turbo 200 CV AWD",
-          "2.0 Turbo 280 CV Veloce AWD",
-          "2.9 V6 510 CV Quadrifoglio AWD"
-        ],
-        allestimenti:["Sprint","Ti","Veloce","Quadrifoglio"],
-        punti:["SUV premium mid-size","Versione Quadrifoglio 510 CV record Nürburgring","Trazione integrale AWD di serie","Design sportivo italiano"],
-        prezzo_base:"€53.000 circa"
-      },
-      "ypsilon": {
-        marca:"Lancia", nome:"Ypsilon", lunghezza:"4,08 m",
-        motori:[
-          "1.2 Mild Hybrid 100+10 CV (48V, eDCT6) — da €24.900 / promo €17.900",
-          "BEV 100% Elettrica 156 CV, 51 kWh, 402 km WLTP — da €34.900",
-          "HF Line Ibrida 110 CV — disponibile",
-          "HF 280 CV Elettrica — versione sportiva"
-        ],
-        allestimenti:[
-          "Ypsilon base — €24.900 · inserti bronzo/verde salvia, Apple/Android Auto wireless, AEB, keyless, strumentazione 10,25\"",
-          "LX — €27.900 · cerchi lega 17\", elementi nero lucido, velluto, caricatore wireless, telecamere 360°, ACC, L2 optional",
-          "Cassina — edizione limitata 1906 esemplari, ricca dotazione, solo blu",
-          "HF Line — aspetto sportivo dedicato",
-          "HF 280 CV — hot hatch elettrica top di gamma"
-        ],
-        punti:["Design premium segmento B","Interni velluto riciclato con massaggio (LX)","Due schermi 10,25\" gemelli","Fari posteriori rotondi (omaggio Stratos)","HF 280 CV: prima hot hatch Lancia moderna","Lancia Ypsilon WRC2 Rally 2026"],
-        prezzo_base:"€24.900 (ibrida) / €34.900 (elettrica)"
-      }
-    };
-
-    function normalizzaModello(input){
-      const low = input.toLowerCase().trim()
-        .replace(/alfa\s?romeo\s?/i,"")
-        .replace(/jeep\s?/i,"")
-        .replace(/fiat\s?/i,"")
-        .replace(/lancia\s?/i,"")
-        .trim();
-      const alias = {
-        "grande panda":"grande panda","grandepanda":"grande panda",
-        "panda":"panda",
-        "500":"500","fiat 500":"500",
-        "avenger":"avenger","jeep avenger":"avenger",
-        "compass":"compass","jeep compass":"compass",
-        "renegade":"renegade","jeep renegade":"renegade",
-        "junior":"junior","alfa junior":"junior","romeo junior":"junior",
-        "tonale":"tonale","alfa tonale":"tonale",
-        "giulia":"giulia","alfa giulia":"giulia",
-        "stelvio":"stelvio","alfa stelvio":"stelvio",
-        "ypsilon":"ypsilon","lancia ypsilon":"ypsilon",
-      };
-      if(alias[low]) return alias[low];
-      for(const key of Object.keys(AUTO_DB)){
-        if(low.includes(key)||key.includes(low)) return key;
-      }
-      return null;
-    }
-
-    function setLoadingStatus(msg){
-      $("cmpResults").innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:20px;color:#60a5fa;font-size:13px;">🔍 ${escapeHtml(msg)}</div>`;
-    }
-
-    const COMPARATORE_SYSTEM=`Sei un esperto di auto nuove italiane (Fiat, Jeep, Alfa Romeo, Lancia).
-Ti vengono forniti dati REALI e AGGIORNATI 2025 estratti direttamente dai configuratori e listini ufficiali.
-Usa SOLO questi dati. Sii preciso, usa i prezzi e gli allestimenti forniti.
-
-Usa SEMPRE questo formato:
-
-⚔ CONFRONTO: [MODELLO1] vs [MODELLO2]
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🔵 [MODELLO1] ([MARCA])
-• [punto forza dai dati]
-• [punto forza dai dati]
-• [punto forza dai dati]
-💰 Prezzo da: [dal DB]
-⚙ Motori: [dal DB, lista compatta]
-📋 Allestimenti: [dal DB, lista compatta]
-
-🟠 [MODELLO2] ([MARCA])
-• [punto forza dai dati]
-• [punto forza dai dati]
-• [punto forza dai dati]
-💰 Prezzo da: [dal DB]
-⚙ Motori: [dal DB, lista compatta]
-📋 Allestimenti: [dal DB, lista compatta]
-
-📊 DIFFERENZE CHIAVE:
-• Dimensioni: [confronto lunghezze]
-• Motorizzazioni: [principali differenze]
-• Tecnologia: [differenze dotazioni]
-• Prezzo: [differenza economica]
-
-🏆 CONSIGLIO: [1-2 righe concrete basate sui dati]
-
-Nessun testo extra. Solo lo schema sopra.`;
-
-    async function runComparatore(){
-      const m1raw=$("cmpInput1").value.trim(), m2raw=$("cmpInput2").value.trim();
-      if(!m1raw||!m2raw){
-        $("cmpResults").innerHTML='<div style="color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">⚠ Inserisci entrambi i modelli!</div>';
-        return;
-      }
-      const btn=$("cmpBtn");
-      btn.disabled=true; btn.textContent="⏳ Elaborazione...";
-      setLoadingStatus(`Cerco ${m1raw} e ${m2raw} nel database ufficiale...`);
-
-      const k1=normalizzaModello(m1raw), k2=normalizzaModello(m2raw);
-      const d1=k1?AUTO_DB[k1]:null, d2=k2?AUTO_DB[k2]:null;
-
-      function dbToContext(d, rawName){
-        if(!d) return `[MODELLO: ${rawName} — non in database locale, usa le tue conoscenze generali per questo modello]`;
-        return `=== ${d.marca.toUpperCase()} ${d.nome.toUpperCase()} ===
-Lunghezza: ${d.lunghezza}
-Prezzo base: ${d.prezzo_base}
-Motori:
-${d.motori.map(m=>"  • "+m).join("\n")}
-Allestimenti:
-${d.allestimenti.map(a=>"  • "+a).join("\n")}
-Punti di forza:
-${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
-      }
-
-      const ctx = `DATI REALI DAI CONFIGURATORI UFFICIALI 2025:\n\n${dbToContext(d1,m1raw)}\n\n${dbToContext(d2,m2raw)}`;
-      const badge = (d1&&d2)
-        ?`<div style="font-size:11px;color:#6ee7b7;margin-bottom:10px;padding:5px 10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;">✅ Dati dai configuratori ufficiali Fiat / Jeep / Alfa Romeo / Lancia (2025)</div>`
-        :`<div style="font-size:11px;color:#fde68a;margin-bottom:10px;padding:5px 10px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;">⚠ ${!d1?m1raw:m2raw} non nel DB locale — dati integrati da conoscenza generale</div>`;
-
-      try{
-        setLoadingStatus("Elaboro il confronto...");
-        const res=await fetch(BACKEND_CHAT,{
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({messages:[
-            {role:"system", content:COMPARATORE_SYSTEM},
-            {role:"system", content:ctx},
-            {role:"user",   content:`Confronta ${d1?d1.marca+" "+d1.nome:m1raw} vs ${d2?d2.marca+" "+d2.nome:m2raw} seguendo esattamente il formato richiesto.`}
-          ]})
-        });
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data=await res.json();
-        let ai=data.choices?.[0]?.message?.content||"Nessuna risposta.";
-        ai=ai.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-        $("cmpResults").innerHTML=`<div style="background:rgba(31,41,55,.35);border:1px solid rgba(31,41,55,.7);border-radius:12px;padding:14px 16px;">${badge}<div style="white-space:pre-line;font-size:13px;line-height:1.7">${ai}</div></div>`;
-      }catch(err){
-        $("cmpResults").innerHTML=`<div style="color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">❌ Errore: ${escapeHtml(err?.message||"connessione fallita")}. Riprova.</div>`;
-      }finally{
-        btn.disabled=false; btn.textContent="🔎 Confronta";
-      }
-    }
-
-    document.querySelectorAll(".cmpSuggest").forEach(btn=>btn.addEventListener("click",()=>{
-      $("cmpInput1").value=btn.dataset.s1;$("cmpInput2").value=btn.dataset.s2;
-      [$("cmpInput1"),$("cmpInput2")].forEach(el=>el.style.borderColor="#3b82f6");
-      runComparatore();
-    }));
-    $("cmpResetBtn").addEventListener("click",()=>{
-      $("cmpInput1").value="";$("cmpInput2").value="";
-      $("cmpResults").innerHTML='<div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">↑ Scrivi il modello e premi Confronta</div>';
-    });
-    $("cmpBtn").addEventListener("click",runComparatore);
-    $("cmpInput1").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();runComparatore()}});
-    $("cmpInput2").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();runComparatore()}});
-
-    /* ══ VENDITE MENSILI ══ */
-    let vendState={months:{},obiettivo:0};
-    let vendDocRef=null,vendUnsub=null,vendTipo="nuova";
-    const TODAY_KEY=(()=>{const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`})();
-    let vendViewKey=TODAY_KEY;
-
-    function monthLabel(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-1,1);const l=d.toLocaleDateString("it-IT",{month:"long",year:"numeric"});return l.charAt(0).toUpperCase()+l.slice(1)}
-    function prevMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-2,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
-    function nextMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
-    function vendUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
-    function ensureMonth(k){if(!vendState.months[k])vendState.months[k]={nuove:[],usate:[]}}
-    function sumProvv(list){return(list||[]).reduce((s,c)=>s+(Number(c.provv)||0),0)}
-    function fmtEur(n){return"€ "+n.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0})}
-
-    function renderObiettivo(provvMese){
-      const target=vendState.obiettivo||0;
-      const inp=$("obiettivoInput");
-      if(document.activeElement!==inp)inp.value=target>0?target:"";
-      const fill=$("progressFill"),pct=$("progressPct"),manca=$("progressManca");
-      if(!target||target<=0){fill.style.width="0%";fill.className="progressFill low";pct.textContent="0%";pct.className="progressPct low";manca.textContent="Imposta un obiettivo ↑";manca.className="progressManca";return}
-      const ratio=Math.min(provvMese/target,1);const pctVal=Math.round(ratio*100);
-      const tier=pctVal>=100?"done":pctVal>=66?"high":pctVal>=33?"mid":"low";
-      fill.style.width=(ratio*100).toFixed(1)+"%";fill.className="progressFill "+tier;
-      pct.textContent=pctVal+"%";pct.className="progressPct "+tier;
-      if(pctVal>=100){manca.textContent="🎉 Obiettivo raggiunto! +"+fmtEur(provvMese-target)+" extra";manca.className="progressManca done"}
-      else{manca.textContent="Mancano "+fmtEur(target-provvMese)+" all'obiettivo";manca.className="progressManca"}
-    }
-
-    function renderVendite(){
-      const k=vendViewKey;ensureMonth(k);
-      const mese=vendState.months[k],nuove=mese.nuove||[],usate=mese.usate||[];
-      const isCurrent=(k===TODAY_KEY);
-      $("vendMonthLabel").innerHTML=escapeHtml(monthLabel(k))+(isCurrent?' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>':"");
-      $("vendNextBtn").disabled=(k===TODAY_KEY);
-      $("totNuove").textContent=nuove.length;$("totUsate").textContent=usate.length;$("totAll").textContent=nuove.length+usate.length;
-      $("cntNuove").textContent=nuove.length;$("cntUsate").textContent=usate.length;
-      $("listNuove").innerHTML=nuove.length?nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova")).join(""):'<div class="emptyList">Nessuna auto nuova</div>';
-      $("listUsate").innerHTML=usate.length?usate.map((c,i)=>autoItemHTML(c,i+1,"usata")).join(""):'<div class="emptyList">Nessuna auto usata</div>';
-      document.querySelectorAll(".autoDelBtn").forEach(btn=>btn.addEventListener("click",()=>deleteAuto(k,btn.dataset.tipo,btn.dataset.id)));
-      const pNuove=sumProvv(nuove),pUsate=sumProvv(usate),pTot=pNuove+pUsate;
-      $("provvMeseTot").textContent=fmtEur(pTot);
-      $("provvMeseSplit").textContent=pNuove>0&&pUsate>0?`🆕 ${fmtEur(pNuove)}  ·  🔄 ${fmtEur(pUsate)}`:pNuove>0?"🆕 Tutte da auto nuove":pUsate>0?"🔄 Tutte da auto usate":"Nessuna provvigione inserita";
-      let tot2026=0,mesi2026=0;
-      Object.entries(vendState.months).forEach(([mk,mv])=>{if(!mk.startsWith("2026"))return;const mP=sumProvv(mv.nuove||[])+sumProvv(mv.usate||[]);tot2026+=mP;if(mP>0)mesi2026++});
-      $("provv2026Tot").textContent=fmtEur(tot2026);
-      $("provv2026Mesi").textContent=mesi2026===0?"Nessun mese con provvigioni":mesi2026===1?"1 mese con provvigioni":mesi2026+" mesi con provvigioni";
-      renderObiettivo(pTot);
-    }
-
-    function autoItemHTML(c,n,tipo){
-      const p=Number(c.provv)||0,pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—",cls=p>0?"autoProvv":"autoProvv zero";
-      return`<div class="autoItem"><span class="autoN">#${n}</span><span class="autoModello">${escapeHtml(c.modello)}</span><span class="${cls}">${pStr}</span><button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button></div>`;
-    }
-
-    async function vendWrite(){if(!vendDocRef)return;try{await setDoc(vendDocRef,vendState,{merge:false})}catch{}}
-    async function addAuto(){
-      const modello=$("vendModello").value.trim();if(!modello)return;
-      const provv=parseFloat($("vendProvv").value)||0;
-      const k=vendViewKey;ensureMonth(k);
-      const id=vendUid(),entry={id,modello,provv,createdAt:Date.now()};
-      if(vendTipo==="nuova")vendState.months[k].nuove.push(entry);
-      else vendState.months[k].usate.push(entry);
-      $("vendModello").value="";$("vendProvv").value="";
-      renderVendite();await vendWrite();
-    }
-    async function deleteAuto(k,tipo,id){
-      ensureMonth(k);
-      const list=tipo==="nuova"?vendState.months[k].nuove:vendState.months[k].usate;
-      const idx=list.findIndex(c=>c.id===id);if(idx!==-1)list.splice(idx,1);
-      renderVendite();await vendWrite();
-    }
-
-    function startVenditeSync(user){
-      if(vendUnsub){try{vendUnsub()}catch{}}
-      vendDocRef=doc(db,"users",user.uid,"vendite","data");
-      setSyncVendite("sync");
-      vendUnsub=onSnapshot(vendDocRef,snap=>{
-        if(snap.exists()){const d=snap.data();vendState={months:d.months||{},obiettivo:d.obiettivo||0}}
-        else{vendState={months:{},obiettivo:0}}
-        ensureMonth(TODAY_KEY);setSyncVendite("ok");renderVendite();
-        if(!snap.exists())setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
-      },()=>setSyncVendite("warn"));
-    }
-    function stopVenditeSync(){
-      if(vendUnsub){try{vendUnsub()}catch{}}
-      vendUnsub=null;vendDocRef=null;vendState={months:{},obiettivo:0};
-      setSyncVendite("warn");renderVendite();
-    }
-    function setSyncVendite(s){
-      const b=$("venditeSyncBadge");
-      if(s==="ok"){b.className="venditeSyncBadge ok";b.textContent="Sync ✓"}
-      else if(s==="sync"){b.className="venditeSyncBadge";b.textContent="Sync …"}
-      else{b.className="venditeSyncBadge";b.textContent="Sync —"}
-    }
-
-    $("vendPrevBtn").addEventListener("click",()=>{vendViewKey=prevMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite()});
-    $("vendNextBtn").addEventListener("click",()=>{if(vendViewKey===TODAY_KEY)return;vendViewKey=nextMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite()});
-    $("tipoBtnNuova").addEventListener("click",()=>{vendTipo="nuova";$("tipoBtnNuova").classList.add("active");$("tipoBtnUsata").classList.remove("active")});
-    $("tipoBtnUsata").addEventListener("click",()=>{vendTipo="usata";$("tipoBtnUsata").classList.add("active");$("tipoBtnNuova").classList.remove("active")});
-    $("vendAddBtn").addEventListener("click",addAuto);
-    $("vendModello").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
-    $("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
-    $("obiettivoInput").addEventListener("input",async()=>{
-      vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
-      const k=vendViewKey;ensureMonth(k);const m=vendState.months[k];
-      renderObiettivo(sumProvv(m.nuove||[])+sumProvv(m.usate||[]));
-      await vendWrite();
-    });
-
-    ensureMonth(TODAY_KEY);renderVendite();
-    (function scheduleMonthCheck(){
-      const now=new Date(),next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,5);
-      setTimeout(()=>{if(vendViewKey===TODAY_KEY)vendViewKey=nextMonthKey(TODAY_KEY);ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck()},Math.max(5000,next-now));
-    })();
+    /* ══ BRAND BUTTONS ══ */
+    ["fiatBtn","fiatBtn2"]  .forEach(id=>$(id)?.addEventListener("click",()=>window.open(BRAND_LINKS.Fiat,"_blank","noopener")));
+    ["jeepBtn","jeepBtn2"]  .forEach(id=>$(id)?.addEventListener("click",()=>window.open(BRAND_LINKS.Jeep,"_blank","noopener")));
+    ["alfaBtn","alfaBtn2"]  .forEach(id=>$(id)?.addEventListener("click",()=>window.open(BRAND_LINKS.AlfaRomeo,"_blank","noopener")));
+    ["lanciaBtn","lanciaBtn2"].forEach(id=>$(id)?.addEventListener("click",()=>window.open(BRAND_LINKS.Lancia,"_blank","noopener")));
 
     /* ══ AUTH STATE ══ */
     onAuthStateChanged(auth,user=>{
@@ -1479,33 +756,374 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         $("userPill").classList.remove("muted");
         $("userPill").style.borderColor="rgba(34,197,94,.5)";
         $("userPill").style.background="rgba(34,197,94,.1)";
-        $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";$("refreshBtn").disabled=false;
-        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();
+        $("loginBtn").style.display="none";
+        $("logoutBtn").style.display="inline-block";
+        $("refreshBtn").disabled=false;
+        loadNews();
       }else{
         $("userPill").textContent="🔒 Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor="";$("userPill").style.background="";
-        $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";$("refreshBtn").disabled=true;
+        $("loginBtn").style.display="inline-block";
+        $("logoutBtn").style.display="none";
+        $("refreshBtn").disabled=true;
         $("newsList").innerHTML="";setStatus("🔒 Effettua il login per caricare le news.");
-        stopPlannerSync();stopVenditeSync();stopTelSync();stopConsegneSync();stopPostSync();renderOggi();
       }
     });
 
-    /* ══ CHATBOT ══ */
-    let chatHistory=[],isMinimized=false;
-    const chatTrigger=$("chatTrigger"),chatBox=$("chatBox"),chatMessages=$("chatMessages"),chatInputField=$("chatInputField"),chatSendBtn=$("chatSendBtn");
-    chatTrigger.addEventListener("click",()=>{chatBox.classList.add("open");chatBox.classList.remove("minimized");chatTrigger.style.display="none";$("chatMinimizedLogo").style.display="none";chatInputField.focus()});
-    $("minimizeBtn").addEventListener("click",()=>{chatBox.classList.add("minimized");isMinimized=true;$("chatMinimizedLogo").style.display="block"});
-    $("closeBtn").addEventListener("click",()=>{chatBox.classList.remove("open","minimized");chatTrigger.style.display="flex"});
-    chatBox.querySelector(".chatHeader").addEventListener("click",e=>{if(isMinimized&&!e.target.closest("button")){chatBox.classList.remove("minimized");isMinimized=false;$("chatMinimizedLogo").style.display="none"}});
-    $("chatMinimizedLogo").addEventListener("click",()=>{chatBox.classList.remove("minimized");isMinimized=false;$("chatMinimizedLogo").style.display="none";chatInputField.focus()});
+    /* ══════════════════════════════════════════════════
+       SEZIONE GARANZIE PDF → Word
+       ══════════════════════════════════════════════════ */
+
+    let garanzieFileData = null;    // base64 del pdf
+    let garanzieFileName = "";
+
+    /* Abilita il bottone solo se cliente + file sono entrambi presenti */
+    function checkGaranzieReady(){
+      const cliente = $("garanzieCliente").value.trim();
+      $("elaboraBtn").disabled = !(cliente && garanzieFileData);
+    }
+
+    $("garanzieCliente").addEventListener("input", checkGaranzieReady);
+
+    /* Upload file */
+    $("garanzieFile").addEventListener("change", e=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      if(file.size > 10 * 1024 * 1024){
+        alert("⚠️ Il file è troppo grande! Massimo 10 MB.");
+        return;
+      }
+      garanzieFileName = file.name;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        // Salva solo la parte base64 (senza il prefisso data:application/pdf;base64,)
+        garanzieFileData = ev.target.result.split(",")[1];
+        const fnBox = $("uploadFileName");
+        fnBox.textContent = "📄 " + file.name;
+        fnBox.style.display = "block";
+        checkGaranzieReady();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    /* Drag & drop */
+    const uploadZone = $("uploadZone");
+    uploadZone.addEventListener("dragover", e=>{e.preventDefault();uploadZone.classList.add("drag")});
+    uploadZone.addEventListener("dragleave", ()=>uploadZone.classList.remove("drag"));
+    uploadZone.addEventListener("drop", e=>{
+      e.preventDefault();uploadZone.classList.remove("drag");
+      const file = e.dataTransfer.files[0];
+      if(file && file.type==="application/pdf"){
+        $("garanzieFile").files;
+        // Simula selezione manuale
+        const dt = new DataTransfer();dt.items.add(file);
+        $("garanzieFile").files = dt.files;
+        $("garanzieFile").dispatchEvent(new Event("change"));
+      }
+    });
+
+    /* ══ ELABORA: Chiama l'AI con il PDF in base64 ══ */
+    $("elaboraBtn").addEventListener("click", async()=>{
+      const cliente = $("garanzieCliente").value.trim();
+      if(!cliente || !garanzieFileData){ alert("Inserisci il nome cliente e carica il PDF."); return; }
+
+      // Mostra progress
+      const prog = $("garanzieProgress");
+      const fill = $("progressFill");
+      const msg  = $("progressMsg");
+      prog.classList.add("show");
+      $("elaboraBtn").disabled = true;
+      $("downloadArea").classList.remove("show");
+
+      // Simula progressi visivi
+      const steps = [
+        {pct:15, txt:"⏳ Lettura del PDF in corso..."},
+        {pct:35, txt:"🔍 Estrazione testo garanzie..."},
+        {pct:60, txt:"🤖 Analisi AI delle clausole..."},
+        {pct:80, txt:"📝 Generazione riepilogo..."},
+        {pct:95, txt:"📄 Preparazione documento Word..."},
+      ];
+      let stepIdx=0;
+      const ticker = setInterval(()=>{
+        if(stepIdx<steps.length){ fill.style.width=steps[stepIdx].pct+"%"; msg.textContent=steps[stepIdx].txt; stepIdx++; }
+      }, 1200);
+
+      try{
+        /* Chiama l'API di Claude con il PDF allegato */
+        const response = await fetch("https://api.anthropic.com/v1/messages", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({
+            model:"claude-sonnet-4-20250514",
+            max_tokens:4000,
+            messages:[{
+              role:"user",
+              content:[
+                {
+                  type:"document",
+                  source:{type:"base64", media_type:"application/pdf", data:garanzieFileData}
+                },
+                {
+                  type:"text",
+                  text:`Sei un esperto di garanzie automotive. Analizza questo documento PDF e crea un riepilogo COMPLETO e STRUTTURATO per il cliente "${cliente}".
+
+Devi estrarre e organizzare TUTTE le seguenti informazioni:
+
+# GARANZIE INCLUSE
+Per ogni garanzia elenca:
+- Nome garanzia
+- Durata (anni/mesi/km)
+- Cosa copre esattamente
+- Cosa NON copre (esclusioni)
+- Eventuali condizioni di validità
+
+# GARANZIE NON INCLUSE
+- Cosa è escluso dalla copertura
+- Cosa decade la garanzia
+
+# FRANCHIGIE
+- Importo di ciascuna franchigia
+- Per quale tipo di intervento si applica
+- Eventuali massimali
+
+# CONTATTI E PROCEDURE
+- Come attivare la garanzia
+- Numeri di telefono o indirizzi utili
+- Tempi di risposta dichiarati
+
+# RIEPILOGO FINALE
+Una tabella con: Tipo garanzia | Durata | Copre | Non Copre | Franchigia
+
+Formatta il testo in modo chiaro con titoli, sottotitoli ed elenchi. Il documento sarà consegnato al cliente ${cliente}.`
+                }
+              ]
+            }]
+          })
+        });
+
+        if(!response.ok){
+          const errData = await response.json().catch(()=>({}));
+          throw new Error(errData.error?.message || `HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const testo = data.content?.[0]?.text || "";
+        if(!testo) throw new Error("Nessun testo ricevuto dall'AI");
+
+        clearInterval(ticker);
+        fill.style.width="100%";
+        msg.textContent="✅ Analisi completata! Generazione Word...";
+
+        /* ══ Genera il file .docx con docx.js ══ */
+        await generaWordDoc(cliente, testo);
+
+      }catch(err){
+        clearInterval(ticker);
+        fill.style.width="100%";
+        fill.style.background="linear-gradient(90deg,#ef4444,#fca5a5)";
+        msg.textContent="❌ Errore: "+escapeHtml(err.message||"Controlla la connessione");
+        $("elaboraBtn").disabled = false;
+        console.error("Errore analisi garanzie:", err);
+      }
+    });
+
+    /* ══ GENERA WORD DOC ══ */
+    async function generaWordDoc(nomeCliente, testoAI){
+      try{
+        const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, Table, TableRow, TableCell, WidthType, ShadingType } = window.docx;
+
+        // Parse il testo AI in paragrafi
+        const righe = testoAI.split("\n");
+        const children = [];
+
+        // Intestazione documento
+        children.push(
+          new Paragraph({
+            children:[new TextRun({text:"RIEPILOGO GARANZIE VEICOLO", bold:true, size:32, color:"1D4ED8"})],
+            alignment:AlignmentType.CENTER,
+            spacing:{after:200}
+          }),
+          new Paragraph({
+            children:[new TextRun({text:`Cliente: ${nomeCliente}`, bold:true, size:24})],
+            alignment:AlignmentType.CENTER,
+            spacing:{after:120}
+          }),
+          new Paragraph({
+            children:[new TextRun({
+              text:`Data: ${new Date().toLocaleDateString("it-IT",{day:"2-digit",month:"long",year:"numeric"})}`,
+              size:22, color:"6B7280"
+            })],
+            alignment:AlignmentType.CENTER,
+            spacing:{after:400}
+          })
+        );
+
+        // Linea separatrice visiva
+        children.push(new Paragraph({
+          border:{bottom:{color:"3B82F6",size:3,style:BorderStyle.SINGLE}},
+          spacing:{after:400}
+        }));
+
+        // Converti il testo dell'AI in paragrafi Word
+        for(const riga of righe){
+          const r = riga.trim();
+          if(!r){children.push(new Paragraph({spacing:{after:100}}));continue}
+
+          // Titoli H1 (# ...)
+          if(r.startsWith("# ")){
+            children.push(new Paragraph({
+              children:[new TextRun({text:r.slice(2), bold:true, size:28, color:"1D4ED8"})],
+              heading:HeadingLevel.HEADING_1,
+              spacing:{before:400, after:200}
+            }));
+          }
+          // Titoli H2 (## ...)
+          else if(r.startsWith("## ")){
+            children.push(new Paragraph({
+              children:[new TextRun({text:r.slice(3), bold:true, size:24, color:"1E40AF"})],
+              heading:HeadingLevel.HEADING_2,
+              spacing:{before:300, after:150}
+            }));
+          }
+          // Titoli H3 (### ...)
+          else if(r.startsWith("### ")){
+            children.push(new Paragraph({
+              children:[new TextRun({text:r.slice(4), bold:true, size:22, color:"3B82F6"})],
+              heading:HeadingLevel.HEADING_3,
+              spacing:{before:200, after:100}
+            }));
+          }
+          // Elenchi puntati (- o • o *)
+          else if(r.match(/^[-•*]\s/)){
+            const txt = r.replace(/^[-•*]\s/,"");
+            children.push(new Paragraph({
+              children:[new TextRun({text:"• "+txt, size:22})],
+              indent:{left:400},
+              spacing:{after:60}
+            }));
+          }
+          // Bold (**testo**)
+          else if(r.includes("**")){
+            const parts = r.split("**");
+            const runs = parts.map((p,i)=>new TextRun({text:p, bold:i%2===1, size:22}));
+            children.push(new Paragraph({children:runs, spacing:{after:100}}));
+          }
+          // Paragrafo normale
+          else{
+            children.push(new Paragraph({
+              children:[new TextRun({text:r, size:22})],
+              spacing:{after:100}
+            }));
+          }
+        }
+
+        // Footer
+        children.push(
+          new Paragraph({spacing:{before:600}}),
+          new Paragraph({
+            border:{top:{color:"E5E7EB",size:1,style:BorderStyle.SINGLE}},
+            spacing:{before:200}
+          }),
+          new Paragraph({
+            children:[new TextRun({
+              text:"Documento generato automaticamente da AI BOTT Automotive — centroautovt.it",
+              size:18, color:"9CA3AF", italics:true
+            })],
+            alignment:AlignmentType.CENTER,
+            spacing:{before:150}
+          })
+        );
+
+        // Crea il documento
+        const doc = new Document({
+          sections:[{
+            properties:{},
+            children
+          }]
+        });
+
+        const blob = await Packer.toBlob(doc);
+        const url  = URL.createObjectURL(blob);
+        const nomeFile = `Garanzie_${nomeCliente.replace(/\s+/g,"_")}.docx`;
+
+        // Mostra download
+        const dlBtn = $("downloadBtn");
+        dlBtn.href = url;
+        dlBtn.download = nomeFile;
+        $("downloadName").textContent = nomeFile;
+        $("downloadSub").textContent = `Riepilogo garanzie per ${nomeCliente} — pronto per la stampa o l'invio.`;
+
+        $("garanzieProgress").classList.remove("show");
+        $("downloadArea").classList.add("show");
+        $("elaboraBtn").disabled = false;
+
+        // Auto-click download
+        dlBtn.click();
+
+      }catch(e){
+        console.error("Errore generazione Word:", e);
+        $("progressMsg").textContent = "❌ Errore Word: "+e.message;
+        $("elaboraBtn").disabled = false;
+      }
+    }
+
+    /* ══ RESET analisi ══ */
+    $("nuovaAnalisiBtn").addEventListener("click",()=>{
+      garanzieFileData = null;
+      garanzieFileName = "";
+      $("garanzieCliente").value = "";
+      $("garanzieFile").value = "";
+      $("uploadFileName").style.display = "none";
+      $("uploadFileName").textContent = "";
+      $("downloadArea").classList.remove("show");
+      $("garanzieProgress").classList.remove("show");
+      $("progressFill").style.width = "0%";
+      $("progressFill").style.background = "";
+      $("elaboraBtn").disabled = true;
+    });
+
+
+    /* ══════════════════════════════════════════════════
+       CHATBOT
+       ══════════════════════════════════════════════════ */
+    let chatHistory=[], isMinimized=false;
+    const chatTrigger=$("chatTrigger"),chatBox=$("chatBox"),chatMessages=$("chatMessages");
+    const chatInputField=$("chatInputField"),chatSendBtn=$("chatSendBtn");
+
+    chatTrigger.addEventListener("click",()=>{
+      chatBox.classList.add("open");chatBox.classList.remove("minimized");
+      chatTrigger.style.display="none";$("chatMinimizedLogo").style.display="none";
+      chatInputField.focus();
+    });
+    $("minimizeBtn").addEventListener("click",()=>{
+      chatBox.classList.add("minimized");isMinimized=true;
+      $("chatMinimizedLogo").style.display="block";
+    });
+    $("closeBtn").addEventListener("click",()=>{
+      chatBox.classList.remove("open","minimized");chatTrigger.style.display="flex";
+    });
+    chatBox.querySelector(".chatHeader").addEventListener("click",e=>{
+      if(isMinimized&&!e.target.closest("button")){
+        chatBox.classList.remove("minimized");isMinimized=false;
+        $("chatMinimizedLogo").style.display="none";
+      }
+    });
+    $("chatMinimizedLogo").addEventListener("click",()=>{
+      chatBox.classList.remove("minimized");isMinimized=false;
+      $("chatMinimizedLogo").style.display="none";chatInputField.focus();
+    });
 
     function addMessage(text,sender){
       const div=document.createElement("div");div.className=`message ${sender}`;
       div.innerHTML=`<div class="messageBubble">${sender==="ai"?text:escapeHtml(text)}</div>`;
       chatMessages.appendChild(div);chatMessages.scrollTop=chatMessages.scrollHeight;
     }
-    function showTyping(){const d=document.createElement("div");d.className="message ai";d.id="typingIndicator";d.innerHTML='<div class="typingIndicator"><div class="typingDot"></div><div class="typingDot"></div><div class="typingDot"></div></div>';chatMessages.appendChild(d);chatMessages.scrollTop=chatMessages.scrollHeight}
+    function showTyping(){
+      const d=document.createElement("div");d.className="message ai";d.id="typingIndicator";
+      d.innerHTML='<div class="typingIndicator"><div class="typingDot"></div><div class="typingDot"></div><div class="typingDot"></div></div>';
+      chatMessages.appendChild(d);chatMessages.scrollTop=chatMessages.scrollHeight;
+    }
     function hideTyping(){const t=$("typingIndicator");if(t)t.remove()}
 
     function needsSearch(text){
@@ -1532,6 +1150,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         return null;
       }catch{return null}
     }
+
     const SYSTEM_PROMPT=`Sei un assistente esperto di auto NUOVE e USATE. AUTO NUOVE: Fiat, Jeep, Alfa Romeo, Lancia. AUTO USATE: CentroAuto VT. Risposte SCHEMATICHE e CONCISE (max 10 righe), usa elenchi puntati, solo dati concreti e verificabili.`;
 
     async function sendMessage(){
@@ -1551,465 +1170,10 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       }catch{hideTyping();addMessage("❌ Errore di connessione. Riprova tra poco.","ai")}
       finally{chatSendBtn.disabled=false;chatInputField.focus()}
     }
+
     chatSendBtn.addEventListener("click",sendMessage);
     chatInputField.addEventListener("keypress",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});
 
-    /* ══ CONSEGNE IN ARRIVO ══ */
-    const CHECKLIST_DEFAULT = [
-      "Modulo ACI (cambio proprietà)",
-      "Documento consegna firmato",
-      "Modulo ritiro veicolo usato",
-      "Documento presa in carico",
-      "Doppie chiavi consegnate",
-      "App connessa (verifica)",
-      "Spiegazione ADAS (sistemi sicurezza)",
-      "QR code recensione Google"
-    ];
-
-    let consegneState = { consegne: {} };
-    let consegneDocRef = null, consegneUnsub = null;
-
-    function consegnaUid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16) }
-
-    function consegnaDateClass(dateStr){
-      if(!dateStr) return "";
-      const today = dateKey(new Date());
-      if(dateStr < today) return "scaduta";
-      if(dateStr === today) return "oggi";
-      return "";
-    }
-
-    function consegnaFmtDate(dateStr){
-      if(!dateStr) return "—";
-      const [y,m,d] = dateStr.split("-");
-      return `${d}/${m}/${y}`;
-    }
-
-    function renderConsegne(){
-      const box = $("consegnaList");
-      if(!auth.currentUser){ box.innerHTML = '<div class="oggiEmpty" style="padding:10px 0">Login richiesto.</div>'; return; }
-      const list = Object.values(consegneState.consegne || {})
-        .sort((a,b) => (a.data||"").localeCompare(b.data||""));
-      if(!list.length){ box.innerHTML = '<div class="oggiEmpty" style="padding:10px 0">Nessuna consegna programmata.</div>'; return; }
-      box.innerHTML = list.map(con => {
-        const checks = con.checks || CHECKLIST_DEFAULT.map(t => ({text:t, done:false}));
-        const doneCnt = checks.filter(ch => ch.done).length;
-        const pct = checks.length ? Math.round(doneCnt/checks.length*100) : 0;
-        const dcls = consegnaDateClass(con.data);
-        return `<div class="consegnaCard" id="cc_${con.id}">
-          <div class="consegnaHead" onclick="toggleConsegna('${con.id}')" style="cursor:pointer;">
-            <div class="consegnaDate ${dcls}">${dcls==="oggi"?"📦 OGGI":dcls==="scaduta"?"⚠ SCADUTA":"📅"} ${consegnaFmtDate(con.data)}</div>
-            <div style="flex:1;min-width:0">
-              <div class="consegnaModello">${escapeHtml(con.modello||"")}</div>
-              <div class="consegnaCliente">${escapeHtml(con.cliente||"")}</div>
-            </div>
-            <div style="font-size:11px;color:#9ca3af;white-space:nowrap;margin-right:6px">${doneCnt}/${checks.length} ✓</div>
-            <div class="consegnaChevron" id="chev_${con.id}">▼</div>
-          </div>
-          <div class="consegnaBody" id="cbody_${con.id}" style="display:none;">
-            <div class="consegnaChecks">
-              ${checks.map((ch,i) => `
-                <div class="consegnaCheckItem" style="display:flex;align-items:center;gap:8px;">
-                  <input type="checkbox" class="consegnaCheckBox" ${ch.done?"checked":""} onchange="toggleConsegnaCheck('${con.id}',${i},this.checked)"/>
-                  <span class="consegnaCheckLabel${ch.done?" done":""}" style="flex:1;">${escapeHtml(ch.text)}</span>
-                  <button onclick="toggleConsegnaCheck('${con.id}',${i},!${ch.done})" title="${ch.done?'Segna non fatto':'Segna fatto'}" style="width:22px;height:22px;border-radius:6px;border:1px solid ${ch.done?'rgba(34,197,94,.5)':'rgba(34,197,94,.25)'};background:${ch.done?'rgba(34,197,94,.18)':'rgba(34,197,94,.06)'};color:#6ee7b7;cursor:pointer;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</button>
-                  <button onclick="deleteConsegnaCheck('${con.id}',${i})" title="Rimuovi voce" style="width:22px;height:22px;border-radius:6px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.07);color:#fca5a5;cursor:pointer;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
-                </div>`).join("")}
-            </div>
-            <div class="consegnaProgress">
-              <div class="consegnaProgressBar"><div class="consegnaProgressFill" style="width:${pct}%"></div></div>
-              <span>${pct}% completato</span>
-            </div>
-            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-              <button onclick="consegnataPostVendita('${con.id}')"
-                style="flex:1;padding:8px;border:1px solid rgba(34,197,94,.4);background:rgba(34,197,94,.1);border-radius:9px;color:#6ee7b7;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;"
-                onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
-                ✅ Consegnata! → Sposta in Post-Vendita
-              </button>
-              <button onclick="deleteConsegna('${con.id}')"
-                style="padding:8px 14px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);border-radius:9px;color:#fca5a5;font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s;"
-                onmouseover="this.style.background='rgba(239,68,68,.14)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">
-                🗑 Elimina
-              </button>
-            </div>
-          </div>
-        </div>`;
-      }).join("");
-      renderOggi();
-    }
-
-    window.toggleConsegna = function(id){
-      const body  = document.getElementById("cbody_"+id);
-      const chev  = document.getElementById("chev_"+id);
-      if(!body) return;
-      const open = body.style.display !== "none";
-      body.style.display = open ? "none" : "block";
-      if(chev) chev.textContent = open ? "▼" : "▲";
-    };
-
-    window.toggleConsegnaCheck = function(id, idx, val){
-      if(!consegneState.consegne[id]) return;
-      const con = consegneState.consegne[id];
-      if(!con.checks) con.checks = CHECKLIST_DEFAULT.map(t=>({text:t,done:false}));
-      con.checks[idx].done = val;
-      consegneWrite();
-      renderConsegne();
-    };
-    window.deleteConsegnaCheck = function(id, idx){
-      if(!consegneState.consegne[id]) return;
-      const con = consegneState.consegne[id];
-      if(!con.checks) con.checks = CHECKLIST_DEFAULT.map(t=>({text:t,done:false}));
-      con.checks.splice(idx, 1);
-      consegneWrite();
-      renderConsegne();
-    };
-    window.deleteConsegna = function(id){
-      delete consegneState.consegne[id];
-      consegneWrite();
-      renderConsegne();
-      renderPostVendita();
-    };
-
-    // ══════════════════════════════════════════════════════════
-    // FIX: consegnataPostVendita — _isConsegna: false + data reale
-    // ══════════════════════════════════════════════════════════
-    window.consegnataPostVendita = function(id){
-      const con = consegneState.consegne[id];
-      if(!con) return;
-
-      const postId = "cons_" + id;
-
-      // Crea l'entry in postState solo se non esiste già
-      // (preserva eventuali stati intervista/recensione già salvati)
-      if(!postState.followup[postId]) {
-        postState.followup[postId] = {
-          id: postId,
-          cliente: con.cliente || con.modello || "Cliente",
-          modello: con.modello || "",
-          dataConsegna: con.data || dateKey(new Date()), // ← usa la data reale della consegna
-          intervistaFatta: false,
-          recensioneFatta: false,
-          _isConsegna: false  // ← FIX: false → viene inclusa nel render del post-vendita
-        };
-      }
-
-      // Rimuovi dal pre-consegna
-      delete consegneState.consegne[id];
-      consegneWrite();
-      postWrite();
-      renderConsegne();
-      renderPostVendita();
-      renderOggi();
-    };
-
-    async function consegneWrite(){
-      if(!consegneDocRef) return;
-      try{ await setDoc(consegneDocRef, consegneState, {merge:false}); }catch{}
-    }
-
-    $("consegnaAddBtn").addEventListener("click", () => {
-      const cliente = $("consegnaCliente").value.trim();
-      const modello = $("consegnaModello").value.trim();
-      const data    = $("consegnaData").value;
-      if(!cliente && !modello) return;
-      const id = consegnaUid();
-      consegneState.consegne[id] = {
-        id, cliente, modello, data,
-        checks: CHECKLIST_DEFAULT.map(t => ({text:t, done:false})),
-        createdAt: Date.now()
-      };
-      $("consegnaCliente").value = "";
-      $("consegnaModello").value = "";
-      $("consegnaData").value    = "";
-      consegneWrite();
-      renderConsegne();
-      renderPostVendita();
-    });
-    $("consegnaCliente").addEventListener("keypress", e=>{ if(e.key==="Enter") $("consegnaAddBtn").click(); });
-    $("consegnaClearDoneBtn").addEventListener("click", () => {
-      for(const [id,c] of Object.entries(consegneState.consegne)){
-        const checks = c.checks || [];
-        if(checks.length && checks.every(ch=>ch.done)) delete consegneState.consegne[id];
-      }
-      consegneWrite(); renderConsegne(); renderPostVendita();
-    });
-
-    function startConsegneSync(user){
-      if(consegneUnsub){try{consegneUnsub()}catch{}}
-      consegneDocRef = doc(db,"users",user.uid,"consegne","data");
-      consegneUnsub = onSnapshot(consegneDocRef, snap => {
-        consegneState = snap.exists() ? snap.data() : {consegne:{}};
-        if(!consegneState.consegne) consegneState.consegne = {};
-        renderConsegne(); renderPostVendita();
-        if(!snap.exists()) setDoc(consegneDocRef, consegneState, {merge:false}).catch(()=>{});
-      }, () => { renderConsegne(); renderPostVendita(); });
-    }
-    function stopConsegneSync(){
-      if(consegneUnsub){try{consegneUnsub()}catch{}}
-      consegneUnsub=null; consegneDocRef=null; consegneState={consegne:{}};
-      renderConsegne(); renderPostVendita();
-    }
-
-    /* ══ POST VENDITA ══ */
-    let postState = { followup: {} };
-    let postDocRef = null, postUnsub = null;
-
-    function postUid(){ return Math.random().toString(16).slice(2)+Date.now().toString(16) }
-    function daysDiff(dateStr){
-      if(!dateStr) return null;
-      const now = new Date(); now.setHours(0,0,0,0);
-      const d   = new Date(dateStr+"T00:00:00");
-      return Math.round((now-d)/(1000*60*60*24));
-    }
-
-    function renderPostVendita(){
-      const box = $("postList");
-      if(!auth.currentUser){ box.innerHTML='<div class="oggiEmpty">Login richiesto.</div>'; return; }
-
-      // Mostra SOLO i followup aggiunti manualmente col pulsante "✅ Consegnata!"
-      // Filtra via eventuali entry create automaticamente da versioni precedenti (_isConsegna: true)
-      const manual = Object.values(postState.followup || {}).filter(f => f._isConsegna !== true);
-
-      if(!manual.length){
-        box.innerHTML='<div class="oggiEmpty">Nessun follow-up. Usa "✅ Consegnata!" nella Pre-Consegna per aggiungere clienti qui.</div>';
-        return;
-      }
-
-      // Ordina: prima urgenti (non completati), poi per data consegna più recente
-      const sorted = manual.sort((a,b) => {
-        const aUrgente = (!a.intervistaFatta || !a.recensioneFatta) ? 0 : 1;
-        const bUrgente = (!b.intervistaFatta || !b.recensioneFatta) ? 0 : 1;
-        return aUrgente - bUrgente || (b.dataConsegna||"").localeCompare(a.dataConsegna||"");
-      });
-
-      box.innerHTML = sorted.map(f => {
-        const diff = daysDiff(f.dataConsegna);
-        const needIntervista  = diff !== null && diff >= 2  && !f.intervistaFatta;
-        const needRecensione  = diff !== null && diff >= 3  && !f.recensioneFatta;
-        const urgente = needIntervista || needRecensione;
-        let diffTxt = diff===null?"—" : diff===0?"oggi" : diff===1?"ieri" : `${diff}gg fa`;
-        return `<div class="postCard${urgente?" urgente":""}" data-post-id="${f.id}">
-          <div class="postCardLeft">
-            <div class="postCardCliente">${escapeHtml(f.cliente)}</div>
-            <div class="postCardModello">🚗 ${escapeHtml(f.modello||"—")}</div>
-            <div class="postCardBadges">
-              <span class="postBadge intervista${f.intervistaFatta?" done":needIntervista?" scaduto":""}"
-                onclick="togglePost('${f.id}','intervista')">${f.intervistaFatta?"✓ Intervista fatta":"📞 Intervista 2gg"}</span>
-              <span class="postBadge recensione${f.recensioneFatta?" done":needRecensione?" scaduto":""}"
-                onclick="togglePost('${f.id}','recensione')">${f.recensioneFatta?"✓ Recensione fatta":"⭐ Recensione 3gg"}</span>
-            </div>
-            <div class="postDays">📅 Consegna: ${consegnaFmtDate(f.dataConsegna)} — ${diffTxt}</div>
-          </div>
-          <button class="iconBtn" onclick="deletePost('${f.id}')" title="Rimuovi" style="flex-shrink:0;font-size:14px;">×</button>
-        </div>`;
-      }).join("");
-      renderOggi();
-    }
-
-    window.togglePost = function(id, tipo){
-      if(!postState.followup[id]) postState.followup[id] = {id};
-      postState.followup[id][tipo==="intervista"?"intervistaFatta":"recensioneFatta"] =
-        !postState.followup[id][tipo==="intervista"?"intervistaFatta":"recensioneFatta"];
-      postWrite(); renderPostVendita();
-    };
-    window.deletePost = function(id){
-      delete postState.followup[id];
-      postWrite(); renderPostVendita();
-    };
-
-    async function postWrite(){
-      if(!postDocRef) return;
-      try{ await setDoc(postDocRef, postState, {merge:false}); }catch{}
-    }
-
-    $("postClearDoneBtn").addEventListener("click", ()=>{
-      for(const[id,f] of Object.entries(postState.followup)){
-        if(f.intervistaFatta && f.recensioneFatta) delete postState.followup[id];
-      }
-      postWrite(); renderPostVendita();
-    });
-
-    function startPostSync(user){
-      if(postUnsub){try{postUnsub()}catch{}}
-      postDocRef = doc(db,"users",user.uid,"postvendita","data");
-      postUnsub = onSnapshot(postDocRef, snap=>{
-        postState = snap.exists() ? snap.data() : {followup:{}};
-        if(!postState.followup) postState.followup={};
-        // Pulizia automatica: rimuove entry create dalla vecchia logica automatica (_isConsegna:true = bug)
-        let needsClean = false;
-        for(const [id, f] of Object.entries(postState.followup)){
-          if(f && f._isConsegna === true){ delete postState.followup[id]; needsClean = true; }
-        }
-        if(needsClean) setDoc(postDocRef, postState, {merge:false}).catch(()=>{});
-        renderPostVendita();
-        if(!snap.exists()) setDoc(postDocRef, postState, {merge:false}).catch(()=>{});
-      }, ()=>renderPostVendita());
-    }
-    function stopPostSync(){
-      if(postUnsub){try{postUnsub()}catch{}}
-      postUnsub=null; postDocRef=null; postState={followup:{}};
-      renderPostVendita();
-    }
-
-    /* ══ VISTA OGGI ══ */
-    function renderOggi(){
-      const dl = $("oggiDateLabel");
-      if(dl) dl.textContent = new Date().toLocaleDateString("it-IT",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
-
-      const todayK = dateKey(new Date());
-
-      const telOggi = Object.values(telState.contatti||{}).filter(c=>c.quando==="oggi"&&!c.chiamato);
-      const kpiChiamate = $("oggiKpiChiamate"); if(kpiChiamate) kpiChiamate.textContent = telOggi.length;
-
-      const caldi = Object.values(telState.contatti||{}).filter(c=>c.stato==="caldo"&&!c.chiamato);
-      const kpiCaldi = $("oggiKpiCaldi"); if(kpiCaldi) kpiCaldi.textContent = caldi.length;
-
-      const in3gg = dateKey(new Date(Date.now()+3*864e5));
-      const consegneOggi = Object.values(consegneState.consegne||{}).filter(c=>c.data && c.data >= todayK && c.data <= in3gg);
-      const kpiCons = $("oggiKpiConsegne"); if(kpiCons) kpiCons.textContent = consegneOggi.length;
-
-      const taskOggi = Object.values(SYNC.data.tasks||{}).filter(t=>t.dateKey===todayK&&!t.done);
-      const kpiTask = $("oggiKpiTask"); if(kpiTask) kpiTask.textContent = taskOggi.length;
-
-      const lt = $("oggiListaTel");
-      if(lt){
-        const statoEmoji = {caldo:"🔥",tiepido:"🌡",freddo:"❄"};
-        lt.innerHTML = telOggi.length
-          ? telOggi.slice(0,6).map(c=>`<div class="oggiItem"><span class="oggiDot ${c.stato==="caldo"?"red":c.stato==="tiepido"?"yellow":"blue"}"></span><span><strong>${escapeHtml(c.nome)}</strong> ${c.modello?`· ${escapeHtml(c.modello)}`:""} <span style="opacity:.7">${statoEmoji[c.stato]||""}</span></span></div>`).join("")
-          : '<div class="oggiEmpty">Nessuna telefonata programmata oggi</div>';
-      }
-
-      const lta = $("oggiListaTask");
-      if(lta){
-        const tasksHtml = taskOggi.slice(0,4).map(t=>`<div class="oggiItem"><span class="oggiDot purple"></span><span>${escapeHtml(t.text)}</span></div>`).join("");
-        const consHtml  = consegneOggi.slice(0,3).map(c=>`<div class="oggiItem"><span class="oggiDot green"></span><span>🚗 <strong>${escapeHtml(c.cliente||c.modello)}</strong> · ${consegnaFmtDate(c.data)}</span></div>`).join("");
-        lta.innerHTML = (tasksHtml+consHtml) || '<div class="oggiEmpty">Nessun task o consegna oggi</div>';
-      }
-
-      const lp = $("oggiListaPost");
-      if(lp){
-        // Mostra follow-up urgenti dal post-vendita (non completati)
-        const urgPost = Object.values(postState.followup||{}).filter(f => !f.intervistaFatta || !f.recensioneFatta);
-        lp.innerHTML = urgPost.length
-          ? urgPost.slice(0,4).map(f=>`<div class="oggiItem"><span class="oggiDot yellow"></span><span>⭐ <strong>${escapeHtml(f.cliente||f.modello||"—")}</strong>${!f.intervistaFatta?" · 📞 intervista":""} ${!f.recensioneFatta?"· ⭐ recensione":""}</span></div>`).join("")
-          : '<div class="oggiEmpty">Nessun follow-up urgente</div>';
-      }
-
-      const lv = $("oggiListaVendite");
-      if(lv){
-        const k = TODAY_KEY;
-        const m = vendState.months[k]||{nuove:[],usate:[]};
-        const tot = (m.nuove||[]).length + (m.usate||[]).length;
-        const prov = sumProvv(m.nuove||[])+sumProvv(m.usate||[]);
-        lv.innerHTML = `<div class="oggiItem"><span class="oggiDot green"></span><span>Auto vendute: <strong>${tot}</strong></span></div>
-          <div class="oggiItem"><span class="oggiDot blue"></span><span>Provvigioni: <strong>${fmtEur(prov)}</strong></span></div>
-          ${vendState.obiettivo>0?`<div class="oggiItem"><span class="oggiDot purple"></span><span>Obiettivo: <strong>${Math.round(Math.min(prov/vendState.obiettivo,1)*100)}%</strong> raggiunto</span></div>`:""}`;
-      }
-    }
-
-    $("oggiRiepilogoBtn").addEventListener("click", async ()=>{
-      const btn = $("oggiRiepilogoBtn");
-      const box = $("oggiSummaryBox");
-      const txt = $("oggiSummaryText");
-      btn.disabled = true; btn.textContent = "⏳ Generazione...";
-      box.style.display = "block";
-      txt.textContent = "🤖 Sto analizzando la tua giornata...";
-
-      const todayK = dateKey(new Date());
-      const telOggi = Object.values(telState.contatti||{}).filter(c=>c.quando==="oggi"&&!c.chiamato);
-      const caldi   = Object.values(telState.contatti||{}).filter(c=>c.stato==="caldo"&&!c.chiamato);
-      const taskOggi= Object.values(SYNC.data.tasks||{}).filter(t=>t.dateKey===todayK&&!t.done);
-      const in3gg   = dateKey(new Date(Date.now()+3*864e5));
-      const consOggi= Object.values(consegneState.consegne||{}).filter(c=>c.data&&c.data>=todayK&&c.data<=in3gg);
-      const postUrgenti = Object.values(postState.followup||{}).filter(f=>!f.intervistaFatta||!f.recensioneFatta);
-      const k       = TODAY_KEY;
-      const mese    = vendState.months[k]||{nuove:[],usate:[]};
-      const totVend  = (mese.nuove||[]).length+(mese.usate||[]).length;
-      const provv    = sumProvv(mese.nuove||[])+sumProvv(mese.usate||[]);
-
-      const ctx = `DATI DI OGGI (${new Date().toLocaleDateString("it-IT")}):
-Telefonate programmate oggi: ${telOggi.length} (${telOggi.map(c=>`${c.nome} - ${c.stato}`).join(", ")||"nessuna"})
-Lead caldi attivi: ${caldi.length} (${caldi.slice(0,3).map(c=>c.nome).join(", ")||"nessuno"})
-Task in agenda oggi: ${taskOggi.length} (${taskOggi.map(t=>t.text).join(", ")||"nessuno"})
-Consegne imminenti (3gg): ${consOggi.length} (${consOggi.map(c=>`${c.cliente||c.modello} il ${consegnaFmtDate(c.data)}`).join(", ")||"nessuna"})
-Follow-up post-vendita da fare: ${postUrgenti.length} (${postUrgenti.slice(0,3).map(f=>f.cliente||f.modello).join(", ")||"nessuno"})
-Vendite mese corrente: ${totVend} auto, ${fmtEur(provv)} provvigioni
-${vendState.obiettivo>0?`Obiettivo mensile: ${Math.round(Math.min(provv/vendState.obiettivo,1)*100)}% raggiunto`:"Nessun obiettivo impostato"}`;
-
-      try{
-        const res = await fetch(BACKEND_CHAT, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({messages:[
-          {role:"system", content:`Sei un assistente personale per un venditore di auto.
-Quando ti viene chiesto "Cosa devo fare oggi?" rispondi con un BRIEFING GIORNALIERO conciso e motivante.
-Formato:
-🌅 BUONGIORNO! Ecco il tuo piano per oggi:
-
-📞 CHIAMATE (X da fare):
-• [nome] — [stato lead] → azione consigliata
-...
-
-🚗 CONSEGNE:
-• [cliente] — [modello] — [data]
-...
-
-📅 TASK AGENDA:
-• [task]
-...
-
-⭐ FOLLOW-UP POST-VENDITA:
-• [cliente] — [cosa fare]
-...
-
-💰 MESE:
-• [stato vendite e obiettivo]
-
-🎯 FOCUS DEL GIORNO:
-[1-2 righe di consiglio strategico personalizzato]
-
-Sii diretto, pratico, motivante. Max 25 righe totali.`},
-          {role:"system", content:ctx},
-          {role:"user",   content:"Cosa devo fare oggi?"}
-        ]})});
-        if(!res.ok) throw new Error();
-        const d = await res.json();
-        let ai = d.choices?.[0]?.message?.content || "Nessuna risposta.";
-        ai = ai.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-        txt.innerHTML = ai;
-      }catch{
-        txt.textContent = "❌ Errore generazione riepilogo. Controlla la connessione.";
-      }finally{
-        btn.disabled = false;
-        btn.textContent = "🤖 Chiedi all'AI: \"Cosa devo fare oggi?\"";
-      }
-    });
-
-    /* ══ NEWS TOGGLE ══ */
-    (function(){
-      const btn = $("newsToggleBtn");
-      const box = $("newsScrollBox");
-      if(!btn||!box) return;
-      let visible = true;
-      btn.addEventListener("click", ()=>{
-        visible = !visible;
-        box.style.display = visible ? "" : "none";
-        btn.textContent   = visible ? "−" : "+";
-        btn.title         = visible ? "Nascondi news" : "Mostra news";
-      });
-    })();
-
-    /* ══ SMART HEADER ══ */
-    (function(){
-      const hdr=document.querySelector("header");
-      let lastY=0,ticking=false;
-      window.addEventListener("scroll",()=>{
-        if(ticking)return;ticking=true;
-        requestAnimationFrame(()=>{
-          const y=window.scrollY;
-          if(y>lastY&&y>80)hdr.classList.add("header-hidden");
-          else hdr.classList.remove("header-hidden");
-          lastY=y;ticking=false;
-        });
-      },{passive:true});
-    })();
   </script>
 </body>
 </html>
