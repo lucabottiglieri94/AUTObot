@@ -11,11 +11,14 @@
       --panel2:rgba(40,54,74,.92);
       --panelHeader:rgba(12,16,24,.22);
       --field:rgba(12,16,24,.28);
-      --line:rgba(255,255,255,.08);
-      --line2:rgba(255,255,255,.12);
+      --line:rgba(255,255,255,.14);
+      --line2:rgba(255,255,255,.24);
+      --hi:rgba(255,255,255,.06);
       --text:#e8eef7; --muted:rgba(232,238,247,.68);
       --accent:#4f8cff; --accent2:#79a9ff;
       --good:#34d399; --warn:#fb923c;
+      --radius:30px;
+      --radiusSm:22px;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{
@@ -63,7 +66,7 @@
     .muted{color:var(--muted)}
 
     .layout{margin-top:16px;display:grid;grid-template-columns:420px 1fr;gap:16px;align-items:start}
-    .panel{background:var(--panel);border:1px solid var(--line);border-radius:24px;overflow-y:auto;max-height:calc(100vh - 72px);position:sticky;top:72px}
+    .panel{background:var(--panel);border:1px solid var(--line2);border-radius:var(--radius);overflow-y:auto;max-height:calc(100vh - 72px);position:sticky;top:72px}
     .panelHeader{padding:14px 14px 10px;border-bottom:1px solid var(--line);background:var(--panelHeader);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
     .panelTitle{font-weight:950;font-size:18px}
     .panelSub{margin-top:6px}
@@ -79,7 +82,11 @@
     .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
     .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
 
-    .weekPanel{border-top:1px solid rgba(31,41,55,.75);padding:12px;background:rgba(10,12,18,.18)}
+    .weekPanel{margin-top:12px}
+    .weekHead{padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panelHeader);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .weekNav{display:flex;align-items:center;gap:8px}
+    .weekGrid{padding:12px}
+    .weekCell{border:1px solid var(--line);background:rgba(12,16,24,.18);border-radius:18px;padding:10px;overflow:hidden}
     .weekHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
     .weekTitle{font-weight:950;font-size:16px}
     .weekSub{color:#9ca3af;font-size:12px}
@@ -98,7 +105,7 @@
     .cmpSuggest:hover{background:rgba(59,130,246,.25);border-color:rgba(59,130,246,.6)}
 
     .widgetStack{display:grid;gap:20px;margin-top:18px}
-    .widgetPanel{background:var(--panel);border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.30)}
+    .widgetPanel{background:var(--panel);border:1px solid var(--line2);border-radius:var(--radius);overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.30)}
     .widgetHeader{padding:16px 20px;border-bottom:1px solid var(--line);background:var(--panelHeader);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     .widgetTitle{font-weight:950;font-size:18px}
     .widgetSub{color:#9ca3af;font-size:13px;margin-top:4px}
@@ -130,14 +137,14 @@
     .syncBadge.warn{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.10);color:#fde68a}
     #agendaPanel .widgetHeader,#memoPanel .widgetHeader{background:linear-gradient(180deg,rgba(249,115,22,.09),rgba(12,16,24,.22) 70%)}
 
-    .venditePanel{background:var(--panel);border:1px solid var(--line);border-radius:24px;overflow:hidden;margin-top:16px}
+    .venditePanel{background:var(--panel);border:1px solid var(--line2);border-radius:var(--radius);overflow:hidden;margin-top:16px;position:relative}
     .venditeHeader{padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panelHeader);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     .venditeTitleRow{display:flex;align-items:center;gap:10px}
     .venditeTitle{font-weight:950;font-size:18px}
     .venditeSyncBadge{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(12,16,24,.18);color:var(--muted);white-space:nowrap}
     .venditeSyncBadge.ok{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10);color:#bbf7d0}
     .venditeNav{display:flex;align-items:center;gap:8px}
-    .navArrow{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:rgba(17,24,39,.6);color:var(--text);cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .navArrow{width:34px;height:34px;border-radius:12px;border:1px solid var(--line);background:rgba(17,24,39,.6);color:var(--text);cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s}
     .navArrow:hover{border-color:rgba(59,130,246,.5);background:rgba(17,24,39,.9);transform:translateY(-1px)}
     .navArrow:disabled{opacity:.35;cursor:not-allowed;transform:none}
     .venditeMonthLabel{font-weight:900;font-size:15px;min-width:140px;text-align:center;padding:0 4px}
@@ -250,7 +257,7 @@
     .chatTrigger{position:fixed;bottom:24px;right:24px;width:70px;height:70px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:all .3s;z-index:1000}
     .chatTrigger:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(0,0,0,.5)}
     .chatTrigger img{width:70px;height:70px;object-fit:contain}
-    .chatBox{position:fixed;bottom:24px;right:24px;width:420px;max-width:calc(100vw - 32px);height:600px;max-height:calc(100vh - 48px);background:rgba(17,24,39,.95);border:1px solid var(--line);border-radius:20px;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:1001;overflow:hidden;backdrop-filter:blur(20px)}
+    .chatBox{position:fixed;bottom:24px;right:24px;width:420px;max-width:calc(100vw - 32px);height:600px;max-height:calc(100vh - 48px);background:rgba(17,24,39,.95);border:1px solid var(--line2);border-radius:var(--radius);display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:1001;overflow:hidden;backdrop-filter:blur(20px)}
     .chatBox.open{display:flex}
     .chatBox.minimized{width:70px;height:70px;background:transparent;border:none;border-radius:50%;box-shadow:0 8px 24px rgba(0,0,0,.3)}
     .chatBox.minimized .chatHeader,.chatBox.minimized .chatMessages,.chatBox.minimized .chatInput{display:none}
@@ -268,10 +275,10 @@
     .message{display:flex;gap:8px;animation:slideIn .3s ease}
     @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     .message.user{flex-direction:row-reverse}
-    .messageBubble{max-width:85%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.6;word-wrap:break-word;white-space:pre-line}
-    .message.ai .messageBubble{background:linear-gradient(135deg,rgba(59,130,246,.85),rgba(96,165,250,.85));color:#fff;border-bottom-left-radius:4px}
-    .message.user .messageBubble{background:rgba(255,255,255,.92);color:#1a1d23;border-bottom-right-radius:4px}
-    .typingIndicator{display:flex;gap:8px;padding:12px 16px;background:linear-gradient(135deg,rgba(59,130,246,.85),rgba(96,165,250,.85));border-radius:18px;border-bottom-left-radius:4px;max-width:75%}
+    .messageBubble{max-width:85%;padding:12px 16px;border-radius:22px;font-size:14px;line-height:1.6;word-wrap:break-word;white-space:pre-line}
+    .message.ai .messageBubble{background:rgba(255,255,255,.10);border:1px solid var(--line);color:var(--text);border-bottom-left-radius:6px}
+    .message.user .messageBubble{background:linear-gradient(135deg,rgba(79,140,255,.95),rgba(121,169,255,.92));color:#fff;border-bottom-right-radius:6px}
+    .typingIndicator{display:flex;gap:8px;padding:12px 16px;background:rgba(255,255,255,.10);border:1px solid var(--line);border-radius:22px;border-bottom-left-radius:6px;max-width:75%}
     .typingDot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.9);animation:bounce 1.4s infinite ease-in-out}
     .typingDot:nth-child(1){animation-delay:0s}.typingDot:nth-child(2){animation-delay:.2s}.typingDot:nth-child(3){animation-delay:.4s}
     @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
@@ -382,11 +389,14 @@
       --panel2:rgba(40,54,74,.92);
       --panelHeader:rgba(12,16,24,.22);
       --field:rgba(12,16,24,.28);
-      --line:rgba(255,255,255,.08);
-      --line2:rgba(255,255,255,.12);
+      --line:rgba(255,255,255,.14);
+      --line2:rgba(255,255,255,.24);
+      --hi:rgba(255,255,255,.06);
       --text:#e8eef7; --muted:rgba(232,238,247,.68);
       --accent:#4f8cff; --accent2:#79a9ff;
       --good:#34d399; --warn:#fb923c;
+      --radius:30px;
+      --radiusSm:22px;
     }
     body{
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
@@ -479,11 +489,14 @@
       --panel2:rgba(40,54,74,.92);
       --panelHeader:rgba(12,16,24,.22);
       --field:rgba(12,16,24,.28);
-      --line:rgba(255,255,255,.08);
-      --line2:rgba(255,255,255,.12);
+      --line:rgba(255,255,255,.14);
+      --line2:rgba(255,255,255,.24);
+      --hi:rgba(255,255,255,.06);
       --text:#e8eef7; --muted:rgba(232,238,247,.68);
       --accent:#4f8cff; --accent2:#79a9ff;
       --good:#34d399; --warn:#fb923c;
+      --radius:30px;
+      --radiusSm:22px;
     }
 
     body{
@@ -622,11 +635,14 @@
       --panel2:rgba(40,54,74,.92);
       --panelHeader:rgba(12,16,24,.22);
       --field:rgba(12,16,24,.28);
-      --line:rgba(255,255,255,.08);
-      --line2:rgba(255,255,255,.12);
+      --line:rgba(255,255,255,.14);
+      --line2:rgba(255,255,255,.24);
+      --hi:rgba(255,255,255,.06);
       --text:#e8eef7; --muted:rgba(232,238,247,.68);
       --accent:#4f8cff; --accent2:#79a9ff;
       --good:#34d399; --warn:#fb923c;
+      --radius:30px;
+      --radiusSm:22px;
     }
 
     body{
@@ -779,13 +795,17 @@
         <div class="newsScroll" id="newsScrollBox"><div id="newsList"></div></div>
 
         <!-- CALENDARIO SETTIMANALE -->
-        <div class="weekPanel">
+        <div class="widgetPanel weekPanel">
           <div class="weekHead">
             <div>
               <div class="weekTitle">🗓 Calendario settimanale</div>
               <div class="weekSub">Task dell'agenda nella settimana corrente</div>
             </div>
-            <div id="weekRange" class="pill muted">—</div>
+            <div class="weekNav">
+              <button class="navArrow" id="weekPrevBtn">&#8249;</button>
+              <div id="weekRange" class="pill muted" style="min-width:110px;text-align:center;">—</div>
+              <button class="navArrow" id="weekNextBtn">&#8250;</button>
+            </div>
           </div>
           <div id="weekGrid" class="weekGrid"></div>
         </div>
@@ -967,11 +987,14 @@
       --panel2:rgba(40,54,74,.92);
       --panelHeader:rgba(12,16,24,.22);
       --field:rgba(12,16,24,.28);
-      --line:rgba(255,255,255,.08);
-      --line2:rgba(255,255,255,.12);
+      --line:rgba(255,255,255,.14);
+      --line2:rgba(255,255,255,.24);
+      --hi:rgba(255,255,255,.06);
       --text:#e8eef7; --muted:rgba(232,238,247,.68);
       --accent:#4f8cff; --accent2:#79a9ff;
       --good:#34d399; --warn:#fb923c;
+      --radius:30px;
+      --radiusSm:22px;
     }
 
     body{
@@ -1476,13 +1499,15 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     function mkUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
 
     function startOfWeekMonday(d=new Date()){const x=todayMidnight(d);const day=x.getDay();x.setDate(x.getDate()+(day===0?-6:1-day));return x}
+    let weekViewStart = startOfWeekMonday(new Date());
+    const THIS_WEEK_START = startOfWeekMonday(new Date());
     function fmtRange(a,b){return`${a.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"})}–${b.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"})}`}
 
     function renderWeekCalendar(){
       const grid=$("weekGrid"),range=$("weekRange");
       if(!grid||!range)return;
       if(!auth.currentUser){range.textContent="Login richiesto";grid.innerHTML="";return}
-      const base=startOfWeekMonday(new Date());
+      const base=new Date(weekViewStart);
       range.textContent=fmtRange(base,addDays(base,6));
       const allTasks=Object.values(SYNC.data.tasks||{});
       const todayKey=dateKey(new Date());
@@ -1493,7 +1518,26 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
         const show=tasks.slice(0,3).map(t=>`<div class="weekTask${t.done?" done":""}" title="${escapeHtml(t.text||"")}">${escapeHtml(t.text||"")}</div>`).join("");
         const more=tasks.length>3?`<div class="weekMore">+${tasks.length-3} altri</div>`:"";
         return`<div class="weekCell${k===todayKey?" today":""}"><div class="weekTop"><div class="weekDow">${dows[i]}</div><div class="weekDay">${String(d.getDate()).padStart(2,"0")}</div></div><div class="weekTasks">${tasks.length?(show+more):'<div class="muted" style="font-size:11px;opacity:.7">—</div>'}</div></div>`;
-      }).join("");
+      }
+
+    // Navigazione calendario settimanale
+    function clampWeekNext(){
+      // non andare oltre la settimana corrente
+      const cur = startOfWeekMonday(new Date());
+      if(weekViewStart > cur) weekViewStart = cur;
+    }
+    function updateWeekNavBtns(){
+      const prev=$('weekPrevBtn'), next=$('weekNextBtn');
+      if(!prev||!next) return;
+      const cur = startOfWeekMonday(new Date());
+      next.disabled = (+todayMidnight(weekViewStart) >= +todayMidnight(cur));
+    }
+    const _renderWeekCalendar = renderWeekCalendar;
+    renderWeekCalendar = function(){ _renderWeekCalendar(); updateWeekNavBtns(); };
+
+    $('weekPrevBtn')?.addEventListener('click',()=>{ weekViewStart = addDays(weekViewStart,-7); renderWeekCalendar(); });
+    $('weekNextBtn')?.addEventListener('click',()=>{ const cur=startOfWeekMonday(new Date()); if(+todayMidnight(weekViewStart) >= +todayMidnight(cur)) return; weekViewStart = addDays(weekViewStart,7); clampWeekNext(); renderWeekCalendar(); });
+).join("");
     }
 
     let selectedOffset=0;
@@ -2945,11 +2989,14 @@ ul{padding-left:20px;margin:6px 0}
       --panel2:rgba(40,54,74,.92);
       --panelHeader:rgba(12,16,24,.22);
       --field:rgba(12,16,24,.28);
-      --line:rgba(255,255,255,.08);
-      --line2:rgba(255,255,255,.12);
+      --line:rgba(255,255,255,.14);
+      --line2:rgba(255,255,255,.24);
+      --hi:rgba(255,255,255,.06);
       --text:#e8eef7; --muted:rgba(232,238,247,.68);
       --accent:#4f8cff; --accent2:#79a9ff;
       --good:#34d399; --warn:#fb923c;
+      --radius:30px;
+      --radiusSm:22px;
     }
 
     body{
