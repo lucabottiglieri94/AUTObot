@@ -455,6 +455,150 @@
     *::-webkit-scrollbar-thumb{background:rgba(17,24,39,.18);border:2px solid rgba(255,255,255,.55);border-radius:999px}
     *::-webkit-scrollbar-track{background:transparent}
 
+  
+    /* ===== macOS / Apple Home light-gray theme (overrides) ===== */
+    :root{
+      --bgTop:#2a2d31;
+      --bgMid:#6b7077;
+      --bgBot:#a7acb3;
+
+      --text:#0b0c0e;
+      --muted:rgba(11,12,14,.55);
+      --line:rgba(12,13,15,.10);
+
+      --panel:rgba(238,240,243,.42);
+      --panel2:rgba(238,240,243,.55);
+
+      --accent:#007aff;
+      --accent2:#4aa3ff;
+      --orange:#ff9f0a;
+      --orange2:#ffb340;
+    }
+
+    body{
+      background:
+        linear-gradient(180deg,var(--bgTop) 0%, var(--bgMid) 22%, var(--bgBot) 100%);
+      color:var(--text);
+    }
+
+    /* Top strip like macOS */
+    header{
+      background:linear-gradient(180deg,rgba(22,24,28,.92),rgba(22,24,28,.55));
+      border-bottom:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(16px) saturate(1.2);
+    }
+
+    /* Cards / widgets: consistent material + rounder corners + more separation */
+    .layout{gap:18px !important}
+    .panel,
+    .widgetPanel{
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:28px;
+      box-shadow:0 18px 40px rgba(0,0,0,.18);
+      backdrop-filter:blur(18px) saturate(1.25);
+    }
+    .widgetStack{gap:18px}
+    .panelHeader,
+    .widgetHeader{
+      background:linear-gradient(180deg,rgba(255,255,255,.20),rgba(255,255,255,.10));
+      border-bottom:1px solid rgba(255,255,255,.14);
+      padding:16px 18px;
+    }
+    .widgetBody{padding:18px}
+
+    /* Text colors on light panels */
+    .panel, .widgetPanel{color:var(--text)}
+    .muted, .panelHeader .muted, .widgetSub{color:var(--muted) !important}
+
+    /* Buttons: macOS pill */
+    .btn{
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.20);
+      color:rgba(255,255,255,.92);
+      border-radius:999px;
+      box-shadow:0 10px 22px rgba(0,0,0,.18);
+      backdrop-filter:blur(12px) saturate(1.2);
+    }
+    .btn:hover{background:rgba(255,255,255,.24)}
+    .btn.primary{
+      background:linear-gradient(135deg,rgba(0,122,255,.95),rgba(74,163,255,.85));
+      border-color:rgba(255,255,255,.22);
+      color:white;
+    }
+
+    /* Pills */
+    .pill{
+      background:rgba(255,255,255,.16) !important;
+      border:1px solid rgba(255,255,255,.16) !important;
+      color:rgba(255,255,255,.92) !important;
+      border-radius:999px !important;
+    }
+
+    /* Fields: light material */
+    .field{
+      background:rgba(255,255,255,.22);
+      border:1px solid rgba(255,255,255,.18);
+      color:rgba(255,255,255,.95);
+      border-radius:18px;
+    }
+    .field::placeholder{color:rgba(255,255,255,.70)}
+    .field:focus{border-color:rgba(0,122,255,.65);background:rgba(255,255,255,.28)}
+
+    /* Inner light widgets (news cards, lists, etc) */
+    .newsItem,
+    .miniCard,
+    .wCard{
+      background:rgba(255,255,255,.22) !important;
+      border:1px solid rgba(255,255,255,.16) !important;
+      border-radius:22px !important;
+    }
+
+    /* Apple-style toggle switch */
+    .appleSwitch{display:inline-flex;align-items:center;gap:10px;user-select:none}
+    .appleSwitch input{display:none}
+    .appleSwitch .track{
+      width:46px;height:28px;border-radius:999px;position:relative;
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);
+      transition:all .18s ease;
+    }
+    .appleSwitch .knob{
+      width:24px;height:24px;border-radius:999px;position:absolute;top:1px;left:1px;
+      background:rgba(255,255,255,.92);
+      box-shadow:0 10px 18px rgba(0,0,0,.20);
+      transition:all .18s ease;
+    }
+    .appleSwitch input:checked + .track{
+      background:linear-gradient(135deg,rgba(0,122,255,.95),rgba(74,163,255,.85));
+      border-color:rgba(255,255,255,.22);
+    }
+    .appleSwitch input:checked + .track .knob{left:21px}
+    .appleSwitch .label{font-size:12px;color:rgba(255,255,255,.92);font-weight:800}
+    .panel .appleSwitch .label,
+    .widgetPanel .appleSwitch .label{color:rgba(18,20,24,.85)}
+    .panel .appleSwitch .track,
+    .widgetPanel .appleSwitch .track{
+      background:rgba(255,255,255,.34);
+      border:1px solid rgba(255,255,255,.22);
+    }
+
+
+    /* Buttons inside panels should be dark like macOS widgets */
+    .panel .btn,
+    .widgetPanel .btn{
+      background:rgba(255,255,255,.34);
+      border:1px solid rgba(255,255,255,.22);
+      color:rgba(18,20,24,.92);
+      box-shadow:0 10px 20px rgba(0,0,0,.14);
+    }
+    .panel .btn:hover,
+    .widgetPanel .btn:hover{background:rgba(255,255,255,.44)}
+
+    /* Make widget corners more "Apple" */
+    .newsScroll, .weekPanel, .compareBox, .chatWrap, .memBox{border-radius:24px !important}
+
   </style>
 </head>
 <body>
@@ -496,6 +640,11 @@
           </div>
           <div style="display:flex;gap:6px;align-items:center;">
             <button id="refreshBtn" class="btn" disabled>🔄</button>
+            <label class="appleSwitch" title="Auto-refresh news">
+              <input id="autoNews" type="checkbox"/>
+              <span class="track"><span class="knob"></span></span>
+              <span class="label">Auto</span>
+            </label>
             <button id="newsToggleBtn" class="btn" title="Mostra/Nascondi news" style="font-size:16px;font-weight:900;padding:6px 10px;min-width:32px;">−</button>
           </div>
         </div>
@@ -682,7 +831,151 @@
           <div style="height:100%;width:60%;background:linear-gradient(90deg,#8b5cf6,#a78bfa,#8b5cf6);background-size:200% 100%;border-radius:999px;animation:garLoad 1.5s infinite linear;"></div>
         </div>
       </div>
-      <style>@keyframes garLoad{0%{background-position:200% 0}100%{background-position:-200% 0}}</style>
+      <style>@keyframes garLoad{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    /* ===== macOS / Apple Home light-gray theme (overrides) ===== */
+    :root{
+      --bgTop:#2a2d31;
+      --bgMid:#6b7077;
+      --bgBot:#a7acb3;
+
+      --text:#0b0c0e;
+      --muted:rgba(11,12,14,.55);
+      --line:rgba(12,13,15,.10);
+
+      --panel:rgba(238,240,243,.42);
+      --panel2:rgba(238,240,243,.55);
+
+      --accent:#007aff;
+      --accent2:#4aa3ff;
+      --orange:#ff9f0a;
+      --orange2:#ffb340;
+    }
+
+    body{
+      background:
+        linear-gradient(180deg,var(--bgTop) 0%, var(--bgMid) 22%, var(--bgBot) 100%);
+      color:var(--text);
+    }
+
+    /* Top strip like macOS */
+    header{
+      background:linear-gradient(180deg,rgba(22,24,28,.92),rgba(22,24,28,.55));
+      border-bottom:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(16px) saturate(1.2);
+    }
+
+    /* Cards / widgets: consistent material + rounder corners + more separation */
+    .layout{gap:18px !important}
+    .panel,
+    .widgetPanel{
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:28px;
+      box-shadow:0 18px 40px rgba(0,0,0,.18);
+      backdrop-filter:blur(18px) saturate(1.25);
+    }
+    .widgetStack{gap:18px}
+    .panelHeader,
+    .widgetHeader{
+      background:linear-gradient(180deg,rgba(255,255,255,.20),rgba(255,255,255,.10));
+      border-bottom:1px solid rgba(255,255,255,.14);
+      padding:16px 18px;
+    }
+    .widgetBody{padding:18px}
+
+    /* Text colors on light panels */
+    .panel, .widgetPanel{color:var(--text)}
+    .muted, .panelHeader .muted, .widgetSub{color:var(--muted) !important}
+
+    /* Buttons: macOS pill */
+    .btn{
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.20);
+      color:rgba(255,255,255,.92);
+      border-radius:999px;
+      box-shadow:0 10px 22px rgba(0,0,0,.18);
+      backdrop-filter:blur(12px) saturate(1.2);
+    }
+    .btn:hover{background:rgba(255,255,255,.24)}
+    .btn.primary{
+      background:linear-gradient(135deg,rgba(0,122,255,.95),rgba(74,163,255,.85));
+      border-color:rgba(255,255,255,.22);
+      color:white;
+    }
+
+    /* Pills */
+    .pill{
+      background:rgba(255,255,255,.16) !important;
+      border:1px solid rgba(255,255,255,.16) !important;
+      color:rgba(255,255,255,.92) !important;
+      border-radius:999px !important;
+    }
+
+    /* Fields: light material */
+    .field{
+      background:rgba(255,255,255,.22);
+      border:1px solid rgba(255,255,255,.18);
+      color:rgba(255,255,255,.95);
+      border-radius:18px;
+    }
+    .field::placeholder{color:rgba(255,255,255,.70)}
+    .field:focus{border-color:rgba(0,122,255,.65);background:rgba(255,255,255,.28)}
+
+    /* Inner light widgets (news cards, lists, etc) */
+    .newsItem,
+    .miniCard,
+    .wCard{
+      background:rgba(255,255,255,.22) !important;
+      border:1px solid rgba(255,255,255,.16) !important;
+      border-radius:22px !important;
+    }
+
+    /* Apple-style toggle switch */
+    .appleSwitch{display:inline-flex;align-items:center;gap:10px;user-select:none}
+    .appleSwitch input{display:none}
+    .appleSwitch .track{
+      width:46px;height:28px;border-radius:999px;position:relative;
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);
+      transition:all .18s ease;
+    }
+    .appleSwitch .knob{
+      width:24px;height:24px;border-radius:999px;position:absolute;top:1px;left:1px;
+      background:rgba(255,255,255,.92);
+      box-shadow:0 10px 18px rgba(0,0,0,.20);
+      transition:all .18s ease;
+    }
+    .appleSwitch input:checked + .track{
+      background:linear-gradient(135deg,rgba(0,122,255,.95),rgba(74,163,255,.85));
+      border-color:rgba(255,255,255,.22);
+    }
+    .appleSwitch input:checked + .track .knob{left:21px}
+    .appleSwitch .label{font-size:12px;color:rgba(255,255,255,.92);font-weight:800}
+    .panel .appleSwitch .label,
+    .widgetPanel .appleSwitch .label{color:rgba(18,20,24,.85)}
+    .panel .appleSwitch .track,
+    .widgetPanel .appleSwitch .track{
+      background:rgba(255,255,255,.34);
+      border:1px solid rgba(255,255,255,.22);
+    }
+
+
+    /* Buttons inside panels should be dark like macOS widgets */
+    .panel .btn,
+    .widgetPanel .btn{
+      background:rgba(255,255,255,.34);
+      border:1px solid rgba(255,255,255,.22);
+      color:rgba(18,20,24,.92);
+      box-shadow:0 10px 20px rgba(0,0,0,.14);
+    }
+    .panel .btn:hover,
+    .widgetPanel .btn:hover{background:rgba(255,255,255,.44)}
+
+    /* Make widget corners more "Apple" */
+    .newsScroll, .weekPanel, .compareBox, .chatWrap, .memBox{border-radius:24px !important}
+
+  </style>
 
       <!-- RISULTATO -->
       <div id="garResultBox"></div>
@@ -1022,6 +1315,20 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     });
     $("logoutBtn").addEventListener("click",async()=>{try{await signOut(auth);$("newsList").innerHTML="";setStatus("👋 Logout.")}catch(e){setStatus("❌ "+e.message)}});
     $("refreshBtn").addEventListener("click",loadNews);
+
+    // Auto-refresh news (toggle stile Apple)
+    let newsTimer=null;
+    const AUTO_MS=5*60*1000;
+    const autoEl=$("autoNews");
+    if(autoEl){
+      autoEl.addEventListener("change",()=>{
+        if(newsTimer){clearInterval(newsTimer);newsTimer=null;}
+        if(autoEl.checked){
+          loadNews();
+          newsTimer=setInterval(loadNews,AUTO_MS);
+        }
+      });
+    }
     $("fiatBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Fiat,"_blank","noopener,noreferrer"));
     $("jeepBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Jeep,"_blank","noopener,noreferrer"));
     $("alfaBtn").addEventListener("click",()=>window.open(BRAND_LINKS.AlfaRomeo,"_blank","noopener,noreferrer"));
@@ -2496,7 +2803,151 @@ td:first-child{background:#f8fafc;font-weight:bold;width:40%}
 ul{padding-left:20px;margin:6px 0}
 .inc{color:#15803d}.exc{color:#dc2626}.warn{color:#92400e}
 .footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;text-align:center}
-</style></head><body>
+
+    /* ===== macOS / Apple Home light-gray theme (overrides) ===== */
+    :root{
+      --bgTop:#2a2d31;
+      --bgMid:#6b7077;
+      --bgBot:#a7acb3;
+
+      --text:#0b0c0e;
+      --muted:rgba(11,12,14,.55);
+      --line:rgba(12,13,15,.10);
+
+      --panel:rgba(238,240,243,.42);
+      --panel2:rgba(238,240,243,.55);
+
+      --accent:#007aff;
+      --accent2:#4aa3ff;
+      --orange:#ff9f0a;
+      --orange2:#ffb340;
+    }
+
+    body{
+      background:
+        linear-gradient(180deg,var(--bgTop) 0%, var(--bgMid) 22%, var(--bgBot) 100%);
+      color:var(--text);
+    }
+
+    /* Top strip like macOS */
+    header{
+      background:linear-gradient(180deg,rgba(22,24,28,.92),rgba(22,24,28,.55));
+      border-bottom:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(16px) saturate(1.2);
+    }
+
+    /* Cards / widgets: consistent material + rounder corners + more separation */
+    .layout{gap:18px !important}
+    .panel,
+    .widgetPanel{
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:28px;
+      box-shadow:0 18px 40px rgba(0,0,0,.18);
+      backdrop-filter:blur(18px) saturate(1.25);
+    }
+    .widgetStack{gap:18px}
+    .panelHeader,
+    .widgetHeader{
+      background:linear-gradient(180deg,rgba(255,255,255,.20),rgba(255,255,255,.10));
+      border-bottom:1px solid rgba(255,255,255,.14);
+      padding:16px 18px;
+    }
+    .widgetBody{padding:18px}
+
+    /* Text colors on light panels */
+    .panel, .widgetPanel{color:var(--text)}
+    .muted, .panelHeader .muted, .widgetSub{color:var(--muted) !important}
+
+    /* Buttons: macOS pill */
+    .btn{
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.20);
+      color:rgba(255,255,255,.92);
+      border-radius:999px;
+      box-shadow:0 10px 22px rgba(0,0,0,.18);
+      backdrop-filter:blur(12px) saturate(1.2);
+    }
+    .btn:hover{background:rgba(255,255,255,.24)}
+    .btn.primary{
+      background:linear-gradient(135deg,rgba(0,122,255,.95),rgba(74,163,255,.85));
+      border-color:rgba(255,255,255,.22);
+      color:white;
+    }
+
+    /* Pills */
+    .pill{
+      background:rgba(255,255,255,.16) !important;
+      border:1px solid rgba(255,255,255,.16) !important;
+      color:rgba(255,255,255,.92) !important;
+      border-radius:999px !important;
+    }
+
+    /* Fields: light material */
+    .field{
+      background:rgba(255,255,255,.22);
+      border:1px solid rgba(255,255,255,.18);
+      color:rgba(255,255,255,.95);
+      border-radius:18px;
+    }
+    .field::placeholder{color:rgba(255,255,255,.70)}
+    .field:focus{border-color:rgba(0,122,255,.65);background:rgba(255,255,255,.28)}
+
+    /* Inner light widgets (news cards, lists, etc) */
+    .newsItem,
+    .miniCard,
+    .wCard{
+      background:rgba(255,255,255,.22) !important;
+      border:1px solid rgba(255,255,255,.16) !important;
+      border-radius:22px !important;
+    }
+
+    /* Apple-style toggle switch */
+    .appleSwitch{display:inline-flex;align-items:center;gap:10px;user-select:none}
+    .appleSwitch input{display:none}
+    .appleSwitch .track{
+      width:46px;height:28px;border-radius:999px;position:relative;
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);
+      transition:all .18s ease;
+    }
+    .appleSwitch .knob{
+      width:24px;height:24px;border-radius:999px;position:absolute;top:1px;left:1px;
+      background:rgba(255,255,255,.92);
+      box-shadow:0 10px 18px rgba(0,0,0,.20);
+      transition:all .18s ease;
+    }
+    .appleSwitch input:checked + .track{
+      background:linear-gradient(135deg,rgba(0,122,255,.95),rgba(74,163,255,.85));
+      border-color:rgba(255,255,255,.22);
+    }
+    .appleSwitch input:checked + .track .knob{left:21px}
+    .appleSwitch .label{font-size:12px;color:rgba(255,255,255,.92);font-weight:800}
+    .panel .appleSwitch .label,
+    .widgetPanel .appleSwitch .label{color:rgba(18,20,24,.85)}
+    .panel .appleSwitch .track,
+    .widgetPanel .appleSwitch .track{
+      background:rgba(255,255,255,.34);
+      border:1px solid rgba(255,255,255,.22);
+    }
+
+
+    /* Buttons inside panels should be dark like macOS widgets */
+    .panel .btn,
+    .widgetPanel .btn{
+      background:rgba(255,255,255,.34);
+      border:1px solid rgba(255,255,255,.22);
+      color:rgba(18,20,24,.92);
+      box-shadow:0 10px 20px rgba(0,0,0,.14);
+    }
+    .panel .btn:hover,
+    .widgetPanel .btn:hover{background:rgba(255,255,255,.44)}
+
+    /* Make widget corners more "Apple" */
+    .newsScroll, .weekPanel, .compareBox, .chatWrap, .memBox{border-radius:24px !important}
+
+  </style></head><body>
 <h1>🛡 Sunto Garanzia — AI BOTT Automotive</h1>
 <div class="box">
   <div class="cliente">👤 ${p.cliente||"—"}</div>
