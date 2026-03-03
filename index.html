@@ -1389,9 +1389,10 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       getFirestore, doc, onSnapshot, setDoc, enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    const BACKEND_NEWS   = "/api/news";
-    const BACKEND_CHAT   = "https://auto-backend-three.vercel.app/api/chat";
-    const BACKEND_SEARCH = "https://auto-backend-three.vercel.app/api/search";
+    const BACKEND_BASE = "https://auto-backend-three.vercel.app";
+    const BACKEND_NEWS   = BACKEND_BASE + "/api/news";
+    const BACKEND_CHAT   = BACKEND_BASE + "/api/chat";
+    const BACKEND_SEARCH = BACKEND_BASE + "/api/search";
     const BRAND_LINKS = {
       Fiat:"https://www.fiat.it/omni/configuratore/#/",
       Jeep:"https://www.jeep-official.it/omni/configuratore",
@@ -1409,6 +1410,15 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     };
     const $ = id => document.getElementById(id);
     const setStatus = t => { $("status").textContent = t; };
+    // Avviso: Firebase Auth non funziona su file:// (apri da GitHub Pages o da localhost)
+    if (location.protocol === "file:") {
+      document.addEventListener("DOMContentLoaded", () => {
+        try { setStatus("⚠️ Apri il sito da un URL https (GitHub Pages/Vercel) o da localhost: con file:// il login Google non funziona."); } catch {}
+        const b = document.getElementById("loginBtn");
+        if (b) b.disabled = true;
+      });
+    }
+
     function escapeHtml(s=""){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
     function safeHost(url){try{return new URL(url).hostname}catch{return""}}
     function fmtDate(d){if(!d)return"";const dt=new Date(d);if(Number.isNaN(dt.getTime()))return String(d);return dt.toLocaleString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}
