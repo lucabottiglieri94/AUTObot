@@ -2206,7 +2206,7 @@ async function extractPdfText(base64){
     const tc=await page.getTextContent();
     full+=tc.items.map(i=>i.str).join(' ')+'\n\n';
   }
-  return full.trim().slice(0,12000); // max ~12k chars per non sforare il context
+  return full.trim().slice(0,25000); // max ~25k chars
 }
 
 window.garAnalizza = async function(){
@@ -2242,40 +2242,50 @@ window.garAnalizza = async function(){
     }
 
     /* 2. manda il testo (non il binario) al backend */
-    const SYS=`Sei un esperto legale automotive italiano. Ti viene fornito il TESTO ESTRATTO da un documento di garanzia auto.
-Analizza attentamente e restituisci SOLO un oggetto JSON valido, senza markdown, senza testo prima o dopo:
+    const SYS=`Sei un esperto legale automotive italiano specializzato nell'analisi di contratti di garanzia auto.
+Riceverai il testo estratto da un documento di garanzia. Il tuo compito è analizzarlo in profondità e restituire ESCLUSIVAMENTE un oggetto JSON valido (nessun testo prima, nessun testo dopo, nessun markdown, nessun backtick).
+
+REGOLE FONDAMENTALI:
+1. cosaInclude: array con OGNI singola voce/componente/servizio coperto dalla garanzia. Estrai tutto, anche voci simili separatamente. Minimo 5 voci se presenti nel testo.
+2. cosaEscluso: array con OGNI singola esclusione/limitazione. Estrai tutto. Minimo 5 voci se presenti nel testo.
+3. contatti: estrai OGNI numero di telefono, email, indirizzo, sito web presente nel documento. Per ogni contatto crea un oggetto separato.
+4. NON inventare dati non presenti nel testo.
+5. Se un campo non è trovato usa stringa "Non specificato" per campi singoli, array vuoto [] per array.
+
+Struttura JSON da restituire (compila con i dati REALI del documento, non con esempi):
 {
-  "cliente": "${nome}",
-  "modello": "${modello||'da documento'}",
-  "dataInizio": "GG/MM/AAAA oppure Non specificata",
-  "dataFine": "GG/MM/AAAA oppure durata",
-  "durataAnni": "es: 2 anni o 24 mesi",
-  "cosaInclude": ["elenca TUTTE le voci coperte trovate nel documento, sii esaustivo"],
-  "cosaEscluso": ["elenca TUTTE le voci escluse/non coperte trovate nel documento, sii esaustivo"],
-  "condizioniPrincipali": ["condizione 1","condizione 2"],
-  "noteImportanti": ["nota 1","nota 2"],
-  "sunto": "Testo del sunto in 4-5 righe in italiano chiaro, mettendo in evidenza il nome cliente e i punti chiave della garanzia",
+  "cliente": "NOME_CLIENTE_QUI",
+  "modello": "MODELLO_AUTO_QUI",
+  "dataInizio": "DATA_INIZIO",
+  "dataFine": "DATA_FINE_O_DURATA",
+  "durataAnni": "DURATA",
+  "sunto": "SUNTO_4_5_RIGHE",
+  "cosaInclude": ["VOCE_REALE_1","VOCE_REALE_2","VOCE_REALE_3"],
+  "cosaEscluso": ["ESCLUSIONE_REALE_1","ESCLUSIONE_REALE_2","ESCLUSIONE_REALE_3"],
+  "condizioniPrincipali": ["CONDIZIONE_1","CONDIZIONE_2"],
+  "noteImportanti": ["NOTA_1","NOTA_2"],
   "contatti": [
-    {
-      "nome": "es: Assistenza Clienti MAPFRE",
-      "telefono": "es: 800 123 456",
-      "email": "es: assistenza@mapfre.it",
-      "orari": "es: Lun-Ven 8:00-18:00",
-      "note": "es: Per sinistri e richieste di intervento"
-    }
+    {"nome":"NOME_SERVIZIO","telefono":"NUMERO","email":"EMAIL","orari":"ORARI","sito":"SITO","note":"A_COSA_SERVE"}
   ]
-}
-IMPORTANTE:
-- Per cosaInclude ed cosaEscluso: estrai TUTTE le voci presenti nel documento, non solo un riassunto. Sii il più completo possibile.
-- Per contatti: estrai TUTTI i numeri di telefono, email, indirizzi, siti web presenti nel documento utili per far valere la garanzia. Se non ci sono contatti scrivi array vuoto [].
-- Se un campo non è presente nel testo scrivi "Non specificato". Il campo cliente DEVE essere: "${nome}".`;
+}`;
 
     const res=await fetch('https://auto-backend-three.vercel.app/api/chat',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({messages:[
         {role:'system', content:SYS},
-        {role:'user',   content:`TESTO DEL DOCUMENTO DI GARANZIA:\n\n${pdfText}\n\n---\nCliente: ${nome}\nAuto: ${modello||'non specificato'}\n\nRestituisci SOLO il JSON richiesto.`}
+        {role:'user', content:`ANALIZZA QUESTO DOCUMENTO DI GARANZIA AUTO.
+
+DATI CLIENTE (da includere OBBLIGATORIAMENTE nel JSON):
+- Nome cliente: ${nome}
+- Modello auto: ${modello||'estrailo dal documento'}
+
+TESTO COMPLETO DEL DOCUMENTO:
+---
+${pdfText}
+---
+
+Restituisci SOLO il JSON. Il campo "cliente" deve contenere esattamente: "${nome}". Estrai TUTTE le voci di cosaInclude e cosaEscluso presenti nel testo. Estrai TUTTI i contatti (telefoni, email, siti) presenti nel documento.`}
       ]})
     });
 
@@ -2296,7 +2306,8 @@ IMPORTANTE:
         cosaInclude:['Vedere documento originale'],
         cosaEscluso:['Vedere documento originale'],
         condizioniPrincipali:[], noteImportanti:[],
-        sunto:'Analisi completata. Per dettagli completi fare riferimento al documento originale.'
+        contatti:[],
+        sunto:'Analisi completata. Il JSON non è stato parsato correttamente. Fare riferimento al documento originale.'
       };
     }
 
