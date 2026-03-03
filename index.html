@@ -2317,6 +2317,126 @@ Se un campo non è presente nel testo scrivi "Non specificato". Il campo cliente
     document.getElementById('garBtnTxt').textContent='Analisi completata! Puoi farne un\'altra';
   }
 };
+  
+/* ══ GARANZIE: funzioni render ══ */
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+function garRenderResult(p){
+  const incl=(p.cosaInclude||[]).map(v=>`<div class="garRow inc"><span style="flex-shrink:0">✅</span><span>${esc(v)}</span></div>`).join("");
+  const excl=(p.cosaEscluso||[]).map(v=>`<div class="garRow exc"><span style="flex-shrink:0">❌</span><span>${esc(v)}</span></div>`).join("");
+  const cond=(p.condizioniPrincipali||[]).map(v=>`<div class="garRow warn"><span style="flex-shrink:0">⚠</span><span>${esc(v)}</span></div>`).join("");
+  const note=(p.noteImportanti||[]).map(v=>`<div class="garRow note"><span style="flex-shrink:0">📌</span><span>${esc(v)}</span></div>`).join("");
+
+  document.getElementById("garResultBox").innerHTML=`
+    <div class="garResult">
+      <div class="garResHead">
+        <div style="font-size:14px;font-weight:900;color:#d8b4fe;">📋 Sunto Garanzia — ${esc(p.cliente)}</div>
+        <span style="font-size:11px;padding:3px 10px;border-radius:999px;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.4);color:#d8b4fe;">✨ AI Analizzato</span>
+      </div>
+      <div class="garResBody">
+        <div class="garSec">👤 Dati Cliente & Veicolo</div>
+        <div class="garGrid2">
+          <div class="garCard"><div class="garCardLabel">Nome Cliente</div><div class="garCardVal hi">👤 ${esc(p.cliente)}</div></div>
+          <div class="garCard"><div class="garCardLabel">Modello Auto</div><div class="garCardVal">🚗 ${esc(p.modello||"—")}</div></div>
+          <div class="garCard"><div class="garCardLabel">Inizio Garanzia</div><div class="garCardVal">📅 ${esc(p.dataInizio||"—")}</div></div>
+          <div class="garCard"><div class="garCardLabel">Durata / Scadenza</div><div class="garCardVal">⏱ ${esc(p.durataAnni||p.dataFine||"—")}</div></div>
+        </div>
+        ${p.sunto?`<div class="garSec">📝 Sunto Rapido</div><div style="padding:12px 14px;border:1px solid rgba(139,92,246,.25);border-radius:10px;background:rgba(139,92,246,.07);font-size:13px;line-height:1.7;color:#e5e7eb;margin-bottom:4px;">${esc(p.sunto)}</div>`:""}
+        <div class="garSec">✅ Cosa Include</div>
+        <div style="margin-bottom:4px;">${incl||'<div class="garRow note">Non specificato nel documento</div>'}</div>
+        <div class="garSec">❌ Esclusioni</div>
+        <div style="margin-bottom:4px;">${excl||'<div class="garRow note">Non specificato nel documento</div>'}</div>
+        ${cond?`<div class="garSec">⚠ Condizioni Principali</div><div style="margin-bottom:4px;">${cond}</div>`:""}
+        ${note?`<div class="garSec">📌 Note Importanti</div><div style="margin-bottom:4px;">${note}</div>`:""}
+        <div style="margin-top:16px;">
+          <button class="garDlBtn" onclick="garDownload()">📥 Scarica Sunto Word (.doc)</button>
+        </div>
+      </div>
+    </div>`;
+
+  window._garUltimo = p;
+}
+
+function garRenderStorico(){
+  const box=document.getElementById("garStoricoBox");
+  if(!garStorico.length){
+    box.innerHTML='<div style="text-align:center;padding:32px 20px;color:#9ca3af;"><div style="font-size:40px;margin-bottom:10px;opacity:.5;">📂</div><div style="font-size:13px;">Nessuna garanzia analizzata ancora.</div></div>';
+    return;
+  }
+  box.innerHTML=garStorico.map(item=>`
+    <div class="garHistItem" onclick="garLoadStorico(${item.id})">
+      <div style="font-size:24px;">🛡</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;">👤 ${esc(item.cliente)} — 🚗 ${esc(item.modello||"—")}</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:2px;">📅 ${esc(item.dataInizio||"—")} · ⏱ ${esc(item.durataAnni||"—")}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;color:#9ca3af;">${esc(item.ts)}</div>
+        <div style="font-size:11px;color:#d8b4fe;margin-top:3px;">Clicca per riaprire →</div>
+      </div>
+    </div>`).join("");
+}
+
+window.garLoadStorico = function(id){
+  const item=garStorico.find(i=>i.id===id);
+  if(!item) return;
+  switchGarTab("nuova");
+  document.getElementById("garNome").value=item.cliente;
+  document.getElementById("garModello").value=item.modello||"";
+  garRenderResult(item.data);
+};
+
+window.garDownload = function(){
+  const p=window._garUltimo;
+  if(!p){alert("Nessuna analisi da scaricare!");return;}
+  const now=new Date().toLocaleDateString("it-IT");
+  const li=arr=>(arr||[]).map(v=>`<li style="padding:3px 0">${v}</li>`).join("");
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+body{font-family:Calibri,Arial,sans-serif;color:#1a1a2e;margin:40px;line-height:1.6}
+h1{color:#1e3a5f;font-size:22px;border-bottom:3px solid #1e3a5f;padding-bottom:8px;margin-bottom:20px}
+h2{color:#2563eb;font-size:16px;margin-top:24px;margin-bottom:10px;border-left:4px solid #2563eb;padding-left:10px}
+.box{background:#eff6ff;border:2px solid #2563eb;border-radius:8px;padding:16px;margin:16px 0}
+.cliente{font-size:22px;font-weight:bold;color:#1e3a5f}
+table{width:100%;border-collapse:collapse;margin-bottom:10px}
+td{padding:8px 12px;border:1px solid #e2e8f0}
+td:first-child{background:#f8fafc;font-weight:bold;width:40%}
+ul{padding-left:20px;margin:6px 0}
+.inc{color:#15803d}.exc{color:#dc2626}.warn{color:#92400e}
+.footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;text-align:center}
+</style></head><body>
+<h1>🛡 Sunto Garanzia — AI BOTT Automotive</h1>
+<div class="box">
+  <div class="cliente">👤 ${p.cliente||"—"}</div>
+  <div style="font-size:16px;color:#2563eb;margin-top:4px;">🚗 ${p.modello||"Non specificato"}</div>
+  <div style="font-size:12px;color:#64748b;margin-top:6px;">Generato il ${now} · AI BOTT Automotive</div>
+</div>
+<h2>📅 Dati Garanzia</h2>
+<table>
+  <tr><td>Inizio Garanzia</td><td>${p.dataInizio||"—"}</td></tr>
+  <tr><td>Durata</td><td>${p.durataAnni||"—"}</td></tr>
+  <tr><td>Scadenza</td><td>${p.dataFine||"—"}</td></tr>
+</table>
+${p.sunto?`<h2>📝 Sunto</h2><p style="background:#faf5ff;border:1px solid #c084fc;border-radius:6px;padding:14px;color:#581c87;font-style:italic">${p.sunto}</p>`:""}
+<h2>✅ Cosa Include</h2>
+<ul class="inc">${li(p.cosaInclude)||"<li>Vedere documento originale</li>"}</ul>
+<h2>❌ Cosa NON Include (Esclusioni)</h2>
+<ul class="exc">${li(p.cosaEscluso)||"<li>Vedere documento originale</li>"}</ul>
+${(p.condizioniPrincipali||[]).length?`<h2>⚠ Condizioni Principali</h2><ul class="warn">${li(p.condizioniPrincipali)}</ul>`:""}
+${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImportanti)}</ul>`:""}
+<div class="footer">Documento generato da AI BOTT Automotive · ${now} · Solo a scopo informativo. Fare sempre riferimento al documento originale.</div>
+</body></html>`;
+
+  const blob=new Blob([html],{type:"application/msword"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=`Garanzia_${(p.cliente||"cliente").replace(/\s+/g,"_")}_${(p.modello||"auto").replace(/\s+/g,"_")}.doc`;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+};
+/* ══ FINE GARANZIE ══ */
+
   </script>
 </body>
 </html>
