@@ -568,13 +568,14 @@
       </div>
 
       <!-- DROP ZONE -->
-<div id="garDrop" class="garDrop" onclick="document.getElementById('garFile').click()">
-  <input type="file" id="garFile" accept=".pdf,application/pdf" style="display:none;"/>
-  <div id="garDropIcon" style="font-size:36px;margin-bottom:8px;">📄</div>
-  <div id="garDropTitle" style="font-size:14px;font-weight:700;color:#d8b4fe;margin-bottom:4px;">Trascina il PDF qui oppure clicca per selezionare</div>
-  <div style="font-size:12px;color:#9ca3af;">Garanzia, contratto, libretto — max 20MB</div>
-  <div id="garFileLabel" style="display:none;font-size:12px;color:#6ee7b7;margin-top:8px;font-weight:700;"></div>
-</div>
+      <div id="garDropZone" style="border:2px dashed rgba(139,92,246,.4);background:rgba(139,92,246,.06);border-radius:14px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .3s;position:relative;margin-bottom:14px;">
+        <input type="file" id="garFileInput" accept=".pdf,application/pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"/>
+        <div id="garDropIcon" style="font-size:36px;margin-bottom:8px;">📄</div>
+        <div id="garDropTitle" style="font-size:14px;font-weight:700;color:#d8b4fe;margin-bottom:4px;">Trascina il PDF qui oppure clicca per selezionare</div>
+        <div style="font-size:12px;color:#9ca3af;">Garanzia, contratto, libretto — max 20MB</div>
+        <div id="garFileLabel" style="display:none;font-size:12px;color:#6ee7b7;margin-top:8px;font-weight:700;"></div>
+      </div>
+
       <!-- BOTTONE ANALIZZA -->
       <button id="garAnalizzaBtn" disabled onclick="garAnalizza()"
         style="width:100%;padding:13px;background:linear-gradient(135deg,rgba(139,92,246,.28),rgba(167,139,250,.2));border:1px solid rgba(139,92,246,.5);border-radius:12px;color:#d8b4fe;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;opacity:.5;">
@@ -2126,43 +2127,35 @@ document.getElementById("garNome")   ?.addEventListener("input", garCheckBtn);
 document.getElementById("garModello")?.addEventListener("input", garCheckBtn);
 
 (function(){
-  const drop  = document.getElementById('garDrop');
-  const input = document.getElementById('garFile');
+  const drop  = document.getElementById("garDropZone");
+  const input = document.getElementById("garFileInput");
   if(!drop||!input) return;
-
-  /* click sulla zona → apre il file picker */
-  drop.addEventListener('click', ()=> input.click());
-
-  /* drag over */
-  drop.addEventListener('dragover', e=>{
-    e.preventDefault();
-    e.stopPropagation();
-    drop.style.borderColor='rgba(139,92,246,.8)';
-    drop.style.background='rgba(139,92,246,.14)';
-  });
-
-  /* drag leave */
-  drop.addEventListener('dragleave', ()=>{
-    drop.style.borderColor='rgba(139,92,246,.4)';
-    drop.style.background='rgba(139,92,246,.06)';
-  });
-
-  /* drop file */
-  drop.addEventListener('drop', e=>{
-    e.preventDefault();
-    e.stopPropagation();
-    drop.style.borderColor='rgba(139,92,246,.4)';
-    drop.style.background='rgba(139,92,246,.06)';
-    const f = e.dataTransfer?.files[0];
-    if(f) garLoadFile(f);
-  });
-
-  /* selezione da file picker */
-  input.addEventListener('change', ()=>{
-    const f = input.files[0];
-    if(f) garLoadFile(f);
-  });
+  drop.addEventListener("dragover", e=>{ e.preventDefault(); drop.style.borderColor="rgba(139,92,246,.8)"; drop.style.background="rgba(139,92,246,.14)"; });
+  drop.addEventListener("dragleave", ()=>{ drop.style.borderColor="rgba(139,92,246,.4)"; drop.style.background="rgba(139,92,246,.06)"; });
+  drop.addEventListener("drop", e=>{ e.preventDefault(); drop.style.borderColor="rgba(139,92,246,.4)"; drop.style.background="rgba(139,92,246,.06)"; const f=e.dataTransfer?.files[0]; if(f) garLoadFile(f); });
+  input.addEventListener("change", ()=>{ const f=input.files[0]; if(f) garLoadFile(f); });
 })();
+
+function garLoadFile(file){
+  if(!file.name.toLowerCase().endsWith(".pdf") && !file.type.includes("pdf")){ alert("⚠ Carica solo file PDF!"); return; }
+  if(file.size > 20*1024*1024){ alert("⚠ File troppo grande (max 20MB)"); return; }
+  garPdfName = file.name;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    garPdfB64 = e.target.result.split(",")[1];
+    const lbl  = document.getElementById("garFileLabel");
+    const icon = document.getElementById("garDropIcon");
+    const title= document.getElementById("garDropTitle");
+    const drop = document.getElementById("garDropZone");
+    if(lbl){ lbl.style.display="block"; lbl.textContent=`✅ ${file.name} (${(file.size/1024).toFixed(0)} KB)`; }
+    if(icon) icon.textContent="✅";
+    if(title) title.textContent="PDF caricato con successo!";
+    if(drop){ drop.style.borderColor="rgba(34,197,94,.5)"; drop.style.background="rgba(34,197,94,.06)"; }
+    garCheckBtn();
+  };
+  reader.readAsDataURL(file);
+}
+
 /* ── carica PDF.js una sola volta ── */
 let _pdfJsReady = false;
 function loadPdfJs(){
