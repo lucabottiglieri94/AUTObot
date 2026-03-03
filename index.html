@@ -2250,25 +2250,13 @@ Analizza attentamente e restituisci SOLO un oggetto JSON valido, senza markdown,
   "dataInizio": "GG/MM/AAAA oppure Non specificata",
   "dataFine": "GG/MM/AAAA oppure durata",
   "durataAnni": "es: 2 anni o 24 mesi",
-  "cosaInclude": ["elenca TUTTE le voci coperte trovate nel documento, sii esaustivo"],
-  "cosaEscluso": ["elenca TUTTE le voci escluse/non coperte trovate nel documento, sii esaustivo"],
+  "cosaInclude": ["voce 1","voce 2","voce 3"],
+  "cosaEscluso": ["voce 1","voce 2","voce 3"],
   "condizioniPrincipali": ["condizione 1","condizione 2"],
   "noteImportanti": ["nota 1","nota 2"],
-  "sunto": "Testo del sunto in 4-5 righe in italiano chiaro, mettendo in evidenza il nome cliente e i punti chiave della garanzia",
-  "contatti": [
-    {
-      "nome": "es: Assistenza Clienti MAPFRE",
-      "telefono": "es: 800 123 456",
-      "email": "es: assistenza@mapfre.it",
-      "orari": "es: Lun-Ven 8:00-18:00",
-      "note": "es: Per sinistri e richieste di intervento"
-    }
-  ]
+  "sunto": "Testo del sunto in 4-5 righe in italiano chiaro, mettendo in evidenza il nome cliente e i punti chiave della garanzia"
 }
-IMPORTANTE:
-- Per cosaInclude ed cosaEscluso: estrai TUTTE le voci presenti nel documento, non solo un riassunto. Sii il più completo possibile.
-- Per contatti: estrai TUTTI i numeri di telefono, email, indirizzi, siti web presenti nel documento utili per far valere la garanzia. Se non ci sono contatti scrivi array vuoto [].
-- Se un campo non è presente nel testo scrivi "Non specificato". Il campo cliente DEVE essere: "${nome}".`;
+Se un campo non è presente nel testo scrivi "Non specificato". Il campo cliente DEVE essere: "${nome}".`;
 
     const res=await fetch('https://auto-backend-three.vercel.app/api/chat',{
       method:'POST',
@@ -2360,18 +2348,6 @@ function garRenderResult(p){
         <div style="margin-bottom:4px;">${excl||'<div class="garRow note">Non specificato nel documento</div>'}</div>
         ${cond?`<div class="garSec">⚠ Condizioni Principali</div><div style="margin-bottom:4px;">${cond}</div>`:""}
         ${note?`<div class="garSec">📌 Note Importanti</div><div style="margin-bottom:4px;">${note}</div>`:""}
-        ${(p.contatti&&p.contatti.length)?`
-        <div class="garSec">📞 Contatti Utili</div>
-        <div style="display:grid;gap:8px;margin-bottom:4px;">
-          ${(p.contatti||[]).map(c=>`
-            <div style="padding:10px 14px;border:1px solid rgba(20,184,166,.3);border-radius:10px;background:rgba(20,184,166,.07);">
-              <div style="font-size:13px;font-weight:700;color:#5eead4;margin-bottom:4px;">${esc(c.nome||"Contatto")}</div>
-              ${c.telefono&&c.telefono!=="Non specificato"?`<div style="font-size:14px;font-weight:900;color:#99f6e4;">☎ ${esc(c.telefono)}</div>`:""}
-              ${c.email&&c.email!=="Non specificato"?`<div style="font-size:12px;color:#ccfbf1;margin-top:2px;">✉ ${esc(c.email)}</div>`:""}
-              ${c.orari&&c.orari!=="Non specificato"?`<div style="font-size:11px;color:#9ca3af;margin-top:2px;">🕐 ${esc(c.orari)}</div>`:""}
-              ${c.note&&c.note!=="Non specificato"?`<div style="font-size:11px;color:#9ca3af;margin-top:2px;font-style:italic">📌 ${esc(c.note)}</div>`:""}
-            </div>`).join("")}
-        </div>`:""}
         <div style="margin-top:16px;">
           <button class="garDlBtn" onclick="garDownload()">📥 Scarica Sunto Word (.doc)</button>
         </div>
@@ -2414,99 +2390,41 @@ window.garDownload = function(){
   const p=window._garUltimo;
   if(!p){alert("Nessuna analisi da scaricare!");return;}
   const now=new Date().toLocaleDateString("it-IT");
-  const li=arr=>(arr||[]).map(v=>`<li style="padding:3px 0;line-height:1.5">${v}</li>`).join("");
-
-  // Sezione contatti utili
-  const contatti=p.contatti||[];
-  const contattiHTML=contatti.length
-    ? contatti.map(c=>`
-      <div style="border:1px solid #bfdbfe;border-radius:8px;padding:14px 16px;margin-bottom:12px;background:#f0f9ff;">
-        <div style="font-size:15px;font-weight:bold;color:#1e40af;margin-bottom:8px;">📞 ${c.nome||"Contatto"}</div>
-        <table style="width:100%;border-collapse:collapse;">
-          ${c.telefono&&c.telefono!=="Non specificato"?`<tr><td style="padding:5px 10px;border:1px solid #dbeafe;background:#eff6ff;font-weight:bold;width:35%">☎ Telefono</td><td style="padding:5px 10px;border:1px solid #dbeafe;font-size:15px;font-weight:bold;color:#1d4ed8">${c.telefono}</td></tr>`:""}
-          ${c.email&&c.email!=="Non specificato"?`<tr><td style="padding:5px 10px;border:1px solid #dbeafe;background:#eff6ff;font-weight:bold;">✉ Email</td><td style="padding:5px 10px;border:1px solid #dbeafe;">${c.email}</td></tr>`:""}
-          ${c.orari&&c.orari!=="Non specificato"?`<tr><td style="padding:5px 10px;border:1px solid #dbeafe;background:#eff6ff;font-weight:bold;">🕐 Orari</td><td style="padding:5px 10px;border:1px solid #dbeafe;">${c.orari}</td></tr>`:""}
-          ${c.sito&&c.sito!=="Non specificato"?`<tr><td style="padding:5px 10px;border:1px solid #dbeafe;background:#eff6ff;font-weight:bold;">🌐 Sito</td><td style="padding:5px 10px;border:1px solid #dbeafe;">${c.sito}</td></tr>`:""}
-          ${c.note&&c.note!=="Non specificato"?`<tr><td style="padding:5px 10px;border:1px solid #dbeafe;background:#eff6ff;font-weight:bold;">📌 Note</td><td style="padding:5px 10px;border:1px solid #dbeafe;font-style:italic">${c.note}</td></tr>`:""}
-        </table>
-      </div>`).join("")
-    : `<p style="color:#64748b;font-style:italic;padding:10px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0">Nessun contatto trovato nel documento. Fare riferimento al documento originale.</p>`;
-
+  const li=arr=>(arr||[]).map(v=>`<li style="padding:3px 0">${v}</li>`).join("");
   const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
 <style>
-body{font-family:Calibri,Arial,sans-serif;color:#1a1a2e;margin:40px;line-height:1.6;font-size:13px}
+body{font-family:Calibri,Arial,sans-serif;color:#1a1a2e;margin:40px;line-height:1.6}
 h1{color:#1e3a5f;font-size:22px;border-bottom:3px solid #1e3a5f;padding-bottom:8px;margin-bottom:20px}
-h2{font-size:16px;margin-top:28px;margin-bottom:12px;padding:8px 14px;border-radius:6px}
-h2.blue{color:#1e40af;background:#eff6ff;border-left:5px solid #2563eb}
-h2.green{color:#15803d;background:#f0fdf4;border-left:5px solid #22c55e}
-h2.red{color:#dc2626;background:#fef2f2;border-left:5px solid #ef4444}
-h2.yellow{color:#92400e;background:#fffbeb;border-left:5px solid #f59e0b}
-h2.purple{color:#6b21a8;background:#faf5ff;border-left:5px solid #a855f7}
-h2.teal{color:#0f766e;background:#f0fdfa;border-left:5px solid #14b8a6}
+h2{color:#2563eb;font-size:16px;margin-top:24px;margin-bottom:10px;border-left:4px solid #2563eb;padding-left:10px}
 .box{background:#eff6ff;border:2px solid #2563eb;border-radius:8px;padding:16px;margin:16px 0}
-.cliente{font-size:24px;font-weight:bold;color:#1e3a5f}
-table.main{width:100%;border-collapse:collapse;margin-bottom:10px}
-table.main td{padding:9px 12px;border:1px solid #e2e8f0}
-table.main td:first-child{background:#f8fafc;font-weight:bold;width:40%}
-ul{padding-left:22px;margin:8px 0}
-ul li{padding:4px 0;line-height:1.5;border-bottom:1px solid #f1f5f9}
-ul li:last-child{border-bottom:none}
-ul.inc li{color:#15803d}
-ul.inc li::marker{content:"✅ "}
-ul.exc li{color:#dc2626}
-ul.exc li::marker{content:"❌ "}
-ul.warn li{color:#92400e}
-ul.warn li::marker{content:"⚠ "}
-.badge-inc{display:inline-block;background:#dcfce7;border:1px solid #86efac;color:#15803d;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:bold;margin-right:4px}
-.badge-exc{display:inline-block;background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:bold;margin-right:4px}
-.cnt{font-size:12px;color:#64748b;font-weight:normal;margin-left:8px}
-.footer{margin-top:40px;padding-top:16px;border-top:2px solid #e2e8f0;font-size:11px;color:#94a3b8;text-align:center}
-.page-break{page-break-before:always}
+.cliente{font-size:22px;font-weight:bold;color:#1e3a5f}
+table{width:100%;border-collapse:collapse;margin-bottom:10px}
+td{padding:8px 12px;border:1px solid #e2e8f0}
+td:first-child{background:#f8fafc;font-weight:bold;width:40%}
+ul{padding-left:20px;margin:6px 0}
+.inc{color:#15803d}.exc{color:#dc2626}.warn{color:#92400e}
+.footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;text-align:center}
 </style></head><body>
-
 <h1>🛡 Sunto Garanzia — AI BOTT Automotive</h1>
-
-<!-- BOX CLIENTE -->
 <div class="box">
   <div class="cliente">👤 ${p.cliente||"—"}</div>
-  <div style="font-size:17px;color:#2563eb;margin-top:6px;font-weight:bold;">🚗 ${p.modello||"Non specificato"}</div>
-  <div style="font-size:12px;color:#64748b;margin-top:8px;">📄 Documento generato il ${now} · AI BOTT Automotive</div>
+  <div style="font-size:16px;color:#2563eb;margin-top:4px;">🚗 ${p.modello||"Non specificato"}</div>
+  <div style="font-size:12px;color:#64748b;margin-top:6px;">Generato il ${now} · AI BOTT Automotive</div>
 </div>
-
-<!-- DATI GARANZIA -->
-<h2 class="blue">📅 Dati Garanzia</h2>
-<table class="main">
-  <tr><td>Data Inizio</td><td><strong>${p.dataInizio||"—"}</strong></td></tr>
-  <tr><td>Durata</td><td><strong>${p.durataAnni||"—"}</strong></td></tr>
-  <tr><td>Data Scadenza</td><td><strong>${p.dataFine||"—"}</strong></td></tr>
+<h2>📅 Dati Garanzia</h2>
+<table>
+  <tr><td>Inizio Garanzia</td><td>${p.dataInizio||"—"}</td></tr>
+  <tr><td>Durata</td><td>${p.durataAnni||"—"}</td></tr>
+  <tr><td>Scadenza</td><td>${p.dataFine||"—"}</td></tr>
 </table>
-
-<!-- SUNTO -->
-${p.sunto&&p.sunto!=="Non specificato"?`<h2 class="purple">📝 Sunto della Garanzia</h2>
-<p style="background:#faf5ff;border:1px solid #c084fc;border-radius:8px;padding:16px;color:#581c87;font-style:italic;line-height:1.8;font-size:13px">${p.sunto}</p>`:""}
-
-<!-- CONTATTI UTILI -->
-<h2 class="teal">📞 Contatti Utili per Far Valere la Garanzia</h2>
-${contattiHTML}
-
-<!-- COSA COPRE -->
-<h2 class="green">✅ Cosa Copre la Garanzia <span class="cnt">(${(p.cosaInclude||[]).length} voci)</span></h2>
+${p.sunto?`<h2>📝 Sunto</h2><p style="background:#faf5ff;border:1px solid #c084fc;border-radius:6px;padding:14px;color:#581c87;font-style:italic">${p.sunto}</p>`:""}
+<h2>✅ Cosa Include</h2>
 <ul class="inc">${li(p.cosaInclude)||"<li>Vedere documento originale</li>"}</ul>
-
-<!-- COSA NON COPRE -->
-<h2 class="red">❌ Cosa NON Copre la Garanzia <span class="cnt">(${(p.cosaEscluso||[]).length} voci)</span></h2>
+<h2>❌ Cosa NON Include (Esclusioni)</h2>
 <ul class="exc">${li(p.cosaEscluso)||"<li>Vedere documento originale</li>"}</ul>
-
-<!-- CONDIZIONI -->
-${(p.condizioniPrincipali||[]).length?`<h2 class="yellow">⚠ Condizioni Principali</h2><ul class="warn">${li(p.condizioniPrincipali)}</ul>`:""}
-
-<!-- NOTE -->
-${(p.noteImportanti||[]).length?`<h2 class="yellow">📌 Note Importanti</h2><ul>${li(p.noteImportanti)}</ul>`:""}
-
-<div class="footer">
-  Documento generato da <strong>AI BOTT Automotive</strong> · ${now}<br>
-  ⚠ Solo a scopo informativo. Fare sempre riferimento al documento di garanzia originale per informazioni legalmente vincolanti.
-</div>
+${(p.condizioniPrincipali||[]).length?`<h2>⚠ Condizioni Principali</h2><ul class="warn">${li(p.condizioniPrincipali)}</ul>`:""}
+${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImportanti)}</ul>`:""}
+<div class="footer">Documento generato da AI BOTT Automotive · ${now} · Solo a scopo informativo. Fare sempre riferimento al documento originale.</div>
 </body></html>`;
 
   const blob=new Blob([html],{type:"application/msword"});
