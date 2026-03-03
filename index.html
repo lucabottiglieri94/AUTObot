@@ -363,6 +363,98 @@
       .centroAutoLink{padding:4px 8px}
       .weekGrid{grid-template-columns:repeat(7,1fr)}
     }
+  
+    /* ========= LIGHT "macOS Dashboard" THEME OVERRIDES ========= */
+    :root{
+      --bgTop:#f3f4f6;--bgMid:#eef0f3;--bgBot:#e7eaee;
+      --panel:rgba(255,255,255,.72);
+      --line:rgba(17,24,39,.12);
+      --text:#111827;--muted:#6b7280;
+      --accent:#0a84ff;--accent2:#64d2ff;
+      --orange:#ff9f0a;--orange2:#ffb340;
+    }
+    body{
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 18% -12%,rgba(10,132,255,.10),transparent 58%),
+        radial-gradient(900px 520px at 72% 8%,rgba(100,210,255,.10),transparent 60%),
+        linear-gradient(180deg,var(--bgTop) 0%,var(--bgMid) 48%,var(--bgBot) 100%);
+    }
+    header{
+      background:rgba(255,255,255,.65);
+      border-bottom:1px solid var(--line);
+      box-shadow:0 6px 24px rgba(17,24,39,.06);
+    }
+    .brandLogo{mix-blend-mode:normal;filter:drop-shadow(0 1px 2px rgba(0,0,0,.12))}
+    .brandName{-webkit-text-fill-color:transparent}
+    .pill{background:rgba(255,255,255,.55);border:1px solid var(--line)}
+    .btn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.60);
+      color:var(--text);
+      box-shadow:0 6px 18px rgba(17,24,39,.06);
+    }
+    .btn:hover{border-color:rgba(10,132,255,.35);background:rgba(255,255,255,.82)}
+    .btn.primary{border-color:rgba(10,132,255,.35);background:rgba(10,132,255,.12)}
+    .btn.primary:hover{background:rgba(10,132,255,.18)}
+    .layout{gap:18px}
+    .panel,.widgetPanel,.venditePanel,.oggiPanel,.chatBox{
+      background:rgba(255,255,255,.70);
+      border:1px solid var(--line);
+      box-shadow:0 14px 40px rgba(17,24,39,.10);
+      backdrop-filter:blur(18px);
+    }
+    .panelHeader,.widgetHeader,.venditeHeader,.oggiHeader{
+      background:rgba(255,255,255,.55);
+      border-bottom:1px solid var(--line);
+    }
+    .newsItem,.dayCol,.item,.autoItem,.telCard,.postCard,.consegnaCard,.oggiItem{
+      background:rgba(255,255,255,.58) !important;
+      border:1px solid var(--line) !important;
+    }
+    .newsItem:hover{border-color:rgba(10,132,255,.30)!important;background:rgba(255,255,255,.82)!important}
+    .field,.venditeForm .fld,.telInput,.chatInputField,.obiettivoInput,.consegnaInput{
+      background:rgba(255,255,255,.68)!important;
+      border:1px solid var(--line)!important;
+      color:var(--text)!important;
+    }
+    .field::placeholder,.venditeForm .fld::placeholder,.telInput::placeholder,.chatInputField::placeholder{color:rgba(107,114,128,.9)!important}
+    .field:focus,.venditeForm .fld:focus,.telInput:focus,.chatInputField:focus,.obiettivoInput:focus,.consegnaInput:focus{
+      border-color:rgba(10,132,255,.45)!important;
+      box-shadow:0 0 0 3px rgba(10,132,255,.15);
+    }
+    .muted{color:var(--muted)!important}
+    .newsMeta,.newsDate,.panelSub,.widgetSub,.weekSub,.oggiDate,.oggiKpiLabel,.oggiKpiSub{color:var(--muted)!important}
+    .weekCell{
+      background:rgba(255,255,255,.55);
+      border:1px solid var(--line);
+      box-shadow:0 10px 22px rgba(17,24,39,.08);
+    }
+    .weekTask{
+      background:rgba(17,24,39,.05);
+      border:1px solid rgba(17,24,39,.10);
+      color:rgba(17,24,39,.88);
+    }
+    .weekTask.done{color:rgba(17,24,39,.55)}
+    .weekCell.today{border-color:rgba(255,159,10,.55);box-shadow:0 0 0 3px rgba(255,159,10,.14) inset}
+    .seg,.tipoSeg,.telSeg,.telWhenSeg{
+      background:rgba(255,255,255,.55);
+      border:1px solid var(--line);
+      box-shadow:0 8px 18px rgba(17,24,39,.06);
+    }
+    .seg button,.tipoBtn,.telBtn,.telWhenBtn{color:rgba(17,24,39,.55)}
+    .seg button.active{color:rgba(17,24,39,.92)}
+    .navArrow{background:rgba(255,255,255,.60);border:1px solid var(--line);color:var(--text)}
+    .navArrow:hover{border-color:rgba(10,132,255,.35);background:rgba(255,255,255,.82)}
+    .chatMessages{background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,.15))}
+    .message.user .messageBubble{background:rgba(17,24,39,.92);color:#fff}
+    .chatInput{background:rgba(255,255,255,.65);border-top:1px solid var(--line)}
+    .chatTrigger{box-shadow:0 14px 40px rgba(17,24,39,.16)}
+    /* Scrollbar (subtle, mac-like) */
+    *::-webkit-scrollbar{height:10px;width:10px}
+    *::-webkit-scrollbar-thumb{background:rgba(17,24,39,.18);border:2px solid rgba(255,255,255,.55);border-radius:999px}
+    *::-webkit-scrollbar-track{background:transparent}
+
   </style>
 </head>
 <body>
