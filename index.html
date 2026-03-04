@@ -643,170 +643,83 @@
 </div>
 <!-- FINE ANALISI GARANZIE -->
         <!-- VENDITE MENSILI -->
-<script>
-
-/* ================================
-   VENDITE MENSILI SISTEMA
-================================ */
-
-let venditeData = JSON.parse(localStorage.getItem("venditeData") || "{}")
-
-let vendDate = new Date()
-let vendMonth = vendDate.getMonth()
-let vendYear = vendDate.getFullYear()
-
-const mesi = [
-"Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
-"Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"
-]
-
-function vendKey(){
- return vendYear + "-" + (vendMonth+1)
-}
-
-function saveVendite(){
- localStorage.setItem("venditeData",JSON.stringify(venditeData))
-}
-
-function getVendite(){
- let key = vendKey()
- if(!venditeData[key]) venditeData[key] = {nuove:[],usate:[]}
- return venditeData[key]
-}
-
-function renderVendite(){
-
- let data = getVendite()
-
- document.getElementById("vendMonthLabel").innerText =
- mesi[vendMonth] + " " + vendYear
-
- let nuove = data.nuove
- let usate = data.usate
-
- document.getElementById("totNuove").innerText = nuove.length
- document.getElementById("totUsate").innerText = usate.length
- document.getElementById("totAll").innerText = nuove.length + usate.length
-
- let nuovaList = document.getElementById("vendListNuove")
- let usataList = document.getElementById("vendListUsate")
-
- if(nuovaList){
-   nuovaList.innerHTML = nuove.map((a,i)=>`
-   <div class="autoItem">
-     <div class="autoN">${i+1}</div>
-     <div class="autoModello">${a.modello}</div>
-     <div class="autoProvv">${a.provv || 0}€</div>
-     <button class="autoDelBtn" onclick="delVend('nuove',${i})">×</button>
-   </div>
-   `).join("") || `<div class="emptyList">Nessuna</div>`
- }
-
- if(usataList){
-   usataList.innerHTML = usate.map((a,i)=>`
-   <div class="autoItem">
-     <div class="autoN">${i+1}</div>
-     <div class="autoModello">${a.modello}</div>
-     <div class="autoProvv">${a.provv || 0}€</div>
-     <button class="autoDelBtn" onclick="delVend('usate',${i})">×</button>
-   </div>
-   `).join("") || `<div class="emptyList">Nessuna</div>`
- }
-
-}
-
-function addVendita(){
-
- let modello = document.getElementById("vendModello").value.trim()
- let provv = parseFloat(document.getElementById("vendProvv").value) || 0
-
- if(!modello) return
-
- let tipo = document.getElementById("tipoBtnNuova").classList.contains("active")
- ? "nuove"
- : "usate"
-
- let data = getVendite()
-
- data[tipo].push({
-  modello,
-  provv
- })
-
- saveVendite()
-
- document.getElementById("vendModello").value=""
- document.getElementById("vendProvv").value=""
-
- renderVendite()
-
-}
-
-function delVend(tipo,i){
-
- let data = getVendite()
- data[tipo].splice(i,1)
-
- saveVendite()
- renderVendite()
-
-}
-
-/* ================================
-   NAVIGAZIONE MESI
-================================ */
-
-function vendPrevClick(){
-
- vendMonth--
-
- if(vendMonth < 0){
-  vendMonth = 11
-  vendYear--
- }
-
- renderVendite()
-
-}
-
-function vendNextClick(){
-
- vendMonth++
-
- if(vendMonth > 11){
-  vendMonth = 0
-  vendYear++
- }
-
- renderVendite()
-
-}
-
-/* ================================
-   TOGGLE NUOVA / USATA
-================================ */
-
-document.getElementById("tipoBtnNuova").onclick = function(){
- this.classList.add("active")
- document.getElementById("tipoBtnUsata").classList.remove("active")
-}
-
-document.getElementById("tipoBtnUsata").onclick = function(){
- this.classList.add("active")
- document.getElementById("tipoBtnNuova").classList.remove("active")
-}
-
-/* ================================
-   INIT
-================================ */
-
-document.addEventListener("DOMContentLoaded",()=>{
-
- renderVendite()
-
-})
-
-</script>
+        <div class="venditePanel">
+          <div class="venditeHeader">
+            <div class="venditeTitleRow">
+              <div class="venditeTitle">🚗 Vendite mensili</div>
+              <span id="venditeSyncBadge" class="venditeSyncBadge">Sync —</span>
+            </div>
+            <div class="venditeNav">
+              <button class="navArrow" id="vendPrevBtn" onclick="vendPrevClick()">&#8249;</button>
+              <div class="venditeMonthLabel" id="vendMonthLabel">—</div>
+              <button class="navArrow" id="vendNextBtn" onclick="vendNextClick()">&#8250;</button>
+            </div>
+          </div>
+          <div class="venditeTotali">
+            <div class="totCard"><div class="totLabel">🆕 Nuove</div><div class="totNum nuova" id="totNuove">0</div></div>
+            <div class="totCard"><div class="totLabel">🔄 Usate</div><div class="totNum usata" id="totUsate">0</div></div>
+            <div class="totCard"><div class="totLabel">📦 Totale</div><div class="totNum all"  id="totAll">0</div></div>
+          </div>
+          <div class="venditeForm">
+            <input id="vendModello" type="text" class="fld" placeholder="Modello auto (es: Jeep Compass…)" style="min-width:160px;"/>
+            <input id="vendProvv"   type="number" class="fld" placeholder="Provvigione €" min="0" step="1" style="max-width:140px;min-width:110px;"/>
+            <div class="tipoSeg">
+              <button class="tipoBtn nuova active" id="tipoBtnNuova">🆕 Nuova</button>
+              <button class="tipoBtn usata"        id="tipoBtnUsata">🔄 Usata</button>
+            </div>
+            <button id="vendAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
+          </div>
+          <div class="venditeListe">
+            <div class="venditeCol">
+              <div class="venditeColTitle nuova">🆕 AUTO NUOVE <span class="venditeCount nuova" id="cntNuove">0</span></div>
+              <div class="venditeList" id="listNuove"></div>
+            </div>
+            <div class="venditeCol">
+              <div class="venditeColTitle usata">🔄 AUTO USATE <span class="venditeCount usata" id="cntUsate">0</span></div>
+              <div class="venditeList" id="listUsate"></div>
+            </div>
+          </div>
+          <div class="venditeProvvBar">
+            <div class="provvMeseGroup">
+              <div class="provvMeseLabel">💰 Provvigioni del mese</div>
+              <div class="provvMeseNum" id="provvMeseTot">€ 0</div>
+              <div class="provvMeseSplit" id="provvMeseSplit"></div>
+            </div>
+          </div>
+          <div class="vendite2026Bar">
+            <div class="bar2026Left">
+              <div class="bar2026Icon">🏆</div>
+              <div>
+                <div class="bar2026Title">Totale provvigioni 2026</div>
+                <div class="bar2026Sub">Somma cumulativa di tutti i mesi</div>
+              </div>
+            </div>
+            <div class="bar2026Right">
+              <div class="bar2026Num" id="provv2026Tot">€ 0</div>
+              <div class="bar2026Mesi" id="provv2026Mesi">0 mesi con provvigioni</div>
+            </div>
+          </div>
+          <div class="obiettivoBar">
+            <div class="obiettivoHead">
+              <div class="obiettivoLeft">
+                <div class="obiettivoIcon">🎯</div>
+                <div>
+                  <div class="obiettivoTitle">Obiettivo mensile</div>
+                  <div class="obiettivoSub">Imposta il tuo target provvigioni per questo mese</div>
+                </div>
+              </div>
+              <div class="obiettivoRight">
+                <span class="obiettivoInputLabel">Target €</span>
+                <input id="obiettivoInput" type="number" class="obiettivoInput" placeholder="es. 3000" min="0" step="100"/>
+              </div>
+            </div>
+            <div class="progressWrap"><div class="progressFill low" id="progressFill" style="width:0%"></div></div>
+            <div class="progressMeta">
+              <span class="progressPct low" id="progressPct">0%</span>
+              <span class="progressManca" id="progressManca">Imposta un obiettivo ↑</span>
+            </div>
+          </div>
+        </div>
 
         <!-- AGENDA + MEMO + TELEFONO -->
         <div class="widgetStack">
