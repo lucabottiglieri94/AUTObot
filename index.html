@@ -1478,6 +1478,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     let vendDocRef    = null;
     let vendUnsub     = null;
     let vendCurrentUid = null;
+    let vendWriting = false; // true mentre stiamo scrivendo su Firebase — ignora snapshot intermedi
 
     // Stato locale del mese visualizzato
     let V = { nuove:[], usate:[], obiettivo:0 };
@@ -1632,6 +1633,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     // Scrive il mese corrente su Firebase
     async function vendWrite(){
       if(!vendDocRef) return;
+      vendWriting = true;
       try{
         await setDoc(vendDocRef, {
           nuove:     V.nuove,
@@ -1641,6 +1643,10 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
           _ts: Date.now()
         }, {merge:false});
       } catch(e){ console.warn("vendWrite:",e); }
+      finally{
+        // rilascia il flag dopo un breve delay (lo snapshot arriva ~200ms dopo)
+        setTimeout(()=>{ vendWriting = false; }, 600);
+      }
     }
 
     // Carica (o ri-carica) il mese k da Firebase, staccando il listener precedente
@@ -1655,6 +1661,11 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       setSyncVendite("sync");
 
       vendUnsub = onSnapshot(vendDocRef, snap=>{
+        if(vendWriting){
+          // Ignora snapshot mentre stiamo scrivendo noi — i dati locali sono già aggiornati
+          setSyncVendite("ok");
+          return;
+        }
         if(snap.exists()){
           const d = snap.data();
           // Accetta solo array veri — ignora oggetti corrotti
