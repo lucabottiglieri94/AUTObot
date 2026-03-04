@@ -374,6 +374,23 @@
     .autoN{color:var(--muted)}
     select option{background:var(--bg2);color:var(--text)}
 
+
+    /* ══ POPUP AUTO ══ */
+    .autoPopupOverlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+    .autoPopupBox{background:#111827;border:1px solid #374151;border-radius:18px;width:420px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.7);}
+    .autoPopupHead{padding:16px 20px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:18px 18px 0 0;}
+    .autoPopupTitle{font-weight:900;font-size:16px;}
+    .autoPopupClose{width:32px;height:32px;border-radius:9px;border:1px solid #374151;background:#1f2937;color:#e5e7eb;cursor:pointer;font-size:20px;font-weight:900;display:flex;align-items:center;justify-content:center;}
+    .autoPopupClose:hover{background:#374151;}
+    .autoPopupList{padding:14px 16px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+    .autoPopupItem{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid #1f2937;border-radius:12px;background:#1a1d23;}
+    .autoPopupN{font-size:12px;font-weight:900;color:#6b7280;min-width:24px;}
+    .autoPopupModello{flex:1;font-size:14px;font-weight:600;}
+    .autoPopupProvv{font-size:13px;font-weight:700;color:#4ade80;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:6px;padding:2px 8px;white-space:nowrap;}
+    .autoPopupProvv.zero{color:#6b7280;background:transparent;border-color:#374151;font-weight:400;}
+    .autoPopupDel{width:28px;height:28px;border-radius:8px;border:1px solid #374151;background:#111827;color:#6b7280;cursor:pointer;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .autoPopupDel:hover{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.1);color:#fca5a5;}
+    .autoPopupEmpty{padding:20px;text-align:center;color:#6b7280;font-style:italic;font-size:13px;}
   </style>
 </head>
 <body>
@@ -656,9 +673,15 @@
             </div>
           </div>
           <div class="venditeTotali">
-            <div class="totCard"><div class="totLabel">🆕 Nuove</div><div class="totNum nuova" id="totNuove">0</div></div>
-            <div class="totCard"><div class="totLabel">🔄 Usate</div><div class="totNum usata" id="totUsate">0</div></div>
-            <div class="totCard"><div class="totLabel">📦 Totale</div><div class="totNum all"  id="totAll">0</div></div>
+            <div class="totCard" id="totCardNuove" style="cursor:pointer;" title="Clicca per vedere le auto nuove">
+              <div class="totLabel">🆕 Nuove</div><div class="totNum nuova" id="totNuove">0</div>
+              <div style="font-size:10px;color:#60a5fa;margin-top:4px;">👆 clicca per vedere</div>
+            </div>
+            <div class="totCard" id="totCardUsate" style="cursor:pointer;" title="Clicca per vedere le auto usate">
+              <div class="totLabel">🔄 Usate</div><div class="totNum usata" id="totUsate">0</div>
+              <div style="font-size:10px;color:#f97316;margin-top:4px;">👆 clicca per vedere</div>
+            </div>
+            <div class="totCard"><div class="totLabel">📦 Totale</div><div class="totNum all" id="totAll">0</div></div>
           </div>
           <div class="venditeForm">
             <input id="vendModello" type="text" class="fld" placeholder="Modello auto (es: Jeep Compass…)" style="min-width:160px;"/>
@@ -669,16 +692,8 @@
             </div>
             <button id="vendAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
           </div>
-          <div class="venditeListe">
-            <div class="venditeCol">
-              <div class="venditeColTitle nuova">🆕 AUTO NUOVE <span class="venditeCount nuova" id="cntNuove">0</span></div>
-              <div class="venditeList" id="listNuove"></div>
-            </div>
-            <div class="venditeCol">
-              <div class="venditeColTitle usata">🔄 AUTO USATE <span class="venditeCount usata" id="cntUsate">0</span></div>
-              <div class="venditeList" id="listUsate"></div>
-            </div>
-          </div>
+          <!-- liste nascoste, dati visibili nel popup cliccando sui totali -->
+          <div style="display:none"><div id="listNuove"></div><div id="listUsate"></div><span id="cntNuove"></span><span id="cntUsate"></span></div>
           <div class="venditeProvvBar">
             <div class="provvMeseGroup">
               <div class="provvMeseLabel">💰 Provvigioni del mese</div>
@@ -862,7 +877,7 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       signOut, onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
     import {
-      getFirestore, doc, getDoc, onSnapshot, setDoc, enableIndexedDbPersistence
+      getFirestore, doc, onSnapshot, setDoc, enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const BACKEND_NEWS   = "/api/news";
@@ -1457,20 +1472,10 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     $("cmpInput2").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();runComparatore()}});
 
     /* ══ VENDITE MENSILI ══ */
-    /* ══ VENDITE MENSILI ══
-       Regola d'oro: lo stato vive in vendState (in memoria).
-       Firebase si usa SOLO per: caricare al login (getDoc) e salvare dopo ogni modifica (setDoc).
-       MAI onSnapshot sulle vendite → zero race condition, zero sovrascritture.
-    */
-    let vendState = {months:{}, obiettivo:0};
-    let vendTipo  = "nuova";
-    let vendUID   = null; // uid utente loggato
-
-    const TODAY_KEY = (()=>{
-      const n=new Date();
-      return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`;
-    })();
-    let vendViewKey = TODAY_KEY;
+    let vendState={months:{},obiettivo:0};
+    let vendDocRef=null,vendUnsub=null,vendTipo="nuova";
+    const TODAY_KEY=(()=>{const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`})();
+    let vendViewKey=TODAY_KEY;
 
     function monthLabel(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-1,1);const l=d.toLocaleDateString("it-IT",{month:"long",year:"numeric"});return l.charAt(0).toUpperCase()+l.slice(1)}
     function prevMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-2,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
@@ -1479,19 +1484,6 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     function ensureMonth(k){if(!vendState.months[k])vendState.months[k]={nuove:[],usate:[]}}
     function sumProvv(list){return(list||[]).reduce((s,c)=>s+(Number(c.provv)||0),0)}
     function fmtEur(n){return"€ "+n.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0})}
-    function isMeseEditabile(k){
-      if(k===TODAY_KEY) return true;
-      const[y,m]=k.split("-").map(Number);
-      const fine=new Date(y,m,0); const oggi=new Date(); oggi.setHours(0,0,0,0);
-      return Math.round((oggi-fine)/864e5)<=10;
-    }
-
-    function setSyncVendite(s){
-      const b=$("venditeSyncBadge");
-      if(s==="ok"){b.className="venditeSyncBadge ok";b.textContent="Sync ✓"}
-      else if(s==="sync"){b.className="venditeSyncBadge";b.textContent="Sync …"}
-      else{b.className="venditeSyncBadge";b.textContent="Sync —"}
-    }
 
     function renderObiettivo(provvMese){
       const target=vendState.obiettivo||0;
@@ -1507,121 +1499,184 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       else{manca.textContent="Mancano "+fmtEur(target-provvMese)+" all'obiettivo";manca.className="progressManca"}
     }
 
-    function autoItemHTML(c,n,tipo,editabile){
-      const p=Number(c.provv)||0,pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—",cls=p>0?"autoProvv":"autoProvv zero";
-      const delBtn=editabile?`<button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>`:'<span style="width:24px;display:inline-block"></span>';
-      return`<div class="autoItem"><span class="autoN">#${n}</span><span class="autoModello">${escapeHtml(c.modello)}</span><span class="${cls}">${pStr}</span>${delBtn}</div>`;
+    // Controlla se un mese è ancora editabile (mese corrente O entro 10 giorni dalla fine)
+    function isMeseEditabile(k){
+      if(k===TODAY_KEY) return true;
+      // Calcola fine mese: ultimo giorno del mese k
+      const [y,m]=k.split("-").map(Number);
+      const fineMese=new Date(y,m,0); // giorno 0 del mese successivo = ultimo del mese corrente
+      const oggi=new Date(); oggi.setHours(0,0,0,0);
+      const diffGiorni=Math.round((oggi-fineMese)/(1000*60*60*24));
+      return diffGiorni<=10; // editabile entro 10 giorni dalla fine
     }
 
     function renderVendite(){
-      const k=vendViewKey; ensureMonth(k);
-      const nuove=vendState.months[k].nuove||[], usate=vendState.months[k].usate||[];
-      const editabile=isMeseEditabile(k), isCurrent=(k===TODAY_KEY);
+      const k=vendViewKey;ensureMonth(k);
+      const mese=vendState.months[k],nuove=mese.nuove||[],usate=mese.usate||[];
+      const isCurrent=(k===TODAY_KEY);
+      const editabile=isMeseEditabile(k);
       $("vendMonthLabel").innerHTML=escapeHtml(monthLabel(k))
         +(isCurrent?' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>':"")
         +(!isCurrent&&editabile?' <span style="color:#fbbf24;font-weight:700;font-size:11px;">✏ editabile</span>':"")
         +(!editabile?' <span style="color:#ef4444;font-weight:700;font-size:10px;">🔒 chiuso</span>':"");
-      $("vendPrevBtn").disabled=false;
-      $("vendNextBtn").disabled=isCurrent;
+      $("vendNextBtn").disabled=(k===TODAY_KEY);
+      $("vendPrevBtn").disabled=false; // sempre libero scorrere indietro
       $("totNuove").textContent=nuove.length;$("totUsate").textContent=usate.length;$("totAll").textContent=nuove.length+usate.length;
       $("cntNuove").textContent=nuove.length;$("cntUsate").textContent=usate.length;
       $("listNuove").innerHTML=nuove.length?nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova",editabile)).join(""):'<div class="emptyList">Nessuna auto nuova</div>';
       $("listUsate").innerHTML=usate.length?usate.map((c,i)=>autoItemHTML(c,i+1,"usata",editabile)).join(""):'<div class="emptyList">Nessuna auto usata</div>';
-      document.querySelectorAll(".autoDelBtn").forEach(btn=>{
-        btn.onclick=()=>deleteAuto(btn.dataset.tipo,btn.dataset.id);
-      });
+      // Mostra/nascondi form aggiunta
       const vendForm=document.querySelector(".venditeForm");
-      if(vendForm){vendForm.style.opacity=editabile?"1":"0.4";vendForm.style.pointerEvents=editabile?"auto":"none";}
-      const pN=sumProvv(nuove),pU=sumProvv(usate),pTot=pN+pU;
+      if(vendForm){
+        vendForm.style.opacity=editabile?"1":"0.4";
+        vendForm.style.pointerEvents=editabile?"auto":"none";
+        vendForm.title=editabile?"":"Mese chiuso - non modificabile";
+      }
+      document.querySelectorAll(".autoDelBtn").forEach(btn=>btn.addEventListener("click",()=>deleteAuto(k,btn.dataset.tipo,btn.dataset.id)));
+      const pNuove=sumProvv(nuove),pUsate=sumProvv(usate),pTot=pNuove+pUsate;
       $("provvMeseTot").textContent=fmtEur(pTot);
-      $("provvMeseSplit").textContent=pN>0&&pU>0?`🆕 ${fmtEur(pN)}  ·  🔄 ${fmtEur(pU)}`:pN>0?"🆕 Tutte da auto nuove":pU>0?"🔄 Tutte da auto usate":"Nessuna provvigione inserita";
+      $("provvMeseSplit").textContent=pNuove>0&&pUsate>0?`🆕 ${fmtEur(pNuove)}  ·  🔄 ${fmtEur(pUsate)}`:pNuove>0?"🆕 Tutte da auto nuove":pUsate>0?"🔄 Tutte da auto usate":"Nessuna provvigione inserita";
       let tot2026=0,mesi2026=0;
-      Object.entries(vendState.months).forEach(([mk,mv])=>{if(!mk.startsWith("2026"))return;const mP=sumProvv(mv.nuove||[])+sumProvv(mv.usate||[]);tot2026+=mP;if(mP>0)mesi2026++;});
+      Object.entries(vendState.months).forEach(([mk,mv])=>{if(!mk.startsWith("2026"))return;const mP=sumProvv(mv.nuove||[])+sumProvv(mv.usate||[]);tot2026+=mP;if(mP>0)mesi2026++});
       $("provv2026Tot").textContent=fmtEur(tot2026);
       $("provv2026Mesi").textContent=mesi2026===0?"Nessun mese con provvigioni":mesi2026===1?"1 mese con provvigioni":mesi2026+" mesi con provvigioni";
       renderObiettivo(pTot);
     }
 
-    // Salva su Firebase in background — non blocca la UI, non rilegge mai
-    function vendSave(){
-      if(!vendUID) return;
-      const ref=doc(db,"users",vendUID,"vendite","data");
-      setDoc(ref,vendState,{merge:false}).then(()=>setSyncVendite("ok")).catch(()=>setSyncVendite("warn"));
+    function autoItemHTML(c,n,tipo,editabile=true){
+      const p=Number(c.provv)||0,pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—",cls=p>0?"autoProvv":"autoProvv zero";
+      const delBtn=editabile?`<button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>`:'<span style="width:24px;display:inline-block"></span>';
+      return`<div class="autoItem"><span class="autoN">#${n}</span><span class="autoModello">${escapeHtml(c.modello)}</span><span class="${cls}">${pStr}</span>${delBtn}</div>`;
     }
 
+    async function vendWrite(){if(!vendDocRef)return;try{await setDoc(vendDocRef,vendState,{merge:false})}catch{}}
     async function addAuto(){
-      const modello=$("vendModello").value.trim(); if(!modello) return;
-      if(!isMeseEditabile(vendViewKey)){alert("⏰ Mese chiuso.");return;}
+      const modello=$("vendModello").value.trim();if(!modello)return;
+      const k=vendViewKey;
+      if(!isMeseEditabile(k)){
+        alert("⏰ Questo mese è chiuso (più di 10 giorni fa). Non puoi aggiungere vendite.");
+        return;
+      }
       const provv=parseFloat($("vendProvv").value)||0;
-      ensureMonth(vendViewKey);
-      vendState.months[vendViewKey][vendTipo==="nuova"?"nuove":"usate"].push({id:vendUid(),modello,provv,createdAt:Date.now()});
-      $("vendModello").value=""; $("vendProvv").value="";
-      renderVendite();   // <-- mostra subito, SENZA aspettare Firebase
-      vendSave();        // <-- salva in background, non blocca nulla
+      ensureMonth(k);
+      const id=vendUid(),entry={id,modello,provv,createdAt:Date.now()};
+      if(vendTipo==="nuova")vendState.months[k].nuove.push(entry);
+      else vendState.months[k].usate.push(entry);
+      $("vendModello").value="";$("vendProvv").value="";
+      renderVendite();await vendWrite();
+    }
+    async function deleteAuto(k,tipo,id){
+      if(!isMeseEditabile(k)){
+        alert("⏰ Questo mese è chiuso. Non puoi modificare le vendite.");
+        return;
+      }
+      ensureMonth(k);
+      const list=tipo==="nuova"?vendState.months[k].nuove:vendState.months[k].usate;
+      const idx=list.findIndex(c=>c.id===id);if(idx!==-1)list.splice(idx,1);
+      renderVendite();await vendWrite();
     }
 
-    function deleteAuto(tipo,id){
-      if(!isMeseEditabile(vendViewKey)){alert("⏰ Mese chiuso.");return;}
-      const list=vendState.months[vendViewKey][tipo==="nuova"?"nuove":"usate"];
-      const idx=list.findIndex(c=>c.id===id); if(idx!==-1) list.splice(idx,1);
-      renderVendite();
-      vendSave();
-    }
-
-    // Carica dati da Firebase al login (UNA sola lettura)
-    async function startVenditeSync(user){
-      vendUID=user.uid;
+    function startVenditeSync(user){
+      if(vendUnsub){try{vendUnsub()}catch{}}
+      vendDocRef=doc(db,"users",user.uid,"vendite","data");
       setSyncVendite("sync");
-      try{
-        const snap=await getDoc(doc(db,"users",user.uid,"vendite","data"));
-        if(snap.exists()){
-          const d=snap.data();
-          // Normalizza: converte oggetti Firebase {0:..} in array reali
-          const fix=arr=>{
-            if(!arr) return [];
-            if(Array.isArray(arr)) return arr;
-            return Object.values(arr);
-          };
-          const months={};
-          if(d.months && typeof d.months==="object"){
-            for(const[mk,mv] of Object.entries(d.months)){
-              const normK=mk.includes("-")?mk.split("-").map((p,i)=>i===1?p.padStart(2,"0"):p).join("-"):mk;
-              months[normK]={nuove:fix(mv.nuove),usate:fix(mv.usate)};
-            }
-          }
-          vendState={months, obiettivo:Number(d.obiettivo)||0};
-        }
-        setSyncVendite("ok");
-      }catch(e){console.warn("vendite load err",e);setSyncVendite("warn");}
-      ensureMonth(TODAY_KEY);
-      renderVendite();
+      vendUnsub=onSnapshot(vendDocRef,snap=>{
+        if(snap.exists()){const d=snap.data();vendState={months:d.months||{},obiettivo:d.obiettivo||0}}
+        else{vendState={months:{},obiettivo:0}}
+        ensureMonth(TODAY_KEY);setSyncVendite("ok");renderVendite();
+        if(!snap.exists())setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
+      },()=>setSyncVendite("warn"));
+    }
+    function stopVenditeSync(){
+      if(vendUnsub){try{vendUnsub()}catch{}}
+      vendUnsub=null;vendDocRef=null;vendState={months:{},obiettivo:0};
+      setSyncVendite("warn");renderVendite();
+    }
+    function setSyncVendite(s){
+      const b=$("venditeSyncBadge");
+      if(s==="ok"){b.className="venditeSyncBadge ok";b.textContent="Sync ✓"}
+      else if(s==="sync"){b.className="venditeSyncBadge";b.textContent="Sync …"}
+      else{b.className="venditeSyncBadge";b.textContent="Sync —"}
     }
 
-    function stopVenditeSync(){
-      vendUID=null; vendState={months:{},obiettivo:0};
-      setSyncVendite("warn"); renderVendite();
-    }
+
 
     $("tipoBtnNuova").addEventListener("click",()=>{vendTipo="nuova";$("tipoBtnNuova").classList.add("active");$("tipoBtnUsata").classList.remove("active")});
     $("tipoBtnUsata").addEventListener("click",()=>{vendTipo="usata";$("tipoBtnUsata").classList.add("active");$("tipoBtnNuova").classList.remove("active")});
     $("vendAddBtn").addEventListener("click",addAuto);
     $("vendModello").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
     $("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
-    $("vendPrevBtn").addEventListener("click",()=>{vendViewKey=prevMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite();});
-    $("vendNextBtn").addEventListener("click",()=>{if(vendViewKey===TODAY_KEY)return;vendViewKey=nextMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite();});
-    $("obiettivoInput").addEventListener("input",()=>{
+    $("obiettivoInput").addEventListener("input",async()=>{
       vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
-      renderObiettivo(sumProvv(vendState.months[vendViewKey]?.nuove||[])+sumProvv(vendState.months[vendViewKey]?.usate||[]));
-      vendSave();
+      const k=vendViewKey;ensureMonth(k);const m=vendState.months[k];
+      renderObiettivo(sumProvv(m.nuove||[])+sumProvv(m.usate||[]));
+      await vendWrite();
     });
 
-    ensureMonth(TODAY_KEY); renderVendite();
-    renderWeekCalendar();
+    ensureMonth(TODAY_KEY);renderVendite();
+    renderWeekCalendar(); // mostra i giorni anche prima del login
 
+    // navigazione vendite gestita via onclick globale (vendPrevClick/vendNextClick)
     (function scheduleMonthCheck(){
       const now=new Date(),next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,5);
       setTimeout(()=>{ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck();},Math.max(60000,next-now));
     })();
+
+    // ── POPUP AUTO ──────────────────────────────────────────
+    let popupTipo = null; // "nuova" o "usata"
+
+    window.openAutoPopup = function(tipo){
+      popupTipo = tipo;
+      renderAutoPopup();
+      document.getElementById("autoPopupOverlay").style.display="flex";
+    };
+    window.closeAutoPopup = function(){
+      document.getElementById("autoPopupOverlay").style.display="none";
+      popupTipo=null;
+    };
+
+    function renderAutoPopup(){
+      if(!popupTipo) return;
+      const k   = vendViewKey;
+      ensureMonth(k);
+      const list = vendState.months[k][popupTipo==="nuova"?"nuove":"usate"] || [];
+      const edit = isMeseEditabile(k);
+      const title = popupTipo==="nuova" ? "🆕 Auto Nuove — "+monthLabel(k) : "🔄 Auto Usate — "+monthLabel(k);
+      document.getElementById("autoPopupTitle").textContent = title;
+      const box = document.getElementById("autoPopupList");
+      if(!list.length){
+        box.innerHTML='<div class="autoPopupEmpty">Nessuna auto inserita</div>';
+        return;
+      }
+      box.innerHTML = list.map((c,i)=>{
+        const p=Number(c.provv)||0;
+        const pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—";
+        const pCls=p>0?"autoPopupProvv":"autoPopupProvv zero";
+        const delBtn=edit
+          ? `<button class="autoPopupDel" onclick="popupDeleteAuto('${escapeHtml(c.id)}')">×</button>`
+          : '';
+        return `<div class="autoPopupItem">
+          <span class="autoPopupN">#${i+1}</span>
+          <span class="autoPopupModello">${escapeHtml(c.modello)}</span>
+          <span class="${pCls}">${pStr}</span>
+          ${delBtn}
+        </div>`;
+      }).join("");
+    }
+
+    window.popupDeleteAuto = function(id){
+      const k=vendViewKey; ensureMonth(k);
+      const key=popupTipo==="nuova"?"nuove":"usate";
+      const list=vendState.months[k][key];
+      const idx=list.findIndex(c=>c.id===id);
+      if(idx!==-1) list.splice(idx,1);
+      renderAutoPopup();  // aggiorna popup
+      renderVendite();    // aggiorna contatori
+      vendWrite();
+    };
+
+    document.getElementById("totCardNuove").addEventListener("click",()=>openAutoPopup("nuova"));
+    document.getElementById("totCardUsate").addEventListener("click",()=>openAutoPopup("usata"));
 
     /* ══ AUTH STATE ══ */
     onAuthStateChanged(auth,user=>{
@@ -2495,6 +2550,18 @@ ${p.sunto?`<h2>📝 Sunto</h2><p style="background:#faf5ff;border:1px solid #c08
 ${(p.condizioniPrincipali||[]).length?`<h2>⚠ Condizioni Principali</h2><ul class="warn">${li(p.condizioniPrincipali)}</ul>`:""}
 ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImportanti)}</ul>`:""}
 <div class="footer">Documento generato da AI BOTT Automotive · ${now} · Solo a scopo informativo. Fare sempre riferimento al documento originale.</div>
+
+  <!-- POPUP AUTO VENDUTE -->
+  <div id="autoPopupOverlay" class="autoPopupOverlay" style="display:none;" onclick="if(event.target===this)closeAutoPopup()">
+    <div class="autoPopupBox">
+      <div class="autoPopupHead">
+        <div class="autoPopupTitle" id="autoPopupTitle">Auto</div>
+        <button class="autoPopupClose" onclick="closeAutoPopup()">×</button>
+      </div>
+      <div class="autoPopupList" id="autoPopupList"></div>
+    </div>
+  </div>
+
 </body></html>`;
 
   const blob=new Blob([html],{type:"application/msword"});
@@ -2508,8 +2575,30 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
 /* ══ FINE GARANZIE ══ */
     // ══ NAVIGAZIONE VENDITE - esposta globalmente ══
 // ══ NAVIGAZIONE VENDITE ══
-
+    $("vendPrevBtn").addEventListener("click", ()=>{
+      vendViewKey = prevMonthKey(vendViewKey);
+      ensureMonth(vendViewKey);
+      renderVendite();
+    });
+    $("vendNextBtn").addEventListener("click", ()=>{
+      if(vendViewKey === TODAY_KEY) return;
+      vendViewKey = nextMonthKey(vendViewKey);
+      ensureMonth(vendViewKey);
+      renderVendite();
+    });
 
   </script>
+
+  <!-- POPUP AUTO VENDUTE -->
+  <div id="autoPopupOverlay" class="autoPopupOverlay" style="display:none;" onclick="if(event.target===this)closeAutoPopup()">
+    <div class="autoPopupBox">
+      <div class="autoPopupHead">
+        <div class="autoPopupTitle" id="autoPopupTitle">Auto</div>
+        <button class="autoPopupClose" onclick="closeAutoPopup()">×</button>
+      </div>
+      <div class="autoPopupList" id="autoPopupList"></div>
+    </div>
+  </div>
+
 </body>
 </html>
