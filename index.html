@@ -655,7 +655,14 @@
 <button type="button" class="navArrow" id="vendNextBtn" onclick="vendGoNext()">&#8250;</button>
             </div>
           </div>
-          <div class="venditeTotali">
+          
+          <div id="vendMonthBarWrap" style="padding:10px 18px;border-bottom:1px solid rgba(31,41,55,.5);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <button type="button" class="btn" id="vendYearPrevBtn" style="padding:6px 10px;font-size:12px;">‹ Anno</button>
+            <div id="vendYearLabel" class="pill muted" style="font-weight:900;">—</div>
+            <button type="button" class="btn" id="vendYearNextBtn" style="padding:6px 10px;font-size:12px;">Anno ›</button>
+            <div id="vendMonthBar" style="display:flex;gap:8px;flex:1;min-width:220px;overflow:auto;padding:2px 0;"></div>
+          </div>
+<div class="venditeTotali">
             <div class="totCard"><div class="totLabel">🆕 Nuove</div><div class="totNum nuova" id="totNuove">0</div></div>
             <div class="totCard"><div class="totLabel">🔄 Usate</div><div class="totNum usata" id="totUsate">0</div></div>
             <div class="totCard"><div class="totLabel">📦 Totale</div><div class="totNum all"  id="totAll">0</div></div>
@@ -1543,6 +1550,8 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       $("provv2026Mesi").textContent=mesi2026===0?"Nessun mese con provvigioni":mesi2026===1?"1 mese con provvigioni":mesi2026+" mesi con provvigioni";
       renderObiettivo(pTot);
     }
+  try{ renderVendMonthBar(); }catch(e){}
+}
 
     function autoItemHTML(c,n,tipo,editabile=true){
       const p=Number(c.provv)||0,pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—",cls=p>0?"autoProvv":"autoProvv zero";
@@ -2553,6 +2562,84 @@ try{
   if(n) n.addEventListener("click", (ev)=>{ ev.preventDefault(); window.vendGoNext(); });
 }catch(e){ console.error("vendite nav bind error", e); }
 /* ══ FINE FIX NAVIGAZIONE VENDITE ══ */
+
+
+/* ══ MESE: BARRA 12 MESI + NAV ANNO (FIX "TUTTI I MESI") ══ */
+function pad2(n){ return String(n).padStart(2,'0'); }
+
+function keyToYM(k){
+  const [y,m]=k.split('-').map(Number);
+  return {y, m};
+}
+
+function setVendViewYM(y,m){
+  const k = `${y}-${pad2(m)}`;
+  vendViewKey = k;
+  ensureMonth(k);
+  renderVendite();
+  renderVendMonthBar();
+}
+
+function renderVendMonthBar(){
+  try{
+    const bar = document.getElementById("vendMonthBar");
+    const yl  = document.getElementById("vendYearLabel");
+    if(!bar || !yl) return;
+
+    const {y, m} = keyToYM(vendViewKey);
+    yl.textContent = y;
+
+    bar.innerHTML = "";
+    for(let mm=1; mm<=12; mm++){
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn";
+      b.style.padding = "6px 10px";
+      b.style.fontSize = "12px";
+      b.style.borderRadius = "999px";
+      b.textContent = mesi[mm-1].slice(0,3);
+      if(mm === m){
+        b.classList.add("primary");
+      }
+      b.addEventListener("click", ()=> setVendViewYM(y, mm));
+      bar.appendChild(b);
+    }
+
+    // abilita/disabilita next mese e next anno oltre il mese corrente
+    const yprev = document.getElementById("vendYearPrevBtn");
+    const ynext = document.getElementById("vendYearNextBtn");
+    const nextBtn = document.getElementById("vendNextBtn");
+
+    if(ynext){
+      const ty = keyToYM(TODAY_KEY).y;
+      ynext.disabled = y >= ty;
+    }
+    if(nextBtn){
+      nextBtn.disabled = vendViewKey === TODAY_KEY;
+    }
+  }catch(e){ console.error("renderVendMonthBar error", e); }
+}
+
+// Nav anno: mantiene lo stesso mese selezionato
+function vendYearPrev(){
+  const {y,m} = keyToYM(vendViewKey);
+  setVendViewYM(y-1, m);
+}
+function vendYearNext(){
+  const {y,m} = keyToYM(vendViewKey);
+  const ty = keyToYM(TODAY_KEY).y;
+  if(y >= ty) return;
+  setVendViewYM(y+1, m);
+}
+
+// bind
+try{
+  const yp=document.getElementById("vendYearPrevBtn");
+  const yn=document.getElementById("vendYearNextBtn");
+  if(yp) yp.addEventListener("click",(ev)=>{ev.preventDefault(); vendYearPrev();});
+  if(yn) yn.addEventListener("click",(ev)=>{ev.preventDefault(); vendYearNext();});
+}catch(e){ console.error("vend year bind error", e); }
+/* ══ FINE BARRA MESI ══ */
 
 </script>
 </body>
