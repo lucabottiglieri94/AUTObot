@@ -1466,7 +1466,19 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     function prevMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-2,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
     function nextMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
     function vendUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
-    function ensureMonth(k){if(!vendState.months[k])vendState.months[k]={nuove:[],usate:[]}}
+    function ensureMonth(k){
+      // Normalizza chiavi mese: supporta sia YYYY-M che YYYY-MM e migra a YYYY-MM
+      const [yy,mm]=k.split("-").map(Number);
+      const padded=`${yy}-${String(mm).padStart(2,"0")}`;
+      const unpadded=`${yy}-${mm}`;
+      if(k!==padded) k=padded;
+
+      if(!vendState.months[padded] && vendState.months[unpadded]){
+        vendState.months[padded]=vendState.months[unpadded];
+        try{ delete vendState.months[unpadded]; }catch{}
+      }
+      if(!vendState.months[padded]) vendState.months[padded]={nuove:[],usate:[]};
+    }
     function sumProvv(list){return(list||[]).reduce((s,c)=>s+(Number(c.provv)||0),0)}
     function fmtEur(n){return"€ "+n.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0})}
 
@@ -1496,7 +1508,11 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     }
 
     function renderVendite(){
-      const k=vendViewKey;ensureMonth(k);
+      let k=vendViewKey;ensureMonth(k);
+      // riallinea la chiave alla versione YYYY-MM
+      const [ry,rm]=k.split('-').map(Number);
+      k=`${ry}-${String(rm).padStart(2,'0')}`;
+      vendViewKey=k;
       const mese=vendState.months[k],nuove=mese.nuove||[],usate=mese.usate||[];
       const isCurrent=(k===TODAY_KEY);
       const editabile=isMeseEditabile(k);
@@ -1568,13 +1584,16 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       vendUnsub=onSnapshot(vendDocRef,snap=>{
         if(snap.exists()){const d=snap.data();vendState={months:d.months||{},obiettivo:d.obiettivo||0}}
         else{vendState={months:{},obiettivo:0}}
-        ensureMonth(TODAY_KEY);setSyncVendite("ok");renderVendite();
+        ensureMonth(TODAY_KEY);
+        // sempre parte dal mese corrente quando si sincronizza (login/refresh)
+        vendViewKey=TODAY_KEY;
+        setSyncVendite("ok");renderVendite();
         if(!snap.exists())setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
       },()=>setSyncVendite("warn"));
     }
     function stopVenditeSync(){
       if(vendUnsub){try{vendUnsub()}catch{}}
-      vendUnsub=null;vendDocRef=null;vendState={months:{},obiettivo:0};
+      vendUnsub=null;vendDocRef=null;vendViewKey=TODAY_KEY;vendState={months:{},obiettivo:0};
       setSyncVendite("warn");renderVendite();
     }
     function setSyncVendite(s){
@@ -1593,7 +1612,11 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     $("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
     $("obiettivoInput").addEventListener("input",async()=>{
       vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
-      const k=vendViewKey;ensureMonth(k);const m=vendState.months[k];
+      let k=vendViewKey;ensureMonth(k);
+      // riallinea la chiave alla versione YYYY-MM
+      const [ry,rm]=k.split('-').map(Number);
+      k=`${ry}-${String(rm).padStart(2,'0')}`;
+      vendViewKey=k;const m=vendState.months[k];
       renderObiettivo(sumProvv(m.nuove||[])+sumProvv(m.usate||[]));
       await vendWrite();
     });
