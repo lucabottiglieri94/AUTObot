@@ -864,7 +864,7 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       signOut, onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
     import {
-      getFirestore, doc, onSnapshot, setDoc, enableIndexedDbPersistence
+      getFirestore, doc, getDoc, onSnapshot, setDoc, enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const BACKEND_NEWS   = "/api/news";
@@ -1476,9 +1476,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     let vendViewKey   = TODAY_KEY;
     let vendTipo      = "nuova";
     let vendDocRef    = null;
-    let vendUnsub     = null;
     let vendCurrentUid = null;
-    let vendWriting = false; // true mentre stiamo scrivendo su Firebase — ignora snapshot intermedi
 
     // Stato locale del mese visualizzato
     let V = { nuove:[], usate:[], obiettivo:0 };
@@ -1630,56 +1628,48 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       renderObiettivo(pTot);
     }
 
-    // Scrive il mese corrente su Firebase
+    // Scrive il mese corrente su Firebase (senza onSnapshot — zero race condition)
     async function vendWrite(){
-      if(!vendDocRef) return;
-      vendWriting = true;
+      if(!vendCurrentUid) return;
+      setSyncVendite("sync");
       try{
-        await setDoc(vendDocRef, {
+        const ref = doc(db,"users",vendCurrentUid,"venditeV3",vendViewKey);
+        await setDoc(ref, {
           nuove:     V.nuove,
           usate:     V.usate,
           obiettivo: V.obiettivo,
           _v: 3,
           _ts: Date.now()
         }, {merge:false});
-      } catch(e){ console.warn("vendWrite:",e); }
-      finally{
-        // rilascia il flag dopo un breve delay (lo snapshot arriva ~200ms dopo)
-        setTimeout(()=>{ vendWriting = false; }, 600);
+        setSyncVendite("ok");
+      } catch(e){
+        console.warn("vendWrite err",e);
+        setSyncVendite("warn");
       }
     }
 
-    // Carica (o ri-carica) il mese k da Firebase, staccando il listener precedente
-    function vendLoadMonth(k){
-      if(vendUnsub){ try{vendUnsub()}catch{} vendUnsub=null; }
-      vendDocRef = null;
+    // Carica il mese k da Firebase con getDoc (lettura una tantum, zero race condition)
+    async function vendLoadMonth(k){
       V = { nuove:[], usate:[], obiettivo:0 };
-
       if(!vendCurrentUid){ renderVendite(); return; }
-
-      vendDocRef = doc(db,"users",vendCurrentUid,"venditeV3",k);
       setSyncVendite("sync");
-
-      vendUnsub = onSnapshot(vendDocRef, snap=>{
-        if(vendWriting){
-          // Ignora snapshot mentre stiamo scrivendo noi — i dati locali sono già aggiornati
-          setSyncVendite("ok");
-          return;
-        }
+      try{
+        const ref  = doc(db,"users",vendCurrentUid,"venditeV3",k);
+        const snap = await getDoc(ref);
         if(snap.exists()){
           const d = snap.data();
-          // Accetta solo array veri — ignora oggetti corrotti
           V = {
             nuove:     Array.isArray(d.nuove) ? d.nuove : [],
             usate:     Array.isArray(d.usate) ? d.usate : [],
             obiettivo: Number(d.obiettivo)||0
           };
-        } else {
-          V = { nuove:[], usate:[], obiettivo:0 };
         }
         setSyncVendite("ok");
-        renderVendite();
-      }, err=>{ console.warn("vendite err",err); setSyncVendite("warn"); });
+      } catch(e){
+        console.warn("vendLoadMonth err",e);
+        setSyncVendite("warn");
+      }
+      renderVendite();
     }
 
     function startVenditeSync(user){
@@ -1687,8 +1677,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       vendLoadMonth(vendViewKey);
     }
     function stopVenditeSync(){
-      if(vendUnsub){ try{vendUnsub()}catch{} vendUnsub=null; }
-      vendDocRef=null; vendCurrentUid=null;
+      vendCurrentUid=null;
       V={ nuove:[], usate:[], obiettivo:0 };
       vendProvvCache={};
       setSyncVendite("warn"); renderVendite();
