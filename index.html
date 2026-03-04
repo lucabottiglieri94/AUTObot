@@ -650,9 +650,9 @@
               <span id="venditeSyncBadge" class="venditeSyncBadge">Sync —</span>
             </div>
             <div class="venditeNav">
-              <button class="navArrow" id="vendPrevBtn">&#8249;</button>
+              <button class="navArrow" id="vendPrevBtn" >&#8249;</button>
               <div class="venditeMonthLabel" id="vendMonthLabel">—</div>
-              <button class="navArrow" id="vendNextBtn">&#8250;</button>
+              <button class="navArrow" id="vendNextBtn" >&#8250;</button>
             </div>
           </div>
           <div class="venditeTotali">
@@ -1584,9 +1584,8 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       else{b.className="venditeSyncBadge";b.textContent="Sync —"}
     }
 
-    $("vendPrevBtn").addEventListener("click",()=>{vendViewKey=prevMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite()});
-    // prevBtn sempre abilitato: scorrimento libero nel passato
-    $("vendNextBtn").addEventListener("click",()=>{if(vendViewKey===TODAY_KEY)return;vendViewKey=nextMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite()});
+
+
     $("tipoBtnNuova").addEventListener("click",()=>{vendTipo="nuova";$("tipoBtnNuova").classList.add("active");$("tipoBtnUsata").classList.remove("active")});
     $("tipoBtnUsata").addEventListener("click",()=>{vendTipo="usata";$("tipoBtnUsata").classList.add("active");$("tipoBtnNuova").classList.remove("active")});
     $("vendAddBtn").addEventListener("click",addAuto);
@@ -1601,6 +1600,19 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
 
     ensureMonth(TODAY_KEY);renderVendite();
     renderWeekCalendar(); // mostra i giorni anche prima del login
+
+    // Navigazione mesi vendite (definiti qui per essere dopo tutte le funzioni)
+    $("vendPrevBtn").addEventListener("click", function(){
+      vendViewKey = prevMonthKey(vendViewKey);
+      ensureMonth(vendViewKey);
+      renderVendite();
+    });
+    $("vendNextBtn").addEventListener("click", function(){
+      if(vendViewKey === TODAY_KEY) return;
+      vendViewKey = nextMonthKey(vendViewKey);
+      ensureMonth(vendViewKey);
+      renderVendite();
+    });
     (function scheduleMonthCheck(){
       const now=new Date(),next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,5);
       setTimeout(()=>{if(vendViewKey===TODAY_KEY)vendViewKey=nextMonthKey(TODAY_KEY);ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck()},Math.max(5000,next-now));
