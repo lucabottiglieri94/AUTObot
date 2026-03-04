@@ -1521,20 +1521,31 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       return diffGiorni<=10; // editabile entro 10 giorni dalla fine
     }
 
+    // Converte qualsiasi cosa (array, oggetto-mappa, null) in un array pulito
+    function toArray(val){
+      if(!val) return [];
+      if(Array.isArray(val)) return val.filter(Boolean);
+      if(typeof val==="object") return Object.values(val).filter(Boolean);
+      return [];
+    }
+
     // Normalizza tutte le chiavi months al formato "YYYY-MM" con zero padding
+    // Gestisce: chiavi "2026-2" vs "2026-02", nuove/usate come array O come oggetti Firebase
     function normalizeMonthKeys(months){
       if(!months||typeof months!=="object") return {};
       const out={};
       for(const [mk,mv] of Object.entries(months)){
+        if(!mv||typeof mv!=="object") continue;
         const parts=String(mk).split("-");
         if(parts.length===2){
           const normK=`${parts[0]}-${parts[1].padStart(2,"0")}`;
           if(!out[normK]) out[normK]={nuove:[],usate:[]};
-          // merge nel caso ci fossero duplicati
-          out[normK].nuove=[...(out[normK].nuove||[]),...(mv.nuove||[])];
-          out[normK].usate=[...(out[normK].usate||[]),...(mv.usate||[])];
+          out[normK].nuove=[...out[normK].nuove,...toArray(mv.nuove)];
+          out[normK].usate=[...out[normK].usate,...toArray(mv.usate)];
         }else{
-          out[mk]=mv;
+          if(!out[mk]) out[mk]={nuove:[],usate:[]};
+          out[mk].nuove=[...out[mk].nuove,...toArray(mv.nuove)];
+          out[mk].usate=[...out[mk].usate,...toArray(mv.usate)];
         }
       }
       return out;
@@ -1617,12 +1628,16 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       vendUnsub=onSnapshot(vendDocRef,snap=>{
         if(snap.exists()){
           const d=snap.data();
-          // Normalizza subito le chiavi appena arrivano da Firebase
-          vendState={
-            months: normalizeMonthKeys(d.months||{}),
-            obiettivo: d.obiettivo||0
-          };
+          console.log("🔥 FIREBASE RAW months keys:", Object.keys(d.months||{}));
+          const k0=Object.keys(d.months||{})[0];
+          if(k0){
+            console.log("📦 Primo mese ["+k0+"] nuove:", (d.months[k0].nuove||[]).length, "usate:", (d.months[k0].usate||[]).length);
+            if((d.months[k0].nuove||[]).length>0) console.log("🚗 Primo item nuove:", JSON.stringify(d.months[k0].nuove[0]));
+          }
+          vendState={months:normalizeMonthKeys(d.months||{}),obiettivo:d.obiettivo||0};
+          console.log("✅ DOPO normalize, vendViewKey="+vendViewKey+" => nuove:", (vendState.months[vendViewKey]||{nuove:[]}).nuove.length);
         }else{
+          console.log("❌ Documento Firebase NON esiste");
           vendState={months:{},obiettivo:0};
         }
         setSyncVendite("ok");
