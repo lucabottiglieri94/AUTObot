@@ -1070,11 +1070,24 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
   const db=getFirestore(app);
   enableIndexedDbPersistence(db).catch(()=>{});
   const provider=new GoogleAuthProvider();
-  provider.setCustomParameters({prompt:"select_account",display:"popup"});
+  provider.setCustomParameters({prompt:"select_account"});
 
-  (async function(){
-    try{await setPersistence(auth,browserLocalPersistence)}catch{try{await setPersistence(auth,browserSessionPersistence)}catch{}}
-    try{await getRedirectResult(auth)}catch{}
+  // FIX: setPersistence DEVE essere await-ato prima di tutto il resto
+  // altrimenti Firebase potrebbe usare session persistence invece di local
+  let _authReady = false;
+  const _authReadyPromise = (async()=>{
+    try{ await setPersistence(auth, browserLocalPersistence); }
+    catch{ try{ await setPersistence(auth, browserSessionPersistence); }catch{} }
+    // Gestisci il ritorno da un signInWithRedirect
+    try{
+      const redirectResult = await getRedirectResult(auth);
+      if(redirectResult?.user){
+        setStatus("✅ Login riuscito! " + redirectResult.user.email);
+      }
+    }catch(e){
+      if(e.code !== "auth/no-auth-event") setStatus("❌ " + (e.code||e.message));
+    }
+    _authReady = true;
   })();
 
   async function loadNews(){
@@ -1096,13 +1109,16 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
   $("loginBtn").addEventListener("click",async()=>{
     try{
       setStatus("🔐 Apertura login...");
-      try{const r=await signInWithPopup(auth,provider);setStatus("✅ Login riuscito! "+r.user.email)}
+      await _authReadyPromise;
+      try{const r=await signInWithPopup(auth,provider);setStatus("✅ Login riuscito! "+r.user.email);}
       catch(pe){
-        if(["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(pe.code)){setStatus("🔄 Reindirizzamento...");await signInWithRedirect(auth,provider)}
-        else throw pe;
+        if(["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(pe.code)){
+          setStatus("🔄 Reindirizzamento...");
+          await signInWithRedirect(auth,provider);
+        } else throw pe;
       }
     }catch(e){
-      let msg=e.code==="auth/unauthorized-domain"?"Dominio non autorizzato":e.code||e.message;
+      const msg=e.code==="auth/unauthorized-domain"?"Dominio non autorizzato":e.code||e.message;
       setStatus("❌ "+msg);
     }
   });
@@ -1581,6 +1597,8 @@ Nessun testo extra.`;
   ensureMonth(getTodayKey());renderVendite();
 
   /* ══ AUTH STATE ══ */
+  // Aspetta che la persistenza sia pronta prima di registrare il listener
+  _authReadyPromise.then(()=>{});
   onAuthStateChanged(auth,user=>{
     if(user){
       $("userPill").textContent="✅ "+(user.email||"Utente");
