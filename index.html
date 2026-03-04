@@ -1700,16 +1700,22 @@ ensureMonth(TODAY_KEY);renderVendite();
 renderWeekCalendar();
 
 // navigazione vendite
-window.vendGoPrev=function(){
-  vendViewKey=prevMonthKey(vendViewKey);
+window.vendGoPrev = function () {
+  console.log("vendGoPrev BEFORE", vendViewKey);
+  vendViewKey = prevMonthKey(vendViewKey);
+  console.log("vendGoPrev AFTER", vendViewKey);
   ensureMonth(vendViewKey);
   renderVendite();
 };
-window.vendGoNext=function(){
-  vendViewKey=nextMonthKey(vendViewKey);
+
+window.vendGoNext = function () {
+  console.log("vendGoNext BEFORE", vendViewKey);
+  vendViewKey = nextMonthKey(vendViewKey);
+  console.log("vendGoNext AFTER", vendViewKey);
   ensureMonth(vendViewKey);
   renderVendite();
 };
+;
 
 // mantenere il passaggio automatico al mese nuovo
 (function scheduleMonthCheck(){
