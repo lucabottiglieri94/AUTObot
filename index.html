@@ -650,9 +650,9 @@
               <span id="venditeSyncBadge" class="venditeSyncBadge">Sync —</span>
             </div>
             <div class="venditeNav">
-<button type="button" class="navArrow" id="vendPrevBtn" onclick="vendGoPrev()">&#8249;</button>
+<button  class="navArrow" id="vendPrevBtn" onclick="vendGoPrev()" type="button" onclick="vendPrevClick()">&#8249;</button>
 <div class="venditeMonthLabel" id="vendMonthLabel">—</div>
-<button type="button" class="navArrow" id="vendNextBtn" onclick="vendGoNext()">&#8250;</button>
+<button  class="navArrow" id="vendNextBtn" onclick="vendGoNext()" type="button" onclick="vendNextClick()">&#8250;</button>
             </div>
           </div>
           <div class="venditeTotali">
@@ -2530,6 +2530,92 @@ try{
   if(n) n.addEventListener("click", (ev)=>{ ev.preventDefault(); window.vendGoNext(); });
 }catch(e){ console.error("vendite nav bind error", e); }
 /* ══ FINE FIX NAVIGAZIONE VENDITE ══ */
+
+
+/* ===== VENDITE: FIX FRECCE SEQUENZIALI + START MARZO ===== */
+(function(){
+  function pad2(n){ return String(n).padStart(2,"0"); }
+  function normKey(k){
+    if(!k || typeof k!=="string") return k;
+    const parts=k.split("-");
+    if(parts.length<2) return k;
+    const y=Number(parts[0]);
+    const m=Number(parts[1]);
+    if(!y || !m) return k;
+    return `${y}-${pad2(m)}`;
+  }
+  function getMarchKeyThisYear(){
+    const y=(new Date()).getFullYear();
+    return `${y}-03`;
+  }
+  // fallback prev/next if not present
+  function prevKey(k){
+    k=normKey(k);
+    const [yS,mS]=k.split("-");
+    let y=Number(yS), m=Number(mS);
+    m--;
+    if(m<1){ m=12; y--; }
+    return `${y}-${pad2(m)}`;
+  }
+  function nextKey(k){
+    k=normKey(k);
+    const [yS,mS]=k.split("-");
+    let y=Number(yS), m=Number(mS);
+    m++;
+    if(m>12){ m=1; y++; }
+    return `${y}-${pad2(m)}`;
+  }
+  function setKey(k){
+    k=normKey(k);
+    try{ if(typeof ensureMonth==="function") ensureMonth(k); }catch(e){}
+    try{ if(typeof vendViewKey!=="undefined") vendViewKey=k; }catch(e){}
+    try{ if(typeof renderVendite==="function") renderVendite(); }catch(e){}
+  }
+
+  // Sovrascrivi le funzioni frecce: un solo passo al mese, sempre in ordine
+  window.vendPrevClick = function(){
+    try{
+      const k = (typeof prevMonthKey==="function") ? prevMonthKey(normKey(vendViewKey)) : prevKey(vendViewKey);
+      setKey(k);
+    }catch(e){ console.error("vendPrevClick", e); }
+  };
+  window.vendNextClick = function(){
+    try{
+      const k = (typeof nextMonthKey==="function") ? nextMonthKey(normKey(vendViewKey)) : nextKey(vendViewKey);
+      setKey(k);
+    }catch(e){ console.error("vendNextClick", e); }
+  };
+
+  // Elimina eventuali listener duplicati: rimpiazza i bottoni con cloni puliti
+  function rebindButtons(){
+    const prev=document.getElementById("vendPrevBtn");
+    const next=document.getElementById("vendNextBtn");
+    if(prev){
+      const p=prev.cloneNode(true);
+      p.type="button";
+      p.onclick=function(ev){ ev.preventDefault(); window.vendPrevClick(); };
+      prev.replaceWith(p);
+    }
+    if(next){
+      const n=next.cloneNode(true);
+      n.type="button";
+      n.onclick=function(ev){ ev.preventDefault(); window.vendNextClick(); };
+      next.replaceWith(n);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    // Start fisso a Marzo (come richiesto)
+    try{
+      const startKey = getMarchKeyThisYear();
+      if(typeof ensureMonth==="function") ensureMonth(startKey);
+      if(typeof vendViewKey!=="undefined") vendViewKey = startKey;
+    }catch(e){}
+    rebindButtons();
+    setKey(typeof vendViewKey!=="undefined" ? vendViewKey : getMarchKeyThisYear());
+  });
+})();
+ /* ===== FINE FIX VENDITE ===== */
 
 </script>
 </body>
