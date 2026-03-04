@@ -966,10 +966,10 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     function renderWeekCalendar(){
       const grid=$("weekGrid"),range=$("weekRange");
       if(!grid||!range)return;
-      if(!auth.currentUser){range.textContent="Login richiesto";grid.innerHTML="";return}
+      // I giorni si mostrano sempre, i task solo se loggato
       const base=startOfWeekMonday(new Date());
       range.textContent=fmtRange(base,addDays(base,6));
-      const allTasks=Object.values(SYNC.data.tasks||{});
+      const allTasks=auth.currentUser?Object.values(SYNC.data.tasks||{}):[];
       const todayKey=dateKey(new Date());
       const dows=["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
       grid.innerHTML=Array.from({length:7}).map((_,i)=>{
@@ -1484,17 +1484,39 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       else{manca.textContent="Mancano "+fmtEur(target-provvMese)+" all'obiettivo";manca.className="progressManca"}
     }
 
+    // Controlla se un mese è ancora editabile (mese corrente O entro 10 giorni dalla fine)
+    function isMeseEditabile(k){
+      if(k===TODAY_KEY) return true;
+      // Calcola fine mese: ultimo giorno del mese k
+      const [y,m]=k.split("-").map(Number);
+      const fineMese=new Date(y,m,0); // giorno 0 del mese successivo = ultimo del mese corrente
+      const oggi=new Date(); oggi.setHours(0,0,0,0);
+      const diffGiorni=Math.round((oggi-fineMese)/(1000*60*60*24));
+      return diffGiorni<=10; // editabile entro 10 giorni dalla fine
+    }
+
     function renderVendite(){
       const k=vendViewKey;ensureMonth(k);
       const mese=vendState.months[k],nuove=mese.nuove||[],usate=mese.usate||[];
       const isCurrent=(k===TODAY_KEY);
-      $("vendMonthLabel").innerHTML=escapeHtml(monthLabel(k))+(isCurrent?' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>':"");
+      const editabile=isMeseEditabile(k);
+      $("vendMonthLabel").innerHTML=escapeHtml(monthLabel(k))
+        +(isCurrent?' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>':"")
+        +(!isCurrent&&editabile?' <span style="color:#fbbf24;font-weight:700;font-size:11px;">✏ editabile</span>':"")
+        +(!editabile?' <span style="color:#ef4444;font-weight:700;font-size:10px;">🔒 chiuso</span>':"");
       $("vendNextBtn").disabled=(k===TODAY_KEY);
-      $("vendPrevBtn").disabled=false; // libero scorrimento all'indietro
+      $("vendPrevBtn").disabled=false; // sempre libero scorrere indietro
       $("totNuove").textContent=nuove.length;$("totUsate").textContent=usate.length;$("totAll").textContent=nuove.length+usate.length;
       $("cntNuove").textContent=nuove.length;$("cntUsate").textContent=usate.length;
-      $("listNuove").innerHTML=nuove.length?nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova")).join(""):'<div class="emptyList">Nessuna auto nuova</div>';
-      $("listUsate").innerHTML=usate.length?usate.map((c,i)=>autoItemHTML(c,i+1,"usata")).join(""):'<div class="emptyList">Nessuna auto usata</div>';
+      $("listNuove").innerHTML=nuove.length?nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova",editabile)).join(""):'<div class="emptyList">Nessuna auto nuova</div>';
+      $("listUsate").innerHTML=usate.length?usate.map((c,i)=>autoItemHTML(c,i+1,"usata",editabile)).join(""):'<div class="emptyList">Nessuna auto usata</div>';
+      // Mostra/nascondi form aggiunta
+      const vendForm=document.querySelector(".venditeForm");
+      if(vendForm){
+        vendForm.style.opacity=editabile?"1":"0.4";
+        vendForm.style.pointerEvents=editabile?"auto":"none";
+        vendForm.title=editabile?"":"Mese chiuso - non modificabile";
+      }
       document.querySelectorAll(".autoDelBtn").forEach(btn=>btn.addEventListener("click",()=>deleteAuto(k,btn.dataset.tipo,btn.dataset.id)));
       const pNuove=sumProvv(nuove),pUsate=sumProvv(usate),pTot=pNuove+pUsate;
       $("provvMeseTot").textContent=fmtEur(pTot);
@@ -1506,16 +1528,22 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       renderObiettivo(pTot);
     }
 
-    function autoItemHTML(c,n,tipo){
+    function autoItemHTML(c,n,tipo,editabile=true){
       const p=Number(c.provv)||0,pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—",cls=p>0?"autoProvv":"autoProvv zero";
-      return`<div class="autoItem"><span class="autoN">#${n}</span><span class="autoModello">${escapeHtml(c.modello)}</span><span class="${cls}">${pStr}</span><button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button></div>`;
+      const delBtn=editabile?`<button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>`:'<span style="width:24px;display:inline-block"></span>';
+      return`<div class="autoItem"><span class="autoN">#${n}</span><span class="autoModello">${escapeHtml(c.modello)}</span><span class="${cls}">${pStr}</span>${delBtn}</div>`;
     }
 
     async function vendWrite(){if(!vendDocRef)return;try{await setDoc(vendDocRef,vendState,{merge:false})}catch{}}
     async function addAuto(){
       const modello=$("vendModello").value.trim();if(!modello)return;
+      const k=vendViewKey;
+      if(!isMeseEditabile(k)){
+        alert("⏰ Questo mese è chiuso (più di 10 giorni fa). Non puoi aggiungere vendite.");
+        return;
+      }
       const provv=parseFloat($("vendProvv").value)||0;
-      const k=vendViewKey;ensureMonth(k);
+      ensureMonth(k);
       const id=vendUid(),entry={id,modello,provv,createdAt:Date.now()};
       if(vendTipo==="nuova")vendState.months[k].nuove.push(entry);
       else vendState.months[k].usate.push(entry);
@@ -1523,6 +1551,10 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       renderVendite();await vendWrite();
     }
     async function deleteAuto(k,tipo,id){
+      if(!isMeseEditabile(k)){
+        alert("⏰ Questo mese è chiuso. Non puoi modificare le vendite.");
+        return;
+      }
       ensureMonth(k);
       const list=tipo==="nuova"?vendState.months[k].nuove:vendState.months[k].usate;
       const idx=list.findIndex(c=>c.id===id);if(idx!==-1)list.splice(idx,1);
@@ -1568,6 +1600,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     });
 
     ensureMonth(TODAY_KEY);renderVendite();
+    renderWeekCalendar(); // mostra i giorni anche prima del login
     (function scheduleMonthCheck(){
       const now=new Date(),next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,5);
       setTimeout(()=>{if(vendViewKey===TODAY_KEY)vendViewKey=nextMonthKey(TODAY_KEY);ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck()},Math.max(5000,next-now));
@@ -1581,7 +1614,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         $("userPill").style.borderColor="rgba(34,197,94,.5)";
         $("userPill").style.background="rgba(34,197,94,.1)";
         $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";$("refreshBtn").disabled=false;
-        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();
+        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();renderWeekCalendar();
       }else{
         $("userPill").textContent="🔒 Non autenticato";
         $("userPill").classList.add("muted");
@@ -1698,7 +1731,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         const pct = checks.length ? Math.round(doneCnt/checks.length*100) : 0;
         const dcls = consegnaDateClass(con.data);
         return `<div class="consegnaCard" id="cc_${con.id}">
-          <div class="consegnaHead" onclick="toggleConsegna('${con.id}')" style="cursor:pointer;">
+          <div class="consegnaHead" onclick="toggleConsegna('${con.id}', event)" style="cursor:pointer;">
             <div class="consegnaDate ${dcls}">${dcls==="oggi"?"📦 OGGI":dcls==="scaduta"?"⚠ SCADUTA":"📅"} ${consegnaFmtDate(con.data)}</div>
             <div style="flex:1;min-width:0">
               <div class="consegnaModello">${escapeHtml(con.modello||"")}</div>
@@ -1710,24 +1743,24 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
           <div class="consegnaBody" id="cbody_${con.id}" style="display:none;">
             <div class="consegnaChecks">
               ${checks.map((ch,i) => `
-                <div class="consegnaCheckItem" style="display:flex;align-items:center;gap:8px;">
-                  <input type="checkbox" class="consegnaCheckBox" ${ch.done?"checked":""} onchange="toggleConsegnaCheck('${con.id}',${i},this.checked)"/>
+                <div class="consegnaCheckItem" onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:8px;">
+                  <input type="checkbox" class="consegnaCheckBox" ${ch.done?"checked":""} onchange="event.stopPropagation();toggleConsegnaCheck('${con.id}',${i},this.checked)"/>
                   <span class="consegnaCheckLabel${ch.done?" done":""}" style="flex:1;">${escapeHtml(ch.text)}</span>
-                  <button onclick="toggleConsegnaCheck('${con.id}',${i},!${ch.done})" title="${ch.done?'Segna non fatto':'Segna fatto'}" style="width:22px;height:22px;border-radius:6px;border:1px solid ${ch.done?'rgba(34,197,94,.5)':'rgba(34,197,94,.25)'};background:${ch.done?'rgba(34,197,94,.18)':'rgba(34,197,94,.06)'};color:#6ee7b7;cursor:pointer;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</button>
-                  <button onclick="deleteConsegnaCheck('${con.id}',${i})" title="Rimuovi voce" style="width:22px;height:22px;border-radius:6px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.07);color:#fca5a5;cursor:pointer;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
+                  <button onclick="event.stopPropagation();toggleConsegnaCheck('${con.id}',${i},!${ch.done})" title="${ch.done?'Segna non fatto':'Segna fatto'}" style="width:22px;height:22px;border-radius:6px;border:1px solid ${ch.done?'rgba(34,197,94,.5)':'rgba(34,197,94,.25)'};background:${ch.done?'rgba(34,197,94,.18)':'rgba(34,197,94,.06)'};color:#6ee7b7;cursor:pointer;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</button>
+                  <button onclick="event.stopPropagation();deleteConsegnaCheck('${con.id}',${i})" title="Rimuovi voce" style="width:22px;height:22px;border-radius:6px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.07);color:#fca5a5;cursor:pointer;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
                 </div>`).join("")}
             </div>
-            <div class="consegnaProgress">
+            <div class="consegnaProgress" onclick="event.stopPropagation()">
               <div class="consegnaProgressBar"><div class="consegnaProgressFill" style="width:${pct}%"></div></div>
               <span>${pct}% completato</span>
             </div>
             <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-              <button onclick="consegnataPostVendita('${con.id}')"
+              <button onclick="event.stopPropagation();consegnataPostVendita('${con.id}')"
                 style="flex:1;padding:8px;border:1px solid rgba(34,197,94,.4);background:rgba(34,197,94,.1);border-radius:9px;color:#6ee7b7;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;"
                 onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
                 ✅ Consegnata! → Sposta in Post-Vendita
               </button>
-              <button onclick="deleteConsegna('${con.id}')"
+              <button onclick="event.stopPropagation();deleteConsegna('${con.id}')"
                 style="padding:8px 14px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);border-radius:9px;color:#fca5a5;font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s;"
                 onmouseover="this.style.background='rgba(239,68,68,.14)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">
                 🗑 Elimina
@@ -1739,7 +1772,14 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       renderOggi();
     }
 
-    window.toggleConsegna = function(id){
+    window.toggleConsegna = function(id, event){
+      // Non chiudere se il click viene da checkbox, button o label interni
+      if(event && event.target && (
+        event.target.tagName === 'INPUT' ||
+        event.target.tagName === 'BUTTON' ||
+        event.target.closest('button') ||
+        event.target.closest('.consegnaCheckItem')
+      )) return;
       const body  = document.getElementById("cbody_"+id);
       const chev  = document.getElementById("chev_"+id);
       if(!body) return;
