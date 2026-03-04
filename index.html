@@ -67,13 +67,6 @@
     .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
     .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
 
-    .weekPanel{border-top:1px solid var(--line);padding:12px;background:rgba(0,0,0,.2)}
-    .weekHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-    .weekTitle{font-weight:950;font-size:16px}
-    .weekSub{color:#9ca3af;font-size:12px}
-    .weekGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-    .weekCell{aspect-ratio:1/1;border:1px solid var(--line);background:var(--bg2);border-radius:11px;padding:8px;overflow:hidden;display:flex;flex-direction:column;gap:5px}
-    .weekCell.today{border-color:rgba(249,115,22,.55);box-shadow:0 0 0 3px rgba(249,115,22,.10) inset}
     .weekTop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
     .weekDow{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase}
     .weekDay{font-size:16px;font-weight:950}
@@ -437,16 +430,12 @@
         </div>
         <div class="newsScroll" id="newsScrollBox"><div id="newsList"></div></div>
 
-        <!-- CALENDARIO SETTIMANALE -->
-        <div class="weekPanel">
-          <div class="weekHead" style="background:transparent;">
-            <div>
-              <div class="weekTitle">🗓 Calendario settimanale</div>
-              <div class="weekSub">Task dell'agenda nella settimana corrente</div>
-            </div>
-            <div id="weekRange" class="pill muted">—</div>
+        <!-- SEPARATORE iMessage style -->
+        <div style="margin:0 12px;padding:18px 0 6px;">
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:14px 18px;display:flex;align-items:center;gap:10px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;box-shadow:0 0 8px rgba(34,197,94,.6);"></div>
+            <div style="font-size:13px;color:#9ca3af;font-weight:600;letter-spacing:.2px;">Gestione consegne e follow-up</div>
           </div>
-          <div id="weekGrid" class="weekGrid"></div>
         </div>
 
         <!-- PRE-CONSEGNA -->
