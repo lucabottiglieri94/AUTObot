@@ -648,8 +648,6 @@
             <div class="venditeTitleRow">
               <div class="venditeTitle">🚗 Vendite mensili</div>
               <span id="venditeSyncBadge" class="venditeSyncBadge">Sync —</span>
-              <button id="vendAzzeraBtn" class="btn" style="font-size:11px;padding:4px 9px;border-color:rgba(239,68,68,.3);color:#fca5a5;background:rgba(239,68,68,.07);"
-                title="Cancella tutti i dati vecchi corrotti e riparte da zero">🗑 Azzera vecchi dati</button>
             </div>
             <div class="venditeNav">
 <button class="navArrow" id="vendPrevBtn">&#8249;</button>
@@ -1459,314 +1457,173 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     $("cmpInput2").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();runComparatore()}});
 
     /* ══ VENDITE MENSILI ══ */
-    /* ══════════════════════════════════════════════════════════════
-       VENDITE MENSILI v3 — architettura per-documento-per-mese
-       Firebase: users/{uid}/venditeV3/{YYYY-MM}
-       Documento: { nuove:[{id,modello,provv,createdAt},...], usate:[...], obiettivo:0 }
-       - nessun array annidato in oggetto
-       - nessun unico documento gigante
-       - navigazione cambia ascolto Firebase
-    ══════════════════════════════════════════════════════════════ */
+    /* ══ VENDITE MENSILI ══
+       Regola d'oro: lo stato vive in vendState (in memoria).
+       Firebase si usa SOLO per: caricare al login (getDoc) e salvare dopo ogni modifica (setDoc).
+       MAI onSnapshot sulle vendite → zero race condition, zero sovrascritture.
+    */
+    let vendState = {months:{}, obiettivo:0};
+    let vendTipo  = "nuova";
+    let vendUID   = null; // uid utente loggato
 
     const TODAY_KEY = (()=>{
-      const n = new Date();
+      const n=new Date();
       return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`;
     })();
+    let vendViewKey = TODAY_KEY;
 
-    let vendViewKey   = TODAY_KEY;
-    let vendTipo      = "nuova";
-    let vendDocRef    = null;
-    let vendCurrentUid = null;
-
-    // Stato locale del mese visualizzato
-    let V = { nuove:[], usate:[], obiettivo:0 };
-
-    // Cache provvigioni per totale annuale { "2026-01": 120, "2026-02": 340, ... }
-    let vendProvvCache = {};
-
-    function monthLabel(k){
-      const [y,m] = k.split("-").map(Number);
-      const l = new Date(y,m-1,1).toLocaleDateString("it-IT",{month:"long",year:"numeric"});
-      return l.charAt(0).toUpperCase()+l.slice(1);
-    }
-    function prevMonthKey(k){
-      const [y,m] = k.split("-").map(Number);
-      const d = new Date(y,m-2,1);
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
-    }
-    function nextMonthKey(k){
-      const [y,m] = k.split("-").map(Number);
-      const d = new Date(y,m,1);
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
-    }
-    function vendUid(){ return Math.random().toString(16).slice(2)+Date.now().toString(16); }
-    function sumProvv(list){ return (list||[]).reduce((s,c)=>s+(Number(c.provv)||0), 0); }
-    function fmtEur(n){ return "€ "+n.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0}); }
+    function monthLabel(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-1,1);const l=d.toLocaleDateString("it-IT",{month:"long",year:"numeric"});return l.charAt(0).toUpperCase()+l.slice(1)}
+    function prevMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-2,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
+    function nextMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
+    function vendUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
+    function ensureMonth(k){if(!vendState.months[k])vendState.months[k]={nuove:[],usate:[]}}
+    function sumProvv(list){return(list||[]).reduce((s,c)=>s+(Number(c.provv)||0),0)}
+    function fmtEur(n){return"€ "+n.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0})}
     function isMeseEditabile(k){
       if(k===TODAY_KEY) return true;
-      const [y,m] = k.split("-").map(Number);
-      const fine  = new Date(y,m,0);
-      const oggi  = new Date(); oggi.setHours(0,0,0,0);
-      return Math.round((oggi-fine)/864e5) <= 10;
+      const[y,m]=k.split("-").map(Number);
+      const fine=new Date(y,m,0); const oggi=new Date(); oggi.setHours(0,0,0,0);
+      return Math.round((oggi-fine)/864e5)<=10;
     }
 
     function setSyncVendite(s){
-      const b = $("venditeSyncBadge");
-      if(!b) return;
-      if(s==="ok"){ b.className="venditeSyncBadge ok"; b.textContent="Sync ✓"; }
-      else if(s==="sync"){ b.className="venditeSyncBadge"; b.textContent="Sync …"; }
-      else { b.className="venditeSyncBadge"; b.textContent="Sync —"; }
+      const b=$("venditeSyncBadge");
+      if(s==="ok"){b.className="venditeSyncBadge ok";b.textContent="Sync ✓"}
+      else if(s==="sync"){b.className="venditeSyncBadge";b.textContent="Sync …"}
+      else{b.className="venditeSyncBadge";b.textContent="Sync —"}
     }
 
     function renderObiettivo(provvMese){
-      const target = V.obiettivo||0;
-      const inp = $("obiettivoInput");
-      if(inp && document.activeElement!==inp) inp.value = target>0?target:"";
-      const fill=$("progressFill"), pct=$("progressPct"), manca=$("progressManca");
-      if(!fill) return;
-      if(!target||target<=0){
-        fill.style.width="0%"; fill.className="progressFill low";
-        pct.textContent="0%"; pct.className="progressPct low";
-        manca.textContent="Imposta un obiettivo ↑"; manca.className="progressManca";
-        return;
-      }
-      const ratio  = Math.min(provvMese/target,1);
-      const pctVal = Math.round(ratio*100);
-      const tier   = pctVal>=100?"done":pctVal>=66?"high":pctVal>=33?"mid":"low";
-      fill.style.width = (ratio*100).toFixed(1)+"%"; fill.className="progressFill "+tier;
-      pct.textContent  = pctVal+"%"; pct.className="progressPct "+tier;
-      if(pctVal>=100){
-        manca.textContent = "🎉 Obiettivo raggiunto! +"+fmtEur(provvMese-target)+" extra";
-        manca.className = "progressManca done";
-      } else {
-        manca.textContent = "Mancano "+fmtEur(target-provvMese)+" all'obiettivo";
-        manca.className = "progressManca";
-      }
+      const target=vendState.obiettivo||0;
+      const inp=$("obiettivoInput");
+      if(document.activeElement!==inp)inp.value=target>0?target:"";
+      const fill=$("progressFill"),pct=$("progressPct"),manca=$("progressManca");
+      if(!target||target<=0){fill.style.width="0%";fill.className="progressFill low";pct.textContent="0%";pct.className="progressPct low";manca.textContent="Imposta un obiettivo ↑";manca.className="progressManca";return}
+      const ratio=Math.min(provvMese/target,1);const pctVal=Math.round(ratio*100);
+      const tier=pctVal>=100?"done":pctVal>=66?"high":pctVal>=33?"mid":"low";
+      fill.style.width=(ratio*100).toFixed(1)+"%";fill.className="progressFill "+tier;
+      pct.textContent=pctVal+"%";pct.className="progressPct "+tier;
+      if(pctVal>=100){manca.textContent="🎉 Obiettivo raggiunto! +"+fmtEur(provvMese-target)+" extra";manca.className="progressManca done"}
+      else{manca.textContent="Mancano "+fmtEur(target-provvMese)+" all'obiettivo";manca.className="progressManca"}
     }
 
-    function autoItemHTML(c, n, tipo, editabile){
-      const p    = Number(c.provv)||0;
-      const pStr = p>0 ? "€ "+p.toLocaleString("it-IT") : "—";
-      const cls  = p>0 ? "autoProvv" : "autoProvv zero";
-      const del  = editabile
-        ? `<button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>`
-        : `<span style="width:24px;display:inline-block"></span>`;
-      return `<div class="autoItem">
-                <span class="autoN">#${n}</span>
-                <span class="autoModello">${escapeHtml(c.modello)}</span>
-                <span class="${cls}">${pStr}</span>
-                ${del}
-              </div>`;
+    function autoItemHTML(c,n,tipo,editabile){
+      const p=Number(c.provv)||0,pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—",cls=p>0?"autoProvv":"autoProvv zero";
+      const delBtn=editabile?`<button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>`:'<span style="width:24px;display:inline-block"></span>';
+      return`<div class="autoItem"><span class="autoN">#${n}</span><span class="autoModello">${escapeHtml(c.modello)}</span><span class="${cls}">${pStr}</span>${delBtn}</div>`;
     }
 
     function renderVendite(){
-      const k        = vendViewKey;
-      const nuove    = V.nuove  || [];
-      const usate    = V.usate  || [];
-      const editabile = isMeseEditabile(k);
-      const isCurrent = (k===TODAY_KEY);
-
-      const ml = $("vendMonthLabel");
-      if(ml) ml.innerHTML = escapeHtml(monthLabel(k))
-        + (isCurrent   ? ' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>' : "")
-        + (!isCurrent&&editabile ? ' <span style="color:#fbbf24;font-weight:700;font-size:11px;">✏ editabile</span>' : "")
-        + (!editabile  ? ' <span style="color:#ef4444;font-weight:700;font-size:10px;">🔒 chiuso</span>' : "");
-
-      const pb = $("vendPrevBtn"), nb = $("vendNextBtn");
-      if(pb) pb.disabled = false;
-      if(nb) nb.disabled = isCurrent;
-
-      const tn=$("totNuove"), tu=$("totUsate"), ta=$("totAll");
-      const cn=$("cntNuove"), cu=$("cntUsate");
-      if(tn) tn.textContent=nuove.length;
-      if(tu) tu.textContent=usate.length;
-      if(ta) ta.textContent=nuove.length+usate.length;
-      if(cn) cn.textContent=nuove.length;
-      if(cu) cu.textContent=usate.length;
-
-      const ln=$("listNuove"), lu=$("listUsate");
-      if(ln) ln.innerHTML = nuove.length
-        ? nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova",editabile)).join("")
-        : '<div class="emptyList">Nessuna auto nuova</div>';
-      if(lu) lu.innerHTML = usate.length
-        ? usate.map((c,i)=>autoItemHTML(c,i+1,"usata",editabile)).join("")
-        : '<div class="emptyList">Nessuna auto usata</div>';
-
-      // Bottoni elimina
+      const k=vendViewKey; ensureMonth(k);
+      const nuove=vendState.months[k].nuove||[], usate=vendState.months[k].usate||[];
+      const editabile=isMeseEditabile(k), isCurrent=(k===TODAY_KEY);
+      $("vendMonthLabel").innerHTML=escapeHtml(monthLabel(k))
+        +(isCurrent?' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>':"")
+        +(!isCurrent&&editabile?' <span style="color:#fbbf24;font-weight:700;font-size:11px;">✏ editabile</span>':"")
+        +(!editabile?' <span style="color:#ef4444;font-weight:700;font-size:10px;">🔒 chiuso</span>':"");
+      $("vendPrevBtn").disabled=false;
+      $("vendNextBtn").disabled=isCurrent;
+      $("totNuove").textContent=nuove.length;$("totUsate").textContent=usate.length;$("totAll").textContent=nuove.length+usate.length;
+      $("cntNuove").textContent=nuove.length;$("cntUsate").textContent=usate.length;
+      $("listNuove").innerHTML=nuove.length?nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova",editabile)).join(""):'<div class="emptyList">Nessuna auto nuova</div>';
+      $("listUsate").innerHTML=usate.length?usate.map((c,i)=>autoItemHTML(c,i+1,"usata",editabile)).join(""):'<div class="emptyList">Nessuna auto usata</div>';
       document.querySelectorAll(".autoDelBtn").forEach(btn=>{
-        btn.onclick = ()=> deleteAuto(btn.dataset.tipo, btn.dataset.id);
+        btn.onclick=()=>deleteAuto(btn.dataset.tipo,btn.dataset.id);
       });
-
-      // Form visibilità
-      const vf = document.querySelector(".venditeForm");
-      if(vf){
-        vf.style.opacity       = editabile?"1":"0.35";
-        vf.style.pointerEvents = editabile?"auto":"none";
-        vf.title               = editabile?"":"Mese chiuso — non modificabile";
-      }
-
-      // Provvigioni mese
-      const pN=sumProvv(nuove), pU=sumProvv(usate), pTot=pN+pU;
-      const pmt=$("provvMeseTot"), pms=$("provvMeseSplit");
-      if(pmt) pmt.textContent = fmtEur(pTot);
-      if(pms) pms.textContent = pN>0&&pU>0
-        ? `🆕 ${fmtEur(pN)}  ·  🔄 ${fmtEur(pU)}`
-        : pN>0?"🆕 Tutte da auto nuove" : pU>0?"🔄 Tutte da auto usate" : "Nessuna provvigione inserita";
-
-      // Aggiorna cache e calcola totale 2026
-      vendProvvCache[k] = pTot;
-      let tot2026=0, mesi2026=0;
-      Object.entries(vendProvvCache).forEach(([mk,pv])=>{
-        if(!mk.startsWith("2026")) return;
-        tot2026+=pv; if(pv>0) mesi2026++;
-      });
-      const p2t=$("provv2026Tot"), p2m=$("provv2026Mesi");
-      if(p2t) p2t.textContent = fmtEur(tot2026);
-      if(p2m) p2m.textContent = mesi2026===0?"Nessun mese con provvigioni"
-        : mesi2026===1?"1 mese con provvigioni":mesi2026+" mesi con provvigioni";
-
+      const vendForm=document.querySelector(".venditeForm");
+      if(vendForm){vendForm.style.opacity=editabile?"1":"0.4";vendForm.style.pointerEvents=editabile?"auto":"none";}
+      const pN=sumProvv(nuove),pU=sumProvv(usate),pTot=pN+pU;
+      $("provvMeseTot").textContent=fmtEur(pTot);
+      $("provvMeseSplit").textContent=pN>0&&pU>0?`🆕 ${fmtEur(pN)}  ·  🔄 ${fmtEur(pU)}`:pN>0?"🆕 Tutte da auto nuove":pU>0?"🔄 Tutte da auto usate":"Nessuna provvigione inserita";
+      let tot2026=0,mesi2026=0;
+      Object.entries(vendState.months).forEach(([mk,mv])=>{if(!mk.startsWith("2026"))return;const mP=sumProvv(mv.nuove||[])+sumProvv(mv.usate||[]);tot2026+=mP;if(mP>0)mesi2026++;});
+      $("provv2026Tot").textContent=fmtEur(tot2026);
+      $("provv2026Mesi").textContent=mesi2026===0?"Nessun mese con provvigioni":mesi2026===1?"1 mese con provvigioni":mesi2026+" mesi con provvigioni";
       renderObiettivo(pTot);
     }
 
-    // Scrive il mese corrente su Firebase (senza onSnapshot — zero race condition)
-    async function vendWrite(){
-      if(!vendCurrentUid) return;
-      setSyncVendite("sync");
-      try{
-        const ref = doc(db,"users",vendCurrentUid,"venditeV3",vendViewKey);
-        await setDoc(ref, {
-          nuove:     V.nuove,
-          usate:     V.usate,
-          obiettivo: V.obiettivo,
-          _v: 3,
-          _ts: Date.now()
-        }, {merge:false});
-        setSyncVendite("ok");
-      } catch(e){
-        console.warn("vendWrite err",e);
-        setSyncVendite("warn");
-      }
-    }
-
-    // Carica il mese k da Firebase con getDoc (lettura una tantum, zero race condition)
-    async function vendLoadMonth(k){
-      V = { nuove:[], usate:[], obiettivo:0 };
-      if(!vendCurrentUid){ renderVendite(); return; }
-      setSyncVendite("sync");
-      try{
-        const ref  = doc(db,"users",vendCurrentUid,"venditeV3",k);
-        const snap = await getDoc(ref);
-        if(snap.exists()){
-          const d = snap.data();
-          V = {
-            nuove:     Array.isArray(d.nuove) ? d.nuove : [],
-            usate:     Array.isArray(d.usate) ? d.usate : [],
-            obiettivo: Number(d.obiettivo)||0
-          };
-        }
-        setSyncVendite("ok");
-      } catch(e){
-        console.warn("vendLoadMonth err",e);
-        setSyncVendite("warn");
-      }
-      renderVendite();
-    }
-
-    function startVenditeSync(user){
-      vendCurrentUid = user.uid;
-      vendLoadMonth(vendViewKey);
-    }
-    function stopVenditeSync(){
-      vendCurrentUid=null;
-      V={ nuove:[], usate:[], obiettivo:0 };
-      vendProvvCache={};
-      setSyncVendite("warn"); renderVendite();
+    // Salva su Firebase in background — non blocca la UI, non rilegge mai
+    function vendSave(){
+      if(!vendUID) return;
+      const ref=doc(db,"users",vendUID,"vendite","data");
+      setDoc(ref,vendState,{merge:false}).then(()=>setSyncVendite("ok")).catch(()=>setSyncVendite("warn"));
     }
 
     async function addAuto(){
-      const modello = $("vendModello").value.trim();
-      if(!modello) return;
-      if(!isMeseEditabile(vendViewKey)){ alert("⏰ Mese chiuso, non puoi aggiungere vendite."); return; }
-      if(!vendCurrentUid){ alert("Fai il login prima!"); return; }
-      const provv  = parseFloat($("vendProvv").value)||0;
-      const entry  = { id:vendUid(), modello, provv, createdAt:Date.now() };
-      if(vendTipo==="nuova") V.nuove.push(entry);
-      else                   V.usate.push(entry);
+      const modello=$("vendModello").value.trim(); if(!modello) return;
+      if(!isMeseEditabile(vendViewKey)){alert("⏰ Mese chiuso.");return;}
+      const provv=parseFloat($("vendProvv").value)||0;
+      ensureMonth(vendViewKey);
+      vendState.months[vendViewKey][vendTipo==="nuova"?"nuove":"usate"].push({id:vendUid(),modello,provv,createdAt:Date.now()});
       $("vendModello").value=""; $("vendProvv").value="";
-      renderVendite();
-      await vendWrite();
+      renderVendite();   // <-- mostra subito, SENZA aspettare Firebase
+      vendSave();        // <-- salva in background, non blocca nulla
     }
 
-    async function deleteAuto(tipo, id){
-      if(!isMeseEditabile(vendViewKey)){ alert("⏰ Mese chiuso, non puoi eliminare."); return; }
-      const list = tipo==="nuova" ? V.nuove : V.usate;
-      const idx  = list.findIndex(c=>c.id===id);
-      if(idx!==-1) list.splice(idx,1);
+    function deleteAuto(tipo,id){
+      if(!isMeseEditabile(vendViewKey)){alert("⏰ Mese chiuso.");return;}
+      const list=vendState.months[vendViewKey][tipo==="nuova"?"nuove":"usate"];
+      const idx=list.findIndex(c=>c.id===id); if(idx!==-1) list.splice(idx,1);
       renderVendite();
-      await vendWrite();
+      vendSave();
     }
 
-    // ── listener UI ────────────────────────────────────────────────────────
-    $("tipoBtnNuova").addEventListener("click",()=>{
-      vendTipo="nuova";
-      $("tipoBtnNuova").classList.add("active");
-      $("tipoBtnUsata").classList.remove("active");
-    });
-    $("tipoBtnUsata").addEventListener("click",()=>{
-      vendTipo="usata";
-      $("tipoBtnUsata").classList.add("active");
-      $("tipoBtnNuova").classList.remove("active");
-    });
-    $("vendAddBtn").addEventListener("click", addAuto);
-    $("vendModello").addEventListener("keypress",e=>{ if(e.key==="Enter"){ e.preventDefault(); addAuto(); }});
-    $("vendProvv").addEventListener("keypress",  e=>{ if(e.key==="Enter"){ e.preventDefault(); addAuto(); }});
-
-    $("vendPrevBtn").addEventListener("click",()=>{
-      vendViewKey = prevMonthKey(vendViewKey);
-      vendLoadMonth(vendViewKey);
-    });
-    $("vendNextBtn").addEventListener("click",()=>{
-      if(vendViewKey===TODAY_KEY) return;
-      vendViewKey = nextMonthKey(vendViewKey);
-      vendLoadMonth(vendViewKey);
-    });
-
-    $("obiettivoInput").addEventListener("input", async()=>{
-      V.obiettivo = parseFloat($("obiettivoInput").value)||0;
-      renderObiettivo(sumProvv(V.nuove)+sumProvv(V.usate));
-      await vendWrite();
-    });
-
-    // Azzera dati vecchi corrotti
-    $("vendAzzeraBtn").addEventListener("click", async()=>{
-      if(!vendCurrentUid){ alert("Fai il login prima!"); return; }
-      const ok = confirm("⚠️ Sei sicuro? Questo cancella TUTTI i dati delle vendite salvati in precedenza (quelli corrotti che non si vedevano).\n\nI dati nuovi che inserirai d'ora in poi funzioneranno perfettamente.");
-      if(!ok) return;
-      // Azzera il mese visualizzato nella nuova collezione
-      V = { nuove:[], usate:[], obiettivo:0 };
-      if(vendDocRef){
-        try{ await setDoc(vendDocRef,{nuove:[],usate:[],obiettivo:0,_v:3,_ts:Date.now()},{merge:false}); } catch{}
-      }
-      vendProvvCache = {};
+    // Carica dati da Firebase al login (UNA sola lettura)
+    async function startVenditeSync(user){
+      vendUID=user.uid;
+      setSyncVendite("sync");
+      try{
+        const snap=await getDoc(doc(db,"users",user.uid,"vendite","data"));
+        if(snap.exists()){
+          const d=snap.data();
+          // Normalizza: converte oggetti Firebase {0:..} in array reali
+          const fix=arr=>{
+            if(!arr) return [];
+            if(Array.isArray(arr)) return arr;
+            return Object.values(arr);
+          };
+          const months={};
+          if(d.months && typeof d.months==="object"){
+            for(const[mk,mv] of Object.entries(d.months)){
+              const normK=mk.includes("-")?mk.split("-").map((p,i)=>i===1?p.padStart(2,"0"):p).join("-"):mk;
+              months[normK]={nuove:fix(mv.nuove),usate:fix(mv.usate)};
+            }
+          }
+          vendState={months, obiettivo:Number(d.obiettivo)||0};
+        }
+        setSyncVendite("ok");
+      }catch(e){console.warn("vendite load err",e);setSyncVendite("warn");}
+      ensureMonth(TODAY_KEY);
       renderVendite();
-      alert("✅ Dati azzerati! Ora puoi inserire le tue vendite da capo.");
+    }
+
+    function stopVenditeSync(){
+      vendUID=null; vendState={months:{},obiettivo:0};
+      setSyncVendite("warn"); renderVendite();
+    }
+
+    $("tipoBtnNuova").addEventListener("click",()=>{vendTipo="nuova";$("tipoBtnNuova").classList.add("active");$("tipoBtnUsata").classList.remove("active")});
+    $("tipoBtnUsata").addEventListener("click",()=>{vendTipo="usata";$("tipoBtnUsata").classList.add("active");$("tipoBtnNuova").classList.remove("active")});
+    $("vendAddBtn").addEventListener("click",addAuto);
+    $("vendModello").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
+    $("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
+    $("vendPrevBtn").addEventListener("click",()=>{vendViewKey=prevMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite();});
+    $("vendNextBtn").addEventListener("click",()=>{if(vendViewKey===TODAY_KEY)return;vendViewKey=nextMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite();});
+    $("obiettivoInput").addEventListener("input",()=>{
+      vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
+      renderObiettivo(sumProvv(vendState.months[vendViewKey]?.nuove||[])+sumProvv(vendState.months[vendViewKey]?.usate||[]));
+      vendSave();
     });
 
-    // render iniziale (pre-login)
-    renderVendite();
+    ensureMonth(TODAY_KEY); renderVendite();
     renderWeekCalendar();
 
-    // cambio mese automatico a mezzanotte — NON tocca vendViewKey
     (function scheduleMonthCheck(){
-      const now  = new Date();
-      const next = new Date(now.getFullYear(), now.getMonth()+1, 1, 0, 0, 5);
-      setTimeout(()=>{
-        renderVendite(); // aggiorna badge "in corso"
-        scheduleMonthCheck();
-      }, Math.max(60000, next - now));
+      const now=new Date(),next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,5);
+      setTimeout(()=>{ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck();},Math.max(60000,next-now));
     })();
 
-        /* ══ AUTH STATE ══ */
+    /* ══ AUTH STATE ══ */
     onAuthStateChanged(auth,user=>{
       if(user){
         $("userPill").textContent="✅ "+(user.email||"Utente");
@@ -2649,7 +2506,9 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
   document.body.removeChild(a);URL.revokeObjectURL(url);
 };
 /* ══ FINE GARANZIE ══ */
-    // navigazione già registrata nel blocco vendite
+    // ══ NAVIGAZIONE VENDITE - esposta globalmente ══
+// ══ NAVIGAZIONE VENDITE ══
+
 
   </script>
 </body>
