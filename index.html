@@ -650,9 +650,9 @@
               <span id="venditeSyncBadge" class="venditeSyncBadge">Sync —</span>
             </div>
             <div class="venditeNav">
-              <button class="navArrow" id="vendPrevBtn" onclick="vendPrevClick()">&#8249;</button>
-              <div class="venditeMonthLabel" id="vendMonthLabel">—</div>
-              <button class="navArrow" id="vendNextBtn" onclick="vendNextClick()">&#8250;</button>
+<button class="navArrow" id="vendPrevBtn">&#8249;</button>
+<div class="venditeMonthLabel" id="vendMonthLabel">—</div>
+<button class="navArrow" id="vendNextBtn">&#8250;</button>
             </div>
           </div>
           <div class="venditeTotali">
@@ -2491,17 +2491,18 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
 };
 /* ══ FINE GARANZIE ══ */
     // ══ NAVIGAZIONE VENDITE - esposta globalmente ══
-    window.vendPrevClick = function(){
+// ══ NAVIGAZIONE VENDITE ══
+    $("vendPrevBtn").addEventListener("click", ()=>{
       vendViewKey = prevMonthKey(vendViewKey);
       ensureMonth(vendViewKey);
       renderVendite();
-    };
-    window.vendNextClick = function(){
+    });
+    $("vendNextBtn").addEventListener("click", ()=>{
       if(vendViewKey === TODAY_KEY) return;
       vendViewKey = nextMonthKey(vendViewKey);
       ensureMonth(vendViewKey);
       renderVendite();
-    };
+    });
 
   </script>
 </body>
