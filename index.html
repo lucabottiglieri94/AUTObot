@@ -374,27 +374,6 @@
     .autoN{color:var(--muted)}
     select option{background:var(--bg2);color:var(--text)}
 
-    /* ══ GARANZIE CSS ══ */
-    .garResult{border:1px solid rgba(139,92,246,.3);border-radius:14px;overflow:hidden;background:rgba(139,92,246,.05)}
-    .garResHead{padding:12px 16px;background:rgba(139,92,246,.12);border-bottom:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-    .garResBody{padding:14px 16px}
-    .garSec{font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:#a78bfa;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid rgba(139,92,246,.15)}
-    .garGrid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
-    .garCard{padding:10px 12px;background:var(--bg2);border:1px solid var(--line);border-radius:10px}
-    .garCardLabel{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
-    .garCardVal{font-size:13px;font-weight:700;color:var(--text)}
-    .garCardVal.hi{color:#d8b4fe;font-size:15px}
-    .garRow{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:9px;font-size:13px;line-height:1.4;margin-bottom:4px}
-    .garRow.inc{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);color:#bbf7d0}
-    .garRow.exc{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#fca5a5}
-    .garRow.warn{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);color:#fde68a}
-    .garRow.note{background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.2);color:#d8b4fe}
-    .garDlBtn{width:100%;padding:11px;background:linear-gradient(135deg,rgba(139,92,246,.22),rgba(167,139,250,.15));border:1px solid rgba(139,92,246,.45);border-radius:10px;color:#d8b4fe;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
-    .garDlBtn:hover{background:linear-gradient(135deg,rgba(139,92,246,.35),rgba(167,139,250,.25));transform:translateY(-1px)}
-    .garHistItem{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);margin-bottom:8px;cursor:pointer;transition:all .18s}
-    .garHistItem:hover{border-color:rgba(139,92,246,.5);background:var(--bg3);transform:translateX(3px)}
-    @media(max-width:600px){.garGrid2{grid-template-columns:1fr}}
-
   </style>
 </head>
 <body>
@@ -671,9 +650,9 @@
               <span id="venditeSyncBadge" class="venditeSyncBadge">Sync —</span>
             </div>
             <div class="venditeNav">
-<button class="navArrow" id="vendPrevBtn" type="button" title="Mese precedente">&#8249;</button>
+<button type="button" class="navArrow" id="vendPrevBtn" onclick="vendGoPrev()">&#8249;</button>
 <div class="venditeMonthLabel" id="vendMonthLabel">—</div>
-<button class="navArrow" id="vendNextBtn" type="button" title="Mese successivo" disabled>&#8250;</button>
+<button type="button" class="navArrow" id="vendNextBtn" onclick="vendGoNext()">&#8250;</button>
             </div>
           </div>
           <div class="venditeTotali">
@@ -2511,24 +2490,47 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
   document.body.removeChild(a);URL.revokeObjectURL(url);
 };
 /* ══ FINE GARANZIE ══ */
-    // ══ NAVIGAZIONE VENDITE ══
-    function vendGoPrev(){
+    // ══ NAVIGAZIONE VENDITE - esposta globalmente ══
+// ══ NAVIGAZIONE VENDITE ══
+    $("vendPrevBtn").addEventListener("click", ()=>{
       vendViewKey = prevMonthKey(vendViewKey);
       ensureMonth(vendViewKey);
       renderVendite();
-    }
-    function vendGoNext(){
+    });
+    $("vendNextBtn").addEventListener("click", ()=>{
       if(vendViewKey === TODAY_KEY) return;
       vendViewKey = nextMonthKey(vendViewKey);
       ensureMonth(vendViewKey);
       renderVendite();
-    }
-    $("vendPrevBtn").addEventListener("click", vendGoPrev);
-    $("vendNextBtn").addEventListener("click", vendGoNext);
-    // fallback onclick globale (extra-sicurezza)
-    window.vendPrevClick = vendGoPrev;
-    window.vendNextClick = vendGoNext;
+    });
 
-  </script>
+  
+/* ══ NAVIGAZIONE VENDITE (FIX CLICK + GLOBAL) ══ */
+window.vendGoPrev = function(){
+  try{
+    vendViewKey = prevMonthKey(vendViewKey);
+    ensureMonth(vendViewKey);
+    renderVendite();
+  }catch(e){ console.error("vendGoPrev error", e); }
+};
+window.vendGoNext = function(){
+  try{
+    if(vendViewKey === TODAY_KEY) return;
+    vendViewKey = nextMonthKey(vendViewKey);
+    ensureMonth(vendViewKey);
+    renderVendite();
+  }catch(e){ console.error("vendGoNext error", e); }
+};
+
+// doppia sicurezza: listener anche via JS
+try{
+  const p=document.getElementById("vendPrevBtn");
+  const n=document.getElementById("vendNextBtn");
+  if(p) p.addEventListener("click", (ev)=>{ ev.preventDefault(); window.vendGoPrev(); });
+  if(n) n.addEventListener("click", (ev)=>{ ev.preventDefault(); window.vendGoNext(); });
+}catch(e){ console.error("vendite nav bind error", e); }
+/* ══ FINE FIX NAVIGAZIONE VENDITE ══ */
+
+</script>
 </body>
 </html>
