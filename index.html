@@ -374,6 +374,27 @@
     .autoN{color:var(--muted)}
     select option{background:var(--bg2);color:var(--text)}
 
+    /* ══ GARANZIE CSS ══ */
+    .garResult{border:1px solid rgba(139,92,246,.3);border-radius:14px;overflow:hidden;background:rgba(139,92,246,.05)}
+    .garResHead{padding:12px 16px;background:rgba(139,92,246,.12);border-bottom:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .garResBody{padding:14px 16px}
+    .garSec{font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:#a78bfa;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid rgba(139,92,246,.15)}
+    .garGrid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+    .garCard{padding:10px 12px;background:var(--bg2);border:1px solid var(--line);border-radius:10px}
+    .garCardLabel{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+    .garCardVal{font-size:13px;font-weight:700;color:var(--text)}
+    .garCardVal.hi{color:#d8b4fe;font-size:15px}
+    .garRow{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:9px;font-size:13px;line-height:1.4;margin-bottom:4px}
+    .garRow.inc{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);color:#bbf7d0}
+    .garRow.exc{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#fca5a5}
+    .garRow.warn{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);color:#fde68a}
+    .garRow.note{background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.2);color:#d8b4fe}
+    .garDlBtn{width:100%;padding:11px;background:linear-gradient(135deg,rgba(139,92,246,.22),rgba(167,139,250,.15));border:1px solid rgba(139,92,246,.45);border-radius:10px;color:#d8b4fe;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+    .garDlBtn:hover{background:linear-gradient(135deg,rgba(139,92,246,.35),rgba(167,139,250,.25));transform:translateY(-1px)}
+    .garHistItem{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);margin-bottom:8px;cursor:pointer;transition:all .18s}
+    .garHistItem:hover{border-color:rgba(139,92,246,.5);background:var(--bg3);transform:translateX(3px)}
+    @media(max-width:600px){.garGrid2{grid-template-columns:1fr}}
+
   </style>
 </head>
 <body>
@@ -650,9 +671,9 @@
               <span id="venditeSyncBadge" class="venditeSyncBadge">Sync —</span>
             </div>
             <div class="venditeNav">
-<button type="button" class="navArrow" id="vendPrevBtn" onclick="vendGoPrev()">&#8249;</button>
+<button class="navArrow" id="vendPrevBtn" type="button" title="Mese precedente">&#8249;</button>
 <div class="venditeMonthLabel" id="vendMonthLabel">—</div>
-<button type="button" class="navArrow" id="vendNextBtn" onclick="vendGoNext()">&#8250;</button>
+<button class="navArrow" id="vendNextBtn" type="button" title="Mese successivo" disabled>&#8250;</button>
             </div>
           </div>
           <div class="venditeTotali">
@@ -1455,277 +1476,162 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     $("cmpBtn").addEventListener("click",runComparatore);
     $("cmpInput1").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();runComparatore()}});
     $("cmpInput2").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();runComparatore()}});
-/* ══ VENDITE MENSILI ══ */
-let vendState={months:{},obiettivo:0};
-let vendDocRef=null,vendUnsub=null,vendTipo="nuova";
-const TODAY_KEY=(()=>{const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`})();
-let vendViewKey=TODAY_KEY;
 
-function monthLabel(k){
-  const [y,m]=k.split("-").map(Number);
-  const d=new Date(y,m-1,1);
-  const l=d.toLocaleDateString("it-IT",{month:"long",year:"numeric"});
-  return l.charAt(0).toUpperCase()+l.slice(1);
-}
+    /* ══ VENDITE MENSILI ══ */
+    let vendState={months:{},obiettivo:0};
+    let vendDocRef=null,vendUnsub=null,vendTipo="nuova";
+    // TODAY_KEY calcolato con data LOCALE (no timezone shift)
+    const TODAY_KEY=(()=>{
+      const n=new Date();
+      // Usa getFullYear/getMonth/getDate che sono sempre locali
+      return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`;
+    })();
+    let vendViewKey=TODAY_KEY;
 
-// voglio poter scorrere indietro fino a gennaio e avanti oltre il mese corrente
-function prevMonthKey(k){
-  const [y,m]=k.split("-").map(Number);      // m = 1‑12
-  const d=new Date(y,m-1-1,1);              // mese precedente
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
-}
-function nextMonthKey(k){
-  const [y,m]=k.split("-").map(Number);
-  const d=new Date(y,m-1+1,1);              // mese successivo
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
-}
+    function monthLabel(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-1,1);const l=d.toLocaleDateString("it-IT",{month:"long",year:"numeric"});return l.charAt(0).toUpperCase()+l.slice(1)}
+    function prevMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-2,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
+    function nextMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
+    function vendUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
+    function ensureMonth(k){if(!vendState.months[k])vendState.months[k]={nuove:[],usate:[]}}
+    function sumProvv(list){return(list||[]).reduce((s,c)=>s+(Number(c.provv)||0),0)}
+    function fmtEur(n){return"€ "+n.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0})}
 
-function vendUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
-function ensureMonth(k){if(!vendState.months[k])vendState.months[k]={nuove:[],usate:[]}}
-function sumProvv(list){return(list||[]).reduce((s,c)=>s+(Number(c.provv)||0),0)}
-function fmtEur(n){return"€ "+n.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0})}
+    function renderObiettivo(provvMese){
+      const target=vendState.obiettivo||0;
+      const inp=$("obiettivoInput");
+      if(document.activeElement!==inp)inp.value=target>0?target:"";
+      const fill=$("progressFill"),pct=$("progressPct"),manca=$("progressManca");
+      if(!target||target<=0){fill.style.width="0%";fill.className="progressFill low";pct.textContent="0%";pct.className="progressPct low";manca.textContent="Imposta un obiettivo ↑";manca.className="progressManca";return}
+      const ratio=Math.min(provvMese/target,1);const pctVal=Math.round(ratio*100);
+      const tier=pctVal>=100?"done":pctVal>=66?"high":pctVal>=33?"mid":"low";
+      fill.style.width=(ratio*100).toFixed(1)+"%";fill.className="progressFill "+tier;
+      pct.textContent=pctVal+"%";pct.className="progressPct "+tier;
+      if(pctVal>=100){manca.textContent="🎉 Obiettivo raggiunto! +"+fmtEur(provvMese-target)+" extra";manca.className="progressManca done"}
+      else{manca.textContent="Mancano "+fmtEur(target-provvMese)+" all'obiettivo";manca.className="progressManca"}
+    }
 
-function renderObiettivo(provvMese){
-  const target=vendState.obiettivo||0;
-  const inp=$("obiettivoInput");
-  if(document.activeElement!==inp)inp.value=target>0?target:"";
-  const fill=$("progressFill"),pct=$("progressPct"),manca=$("progressManca");
-  if(!target||target<=0){
-    fill.style.width="0%";fill.className="progressFill low";
-    pct.textContent="0%";pct.className="progressPct low";
-    manca.textContent="Imposta un obiettivo ↑";manca.className="progressManca";
-    return;
-  }
-  const ratio=Math.min(provvMese/target,1);const pctVal=Math.round(ratio*100);
-  const tier=pctVal>=100?"done":pctVal>=66?"high":pctVal>=33?"mid":"low";
-  fill.style.width=(ratio*100).toFixed(1)+"%";fill.className="progressFill "+tier;
-  pct.textContent=pctVal+"%";pct.className="progressPct "+tier;
-  if(pctVal>=100){
-    manca.textContent="🎉 Obiettivo raggiunto! +"+fmtEur(provvMese-target)+" extra";
-    manca.className="progressManca done";
-  }else{
-    manca.textContent="Mancano "+fmtEur(target-provvMese)+" all'obiettivo";
-    manca.className="progressManca";
-  }
-}
+    // Controlla se un mese è ancora editabile (mese corrente O entro 10 giorni dalla fine)
+    function isMeseEditabile(k){
+      if(k===TODAY_KEY) return true;
+      // Calcola fine mese: ultimo giorno del mese k
+      const [y,m]=k.split("-").map(Number);
+      const fineMese=new Date(y,m,0); // giorno 0 del mese successivo = ultimo del mese corrente
+      const oggi=new Date(); oggi.setHours(0,0,0,0);
+      const diffGiorni=Math.round((oggi-fineMese)/(1000*60*60*24));
+      return diffGiorni<=10; // editabile entro 10 giorni dalla fine
+    }
 
-// REGOLA DATE:
-// - mese corrente: sempre editabile
-// - mese precedente: editabile SOLO fino al giorno 10 del mese corrente
-// - tutti gli altri mesi: sola lettura
-function isMeseEditabile(k){
-  const [y,m]=k.split("-").map(Number);  // m = 1‑12
-  const mese=m-1;                        // 0‑based
-  const oggi=new Date();
-  const cy=oggi.getFullYear();
-  const cm=oggi.getMonth();             // 0‑based
-  const cd=oggi.getDate();
-
-  // mese corrente
-  if(y===cy && mese===cm) return true;
-
-  // mese precedente
-  const prev=new Date(cy,cm-1,1);
-  if(y===prev.getFullYear() && mese===prev.getMonth()){
-    return cd<=10;
-  }
-  return false;
-}
-
-function renderVendite(){
-  const k=vendViewKey;
-  ensureMonth(k);
-  const mese=vendState.months[k],nuove=mese.nuove||[],usate=mese.usate||[];
-
-  const isCurrent=(k===TODAY_KEY);
-  const editabile=isMeseEditabile(k);
-
-  $("vendMonthLabel").innerHTML=
-    escapeHtml(monthLabel(k))
-    +(isCurrent?' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>':"")
-    +(!isCurrent&&editabile?' <span style="color:#fbbf24;font-weight:700;font-size:11px;">✏ editabile</span>':"")
-    +(!editabile?' <span style="color:#ef4444;font-weight:700;font-size:10px;">🔒 chiuso</span>':"");
-
-  // sempre libere entrambe le frecce
-  $("vendNextBtn").disabled=false;
-  $("vendPrevBtn").disabled=false;
-
-  $("totNuove").textContent=nuove.length;
-  $("totUsate").textContent=usate.length;
-  $("totAll").textContent=nuove.length+usate.length;
-  $("cntNuove").textContent=nuove.length;
-  $("cntUsate").textContent=usate.length;
-
-  $("listNuove").innerHTML=nuove.length
-    ? nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova",editabile)).join("")
-    : '<div class="emptyList">Nessuna auto nuova</div>';
-  $("listUsate").innerHTML=usate.length
-    ? usate.map((c,i)=>autoItemHTML(c,i+1,"usata",editabile)).join("")
-    : '<div class="emptyList">Nessuna auto usata</div>';
-
-  const vendForm=document.querySelector(".venditeForm");
-  if(vendForm){
-    vendForm.style.opacity=editabile?"1":"0.4";
-    vendForm.style.pointerEvents=editabile?"auto":"none";
-    vendForm.title=editabile
-      ?"Puoi modificare le vendite di questo mese"
-      :"Mese chiuso - non modificabile";
-  }
-
-  document.querySelectorAll(".autoDelBtn").forEach(btn=>{
-    btn.addEventListener("click",()=>deleteAuto(k,btn.dataset.tipo,btn.dataset.id));
-  });
-
-  const pNuove=sumProvv(nuove),pUsate=sumProvv(usate),pTot=pNuove+pUsate;
-  $("provvMeseTot").textContent=fmtEur(pTot);
-  $("provvMeseSplit").textContent=
-    pNuove>0&&pUsate>0?`🆕 ${fmtEur(pNuove)}  ·  🔄 ${fmtEur(pUsate)}`
-    :pNuove>0?"🆕 Tutte da auto nuove"
-    :pUsate>0?"🔄 Tutte da auto usate"
-    :"Nessuna provvigione inserita";
-
-  let tot2026=0,mesi2026=0;
-  Object.entries(vendState.months).forEach(([mk,mv])=>{
-    if(!mk.startsWith("2026"))return;
-    const mP=sumProvv(mv.nuove||[])+sumProvv(mv.usate||[]);
-    tot2026+=mP;
-    if(mP>0)mesi2026++;
-  });
-  $("provv2026Tot").textContent=fmtEur(tot2026);
-  $("provv2026Mesi").textContent=
-    mesi2026===0?"Nessun mese con provvigioni"
-    :mesi2026===1?"1 mese con provvigioni"
-    :mesi2026+" mesi con provvigioni";
-
-  renderObiettivo(pTot);
-}
-
-function autoItemHTML(c,n,tipo,editabile=true){
-  const p=Number(c.provv)||0;
-  const pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—";
-  const cls=p>0?"autoProvv":"autoProvv zero";
-  const delBtn=editabile
-    ?`<button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>`
-    :'<span style="width:24px;display:inline-block"></span>';
-  return`<div class="autoItem">
-    <span class="autoN">#${n}</span>
-    <span class="autoModello">${escapeHtml(c.modello)}</span>
-    <span class="${cls}">${pStr}</span>
-    ${delBtn}
-  </div>`;
-}
-
-async function vendWrite(){
-  if(!vendDocRef)return;
-  try{await setDoc(vendDocRef,vendState,{merge:false})}catch{}
-}
-
-async function addAuto(){
-  const modello=$("vendModello").value.trim();
-  if(!modello)return;
-  const k=vendViewKey;
-  if(!isMeseEditabile(k)){
-    alert("⏰ Questo mese è chiuso. Non puoi aggiungere vendite.");
-    return;
-  }
-  const provv=parseFloat($("vendProvv").value)||0;
-  ensureMonth(k);
-  const id=vendUid(),entry={id,modello,provv,createdAt:Date.now()};
-  if(vendTipo==="nuova")vendState.months[k].nuove.push(entry);
-  else vendState.months[k].usate.push(entry);
-  $("vendModello").value="";$("vendProvv").value="";
-  renderVendite();await vendWrite();
-}
-
-async function deleteAuto(k,tipo,id){
-  if(!isMeseEditabile(k)){
-    alert("⏰ Questo mese è chiuso. Non puoi modificare le vendite.");
-    return;
-  }
-  ensureMonth(k);
-  const list=tipo==="nuova"?vendState.months[k].nuove:vendState.months[k].usate;
-  const idx=list.findIndex(c=>c.id===id);
-  if(idx!==-1)list.splice(idx,1);
-  renderVendite();await vendWrite();
-}
-
-function startVenditeSync(user){
-  if(vendUnsub){try{vendUnsub()}catch{}}
-  vendDocRef=doc(db,"users",user.uid,"vendite","data");
-  setSyncVendite("sync");
-  vendUnsub=onSnapshot(
-    vendDocRef,
-    snap=>{
-      if(snap.exists()){
-        const d=snap.data();
-        vendState={months:d.months||{},obiettivo:d.obiettivo||0};
-      }else{
-        vendState={months:{},obiettivo:0};
+    function renderVendite(){
+      const k=vendViewKey;ensureMonth(k);
+      const mese=vendState.months[k],nuove=mese.nuove||[],usate=mese.usate||[];
+      const isCurrent=(k===TODAY_KEY);
+      const editabile=isMeseEditabile(k);
+      $("vendMonthLabel").innerHTML=escapeHtml(monthLabel(k))
+        +(isCurrent?' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>':"")
+        +(!isCurrent&&editabile?' <span style="color:#fbbf24;font-weight:700;font-size:11px;">✏ editabile</span>':"")
+        +(!editabile?' <span style="color:#ef4444;font-weight:700;font-size:10px;">🔒 chiuso</span>':"");
+      $("vendNextBtn").disabled=(k===TODAY_KEY);
+      $("vendPrevBtn").disabled=false; // sempre libero scorrere indietro
+      $("totNuove").textContent=nuove.length;$("totUsate").textContent=usate.length;$("totAll").textContent=nuove.length+usate.length;
+      $("cntNuove").textContent=nuove.length;$("cntUsate").textContent=usate.length;
+      $("listNuove").innerHTML=nuove.length?nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova",editabile)).join(""):'<div class="emptyList">Nessuna auto nuova</div>';
+      $("listUsate").innerHTML=usate.length?usate.map((c,i)=>autoItemHTML(c,i+1,"usata",editabile)).join(""):'<div class="emptyList">Nessuna auto usata</div>';
+      // Mostra/nascondi form aggiunta
+      const vendForm=document.querySelector(".venditeForm");
+      if(vendForm){
+        vendForm.style.opacity=editabile?"1":"0.4";
+        vendForm.style.pointerEvents=editabile?"auto":"none";
+        vendForm.title=editabile?"":"Mese chiuso - non modificabile";
       }
-      ensureMonth(TODAY_KEY);
-      setSyncVendite("ok");
-      renderVendite();
-      if(!snap.exists())setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
-    },
-    ()=>setSyncVendite("warn")
-  );
-}
+      document.querySelectorAll(".autoDelBtn").forEach(btn=>btn.addEventListener("click",()=>deleteAuto(k,btn.dataset.tipo,btn.dataset.id)));
+      const pNuove=sumProvv(nuove),pUsate=sumProvv(usate),pTot=pNuove+pUsate;
+      $("provvMeseTot").textContent=fmtEur(pTot);
+      $("provvMeseSplit").textContent=pNuove>0&&pUsate>0?`🆕 ${fmtEur(pNuove)}  ·  🔄 ${fmtEur(pUsate)}`:pNuove>0?"🆕 Tutte da auto nuove":pUsate>0?"🔄 Tutte da auto usate":"Nessuna provvigione inserita";
+      let tot2026=0,mesi2026=0;
+      Object.entries(vendState.months).forEach(([mk,mv])=>{if(!mk.startsWith("2026"))return;const mP=sumProvv(mv.nuove||[])+sumProvv(mv.usate||[]);tot2026+=mP;if(mP>0)mesi2026++});
+      $("provv2026Tot").textContent=fmtEur(tot2026);
+      $("provv2026Mesi").textContent=mesi2026===0?"Nessun mese con provvigioni":mesi2026===1?"1 mese con provvigioni":mesi2026+" mesi con provvigioni";
+      renderObiettivo(pTot);
+    }
 
-function stopVenditeSync(){
-  if(vendUnsub){try{vendUnsub()}catch{}}
-  vendUnsub=null;vendDocRef=null;vendState={months:{},obiettivo:0};
-  setSyncVendite("warn");renderVendite();
-}
+    function autoItemHTML(c,n,tipo,editabile=true){
+      const p=Number(c.provv)||0,pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—",cls=p>0?"autoProvv":"autoProvv zero";
+      const delBtn=editabile?`<button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>`:'<span style="width:24px;display:inline-block"></span>';
+      return`<div class="autoItem"><span class="autoN">#${n}</span><span class="autoModello">${escapeHtml(c.modello)}</span><span class="${cls}">${pStr}</span>${delBtn}</div>`;
+    }
 
-function setSyncVendite(s){
-  const b=$("venditeSyncBadge");
-  if(s==="ok"){b.className="venditeSyncBadge ok";b.textContent="Sync ✓";}
-  else if(s==="sync"){b.className="venditeSyncBadge";b.textContent="Sync …";}
-  else{b.className="venditeSyncBadge";b.textContent="Sync —";}
-}
+    async function vendWrite(){if(!vendDocRef)return;try{await setDoc(vendDocRef,vendState,{merge:false})}catch{}}
+    async function addAuto(){
+      const modello=$("vendModello").value.trim();if(!modello)return;
+      const k=vendViewKey;
+      if(!isMeseEditabile(k)){
+        alert("⏰ Questo mese è chiuso (più di 10 giorni fa). Non puoi aggiungere vendite.");
+        return;
+      }
+      const provv=parseFloat($("vendProvv").value)||0;
+      ensureMonth(k);
+      const id=vendUid(),entry={id,modello,provv,createdAt:Date.now()};
+      if(vendTipo==="nuova")vendState.months[k].nuove.push(entry);
+      else vendState.months[k].usate.push(entry);
+      $("vendModello").value="";$("vendProvv").value="";
+      renderVendite();await vendWrite();
+    }
+    async function deleteAuto(k,tipo,id){
+      if(!isMeseEditabile(k)){
+        alert("⏰ Questo mese è chiuso. Non puoi modificare le vendite.");
+        return;
+      }
+      ensureMonth(k);
+      const list=tipo==="nuova"?vendState.months[k].nuove:vendState.months[k].usate;
+      const idx=list.findIndex(c=>c.id===id);if(idx!==-1)list.splice(idx,1);
+      renderVendite();await vendWrite();
+    }
 
-$("tipoBtnNuova").addEventListener("click",()=>{vendTipo="nuova";$("tipoBtnNuova").classList.add("active");$("tipoBtnUsata").classList.remove("active")});
-$("tipoBtnUsata").addEventListener("click",()=>{vendTipo="usata";$("tipoBtnUsata").classList.add("active");$("tipoBtnNuova").classList.remove("active")});
-$("vendAddBtn").addEventListener("click",addAuto);
-$("vendModello").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
-$("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
-$("obiettivoInput").addEventListener("input",async()=>{
-  vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
-  const k=vendViewKey;ensureMonth(k);const m=vendState.months[k];
-  renderObiettivo(sumProvv(m.nuove||[])+sumProvv(m.usate||[]));
-  await vendWrite();
-});
+    function startVenditeSync(user){
+      if(vendUnsub){try{vendUnsub()}catch{}}
+      vendDocRef=doc(db,"users",user.uid,"vendite","data");
+      setSyncVendite("sync");
+      vendUnsub=onSnapshot(vendDocRef,snap=>{
+        if(snap.exists()){const d=snap.data();vendState={months:d.months||{},obiettivo:d.obiettivo||0}}
+        else{vendState={months:{},obiettivo:0}}
+        ensureMonth(TODAY_KEY);setSyncVendite("ok");renderVendite();
+        if(!snap.exists())setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
+      },()=>setSyncVendite("warn"));
+    }
+    function stopVenditeSync(){
+      if(vendUnsub){try{vendUnsub()}catch{}}
+      vendUnsub=null;vendDocRef=null;vendState={months:{},obiettivo:0};
+      setSyncVendite("warn");renderVendite();
+    }
+    function setSyncVendite(s){
+      const b=$("venditeSyncBadge");
+      if(s==="ok"){b.className="venditeSyncBadge ok";b.textContent="Sync ✓"}
+      else if(s==="sync"){b.className="venditeSyncBadge";b.textContent="Sync …"}
+      else{b.className="venditeSyncBadge";b.textContent="Sync —"}
+    }
 
-ensureMonth(TODAY_KEY);renderVendite();
-renderWeekCalendar();
 
-// navigazione vendite
-window.vendGoPrev = function () {
-  console.log("vendGoPrev BEFORE", vendViewKey);
-  vendViewKey = prevMonthKey(vendViewKey);
-  console.log("vendGoPrev AFTER", vendViewKey);
-  ensureMonth(vendViewKey);
-  renderVendite();
-};
 
-window.vendGoNext = function () {
-  console.log("vendGoNext BEFORE", vendViewKey);
-  vendViewKey = nextMonthKey(vendViewKey);
-  console.log("vendGoNext AFTER", vendViewKey);
-  ensureMonth(vendViewKey);
-  renderVendite();
-};
-;
+    $("tipoBtnNuova").addEventListener("click",()=>{vendTipo="nuova";$("tipoBtnNuova").classList.add("active");$("tipoBtnUsata").classList.remove("active")});
+    $("tipoBtnUsata").addEventListener("click",()=>{vendTipo="usata";$("tipoBtnUsata").classList.add("active");$("tipoBtnNuova").classList.remove("active")});
+    $("vendAddBtn").addEventListener("click",addAuto);
+    $("vendModello").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
+    $("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
+    $("obiettivoInput").addEventListener("input",async()=>{
+      vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
+      const k=vendViewKey;ensureMonth(k);const m=vendState.months[k];
+      renderObiettivo(sumProvv(m.nuove||[])+sumProvv(m.usate||[]));
+      await vendWrite();
+    });
 
-// mantenere il passaggio automatico al mese nuovo
-(function scheduleMonthCheck(){
-  const now=new Date(),next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,5);
-  setTimeout(()=>{
-    if(vendViewKey===TODAY_KEY)vendViewKey=nextMonthKey(TODAY_KEY);
-    ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck();
-  },Math.max(5000,next-now));
-})();
+    ensureMonth(TODAY_KEY);renderVendite();
+    renderWeekCalendar(); // mostra i giorni anche prima del login
 
+    // Controlla cambio mese a mezzanotte — NON tocca vendViewKey
+    (function scheduleMonthCheck(){
+      const now=new Date(),next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,5);
+      setTimeout(()=>{ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck();},Math.max(60000,next-now));
+    })();
 
     /* ══ AUTH STATE ══ */
     onAuthStateChanged(auth,user=>{
@@ -2610,69 +2516,24 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
   document.body.removeChild(a);URL.revokeObjectURL(url);
 };
 /* ══ FINE GARANZIE ══ */
-    // ══ NAVIGAZIONE VENDITE (FIX: niente listener doppi, 12 mesi completi) ══
-    (function(){
-      function normKey(k){
-        const [y,m]=String(k).split("-").map(Number);
-        return `${y}-${String(m).padStart(2,"0")}`;
-      }
-      function setKey(k){
-        vendViewKey = normKey(k);
-        ensureMonth(vendViewKey);
-        renderVendite();
-      }
-      function rebind(){
-        const prevEl = document.getElementById("vendPrevBtn");
-        const nextEl = document.getElementById("vendNextBtn");
-        if(prevEl){
-          const p = prevEl.cloneNode(true);
-          p.type = "button";
-          p.disabled = false;
-          p.onclick = (ev)=>{ ev.preventDefault(); ev.stopPropagation(); setKey(prevMonthKey(vendViewKey)); };
-          prevEl.replaceWith(p);
-        }
-        if(nextEl){
-          const n = nextEl.cloneNode(true);
-          n.type = "button";
-          n.onclick = (ev)=>{ ev.preventDefault(); ev.stopPropagation(); setKey(nextMonthKey(vendViewKey)); };
-          nextEl.replaceWith(n);
-        }
-      }
+    // ══ NAVIGAZIONE VENDITE ══
+    function vendGoPrev(){
+      vendViewKey = prevMonthKey(vendViewKey);
+      ensureMonth(vendViewKey);
+      renderVendite();
+    }
+    function vendGoNext(){
+      if(vendViewKey === TODAY_KEY) return;
+      vendViewKey = nextMonthKey(vendViewKey);
+      ensureMonth(vendViewKey);
+      renderVendite();
+    }
+    $("vendPrevBtn").addEventListener("click", vendGoPrev);
+    $("vendNextBtn").addEventListener("click", vendGoNext);
+    // fallback onclick globale (extra-sicurezza)
+    window.vendPrevClick = vendGoPrev;
+    window.vendNextClick = vendGoNext;
 
-      // sempre parte dal mese corrente (oggi)
-      document.addEventListener("DOMContentLoaded", ()=>{
-        vendViewKey = TODAY_KEY;
-        ensureMonth(vendViewKey);
-        rebind();
-        renderVendite();
-      });
-    })();
-/* ══ NAVIGAZIONE VENDITE (FIX CLICK + GLOBAL) ══ */
-window.vendGoPrev = function(){
-  try{
-    vendViewKey = prevMonthKey(vendViewKey);
-    ensureMonth(vendViewKey);
-    renderVendite();
-  }catch(e){ console.error("vendGoPrev error", e); }
-};
-window.vendGoNext = function(){
-  try{
-    if(vendViewKey === TODAY_KEY) return;
-    vendViewKey = nextMonthKey(vendViewKey);
-    ensureMonth(vendViewKey);
-    renderVendite();
-  }catch(e){ console.error("vendGoNext error", e); }
-};
-
-// doppia sicurezza: listener anche via JS
-try{
-  const p=document.getElementById("vendPrevBtn");
-  const n=document.getElementById("vendNextBtn");
-  if(p) p.addEventListener("click", (ev)=>{ ev.preventDefault(); window.vendGoPrev(); });
-  if(n) n.addEventListener("click", (ev)=>{ ev.preventDefault(); window.vendGoNext(); });
-}catch(e){ console.error("vendite nav bind error", e); }
-/* ══ FINE FIX NAVIGAZIONE VENDITE ══ */
-
-</script>
+  </script>
 </body>
 </html>
