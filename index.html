@@ -1484,105 +1484,217 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       else{manca.textContent="Mancano "+fmtEur(target-provvMese)+" all'obiettivo";manca.className="progressManca"}
     }
 
-    // Controlla se un mese è ancora editabile (mese corrente O entro 10 giorni dalla fine)
-    function isMeseEditabile(k){
-      if(k===TODAY_KEY) return true;
-      // Calcola fine mese: ultimo giorno del mese k
-      const [y,m]=k.split("-").map(Number);
-      const fineMese=new Date(y,m,0); // giorno 0 del mese successivo = ultimo del mese corrente
-      const oggi=new Date(); oggi.setHours(0,0,0,0);
-      const diffGiorni=Math.round((oggi-fineMese)/(1000*60*60*24));
-      return diffGiorni<=10; // editabile entro 10 giorni dalla fine
-    }
+   // REGOLA: 
+// - mese corrente: sempre editabile
+// - mese precedente: editabile SOLO fino al giorno 10 del mese corrente
+// - tutti gli altri mesi: sola lettura
+function isMeseEditabile(k){
+  const [y,m] = k.split("-").map(Number);   // m = 1‑12
+  const mese  = m - 1;                      // 0‑based
+  const oggi  = new Date();
+  const cy    = oggi.getFullYear();
+  const cm    = oggi.getMonth();           // 0‑based
+  const cd    = oggi.getDate();
 
-    function renderVendite(){
-      const k=vendViewKey;ensureMonth(k);
-      const mese=vendState.months[k],nuove=mese.nuove||[],usate=mese.usate||[];
-      const isCurrent=(k===TODAY_KEY);
-      const editabile=isMeseEditabile(k);
-      $("vendMonthLabel").innerHTML=escapeHtml(monthLabel(k))
-        +(isCurrent?' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>':"")
-        +(!isCurrent&&editabile?' <span style="color:#fbbf24;font-weight:700;font-size:11px;">✏ editabile</span>':"")
-        +(!editabile?' <span style="color:#ef4444;font-weight:700;font-size:10px;">🔒 chiuso</span>':"");
-      $("vendNextBtn").disabled=(k===TODAY_KEY);
-      $("vendPrevBtn").disabled=false; // sempre libero scorrere indietro
-      $("totNuove").textContent=nuove.length;$("totUsate").textContent=usate.length;$("totAll").textContent=nuove.length+usate.length;
-      $("cntNuove").textContent=nuove.length;$("cntUsate").textContent=usate.length;
-      $("listNuove").innerHTML=nuove.length?nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova",editabile)).join(""):'<div class="emptyList">Nessuna auto nuova</div>';
-      $("listUsate").innerHTML=usate.length?usate.map((c,i)=>autoItemHTML(c,i+1,"usata",editabile)).join(""):'<div class="emptyList">Nessuna auto usata</div>';
-      // Mostra/nascondi form aggiunta
-      const vendForm=document.querySelector(".venditeForm");
-      if(vendForm){
-        vendForm.style.opacity=editabile?"1":"0.4";
-        vendForm.style.pointerEvents=editabile?"auto":"none";
-        vendForm.title=editabile?"":"Mese chiuso - non modificabile";
+  // mese corrente
+  if (y === cy && mese === cm) return true;
+
+  // mese precedente
+  const prev = new Date(cy, cm - 1, 1);
+  if (y === prev.getFullYear() && mese === prev.getMonth()){
+    return cd <= 10;
+  }
+
+  // tutti gli altri: chiusi
+  return false;
+}
+
+function renderVendite(){
+  const k = vendViewKey;
+  ensureMonth(k);
+  const mese  = vendState.months[k];
+  const nuove = mese.nuove || [];
+  const usate = mese.usate || [];
+
+  const isCurrent = (k === TODAY_KEY);
+  const editabile = isMeseEditabile(k);
+
+  $("vendMonthLabel").innerHTML =
+    escapeHtml(monthLabel(k))
+    + (isCurrent
+        ? ' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>'
+        : ""
+      )
+    + (!isCurrent && editabile
+        ? ' <span style="color:#fbbf24;font-weight:700;font-size:11px;">✏ editabile</span>'
+        : ""
+      )
+    + (!editabile
+        ? ' <span style="color:#ef4444;font-weight:700;font-size:10px;">🔒 chiuso</span>'
+        : ""
+      );
+
+  // ora puoi SEMPRE scorrere avanti/indietro
+  $("vendNextBtn").disabled = false;
+  $("vendPrevBtn").disabled = false;
+
+  $("totNuove").textContent = nuove.length;
+  $("totUsate").textContent = usate.length;
+  $("totAll").textContent   = nuove.length + usate.length;
+
+  $("cntNuove").textContent = nuove.length;
+  $("cntUsate").textContent = usate.length;
+
+  $("listNuove").innerHTML = nuove.length
+    ? nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova",editabile)).join("")
+    : '<div class="emptyList">Nessuna auto nuova</div>';
+
+  $("listUsate").innerHTML = usate.length
+    ? usate.map((c,i)=>autoItemHTML(c,i+1,"usata",editabile)).join("")
+    : '<div class="emptyList">Nessuna auto usata</div>';
+
+  const vendForm = document.querySelector(".venditeForm");
+  if (vendForm){
+    vendForm.style.opacity       = editabile ? "1"    : "0.4";
+    vendForm.style.pointerEvents = editabile ? "auto" : "none";
+    vendForm.title = editabile
+      ? "Puoi modificare le vendite di questo mese"
+      : "Mese chiuso - non modificabile";
+  }
+
+  document
+    .querySelectorAll(".autoDelBtn")
+    .forEach(btn =>
+      btn.addEventListener("click", () =>
+        deleteAuto(k, btn.dataset.tipo, btn.dataset.id)
+      )
+    );
+
+  const pNuove = sumProvv(nuove);
+  const pUsate = sumProvv(usate);
+  const pTot   = pNuove + pUsate;
+
+  $("provvMeseTot").textContent  = fmtEur(pTot);
+  $("provvMeseSplit").textContent =
+    pNuove > 0 && pUsate > 0
+      ? `🆕 ${fmtEur(pNuove)}  ·  🔄 ${fmtEur(pUsate)}`
+      : pNuove > 0 ? "🆕 Tutte da auto nuove"
+      : pUsate > 0 ? "🔄 Tutte da auto usate"
+      : "Nessuna provvigione inserita";
+
+  let tot2026 = 0, mesi2026 = 0;
+  Object.entries(vendState.months).forEach(([mk,mv])=>{
+    if (!mk.startsWith("2026")) return;
+    const mP = sumProvv(mv.nuove || []) + sumProvv(mv.usate || []);
+    tot2026 += mP;
+    if (mP > 0) mesi2026++;
+  });
+  $("provv2026Tot").textContent = fmtEur(tot2026);
+  $("provv2026Mesi").textContent =
+    mesi2026 === 0 ? "Nessun mese con provvigioni"
+    : mesi2026 === 1 ? "1 mese con provvigioni"
+    : mesi2026 + " mesi con provvigioni";
+
+  renderObiettivo(pTot);
+}
+
+function autoItemHTML(c,n,tipo,editabile=true){
+  const p    = Number(c.provv) || 0;
+  const pStr = p > 0 ? "€ " + p.toLocaleString("it-IT") : "—";
+  const cls  = p > 0 ? "autoProvv" : "autoProvv zero";
+  const delBtn = editabile
+    ? `<button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>`
+    : '<span style="width:24px;display:inline-block"></span>';
+  return `<div class="autoItem">
+    <span class="autoN">#${n}</span>
+    <span class="autoModello">${escapeHtml(c.modello)}</span>
+    <span class="${cls}">${pStr}</span>
+    ${delBtn}
+  </div>`;
+}
+
+async function vendWrite(){
+  if(!vendDocRef) return;
+  try{
+    await setDoc(vendDocRef, vendState, {merge:false});
+  }catch{}
+}
+
+async function addAuto(){
+  const modello = $("vendModello").value.trim();
+  if(!modello) return;
+
+  const k = vendViewKey;
+  if(!isMeseEditabile(k)){
+    alert("⏰ Questo mese è chiuso. Non puoi aggiungere vendite.");
+    return;
+  }
+  const provv = parseFloat($("vendProvv").value) || 0;
+  ensureMonth(k);
+  const id    = vendUid();
+  const entry = {id,modello,provv,createdAt:Date.now()};
+
+  if (vendTipo === "nuova") vendState.months[k].nuove.push(entry);
+  else                      vendState.months[k].usate.push(entry);
+
+  $("vendModello").value = "";
+  $("vendProvv").value   = "";
+  renderVendite();
+  await vendWrite();
+}
+
+async function deleteAuto(k,tipo,id){
+  if(!isMeseEditabile(k)){
+    alert("⏰ Questo mese è chiuso. Non puoi modificare le vendite.");
+    return;
+  }
+  ensureMonth(k);
+  const list = tipo==="nuova"
+    ? vendState.months[k].nuove
+    : vendState.months[k].usate;
+  const idx = list.findIndex(c => c.id === id);
+  if(idx !== -1) list.splice(idx,1);
+  renderVendite();
+  await vendWrite();
+}
+
+function startVenditeSync(user){
+  if(vendUnsub){try{vendUnsub()}catch{}}
+  vendDocRef = doc(db,"users",user.uid,"vendite","data");
+  setSyncVendite("sync");
+  vendUnsub = onSnapshot(
+    vendDocRef,
+    snap=>{
+      if(snap.exists()){
+        const d = snap.data();
+        vendState = {months:d.months || {}, obiettivo:d.obiettivo || 0};
+      }else{
+        vendState = {months:{}, obiettivo:0};
       }
-      document.querySelectorAll(".autoDelBtn").forEach(btn=>btn.addEventListener("click",()=>deleteAuto(k,btn.dataset.tipo,btn.dataset.id)));
-      const pNuove=sumProvv(nuove),pUsate=sumProvv(usate),pTot=pNuove+pUsate;
-      $("provvMeseTot").textContent=fmtEur(pTot);
-      $("provvMeseSplit").textContent=pNuove>0&&pUsate>0?`🆕 ${fmtEur(pNuove)}  ·  🔄 ${fmtEur(pUsate)}`:pNuove>0?"🆕 Tutte da auto nuove":pUsate>0?"🔄 Tutte da auto usate":"Nessuna provvigione inserita";
-      let tot2026=0,mesi2026=0;
-      Object.entries(vendState.months).forEach(([mk,mv])=>{if(!mk.startsWith("2026"))return;const mP=sumProvv(mv.nuove||[])+sumProvv(mv.usate||[]);tot2026+=mP;if(mP>0)mesi2026++});
-      $("provv2026Tot").textContent=fmtEur(tot2026);
-      $("provv2026Mesi").textContent=mesi2026===0?"Nessun mese con provvigioni":mesi2026===1?"1 mese con provvigioni":mesi2026+" mesi con provvigioni";
-      renderObiettivo(pTot);
-    }
+      ensureMonth(TODAY_KEY);
+      setSyncVendite("ok");
+      renderVendite();
+      if(!snap.exists()) setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
+    },
+    ()=>setSyncVendite("warn")
+  );
+}
 
-    function autoItemHTML(c,n,tipo,editabile=true){
-      const p=Number(c.provv)||0,pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—",cls=p>0?"autoProvv":"autoProvv zero";
-      const delBtn=editabile?`<button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>`:'<span style="width:24px;display:inline-block"></span>';
-      return`<div class="autoItem"><span class="autoN">#${n}</span><span class="autoModello">${escapeHtml(c.modello)}</span><span class="${cls}">${pStr}</span>${delBtn}</div>`;
-    }
+function stopVenditeSync(){
+  if(vendUnsub){try{vendUnsub()}catch{}}
+  vendUnsub = null;
+  vendDocRef = null;
+  vendState = {months:{},obiettivo:0};
+  setSyncVendite("warn");
+  renderVendite();
+}
 
-    async function vendWrite(){if(!vendDocRef)return;try{await setDoc(vendDocRef,vendState,{merge:false})}catch{}}
-    async function addAuto(){
-      const modello=$("vendModello").value.trim();if(!modello)return;
-      const k=vendViewKey;
-      if(!isMeseEditabile(k)){
-        alert("⏰ Questo mese è chiuso (più di 10 giorni fa). Non puoi aggiungere vendite.");
-        return;
-      }
-      const provv=parseFloat($("vendProvv").value)||0;
-      ensureMonth(k);
-      const id=vendUid(),entry={id,modello,provv,createdAt:Date.now()};
-      if(vendTipo==="nuova")vendState.months[k].nuove.push(entry);
-      else vendState.months[k].usate.push(entry);
-      $("vendModello").value="";$("vendProvv").value="";
-      renderVendite();await vendWrite();
-    }
-    async function deleteAuto(k,tipo,id){
-      if(!isMeseEditabile(k)){
-        alert("⏰ Questo mese è chiuso. Non puoi modificare le vendite.");
-        return;
-      }
-      ensureMonth(k);
-      const list=tipo==="nuova"?vendState.months[k].nuove:vendState.months[k].usate;
-      const idx=list.findIndex(c=>c.id===id);if(idx!==-1)list.splice(idx,1);
-      renderVendite();await vendWrite();
-    }
-
-    function startVenditeSync(user){
-      if(vendUnsub){try{vendUnsub()}catch{}}
-      vendDocRef=doc(db,"users",user.uid,"vendite","data");
-      setSyncVendite("sync");
-      vendUnsub=onSnapshot(vendDocRef,snap=>{
-        if(snap.exists()){const d=snap.data();vendState={months:d.months||{},obiettivo:d.obiettivo||0}}
-        else{vendState={months:{},obiettivo:0}}
-        ensureMonth(TODAY_KEY);setSyncVendite("ok");renderVendite();
-        if(!snap.exists())setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
-      },()=>setSyncVendite("warn"));
-    }
-    function stopVenditeSync(){
-      if(vendUnsub){try{vendUnsub()}catch{}}
-      vendUnsub=null;vendDocRef=null;vendState={months:{},obiettivo:0};
-      setSyncVendite("warn");renderVendite();
-    }
-    function setSyncVendite(s){
-      const b=$("venditeSyncBadge");
-      if(s==="ok"){b.className="venditeSyncBadge ok";b.textContent="Sync ✓"}
-      else if(s==="sync"){b.className="venditeSyncBadge";b.textContent="Sync …"}
-      else{b.className="venditeSyncBadge";b.textContent="Sync —"}
-    }
+function setSyncVendite(s){
+  const b = $("venditeSyncBadge");
+  if(s === "ok"){b.className="venditeSyncBadge ok";b.textContent="Sync ✓";}
+  else if(s === "sync"){b.className="venditeSyncBadge";b.textContent="Sync …";}
+  else{b.className="venditeSyncBadge";b.textContent="Sync —";}
+}
 
 
 
