@@ -1568,7 +1568,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       if(typeof val==="object") return Object.values(val).filter(Boolean);
       return [];
     }
-    // Normalizza chiavi "2026-2" → "2026-02" e converte nuove/usate da oggetto ad array
+    // Normalizza chiavi "2026-2"→"2026-02" e converte nuove/usate da oggetto ad array
     function normalizeMonths(months){
       if(!months||typeof months!=="object") return {};
       const out={};
@@ -1630,7 +1630,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     // navigazione vendite gestita via onclick globale (vendPrevClick/vendNextClick)
     (function scheduleMonthCheck(){
       const now=new Date(),next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,5);
-      setTimeout(()=>{if(vendViewKey===TODAY_KEY)vendViewKey=nextMonthKey(TODAY_KEY);ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck()},Math.max(5000,next-now));
+      setTimeout(()=>{ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck();},Math.max(60000,next-now));
     })();
 
     /* ══ AUTH STATE ══ */
