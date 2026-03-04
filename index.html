@@ -1031,7 +1031,7 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     getFirestore, doc, onSnapshot, setDoc, enableIndexedDbPersistence
   } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-  const BACKEND_NEWS   = "/api/news";
+  const BACKEND_NEWS   = "https://auto-backend-three.vercel.app/api/news";
   const BACKEND_CHAT   = "https://auto-backend-three.vercel.app/api/chat";
   const BACKEND_SEARCH = "https://auto-backend-three.vercel.app/api/search";
   const BRAND_LINKS = {
@@ -1090,10 +1090,36 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     _authReady = true;
   })();
 
+  // Feed RSS automotive come fallback
+  const RSS_FEEDS_PROXY = [
+    "https://api.rss2json.com/v1/api.json?rss_url=https://www.autocar.it/feed",
+    "https://api.rss2json.com/v1/api.json?rss_url=https://www.motorionline.com/feed",
+    "https://api.rss2json.com/v1/api.json?rss_url=https://www.automoto.it/rss.xml"
+  ];
+
+  async function loadNewsFromRSS(){
+    for(const url of RSS_FEEDS_PROXY){
+      try{
+        const r = await fetch(url, {cache:"no-store"});
+        if(!r.ok) continue;
+        const d = await r.json();
+        if(d.status==="ok" && d.items?.length){
+          return d.items.slice(0,10).map(it=>({
+            title: it.title,
+            url: it.link,
+            date: it.pubDate
+          }));
+        }
+      }catch{}
+    }
+    return null;
+  }
+
   async function loadNews(){
     if(!auth.currentUser){$("newsList").innerHTML="";setStatus("🔒 Login per vedere le news.");return}
     setStatus("⏳ Caricamento...");$("refreshBtn").disabled=true;
     try{
+      // Prima prova il backend Vercel
       const r=await fetch(BACKEND_NEWS,{method:"GET",headers:{"Cache-Control":"no-cache"},cache:"no-store"});
       if(!r.ok)throw new Error(`HTTP ${r.status}`);
       const data=await r.json();
@@ -1101,8 +1127,22 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       else if(Array.isArray(data))renderItems(data);
       else throw new Error("Formato non valido");
     }catch(err){
-      $("newsList").innerHTML='<div class="muted" style="padding:16px;text-align:center;font-size:12px">❌ Errore news</div>';
-      setStatus("❌ "+(err?.message||err));
+      console.warn("Backend news fallito:", err?.message, "— provo RSS...");
+      setStatus("⏳ Backend non disponibile, carico da RSS...");
+      // Fallback: RSS pubblici automotive
+      try{
+        const items = await loadNewsFromRSS();
+        if(items && items.length){
+          renderItems(items);
+          setStatus("✅ " + items.length + " news (RSS) • " + new Date().toLocaleString("it-IT"));
+        } else {
+          $("newsList").innerHTML='<div style="padding:16px;text-align:center;font-size:12px;color:#fca5a5;">❌ Nessuna news disponibile<br><span style="opacity:.7;font-size:11px">Controlla la connessione</span></div>';
+          setStatus("❌ News non disponibili: " + (err?.message||err));
+        }
+      }catch(e2){
+        $("newsList").innerHTML='<div style="padding:16px;text-align:center;font-size:12px;color:#fca5a5;">❌ Errore news<br><span style="opacity:.7;font-size:11px">' + (err?.message||err) + '</span></div>';
+        setStatus("❌ " + (err?.message||err));
+      }
     }finally{$("refreshBtn").disabled=!auth.currentUser}
   }
 
