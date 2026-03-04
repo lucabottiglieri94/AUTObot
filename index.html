@@ -2639,6 +2639,75 @@ try{
 })();
  /* ===== FINE FIX INDIETRO ===== */
 
+
+/* ===== OVERRIDE NAV: NIENTE CLAMP, SEMPRE 12 MESI (INCLUSO GEN/FEB/MAR) ===== */
+(function(){
+  function pad2(n){ return String(n).padStart(2,"0"); }
+  function normKey(k){
+    if(!k || typeof k!=="string") return k;
+    const parts=k.split("-");
+    if(parts.length<2) return k;
+    const y=Number(parts[0]);
+    const m=Number(parts[1]);
+    if(!y || !m) return k;
+    return `${y}-${pad2(m)}`;
+  }
+  function prevKey(k){
+    k=normKey(k);
+    let [y,m]=k.split("-").map(Number);
+    m--; if(m<1){m=12;y--;}
+    return `${y}-${pad2(m)}`;
+  }
+  function nextKey(k){
+    k=normKey(k);
+    let [y,m]=k.split("-").map(Number);
+    m++; if(m>12){m=1;y++;}
+    return `${y}-${pad2(m)}`;
+  }
+  function setKey(k){
+    k=normKey(k);
+    try{ if(typeof ensureMonth==="function") ensureMonth(k); }catch(e){}
+    try{ if(typeof vendViewKey!=="undefined") vendViewKey=k; }catch(e){}
+    try{ if(typeof renderVendite==="function") renderVendite(); }catch(e){}
+  }
+
+  window.vendPrevClick = function(){
+    try{ setKey(prevKey(vendViewKey)); }catch(e){ console.error(e); }
+  };
+  window.vendNextClick = function(){
+    try{ setKey(nextKey(vendViewKey)); }catch(e){ console.error(e); }
+  };
+
+  // Start mese corrente richiesto: MARZO dell'anno corrente
+  document.addEventListener("DOMContentLoaded", function(){
+    const y=(new Date()).getFullYear();
+    const start=`${y}-03`;
+    try{
+      if(typeof ensureMonth==="function") ensureMonth(start);
+      if(typeof vendViewKey!=="undefined") vendViewKey=start;
+    }catch(e){}
+    setKey(start);
+
+    // ribind bottoni pulito
+    const prev=document.getElementById("vendPrevBtn");
+    const next=document.getElementById("vendNextBtn");
+    if(prev){
+      const p=prev.cloneNode(true);
+      p.type="button";
+      p.disabled=false;
+      p.onclick=function(ev){ ev.preventDefault(); window.vendPrevClick(); };
+      prev.replaceWith(p);
+    }
+    if(next){
+      const n=next.cloneNode(true);
+      n.type="button";
+      n.onclick=function(ev){ ev.preventDefault(); window.vendNextClick(); };
+      next.replaceWith(n);
+    }
+  });
+})();
+ /* ===== FINE OVERRIDE NAV ===== */
+
 </script>
 </body>
 </html>
