@@ -2617,6 +2617,28 @@ try{
 })();
  /* ===== FINE FIX VENDITE ===== */
 
+
+/* ===== VENDITE: FIX TASTO INDIETRO DISABILITATO ===== */
+(function(){
+  function enablePrev(){
+    const p=document.getElementById("vendPrevBtn");
+    if(p) p.disabled = false;
+  }
+  // forza sempre abilitato dopo ogni render
+  try{
+    const _rv = window.renderVendite;
+    if(typeof _rv === "function"){
+      window.renderVendite = function(){
+        const r = _rv.apply(this, arguments);
+        try{ enablePrev(); }catch(e){}
+        return r;
+      };
+    }
+  }catch(e){}
+  document.addEventListener("DOMContentLoaded", ()=>{ try{ enablePrev(); }catch(e){} });
+})();
+ /* ===== FINE FIX INDIETRO ===== */
+
 </script>
 </body>
 </html>
