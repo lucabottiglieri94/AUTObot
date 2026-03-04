@@ -1455,157 +1455,159 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     $("cmpBtn").addEventListener("click",runComparatore);
     $("cmpInput1").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();runComparatore()}});
     $("cmpInput2").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();runComparatore()}});
+/* ══ VENDITE MENSILI ══ */
+let vendState={months:{},obiettivo:0};
+let vendDocRef=null,vendUnsub=null,vendTipo="nuova";
+const TODAY_KEY=(()=>{const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`})();
+let vendViewKey=TODAY_KEY;
 
-    /* ══ VENDITE MENSILI ══ */
-    let vendState={months:{},obiettivo:0};
-    let vendDocRef=null,vendUnsub=null,vendTipo="nuova";
-    const TODAY_KEY=(()=>{const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`})();
-    let vendViewKey=TODAY_KEY;
+function monthLabel(k){
+  const [y,m]=k.split("-").map(Number);
+  const d=new Date(y,m-1,1);
+  const l=d.toLocaleDateString("it-IT",{month:"long",year:"numeric"});
+  return l.charAt(0).toUpperCase()+l.slice(1);
+}
 
-    function monthLabel(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-1,1);const l=d.toLocaleDateString("it-IT",{month:"long",year:"numeric"});return l.charAt(0).toUpperCase()+l.slice(1)}
-    function prevMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-2,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
-    function nextMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
-    function vendUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
-    function ensureMonth(k){if(!vendState.months[k])vendState.months[k]={nuove:[],usate:[]}}
-    function sumProvv(list){return(list||[]).reduce((s,c)=>s+(Number(c.provv)||0),0)}
-    function fmtEur(n){return"€ "+n.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0})}
+// voglio poter scorrere indietro fino a gennaio e avanti oltre il mese corrente
+function prevMonthKey(k){
+  const [y,m]=k.split("-").map(Number);      // m = 1‑12
+  const d=new Date(y,m-1-1,1);              // mese precedente
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+function nextMonthKey(k){
+  const [y,m]=k.split("-").map(Number);
+  const d=new Date(y,m-1+1,1);              // mese successivo
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
 
-    function renderObiettivo(provvMese){
-      const target=vendState.obiettivo||0;
-      const inp=$("obiettivoInput");
-      if(document.activeElement!==inp)inp.value=target>0?target:"";
-      const fill=$("progressFill"),pct=$("progressPct"),manca=$("progressManca");
-      if(!target||target<=0){fill.style.width="0%";fill.className="progressFill low";pct.textContent="0%";pct.className="progressPct low";manca.textContent="Imposta un obiettivo ↑";manca.className="progressManca";return}
-      const ratio=Math.min(provvMese/target,1);const pctVal=Math.round(ratio*100);
-      const tier=pctVal>=100?"done":pctVal>=66?"high":pctVal>=33?"mid":"low";
-      fill.style.width=(ratio*100).toFixed(1)+"%";fill.className="progressFill "+tier;
-      pct.textContent=pctVal+"%";pct.className="progressPct "+tier;
-      if(pctVal>=100){manca.textContent="🎉 Obiettivo raggiunto! +"+fmtEur(provvMese-target)+" extra";manca.className="progressManca done"}
-      else{manca.textContent="Mancano "+fmtEur(target-provvMese)+" all'obiettivo";manca.className="progressManca"}
-    }
+function vendUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
+function ensureMonth(k){if(!vendState.months[k])vendState.months[k]={nuove:[],usate:[]}}
+function sumProvv(list){return(list||[]).reduce((s,c)=>s+(Number(c.provv)||0),0)}
+function fmtEur(n){return"€ "+n.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0})}
 
-   // REGOLA: 
+function renderObiettivo(provvMese){
+  const target=vendState.obiettivo||0;
+  const inp=$("obiettivoInput");
+  if(document.activeElement!==inp)inp.value=target>0?target:"";
+  const fill=$("progressFill"),pct=$("progressPct"),manca=$("progressManca");
+  if(!target||target<=0){
+    fill.style.width="0%";fill.className="progressFill low";
+    pct.textContent="0%";pct.className="progressPct low";
+    manca.textContent="Imposta un obiettivo ↑";manca.className="progressManca";
+    return;
+  }
+  const ratio=Math.min(provvMese/target,1);const pctVal=Math.round(ratio*100);
+  const tier=pctVal>=100?"done":pctVal>=66?"high":pctVal>=33?"mid":"low";
+  fill.style.width=(ratio*100).toFixed(1)+"%";fill.className="progressFill "+tier;
+  pct.textContent=pctVal+"%";pct.className="progressPct "+tier;
+  if(pctVal>=100){
+    manca.textContent="🎉 Obiettivo raggiunto! +"+fmtEur(provvMese-target)+" extra";
+    manca.className="progressManca done";
+  }else{
+    manca.textContent="Mancano "+fmtEur(target-provvMese)+" all'obiettivo";
+    manca.className="progressManca";
+  }
+}
+
+// REGOLA DATE:
 // - mese corrente: sempre editabile
 // - mese precedente: editabile SOLO fino al giorno 10 del mese corrente
 // - tutti gli altri mesi: sola lettura
 function isMeseEditabile(k){
-  const [y,m] = k.split("-").map(Number);   // m = 1‑12
-  const mese  = m - 1;                      // 0‑based
-  const oggi  = new Date();
-  const cy    = oggi.getFullYear();
-  const cm    = oggi.getMonth();           // 0‑based
-  const cd    = oggi.getDate();
+  const [y,m]=k.split("-").map(Number);  // m = 1‑12
+  const mese=m-1;                        // 0‑based
+  const oggi=new Date();
+  const cy=oggi.getFullYear();
+  const cm=oggi.getMonth();             // 0‑based
+  const cd=oggi.getDate();
 
   // mese corrente
-  if (y === cy && mese === cm) return true;
+  if(y===cy && mese===cm) return true;
 
   // mese precedente
-  const prev = new Date(cy, cm - 1, 1);
-  if (y === prev.getFullYear() && mese === prev.getMonth()){
-    return cd <= 10;
+  const prev=new Date(cy,cm-1,1);
+  if(y===prev.getFullYear() && mese===prev.getMonth()){
+    return cd<=10;
   }
-
-  // tutti gli altri: chiusi
   return false;
 }
 
 function renderVendite(){
-  const k = vendViewKey;
+  const k=vendViewKey;
   ensureMonth(k);
-  const mese  = vendState.months[k];
-  const nuove = mese.nuove || [];
-  const usate = mese.usate || [];
+  const mese=vendState.months[k],nuove=mese.nuove||[],usate=mese.usate||[];
 
-  const isCurrent = (k === TODAY_KEY);
-  const editabile = isMeseEditabile(k);
+  const isCurrent=(k===TODAY_KEY);
+  const editabile=isMeseEditabile(k);
 
-  $("vendMonthLabel").innerHTML =
+  $("vendMonthLabel").innerHTML=
     escapeHtml(monthLabel(k))
-    + (isCurrent
-        ? ' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>'
-        : ""
-      )
-    + (!isCurrent && editabile
-        ? ' <span style="color:#fbbf24;font-weight:700;font-size:11px;">✏ editabile</span>'
-        : ""
-      )
-    + (!editabile
-        ? ' <span style="color:#ef4444;font-weight:700;font-size:10px;">🔒 chiuso</span>'
-        : ""
-      );
+    +(isCurrent?' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>':"")
+    +(!isCurrent&&editabile?' <span style="color:#fbbf24;font-weight:700;font-size:11px;">✏ editabile</span>':"")
+    +(!editabile?' <span style="color:#ef4444;font-weight:700;font-size:10px;">🔒 chiuso</span>':"");
 
-  // ora puoi SEMPRE scorrere avanti/indietro
-  $("vendNextBtn").disabled = false;
-  $("vendPrevBtn").disabled = false;
+  // sempre libere entrambe le frecce
+  $("vendNextBtn").disabled=false;
+  $("vendPrevBtn").disabled=false;
 
-  $("totNuove").textContent = nuove.length;
-  $("totUsate").textContent = usate.length;
-  $("totAll").textContent   = nuove.length + usate.length;
+  $("totNuove").textContent=nuove.length;
+  $("totUsate").textContent=usate.length;
+  $("totAll").textContent=nuove.length+usate.length;
+  $("cntNuove").textContent=nuove.length;
+  $("cntUsate").textContent=usate.length;
 
-  $("cntNuove").textContent = nuove.length;
-  $("cntUsate").textContent = usate.length;
-
-  $("listNuove").innerHTML = nuove.length
+  $("listNuove").innerHTML=nuove.length
     ? nuove.map((c,i)=>autoItemHTML(c,i+1,"nuova",editabile)).join("")
     : '<div class="emptyList">Nessuna auto nuova</div>';
-
-  $("listUsate").innerHTML = usate.length
+  $("listUsate").innerHTML=usate.length
     ? usate.map((c,i)=>autoItemHTML(c,i+1,"usata",editabile)).join("")
     : '<div class="emptyList">Nessuna auto usata</div>';
 
-  const vendForm = document.querySelector(".venditeForm");
-  if (vendForm){
-    vendForm.style.opacity       = editabile ? "1"    : "0.4";
-    vendForm.style.pointerEvents = editabile ? "auto" : "none";
-    vendForm.title = editabile
-      ? "Puoi modificare le vendite di questo mese"
-      : "Mese chiuso - non modificabile";
+  const vendForm=document.querySelector(".venditeForm");
+  if(vendForm){
+    vendForm.style.opacity=editabile?"1":"0.4";
+    vendForm.style.pointerEvents=editabile?"auto":"none";
+    vendForm.title=editabile
+      ?"Puoi modificare le vendite di questo mese"
+      :"Mese chiuso - non modificabile";
   }
 
-  document
-    .querySelectorAll(".autoDelBtn")
-    .forEach(btn =>
-      btn.addEventListener("click", () =>
-        deleteAuto(k, btn.dataset.tipo, btn.dataset.id)
-      )
-    );
-
-  const pNuove = sumProvv(nuove);
-  const pUsate = sumProvv(usate);
-  const pTot   = pNuove + pUsate;
-
-  $("provvMeseTot").textContent  = fmtEur(pTot);
-  $("provvMeseSplit").textContent =
-    pNuove > 0 && pUsate > 0
-      ? `🆕 ${fmtEur(pNuove)}  ·  🔄 ${fmtEur(pUsate)}`
-      : pNuove > 0 ? "🆕 Tutte da auto nuove"
-      : pUsate > 0 ? "🔄 Tutte da auto usate"
-      : "Nessuna provvigione inserita";
-
-  let tot2026 = 0, mesi2026 = 0;
-  Object.entries(vendState.months).forEach(([mk,mv])=>{
-    if (!mk.startsWith("2026")) return;
-    const mP = sumProvv(mv.nuove || []) + sumProvv(mv.usate || []);
-    tot2026 += mP;
-    if (mP > 0) mesi2026++;
+  document.querySelectorAll(".autoDelBtn").forEach(btn=>{
+    btn.addEventListener("click",()=>deleteAuto(k,btn.dataset.tipo,btn.dataset.id));
   });
-  $("provv2026Tot").textContent = fmtEur(tot2026);
-  $("provv2026Mesi").textContent =
-    mesi2026 === 0 ? "Nessun mese con provvigioni"
-    : mesi2026 === 1 ? "1 mese con provvigioni"
-    : mesi2026 + " mesi con provvigioni";
+
+  const pNuove=sumProvv(nuove),pUsate=sumProvv(usate),pTot=pNuove+pUsate;
+  $("provvMeseTot").textContent=fmtEur(pTot);
+  $("provvMeseSplit").textContent=
+    pNuove>0&&pUsate>0?`🆕 ${fmtEur(pNuove)}  ·  🔄 ${fmtEur(pUsate)}`
+    :pNuove>0?"🆕 Tutte da auto nuove"
+    :pUsate>0?"🔄 Tutte da auto usate"
+    :"Nessuna provvigione inserita";
+
+  let tot2026=0,mesi2026=0;
+  Object.entries(vendState.months).forEach(([mk,mv])=>{
+    if(!mk.startsWith("2026"))return;
+    const mP=sumProvv(mv.nuove||[])+sumProvv(mv.usate||[]);
+    tot2026+=mP;
+    if(mP>0)mesi2026++;
+  });
+  $("provv2026Tot").textContent=fmtEur(tot2026);
+  $("provv2026Mesi").textContent=
+    mesi2026===0?"Nessun mese con provvigioni"
+    :mesi2026===1?"1 mese con provvigioni"
+    :mesi2026+" mesi con provvigioni";
 
   renderObiettivo(pTot);
 }
 
 function autoItemHTML(c,n,tipo,editabile=true){
-  const p    = Number(c.provv) || 0;
-  const pStr = p > 0 ? "€ " + p.toLocaleString("it-IT") : "—";
-  const cls  = p > 0 ? "autoProvv" : "autoProvv zero";
-  const delBtn = editabile
-    ? `<button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>`
-    : '<span style="width:24px;display:inline-block"></span>';
-  return `<div class="autoItem">
+  const p=Number(c.provv)||0;
+  const pStr=p>0?"€ "+p.toLocaleString("it-IT"):"—";
+  const cls=p>0?"autoProvv":"autoProvv zero";
+  const delBtn=editabile
+    ?`<button class="autoDelBtn" data-id="${escapeHtml(c.id)}" data-tipo="${tipo}" title="Elimina">×</button>`
+    :'<span style="width:24px;display:inline-block"></span>';
+  return`<div class="autoItem">
     <span class="autoN">#${n}</span>
     <span class="autoModello">${escapeHtml(c.modello)}</span>
     <span class="${cls}">${pStr}</span>
@@ -1614,33 +1616,25 @@ function autoItemHTML(c,n,tipo,editabile=true){
 }
 
 async function vendWrite(){
-  if(!vendDocRef) return;
-  try{
-    await setDoc(vendDocRef, vendState, {merge:false});
-  }catch{}
+  if(!vendDocRef)return;
+  try{await setDoc(vendDocRef,vendState,{merge:false})}catch{}
 }
 
 async function addAuto(){
-  const modello = $("vendModello").value.trim();
-  if(!modello) return;
-
-  const k = vendViewKey;
+  const modello=$("vendModello").value.trim();
+  if(!modello)return;
+  const k=vendViewKey;
   if(!isMeseEditabile(k)){
     alert("⏰ Questo mese è chiuso. Non puoi aggiungere vendite.");
     return;
   }
-  const provv = parseFloat($("vendProvv").value) || 0;
+  const provv=parseFloat($("vendProvv").value)||0;
   ensureMonth(k);
-  const id    = vendUid();
-  const entry = {id,modello,provv,createdAt:Date.now()};
-
-  if (vendTipo === "nuova") vendState.months[k].nuove.push(entry);
-  else                      vendState.months[k].usate.push(entry);
-
-  $("vendModello").value = "";
-  $("vendProvv").value   = "";
-  renderVendite();
-  await vendWrite();
+  const id=vendUid(),entry={id,modello,provv,createdAt:Date.now()};
+  if(vendTipo==="nuova")vendState.months[k].nuove.push(entry);
+  else vendState.months[k].usate.push(entry);
+  $("vendModello").value="";$("vendProvv").value="";
+  renderVendite();await vendWrite();
 }
 
 async function deleteAuto(k,tipo,id){
@@ -1649,32 +1643,29 @@ async function deleteAuto(k,tipo,id){
     return;
   }
   ensureMonth(k);
-  const list = tipo==="nuova"
-    ? vendState.months[k].nuove
-    : vendState.months[k].usate;
-  const idx = list.findIndex(c => c.id === id);
-  if(idx !== -1) list.splice(idx,1);
-  renderVendite();
-  await vendWrite();
+  const list=tipo==="nuova"?vendState.months[k].nuove:vendState.months[k].usate;
+  const idx=list.findIndex(c=>c.id===id);
+  if(idx!==-1)list.splice(idx,1);
+  renderVendite();await vendWrite();
 }
 
 function startVenditeSync(user){
   if(vendUnsub){try{vendUnsub()}catch{}}
-  vendDocRef = doc(db,"users",user.uid,"vendite","data");
+  vendDocRef=doc(db,"users",user.uid,"vendite","data");
   setSyncVendite("sync");
-  vendUnsub = onSnapshot(
+  vendUnsub=onSnapshot(
     vendDocRef,
     snap=>{
       if(snap.exists()){
-        const d = snap.data();
-        vendState = {months:d.months || {}, obiettivo:d.obiettivo || 0};
+        const d=snap.data();
+        vendState={months:d.months||{},obiettivo:d.obiettivo||0};
       }else{
-        vendState = {months:{}, obiettivo:0};
+        vendState={months:{},obiettivo:0};
       }
       ensureMonth(TODAY_KEY);
       setSyncVendite("ok");
       renderVendite();
-      if(!snap.exists()) setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
+      if(!snap.exists())setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
     },
     ()=>setSyncVendite("warn")
   );
@@ -1682,42 +1673,53 @@ function startVenditeSync(user){
 
 function stopVenditeSync(){
   if(vendUnsub){try{vendUnsub()}catch{}}
-  vendUnsub = null;
-  vendDocRef = null;
-  vendState = {months:{},obiettivo:0};
-  setSyncVendite("warn");
-  renderVendite();
+  vendUnsub=null;vendDocRef=null;vendState={months:{},obiettivo:0};
+  setSyncVendite("warn");renderVendite();
 }
 
 function setSyncVendite(s){
-  const b = $("venditeSyncBadge");
-  if(s === "ok"){b.className="venditeSyncBadge ok";b.textContent="Sync ✓";}
-  else if(s === "sync"){b.className="venditeSyncBadge";b.textContent="Sync …";}
+  const b=$("venditeSyncBadge");
+  if(s==="ok"){b.className="venditeSyncBadge ok";b.textContent="Sync ✓";}
+  else if(s==="sync"){b.className="venditeSyncBadge";b.textContent="Sync …";}
   else{b.className="venditeSyncBadge";b.textContent="Sync —";}
 }
 
+$("tipoBtnNuova").addEventListener("click",()=>{vendTipo="nuova";$("tipoBtnNuova").classList.add("active");$("tipoBtnUsata").classList.remove("active")});
+$("tipoBtnUsata").addEventListener("click",()=>{vendTipo="usata";$("tipoBtnUsata").classList.add("active");$("tipoBtnNuova").classList.remove("active")});
+$("vendAddBtn").addEventListener("click",addAuto);
+$("vendModello").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
+$("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
+$("obiettivoInput").addEventListener("input",async()=>{
+  vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
+  const k=vendViewKey;ensureMonth(k);const m=vendState.months[k];
+  renderObiettivo(sumProvv(m.nuove||[])+sumProvv(m.usate||[]));
+  await vendWrite();
+});
 
+ensureMonth(TODAY_KEY);renderVendite();
+renderWeekCalendar();
 
-    $("tipoBtnNuova").addEventListener("click",()=>{vendTipo="nuova";$("tipoBtnNuova").classList.add("active");$("tipoBtnUsata").classList.remove("active")});
-    $("tipoBtnUsata").addEventListener("click",()=>{vendTipo="usata";$("tipoBtnUsata").classList.add("active");$("tipoBtnNuova").classList.remove("active")});
-    $("vendAddBtn").addEventListener("click",addAuto);
-    $("vendModello").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
-    $("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
-    $("obiettivoInput").addEventListener("input",async()=>{
-      vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
-      const k=vendViewKey;ensureMonth(k);const m=vendState.months[k];
-      renderObiettivo(sumProvv(m.nuove||[])+sumProvv(m.usate||[]));
-      await vendWrite();
-    });
+// navigazione vendite
+window.vendGoPrev=function(){
+  vendViewKey=prevMonthKey(vendViewKey);
+  ensureMonth(vendViewKey);
+  renderVendite();
+};
+window.vendGoNext=function(){
+  vendViewKey=nextMonthKey(vendViewKey);
+  ensureMonth(vendViewKey);
+  renderVendite();
+};
 
-    ensureMonth(TODAY_KEY);renderVendite();
-    renderWeekCalendar(); // mostra i giorni anche prima del login
+// mantenere il passaggio automatico al mese nuovo
+(function scheduleMonthCheck(){
+  const now=new Date(),next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,5);
+  setTimeout(()=>{
+    if(vendViewKey===TODAY_KEY)vendViewKey=nextMonthKey(TODAY_KEY);
+    ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck();
+  },Math.max(5000,next-now));
+})();
 
-    // navigazione vendite gestita via onclick globale (vendPrevClick/vendNextClick)
-    (function scheduleMonthCheck(){
-      const now=new Date(),next=new Date(now.getFullYear(),now.getMonth()+1,1,0,0,5);
-      setTimeout(()=>{if(vendViewKey===TODAY_KEY)vendViewKey=nextMonthKey(TODAY_KEY);ensureMonth(TODAY_KEY);renderVendite();scheduleMonthCheck()},Math.max(5000,next-now));
-    })();
 
     /* ══ AUTH STATE ══ */
     onAuthStateChanged(auth,user=>{
