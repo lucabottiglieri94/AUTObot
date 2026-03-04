@@ -1521,23 +1521,29 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       return diffGiorni<=10; // editabile entro 10 giorni dalla fine
     }
 
-    function renderVendite(){
-      const k=vendViewKey;ensureMonth(k);
-
-      // ══ FIX CHIAVI FIREBASE ══
-      // Firebase potrebbe avere salvato "2026-2" invece di "2026-02"
-      // Normalizziamo tutte le chiavi months al formato "YYYY-MM"
-      const normalized={};
-      for(const [mk,mv] of Object.entries(vendState.months)){
-        const parts=mk.split("-");
+    // Normalizza tutte le chiavi months al formato "YYYY-MM" con zero padding
+    function normalizeMonthKeys(months){
+      if(!months||typeof months!=="object") return {};
+      const out={};
+      for(const [mk,mv] of Object.entries(months)){
+        const parts=String(mk).split("-");
         if(parts.length===2){
           const normK=`${parts[0]}-${parts[1].padStart(2,"0")}`;
-          if(!normalized[normK]) normalized[normK]={nuove:[],usate:[]};
-          normalized[normK].nuove=[...(normalized[normK].nuove||[]),...(mv.nuove||[])];
-          normalized[normK].usate=[...(normalized[normK].usate||[]),...(mv.usate||[])];
-        }else{normalized[mk]=mv}
+          if(!out[normK]) out[normK]={nuove:[],usate:[]};
+          // merge nel caso ci fossero duplicati
+          out[normK].nuove=[...(out[normK].nuove||[]),...(mv.nuove||[])];
+          out[normK].usate=[...(out[normK].usate||[]),...(mv.usate||[])];
+        }else{
+          out[mk]=mv;
+        }
       }
-      vendState.months=normalized;
+      return out;
+    }
+
+    function renderVendite(){
+      // Prima normalizza le chiavi, POI ensureMonth
+      vendState.months = normalizeMonthKeys(vendState.months);
+      const k=vendViewKey;
       if(!vendState.months[k]) vendState.months[k]={nuove:[],usate:[]};
 
       const mese=vendState.months[k],nuove=mese.nuove||[],usate=mese.usate||[];
@@ -1609,9 +1615,18 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       vendDocRef=doc(db,"users",user.uid,"vendite","data");
       setSyncVendite("sync");
       vendUnsub=onSnapshot(vendDocRef,snap=>{
-        if(snap.exists()){const d=snap.data();vendState={months:d.months||{},obiettivo:d.obiettivo||0}}
-        else{vendState={months:{},obiettivo:0}}
-        ensureMonth(TODAY_KEY);setSyncVendite("ok");renderVendite();
+        if(snap.exists()){
+          const d=snap.data();
+          // Normalizza subito le chiavi appena arrivano da Firebase
+          vendState={
+            months: normalizeMonthKeys(d.months||{}),
+            obiettivo: d.obiettivo||0
+          };
+        }else{
+          vendState={months:{},obiettivo:0};
+        }
+        setSyncVendite("ok");
+        renderVendite();
         if(!snap.exists())setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
       },()=>setSyncVendite("warn"));
     }
