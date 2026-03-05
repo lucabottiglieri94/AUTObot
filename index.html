@@ -2497,8 +2497,6 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     $("vendAddBtn").addEventListener("click",addAuto);
     $("vendModello").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
     $("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
-    $("vendPrevBtn").addEventListener("click",()=>{vendViewKey=prevMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite()});
-    $("vendNextBtn").addEventListener("click",()=>{if(vendViewKey===TODAY_KEY)return;vendViewKey=nextMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite()});
     $("obiettivoInput").addEventListener("input",async()=>{
       vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
       const k=vendViewKey;ensureMonth(k);const m=vendState.months[k];
@@ -2579,14 +2577,14 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         $("userPill").style.borderColor="rgba(34,197,94,.5)";
         $("userPill").style.background="rgba(34,197,94,.1)";
         $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";$("refreshBtn").disabled=false;
-        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);window.startObSync(user);renderOggi();renderWeekCalendar();
+        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();renderWeekCalendar();
       }else{
         $("userPill").textContent="🔒 Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor="";$("userPill").style.background="";
         $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";$("refreshBtn").disabled=true;
         $("newsList").innerHTML="";setStatus("🔒 Effettua il login per caricare le news.");
-        stopPlannerSync();stopVenditeSync();stopTelSync();stopConsegneSync();stopPostSync();if(window.stopObSync)window.stopObSync();renderOggi();
+        stopPlannerSync();stopVenditeSync();stopTelSync();stopConsegneSync();stopPostSync();renderOggi();
       }
     });
 
@@ -2971,36 +2969,15 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         // restituisce 0,1,2,3 = settimana 1,2,3,4 del mese
       }
 
-      function obUid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
-      function defaultObState(){ return { settimane:[[],[],[],[]] }; }
+      function loadOb(){
+        try{ const s=localStorage.getItem(OB_KEY); if(s) return JSON.parse(s); }catch{}
+        return { settimane:[[],[],[],[]] };
+      }
+      function saveOb(){ try{ localStorage.setItem(OB_KEY, JSON.stringify(obState)); }catch{} }
+      function obUid(){ return Math.random().toString(36).slice(2); }
 
-      let obState = defaultObState();
-      let obDocRef = null, obUnsub = null;
+      let obState = loadOb();
       let pendingModello = "";
-
-      // ── Firebase sync ─────────────────────────────────────────
-      function saveOb(){
-        if(!obDocRef){ return; }
-        setDoc(obDocRef, obState, {merge:false}).catch(()=>{});
-      }
-      function startObSync(user){
-        if(obUnsub){ try{ obUnsub(); }catch{} }
-        obDocRef = doc(db,"users",user.uid,"obiettivo","data");
-        obUnsub = onSnapshot(obDocRef, snap=>{
-          if(snap.exists()){
-            const d = snap.data();
-            obState = { settimane: (d.settimane||[[],[],[],[]]).map(s=>Array.isArray(s)?s:[]) };
-          } else {
-            obState = defaultObState();
-            setDoc(obDocRef, obState, {merge:false}).catch(()=>{});
-          }
-          renderObiettivo();
-        }, ()=>{ renderObiettivo(); });
-      }
-      function stopObSync(){
-        if(obUnsub){ try{ obUnsub(); }catch{} }
-        obUnsub=null; obDocRef=null; obState=defaultObState(); renderObiettivo();
-      }
 
       // ── Popup step 1: tipo (nuova/usata) ──────────────────────
       function showPopupTipo(modello){
@@ -3115,10 +3092,6 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       };
 
       renderObiettivo();
-
-      // Esponi sync functions per l'auth state
-      window.startObSync = startObSync;
-      window.stopObSync  = stopObSync;
     })();
 
         /* ══ VISTA OGGI ══ */
@@ -3647,7 +3620,7 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
 
 
   <!-- POPUP OBIETTIVO — step 1: tipo, step 2: finanziamento -->
-  <div id="obPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div id="obPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
     <div style="background:#111827;border:1px solid #1f2937;border-radius:20px;width:340px;max-width:92vw;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8);">
 
       <!-- Intestazione -->
@@ -3696,13 +3669,72 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
   document.body.removeChild(a);URL.revokeObjectURL(url);
 };
 /* ══ FINE GARANZIE ══ */
-
+    // ══ NAVIGAZIONE VENDITE - esposta globalmente ══
+// ══ NAVIGAZIONE VENDITE ══
+    $("vendPrevBtn").addEventListener("click", ()=>{
+      vendViewKey = prevMonthKey(vendViewKey);
+      ensureMonth(vendViewKey);
+      renderVendite();
+    });
+    $("vendNextBtn").addEventListener("click", ()=>{
+      if(vendViewKey === TODAY_KEY) return;
+      vendViewKey = nextMonthKey(vendViewKey);
+      ensureMonth(vendViewKey);
+      renderVendite();
+    });
 
   </script>
 
   <!-- POPUP AUTO VENDUTE -->
+  <div id="autoPopupOverlay" class="autoPopupOverlay" style="display:none;" onclick="if(event.target===this)closeAutoPopup()">
+    <div class="autoPopupBox">
+      <div class="autoPopupHead">
+        <div class="autoPopupTitle" id="autoPopupTitle">Auto</div>
+        <button class="autoPopupClose" onclick="closeAutoPopup()">×</button>
+      </div>
+      <div class="autoPopupList" id="autoPopupList"></div>
+    </div>
+  </div>
 
 
-  
+  <!-- POPUP OBIETTIVO — step 1: tipo, step 2: finanziamento -->
+  <div id="obPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+    <div style="background:#111827;border:1px solid #1f2937;border-radius:20px;width:340px;max-width:92vw;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8);">
+
+      <!-- Intestazione -->
+      <div style="padding:16px 20px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div id="obPopupTitle" style="font-weight:900;font-size:16px;"></div>
+          <div id="obPopupSub" style="font-size:12px;color:#9ca3af;margin-top:2px;"></div>
+        </div>
+        <button id="obPopupClose" style="width:30px;height:30px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#e5e7eb;cursor:pointer;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+
+      <!-- Step 1: tipo -->
+      <div id="obPopupTipoBox" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
+        <button id="obBtnNuova" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
+          🆕 <span>Auto Nuova</span>
+        </button>
+        <button id="obBtnUsata" style="padding:16px;border-radius:14px;border:2px solid rgba(249,115,22,.5);background:rgba(249,115,22,.1);color:#fb923c;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(249,115,22,.2)'" onmouseout="this.style.background='rgba(249,115,22,.1)'">
+          🔄 <span>Auto Usata</span>
+        </button>
+      </div>
+
+      <!-- Step 2: finanziamento -->
+      <div id="obPopupFinBox" style="padding:20px;display:none;flex-direction:column;gap:12px;">
+        <button id="obBtnCash" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
+          💵 <span>Cash</span>
+        </button>
+        <button id="obBtnFin" style="padding:16px;border-radius:14px;border:2px solid rgba(59,130,246,.5);background:rgba(59,130,246,.1);color:#60a5fa;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(59,130,246,.2)'" onmouseout="this.style.background='rgba(59,130,246,.1)'">
+          💳 <span>Finanziamento</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
 </body>
 </html>
