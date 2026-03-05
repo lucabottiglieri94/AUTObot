@@ -64,28 +64,25 @@
   background:var(--bg1);
   border:1px solid var(--line);
   border-radius:16px;
-  overflow:hidden;
   box-shadow:4px 0 20px rgba(0,0,0,.5);
-  max-height:none;
+  max-height:none;      /* niente limite sul pannello intero */
+  overflow:hidden;      /* lo scroll lo fa la sezione interna */
 }
 
-/* PANEL NEWS: alto max ~4 dita */
+/* PANEL NEWS: altezza visiva fissa (~4 dita) */
 .panel--news{
-  max-height:260px;     /* se lo vuoi più alto/basso cambia qui */
+  max-height:360px;     /* aumenta/diminuisci per cambiare l’altezza */
 }
 
 /* scroll solo dentro il contenuto news */
 .newsScroll{
-  max-height:620px;   /* pannello più alto (circa 4 dita) */
+  max-height:360px;     /* stessa altezza del pannello */
+  min-height:260px;
   overflow-y:auto;
   overflow-x:hidden;
   padding:12px;
 }
-/* regola generica, così altri eventuali .newsScroll non rompono */
-.newsScroll{
-  max-height:none;
-  overflow:visible;
-}
+
 
 .panelHeader{padding:14px 14px 10px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.3);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .panelTitle{font-weight:950;font-size:18px}
