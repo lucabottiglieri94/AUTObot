@@ -139,7 +139,7 @@
 
   .panel{
     background:var(--panel);
-    border:1px solid var(--line);
+    border:1px solid var(--tintBorder, var(--line));
     border-radius:18px;
     box-shadow:0 18px 45px rgba(0,0,0,.75);
     max-height:none;
@@ -160,7 +160,8 @@
   .panelHeader{
     padding:14px 14px 10px;
     border-bottom:1px solid var(--line);
-    background:linear-gradient(135deg,rgba(58,58,60,0.92),rgba(44,44,46,0.82));
+    background:linear-gradient(180deg,var(--tintTop,rgba(255,255,255,.06)), rgba(10,12,18,.95) 70%);
+border-bottom:1px solid var(--tintBorder, var(--line));
     display:flex;
     align-items:flex-start;
     justify-content:space-between;
@@ -235,7 +236,7 @@
   .widgetHeader{
     padding:13px 18px;
     border-bottom:1px solid var(--line);
-    background:linear-gradient(135deg,rgba(44,44,46,0.96),rgba(28,28,30,0.9));
+    background:linear-gradient(180deg,var(--tintTop,rgba(255,255,255,.06)), rgba(10,12,18,.95) 70%);
     display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
   }
   .widgetTitle{font-weight:950;font-size:18px}
@@ -358,7 +359,7 @@
   .syncBadge.warn{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.10);color:#fde68a}
 
   #agendaPanel .widgetHeader,#memoPanel .widgetHeader{
-    background:linear-gradient(135deg,rgba(255,149,0,0.10),rgba(44,44,46,0.96));
+    background:linear-gradient(180deg,var(--tintTop,rgba(255,255,255,.06)), rgba(10,12,18,.95) 70%);
   }
 
   /* VENDITE + BARRA PROVV */
@@ -608,7 +609,7 @@
 
   /* TELEFONO */
   #telefonoPanel .widgetHeader{
-    background:linear-gradient(135deg,rgba(168,85,247,.16),rgba(28,28,30,0.96));
+    background:linear-gradient(180deg,var(--tintTop,rgba(255,255,255,.06)), rgba(10,12,18,.95) 70%);
   }
   .telFormRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
   .telInput{
@@ -964,7 +965,7 @@
     -webkit-backdrop-filter:blur(22px);
   }
   #consegnePanel .widgetHeader{
-    background:linear-gradient(180deg,rgba(34,197,94,.16),rgba(10,12,18,.95) 70%);
+    background:linear-gradient(180deg,var(--tintTop,rgba(255,255,255,.06)), rgba(10,12,18,.95) 70%);
   }
   .consegnaCard{
     border:1px solid var(--line);
@@ -1078,7 +1079,7 @@
     -webkit-backdrop-filter:blur(22px);
   }
   #postPanel .widgetHeader{
-    background:linear-gradient(180deg,rgba(251,191,36,.12),rgba(10,12,18,.95) 70%);
+    background:linear-gradient(180deg,var(--tintTop,rgba(255,255,255,.06)), rgba(10,12,18,.95) 70%);
   }
   .postCard{
     border:1px solid var(--line);
@@ -1225,6 +1226,32 @@
     .centroAutoLogo{height:36px}
     .centroAutoLink{padding:4px 8px}
   }
+
+  /* PANEL TINT SYSTEM (Post-Vendita style, but unique per panel) */
+  .tintedPanel{background:var(--panel);border:1px solid var(--tintBorder,var(--line));border-radius:18px;overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.75);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);}
+  .tintedHeader{padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    background:linear-gradient(180deg,var(--tintTop,rgba(255,255,255,.06)), rgba(10,12,18,.95) 70%);
+    border-bottom:1px solid var(--tintBorder,var(--line));
+  }
+
+  /* Left column panels */
+  #newsPanel{--tintTop:rgba(0,122,255,.14);--tintBorder:rgba(0,122,255,.26);}
+  #preConsegnaPanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
+  #postVenditaLeftPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
+
+  /* Common widget panels (right side) */
+  #agendaPanel{--tintTop:rgba(255,149,0,.14);--tintBorder:rgba(255,149,0,.26);}
+  #memoPanel{--tintTop:rgba(168,85,247,.14);--tintBorder:rgba(168,85,247,.26);}
+  #telefonoPanel{--tintTop:rgba(59,130,246,.14);--tintBorder:rgba(59,130,246,.26);}
+  #consegnePanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
+  #postPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
+  #obiettivoPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.26);}
+  #comparatorePanel{--tintTop:rgba(239,68,68,.12);--tintBorder:rgba(239,68,68,.22);}
+  #venditePanel{--tintTop:rgba(34,197,94,.12);--tintBorder:rgba(34,197,94,.22);}
+
+  /* Fallback: each widgetPanel can opt-in by setting vars on its root */
+  .widgetPanel{border-color:var(--tintBorder,var(--line));}
+
 </style>
 
 </head>
@@ -1261,7 +1288,7 @@
 
 
        <!-- NEWS -->
-<div class="panel panel--news">
+<div class="panel panel--news tintedPanel" id="newsPanel">
   <div class="panelHeader">
     <div>
       <div class="panelTitle">📰 Ultime News</div>
@@ -1279,8 +1306,8 @@
 </div>
 
         <!-- PRE-CONSEGNA -->
-        <div class="panel" style="position:static;">
-          <div style="background:rgba(34,197,94,.08);border-bottom:1px solid rgba(34,197,94,.2);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div class="panel tintedPanel" id="preConsegnaPanel" style="position:static;">
+          <div class="tintedHeader">
             <div>
               <div style="font-weight:950;font-size:16px;">🚗 Pre-Consegna</div>
               <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Checklist consegne — sempre visibile</div>
@@ -1299,8 +1326,8 @@
         </div>
 
         <!-- POST VENDITA -->
-        <div class="panel" style="position:static;">
-          <div style="background:rgba(251,191,36,.07);border-bottom:1px solid rgba(251,191,36,.2);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div class="panel tintedPanel" id="postVenditaLeftPanel" style="position:static;">
+          <div class="tintedHeader">
             <div>
               <div style="font-weight:950;font-size:16px;">⭐ Post-Vendita</div>
               <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Follow-up: intervista (2gg) · recensione (3gg)</div>
@@ -1377,8 +1404,8 @@
         </div>
 
         <!-- COMPARATORE -->
-        <div style="background:var(--bg1);border:1px solid var(--line);border-radius:16px;overflow:hidden;">
-          <div style="padding:13px 18px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.22);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div id="comparatorePanel" class="tintedPanel" style="background:var(--bg1);border:1px solid var(--tintBorder,var(--line));border-radius:16px;overflow:hidden;">
+          <div class="tintedHeader" style="padding:13px 18px;">
             <div>
               <div style="font-weight:950;font-size:18px">⚔ Comparatore Auto</div>
               <div style="color:#9ca3af;font-size:13px;margin-top:4px">Confronta due auto nuove — cerca sui configuratori ufficiali</div>
@@ -1454,7 +1481,33 @@
           <div style="height:100%;width:60%;background:linear-gradient(90deg,#8b5cf6,#a78bfa,#8b5cf6);background-size:200% 100%;border-radius:999px;animation:garLoad 1.5s infinite linear;"></div>
         </div>
       </div>
-      <style>@keyframes garLoad{0%{background-position:200% 0}100%{background-position:-200% 0}}</style>
+      <style>@keyframes garLoad{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  /* PANEL TINT SYSTEM (Post-Vendita style, but unique per panel) */
+  .tintedPanel{background:var(--panel);border:1px solid var(--tintBorder,var(--line));border-radius:18px;overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.75);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);}
+  .tintedHeader{padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    background:linear-gradient(180deg,var(--tintTop,rgba(255,255,255,.06)), rgba(10,12,18,.95) 70%);
+    border-bottom:1px solid var(--tintBorder,var(--line));
+  }
+
+  /* Left column panels */
+  #newsPanel{--tintTop:rgba(0,122,255,.14);--tintBorder:rgba(0,122,255,.26);}
+  #preConsegnaPanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
+  #postVenditaLeftPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
+
+  /* Common widget panels (right side) */
+  #agendaPanel{--tintTop:rgba(255,149,0,.14);--tintBorder:rgba(255,149,0,.26);}
+  #memoPanel{--tintTop:rgba(168,85,247,.14);--tintBorder:rgba(168,85,247,.26);}
+  #telefonoPanel{--tintTop:rgba(59,130,246,.14);--tintBorder:rgba(59,130,246,.26);}
+  #consegnePanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
+  #postPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
+  #obiettivoPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.26);}
+  #comparatorePanel{--tintTop:rgba(239,68,68,.12);--tintBorder:rgba(239,68,68,.22);}
+  #venditePanel{--tintTop:rgba(34,197,94,.12);--tintBorder:rgba(34,197,94,.22);}
+
+  /* Fallback: each widgetPanel can opt-in by setting vars on its root */
+  .widgetPanel{border-color:var(--tintBorder,var(--line));}
+
+</style>
 
       <!-- RISULTATO -->
       <div id="garResultBox"></div>
@@ -1496,7 +1549,7 @@
 </div>
 <!-- FINE ANALISI GARANZIE -->
         <!-- VENDITE MENSILI -->
-        <div class="venditePanel">
+        <div class="venditePanel" id="venditePanel">
           <div class="venditeHeader">
             <div class="venditeTitleRow">
               <div class="venditeTitle">🚗 Vendite mensili</div>
@@ -3492,6 +3545,32 @@ td:first-child{background:#f8fafc;font-weight:bold;width:40%}
 ul{padding-left:20px;margin:6px 0}
 .inc{color:#15803d}.exc{color:#dc2626}.warn{color:#92400e}
 .footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;text-align:center}
+
+  /* PANEL TINT SYSTEM (Post-Vendita style, but unique per panel) */
+  .tintedPanel{background:var(--panel);border:1px solid var(--tintBorder,var(--line));border-radius:18px;overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.75);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);}
+  .tintedHeader{padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    background:linear-gradient(180deg,var(--tintTop,rgba(255,255,255,.06)), rgba(10,12,18,.95) 70%);
+    border-bottom:1px solid var(--tintBorder,var(--line));
+  }
+
+  /* Left column panels */
+  #newsPanel{--tintTop:rgba(0,122,255,.14);--tintBorder:rgba(0,122,255,.26);}
+  #preConsegnaPanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
+  #postVenditaLeftPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
+
+  /* Common widget panels (right side) */
+  #agendaPanel{--tintTop:rgba(255,149,0,.14);--tintBorder:rgba(255,149,0,.26);}
+  #memoPanel{--tintTop:rgba(168,85,247,.14);--tintBorder:rgba(168,85,247,.26);}
+  #telefonoPanel{--tintTop:rgba(59,130,246,.14);--tintBorder:rgba(59,130,246,.26);}
+  #consegnePanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
+  #postPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
+  #obiettivoPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.26);}
+  #comparatorePanel{--tintTop:rgba(239,68,68,.12);--tintBorder:rgba(239,68,68,.22);}
+  #venditePanel{--tintTop:rgba(34,197,94,.12);--tintBorder:rgba(34,197,94,.22);}
+
+  /* Fallback: each widgetPanel can opt-in by setting vars on its root */
+  .widgetPanel{border-color:var(--tintBorder,var(--line));}
+
 </style></head><body>
 <h1>🛡 Sunto Garanzia — AI BOTT Automotive</h1>
 <div class="box">
