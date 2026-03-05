@@ -3066,7 +3066,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
               <span style="font-size:12px;font-weight:700;color:${sett.length>=OB_WEEK_TARGET[wi]?"#4ade80":"#9ca3af"}">${sett.length} / ${OB_WEEK_TARGET[wi]}</span>
             </div>
             <div style="padding:8px;display:flex;flex-direction:column;gap:5px;">
-              ${cards||'<div style="padding:6px 4px;color:#6b7280;font-size:12px;font-style:italic;">Nessuna auto — obiettivo: ${OB_WEEK_TARGET[wi]}</div>'}
+              ${cards||`<div style="padding:6px 4px;color:#6b7280;font-size:12px;font-style:italic;">Nessuna auto — obiettivo: ${OB_WEEK_TARGET[wi]}</div>`}
             </div>
           </div>`;
         }).join("");
