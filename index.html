@@ -483,7 +483,7 @@
           <div style="padding:14px 20px;background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(249,115,22,.07));border-bottom:1px solid rgba(251,191,36,.2);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
             <div>
               <div style="font-weight:950;font-size:18px;">🎯 Obiettivo Mensile</div>
-              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Target: <strong style="color:#fbbf24;">11 auto</strong> · di cui <strong style="color:#4ade80;">70% finanziate</strong> · 2 a settimana</div>
+              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Target: <strong style="color:#fbbf24;">11 auto</strong> · di cui <strong style="color:#4ade80;">70% finanziate</strong> · 3+3+3+2 a settimana</div>
             </div>
             <div style="display:flex;gap:8px;align-items:center;">
               <button id="obAddBtn" style="background:linear-gradient(135deg,rgba(251,191,36,.2),rgba(249,115,22,.15));border:1px solid rgba(251,191,36,.4);border-radius:10px;padding:8px 16px;color:#fbbf24;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;">+ Auto</button>
@@ -2060,6 +2060,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     (function(){
       const OB_TARGET_AUTO = 11;
       const OB_TARGET_FIN  = 70;
+      const OB_WEEK_TARGET = [3,3,3,2]; // 3+3+3+2 = 11
       const OB_KEY         = "obiettivoMensile_v2";
 
       function getWeekOfMonth(){
@@ -2165,10 +2166,10 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
               <span style="font-size:12px;font-weight:900;color:${isCurrent?"#fbbf24":"#9ca3af"};text-transform:uppercase;letter-spacing:.4px;">
                 ${isCurrent?"📍 ":""}Settimana ${wi+1}${isCurrent?" — in corso":""}
               </span>
-              <span style="font-size:12px;font-weight:700;color:${sett.length>=2?"#4ade80":"#9ca3af"}">${sett.length} / 2</span>
+              <span style="font-size:12px;font-weight:700;color:${sett.length>=OB_WEEK_TARGET[wi]?"#4ade80":"#9ca3af"}">${sett.length} / ${OB_WEEK_TARGET[wi]}</span>
             </div>
             <div style="padding:8px;display:flex;flex-direction:column;gap:5px;">
-              ${cards||'<div style="padding:6px 4px;color:#6b7280;font-size:12px;font-style:italic;">Nessuna auto questa settimana</div>'}
+              ${cards||'<div style="padding:6px 4px;color:#6b7280;font-size:12px;font-style:italic;">Nessuna auto — obiettivo: ${OB_WEEK_TARGET[wi]}</div>'}
             </div>
           </div>`;
         }).join("");
