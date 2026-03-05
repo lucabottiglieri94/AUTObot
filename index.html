@@ -1336,7 +1336,69 @@ border-bottom:1px solid var(--tintBorder, var(--line));
           </div>
           <div style="padding:12px 12px 16px;">
             <div id="postList"></div>
+
+
+        <!-- MEMO -->
+        <div class="panel tintedPanel" id="memoPanel" style="position:static;border-top:2px solid rgba(168,85,247,.25);">
+          <div class="tintedHeader">
+            <div>
+              <div style="font-weight:950;font-size:16px;">📝 Memo</div>
+              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Sincronizzate su Firebase.</div>
+            </div>
+            <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
           </div>
+          <div style="padding:12px 12px 16px;">
+            <div class="formRow" style="align-items:stretch;">
+              <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
+              <button id="addMemoBtn" class="btn primary" type="button" style="align-self:flex-start;">Aggiungi</button>
+            </div>
+            <div style="margin-top:14px;"><div id="memoList" class="list" style="max-height:320px;"></div></div>
+            <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
+          </div>
+        </div>
+
+        <!-- COLPI DI TELEFONO -->
+        <!-- COLPI DI TELEFONO -->
+        <div class="panel tintedPanel" id="telefonoPanel" style="position:static;border-top:2px solid rgba(59,130,246,.25);">
+          <div class="tintedHeader">
+            <div>
+              <div style="font-weight:950;font-size:16px;">📞 Colpi di telefono</div>
+              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Chi spingere oggi, domani, prossima settimana.</div>
+            </div>
+            <button id="telClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci chiamati</button>
+          </div>
+          <div style="padding:12px 12px 16px;">
+            <div class="telFormRow">
+              <input id="telNome"    class="telInput" type="text" placeholder="Nome (es: Marco R.)"/>
+              <input id="telModello" class="telInput" type="text" placeholder="Modello interesse" style="max-width:160px"/>
+              <div class="telSeg">
+                <button class="telBtn caldo   active" id="telBtnCaldo"  >🔥 Caldo</button>
+                <button class="telBtn tiepido"        id="telBtnTiepido">🌡 Tiepido</button>
+                <button class="telBtn freddo"         id="telBtnFreddo" >❄ Freddo</button>
+              </div>
+            </div>
+            <div class="telFormRow">
+              <div class="telWhenSeg">
+                <button class="telWhenBtn active" id="telWhenOggi">📅 Oggi</button>
+                <button class="telWhenBtn"        id="telWhenDomani">Domani</button>
+                <button class="telWhenBtn"        id="telWhenSettimana">Settimana</button>
+              </div>
+              <button id="telAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
+            </div>
+            <div class="telSection">
+              <div class="telSectionLabel">📅 Da chiamare oggi <span id="telCntOggi" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
+              <div id="telListOggi" class="telList"></div>
+            </div>
+            <div class="telSection">
+              <div class="telSectionLabel">🌅 Domani <span id="telCntDomani" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
+              <div id="telListDomani" class="telList"></div>
+            </div>
+            <div class="telSection">
+              <div class="telSectionLabel">📆 Prossima settimana <span id="telCntSettimana" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
+              <div id="telListSettimana" class="telList"></div>
+            </div>
+          </div>
+        </div>          </div>
         </div>
 
       </aside>
@@ -1666,65 +1728,6 @@ border-bottom:1px solid var(--tintBorder, var(--line));
             </div>
           </div>
 
-          <div class="widgetPanel" id="memoPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">📝 Memo</div>
-                <div class="widgetSub">Sincronizzate su Firebase.</div>
-              </div>
-              <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
-            </div>
-            <div class="widgetBody">
-              <div class="formRow" style="align-items:stretch;">
-                <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
-                <button id="addMemoBtn" class="btn primary" type="button" style="align-self:flex-start;">Aggiungi</button>
-              </div>
-              <div style="margin-top:14px;"><div id="memoList" class="list" style="max-height:320px;"></div></div>
-              <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
-            </div>
-          </div>
-
-          <!-- COLPI DI TELEFONO -->
-          <div class="widgetPanel" id="telefonoPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">📞 Colpi di telefono</div>
-                <div class="widgetSub">Chi spingere oggi, domani, prossima settimana.</div>
-              </div>
-              <button id="telClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci chiamati</button>
-            </div>
-            <div class="widgetBody">
-              <div class="telFormRow">
-                <input id="telNome"    class="telInput" type="text" placeholder="Nome (es: Marco R.)"/>
-                <input id="telModello" class="telInput" type="text" placeholder="Modello interesse" style="max-width:160px"/>
-                <div class="telSeg">
-                  <button class="telBtn caldo   active" id="telBtnCaldo"  >🔥 Caldo</button>
-                  <button class="telBtn tiepido"        id="telBtnTiepido">🌡 Tiepido</button>
-                  <button class="telBtn freddo"         id="telBtnFreddo" >❄ Freddo</button>
-                </div>
-              </div>
-              <div class="telFormRow">
-                <div class="telWhenSeg">
-                  <button class="telWhenBtn active" id="telWhenOggi">📅 Oggi</button>
-                  <button class="telWhenBtn"        id="telWhenDomani">Domani</button>
-                  <button class="telWhenBtn"        id="telWhenSettimana">Settimana</button>
-                </div>
-                <button id="telAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
-              </div>
-              <div class="telSection">
-                <div class="telSectionLabel">📅 Da chiamare oggi <span id="telCntOggi" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
-                <div id="telListOggi" class="telList"></div>
-              </div>
-              <div class="telSection">
-                <div class="telSectionLabel">🌅 Domani <span id="telCntDomani" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
-                <div id="telListDomani" class="telList"></div>
-              </div>
-              <div class="telSection">
-                <div class="telSectionLabel">📆 Prossima settimana <span id="telCntSettimana" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
-                <div id="telListSettimana" class="telList"></div>
-              </div>
-            </div>
-          </div>
 
         </div>
       </section>
