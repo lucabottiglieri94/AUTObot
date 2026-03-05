@@ -384,15 +384,6 @@
     .autoPopupDel{width:28px;height:28px;border-radius:8px;border:1px solid #374151;background:#111827;color:#6b7280;cursor:pointer;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
     .autoPopupDel:hover{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.1);color:#fca5a5;}
     .autoPopupEmpty{padding:20px;text-align:center;color:#6b7280;font-style:italic;font-size:13px;}
-
-    /* ══ OBIETTIVO MENSILE CARDS ══ */
-    .obCard{position:relative;border-radius:12px;overflow:hidden;user-select:none;touch-action:pan-y;}
-    .obCardInner{position:relative;z-index:1;background:rgba(17,24,39,.6);border:1px solid rgba(31,41,55,.8);border-radius:12px;cursor:grab;}
-    .obCardInner:active{cursor:grabbing;}
-    .obSwipeBg{position:absolute;inset:0;display:flex;align-items:center;border-radius:12px;padding:0 16px;}
-    .obSwipeBg.left{justify-content:flex-start;}
-    .obSwipeBg.right{justify-content:flex-end;}
-    .obCardContent{padding:10px 12px;display:flex;align-items:center;gap:10px;background:rgba(17,24,39,.85);border-radius:12px;position:relative;}
   </style>
 </head>
 <body>
@@ -2068,166 +2059,130 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     /* ══ OBIETTIVO MENSILE ══ */
     (function(){
       const OB_TARGET_AUTO = 11;
-      const OB_TARGET_FIN  = 70; // %
-      const OB_WEEKS       = 4;
-      const OB_KEY         = "obiettivoMensile_v1";
+      const OB_TARGET_FIN  = 70;
+      const OB_KEY         = "obiettivoMensile_v2";
 
-      // Struttura: { settimane: [ [{tipo,fin},..], ..x4 ] }
-      let obState = loadOb();
+      function getWeekOfMonth(){
+        const oggi = new Date();
+        const primoGiorno = new Date(oggi.getFullYear(), oggi.getMonth(), 1);
+        return Math.min(3, Math.floor((oggi.getDate() - 1 + primoGiorno.getDay()) / 7));
+        // restituisce 0,1,2,3 = settimana 1,2,3,4 del mese
+      }
 
       function loadOb(){
         try{ const s=localStorage.getItem(OB_KEY); if(s) return JSON.parse(s); }catch{}
-        return { settimane: [[],[],[],[]] };
+        return { settimane:[[],[],[],[]] };
       }
-      function saveOb(){
-        try{ localStorage.setItem(OB_KEY, JSON.stringify(obState)); }catch{}
-      }
+      function saveOb(){ try{ localStorage.setItem(OB_KEY, JSON.stringify(obState)); }catch{} }
       function obUid(){ return Math.random().toString(36).slice(2); }
 
+      let obState = loadOb();
+      let pendingModello = "";
+
+      // ── Popup step 1: tipo (nuova/usata) ──────────────────────
+      function showPopupTipo(modello){
+        pendingModello = modello;
+        const ov = document.getElementById("obPopupOverlay");
+        document.getElementById("obPopupTipoBox").style.display = "flex";
+        document.getElementById("obPopupFinBox").style.display  = "none";
+        document.getElementById("obPopupTitle").textContent = "Tipo auto";
+        document.getElementById("obPopupSub").textContent   = modello;
+        ov.style.display = "flex";
+      }
+
+      // ── Popup step 2: finanziamento ───────────────────────────
+      function showPopupFin(tipo){
+        window._obPendingTipo = tipo;
+        document.getElementById("obPopupTipoBox").style.display = "none";
+        document.getElementById("obPopupFinBox").style.display  = "flex";
+        document.getElementById("obPopupTitle").textContent = "Finanziamento?";
+        document.getElementById("obPopupSub").textContent   = (tipo==="nuova"?"🆕 Auto Nuova":"🔄 Auto Usata")+" · "+pendingModello;
+      }
+
+      function closeObPopup(){
+        document.getElementById("obPopupOverlay").style.display = "none";
+        pendingModello=""; window._obPendingTipo=null;
+      }
+
+      function addAutoToOb(tipo, fin){
+        const wi = getWeekOfMonth();
+        obState.settimane[wi].push({id:obUid(), modello:pendingModello, tipo, fin});
+        saveOb(); closeObPopup(); renderObiettivo();
+      }
+
+      // ── Listener popup ────────────────────────────────────────
+      document.getElementById("obBtnNuova").addEventListener("click",  ()=>showPopupFin("nuova"));
+      document.getElementById("obBtnUsata").addEventListener("click",  ()=>showPopupFin("usata"));
+      document.getElementById("obBtnCash").addEventListener("click",   ()=>addAutoToOb(window._obPendingTipo, false));
+      document.getElementById("obBtnFin").addEventListener("click",    ()=>addAutoToOb(window._obPendingTipo, true));
+      document.getElementById("obPopupClose").addEventListener("click", closeObPopup);
+      document.getElementById("obPopupOverlay").addEventListener("click", e=>{ if(e.target===document.getElementById("obPopupOverlay")) closeObPopup(); });
+
+      // ── Bottone + Auto ────────────────────────────────────────
+      document.getElementById("obAddBtn").addEventListener("click",()=>{
+        const modello = prompt("Nome auto (es: Jeep Compass):","");
+        if(!modello || !modello.trim()) return;
+        showPopupTipo(modello.trim());
+      });
+
+      // ── Render ────────────────────────────────────────────────
       function renderObiettivo(){
         const box = document.getElementById("obSettimaneListe");
         if(!box) return;
 
-        // Calcola totali
-        const tutte = obState.settimane.flat();
-        const totAuto = tutte.length;
-        const totFin  = tutte.filter(a=>a.fin).length;
-        const pctFin  = totAuto>0 ? Math.round(totFin/totAuto*100) : 0;
+        const settimanaCorrente = getWeekOfMonth();
+        const tutte    = obState.settimane.flat();
+        const totAuto  = tutte.length;
+        const totFin   = tutte.filter(a=>a.fin).length;
+        const pctFin   = totAuto>0 ? Math.round(totFin/totAuto*100) : 0;
 
         // Barre
-        const pAuto = Math.min(totAuto/OB_TARGET_AUTO*100, 100);
-        const pFin  = Math.min(pctFin/OB_TARGET_FIN*100, 100);
+        const pAuto = Math.min(totAuto/OB_TARGET_AUTO*100,100);
+        const pFin  = Math.min(pctFin/OB_TARGET_FIN*100,100);
         const colorAuto = pAuto>=100?"linear-gradient(90deg,#a855f7,#c084fc)":pAuto>=60?"linear-gradient(90deg,#22c55e,#4ade80)":"linear-gradient(90deg,#3b82f6,#60a5fa)";
         const colorFin  = pFin>=100?"linear-gradient(90deg,#a855f7,#c084fc)":pFin>=60?"linear-gradient(90deg,#22c55e,#4ade80)":"linear-gradient(90deg,#eab308,#fbbf24)";
-        document.getElementById("obProgAutoBar").style.width = pAuto+"%";
-        document.getElementById("obProgAutoBar").style.background = colorAuto;
-        document.getElementById("obProgAutoTxt").textContent = totAuto+" / "+OB_TARGET_AUTO;
-        document.getElementById("obProgFinBar").style.width = pFin+"%";
-        document.getElementById("obProgFinBar").style.background = colorFin;
-        document.getElementById("obProgFinTxt").textContent = pctFin+"% / "+OB_TARGET_FIN+"%";
+        document.getElementById("obProgAutoBar").style.cssText += ";width:"+pAuto+"%;background:"+colorAuto;
+        document.getElementById("obProgAutoTxt").textContent   = totAuto+" / "+OB_TARGET_AUTO;
+        document.getElementById("obProgFinBar").style.cssText  += ";width:"+pFin+"%;background:"+colorFin;
+        document.getElementById("obProgFinTxt").textContent    = pctFin+"% / "+OB_TARGET_FIN+"%";
 
-        // Settimane
-        box.innerHTML = obState.settimane.map((sett, wi)=>{
+        box.innerHTML = obState.settimane.map((sett,wi)=>{
+          const isCurrent = wi===settimanaCorrente;
           const cards = sett.map(a=>`
-            <div class="obCard" data-id="${a.id}" data-wi="${wi}">
-              <div class="obCardInner">
-                <!-- sfondo swipe sinistra (usata) -->
-                <div class="obSwipeBg left" style="background:rgba(249,115,22,.18);">
-                  <span style="color:#fb923c;font-size:11px;font-weight:900;">🔄 USATA</span>
-                </div>
-                <!-- sfondo swipe destra (nuova) -->
-                <div class="obSwipeBg right" style="background:rgba(59,130,246,.18);">
-                  <span style="color:#60a5fa;font-size:11px;font-weight:900;">🆕 NUOVA</span>
-                </div>
-                <!-- contenuto card -->
-                <div class="obCardContent">
-                  <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">
-                    <div style="font-size:13px;font-weight:700;">${escapeHtml(a.modello||"Auto")}</div>
-                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                      <span style="font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;${a.tipo==="nuova"?"background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd":"background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);color:#fdba74"}">${a.tipo==="nuova"?"🆕 Nuova":"🔄 Usata"}</span>
-                      <span style="font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;${a.fin?"background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#6ee7b7":"background:rgba(107,114,128,.15);border:1px solid rgba(107,114,128,.3);color:#9ca3af"}">${a.fin?"💳 Finanz.":"💵 Contante"}</span>
-                    </div>
-                  </div>
-                  <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
-                    <button class="obFinBtn" data-id="${a.id}" data-wi="${wi}" title="${a.fin?"Segna contante":"Segna finanziata"}"
-                      style="padding:5px 10px;border-radius:8px;border:1px solid ${a.fin?"rgba(34,197,94,.4)":"rgba(107,114,128,.3)"};background:${a.fin?"rgba(34,197,94,.1)":"rgba(107,114,128,.08)"};color:${a.fin?"#4ade80":"#9ca3af"};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;">
-                      ${a.fin?"💳":"💵"}
-                    </button>
-                    <button class="obDelBtn" data-id="${a.id}" data-wi="${wi}"
-                      style="width:26px;height:26px;border-radius:7px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);color:#fca5a5;cursor:pointer;font-size:15px;font-weight:900;display:flex;align-items:center;justify-content:center;">×</button>
-                  </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid rgba(31,41,55,.8);border-radius:10px;background:rgba(17,24,39,.6);">
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(a.modello)}</div>
+                <div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap;">
+                  <span style="font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;${a.tipo==="nuova"?"background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd":"background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);color:#fdba74"}">${a.tipo==="nuova"?"🆕 Nuova":"🔄 Usata"}</span>
+                  <span style="font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;${a.fin?"background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);color:#93c5fd":"background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#6ee7b7"}">${a.fin?"💳 Finanz.":"💵 Cash"}</span>
                 </div>
               </div>
+              <button onclick="obDelete(${wi},'${a.id}')" style="width:26px;height:26px;border-radius:7px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);color:#fca5a5;cursor:pointer;font-size:15px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
             </div>`).join("");
 
-          return `<div style="background:rgba(31,41,55,.25);border:1px solid rgba(31,41,55,.6);border-radius:12px;overflow:hidden;">
-            <div style="padding:8px 12px;background:rgba(0,0,0,.2);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(31,41,55,.5);">
-              <span style="font-size:12px;font-weight:900;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">Settimana ${wi+1}</span>
-              <span style="font-size:12px;font-weight:700;color:${sett.length>=2?"#4ade80":"#fbbf24"}">${sett.length} auto ${sett.length>=2?"✓":"/ 2 obiettivo"}</span>
+          return `<div style="border-radius:12px;overflow:hidden;border:${isCurrent?"1px solid rgba(251,191,36,.5)":"1px solid rgba(31,41,55,.6)"};${isCurrent?"box-shadow:0 0 0 3px rgba(251,191,36,.08);":""}">
+            <div style="padding:8px 12px;background:${isCurrent?"rgba(251,191,36,.1)":"rgba(0,0,0,.2)"};border-bottom:1px solid rgba(31,41,55,.5);display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:12px;font-weight:900;color:${isCurrent?"#fbbf24":"#9ca3af"};text-transform:uppercase;letter-spacing:.4px;">
+                ${isCurrent?"📍 ":""}Settimana ${wi+1}${isCurrent?" — in corso":""}
+              </span>
+              <span style="font-size:12px;font-weight:700;color:${sett.length>=2?"#4ade80":"#9ca3af"}">${sett.length} / 2</span>
             </div>
-            <div style="padding:8px;display:flex;flex-direction:column;gap:6px;" id="obWeek_${wi}">
-              ${cards||'<div style="padding:8px 4px;color:#6b7280;font-size:12px;font-style:italic;">Nessuna auto — trascina per tipo</div>'}
+            <div style="padding:8px;display:flex;flex-direction:column;gap:5px;">
+              ${cards||'<div style="padding:6px 4px;color:#6b7280;font-size:12px;font-style:italic;">Nessuna auto questa settimana</div>'}
             </div>
           </div>`;
         }).join("");
-
-        attachObListeners();
-        attachSwipe();
       }
 
-      function attachObListeners(){
-        document.querySelectorAll(".obDelBtn").forEach(btn=>{
-          btn.onclick = e=>{
-            e.stopPropagation();
-            const wi=+btn.dataset.wi, id=btn.dataset.id;
-            obState.settimane[wi] = obState.settimane[wi].filter(a=>a.id!==id);
-            saveOb(); renderObiettivo();
-          };
-        });
-        document.querySelectorAll(".obFinBtn").forEach(btn=>{
-          btn.onclick = e=>{
-            e.stopPropagation();
-            const wi=+btn.dataset.wi, id=btn.dataset.id;
-            const a=obState.settimane[wi].find(x=>x.id===id);
-            if(a){ a.fin=!a.fin; saveOb(); renderObiettivo(); }
-          };
-        });
-      }
-
-      // ── Swipe orizzontale per cambiare tipo (nuova ↔ usata) ──
-      function attachSwipe(){
-        document.querySelectorAll(".obCard").forEach(card=>{
-          let startX=0, curX=0, dragging=false;
-          const inner = card.querySelector(".obCardContent");
-
-          function onStart(ex){
-            startX=ex; curX=ex; dragging=true;
-            inner.style.transition="none";
-          }
-          function onMove(ex){
-            if(!dragging) return;
-            curX=ex;
-            const dx=curX-startX;
-            inner.style.transform=`translateX(${Math.max(-80,Math.min(80,dx))}px)`;
-          }
-          function onEnd(){
-            if(!dragging) return; dragging=false;
-            const dx=curX-startX;
-            inner.style.transition="transform .25s cubic-bezier(.4,0,.2,1)";
-            inner.style.transform="translateX(0)";
-            if(Math.abs(dx)>50){
-              const wi=+card.dataset.wi, id=card.dataset.id;
-              const a=obState.settimane[wi].find(x=>x.id===id);
-              if(a){ a.tipo=dx>0?"nuova":"usata"; saveOb(); renderObiettivo(); }
-            }
-          }
-          card.addEventListener("mousedown",  e=>onStart(e.clientX));
-          card.addEventListener("mousemove",  e=>onMove(e.clientX));
-          card.addEventListener("mouseup",    onEnd);
-          card.addEventListener("mouseleave", onEnd);
-          card.addEventListener("touchstart", e=>onStart(e.touches[0].clientX),{passive:true});
-          card.addEventListener("touchmove",  e=>onMove(e.touches[0].clientX),{passive:true});
-          card.addEventListener("touchend",   onEnd);
-        });
-      }
-
-      // Bottone + Auto
-      const addBtn = document.getElementById("obAddBtn");
-      if(addBtn){
-        addBtn.addEventListener("click",()=>{
-          const modello = prompt("Nome auto (es: Jeep Compass):","");
-          if(!modello) return;
-          // Trova la settimana con meno auto
-          const wi = obState.settimane.reduce((best,s,i)=>s.length<obState.settimane[best].length?i:best, 0);
-          obState.settimane[wi].push({id:obUid(), modello:modello.trim(), tipo:"nuova", fin:false});
-          saveOb(); renderObiettivo();
-        });
-      }
+      window.obDelete = function(wi,id){
+        obState.settimane[wi] = obState.settimane[wi].filter(a=>a.id!==id);
+        saveOb(); renderObiettivo();
+      };
 
       renderObiettivo();
     })();
 
-    /* ══ VISTA OGGI ══ */
+        /* ══ VISTA OGGI ══ */
     function renderOggi(){
       const dl = $("oggiDateLabel");
       if(dl) dl.textContent = new Date().toLocaleDateString("it-IT",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
@@ -2725,6 +2680,46 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
     </div>
   </div>
 
+
+  <!-- POPUP OBIETTIVO — step 1: tipo, step 2: finanziamento -->
+  <div id="obPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+    <div style="background:#111827;border:1px solid #1f2937;border-radius:20px;width:340px;max-width:92vw;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8);">
+
+      <!-- Intestazione -->
+      <div style="padding:16px 20px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div id="obPopupTitle" style="font-weight:900;font-size:16px;"></div>
+          <div id="obPopupSub" style="font-size:12px;color:#9ca3af;margin-top:2px;"></div>
+        </div>
+        <button id="obPopupClose" style="width:30px;height:30px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#e5e7eb;cursor:pointer;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+
+      <!-- Step 1: tipo -->
+      <div id="obPopupTipoBox" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
+        <button id="obBtnNuova" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
+          🆕 <span>Auto Nuova</span>
+        </button>
+        <button id="obBtnUsata" style="padding:16px;border-radius:14px;border:2px solid rgba(249,115,22,.5);background:rgba(249,115,22,.1);color:#fb923c;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(249,115,22,.2)'" onmouseout="this.style.background='rgba(249,115,22,.1)'">
+          🔄 <span>Auto Usata</span>
+        </button>
+      </div>
+
+      <!-- Step 2: finanziamento -->
+      <div id="obPopupFinBox" style="padding:20px;display:none;flex-direction:column;gap:12px;">
+        <button id="obBtnCash" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
+          💵 <span>Cash</span>
+        </button>
+        <button id="obBtnFin" style="padding:16px;border-radius:14px;border:2px solid rgba(59,130,246,.5);background:rgba(59,130,246,.1);color:#60a5fa;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(59,130,246,.2)'" onmouseout="this.style.background='rgba(59,130,246,.1)'">
+          💳 <span>Finanziamento</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
 </body></html>`;
 
   const blob=new Blob([html],{type:"application/msword"});
@@ -2763,5 +2758,45 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
     </div>
   </div>
 
+
+  <!-- POPUP OBIETTIVO — step 1: tipo, step 2: finanziamento -->
+  <div id="obPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+    <div style="background:#111827;border:1px solid #1f2937;border-radius:20px;width:340px;max-width:92vw;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8);">
+
+      <!-- Intestazione -->
+      <div style="padding:16px 20px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div id="obPopupTitle" style="font-weight:900;font-size:16px;"></div>
+          <div id="obPopupSub" style="font-size:12px;color:#9ca3af;margin-top:2px;"></div>
+        </div>
+        <button id="obPopupClose" style="width:30px;height:30px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#e5e7eb;cursor:pointer;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+
+      <!-- Step 1: tipo -->
+      <div id="obPopupTipoBox" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
+        <button id="obBtnNuova" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
+          🆕 <span>Auto Nuova</span>
+        </button>
+        <button id="obBtnUsata" style="padding:16px;border-radius:14px;border:2px solid rgba(249,115,22,.5);background:rgba(249,115,22,.1);color:#fb923c;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(249,115,22,.2)'" onmouseout="this.style.background='rgba(249,115,22,.1)'">
+          🔄 <span>Auto Usata</span>
+        </button>
+      </div>
+
+      <!-- Step 2: finanziamento -->
+      <div id="obPopupFinBox" style="padding:20px;display:none;flex-direction:column;gap:12px;">
+        <button id="obBtnCash" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
+          💵 <span>Cash</span>
+        </button>
+        <button id="obBtnFin" style="padding:16px;border-radius:14px;border:2px solid rgba(59,130,246,.5);background:rgba(59,130,246,.1);color:#60a5fa;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onmouseover="this.style.background='rgba(59,130,246,.2)'" onmouseout="this.style.background='rgba(59,130,246,.1)'">
+          💳 <span>Finanziamento</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
 </body>
 </html>
