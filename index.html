@@ -4,50 +4,57 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AI BOTT Automotive</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg0:#111;--bg1:#181818;--bg2:#202020;--bg3:#2a2a2a;
-      --panel:rgba(24,24,24,.97);--line:rgba(255,255,255,.07);
-      --text:#f0f0f0;--muted:#777;
-      --accent:#3b82f6;--accent2:#60a5fa;
-      --orange:#f97316;--orange2:#fb923c;
+      /* ── Apple iOS Light · Pantone 17-1230 Mocha Mousse 2025 ── */
+      --bg0:#f2f2f7;--bg1:#e8e8ed;--bg2:#ffffff;--bg3:#f5f5fa;
+      --panel:rgba(255,255,255,.85);--line:rgba(60,60,67,.14);
+      --text:#1c1c1e;--muted:#8e8e93;
+      --accent:#a07855;--accent2:#c9a07a; /* Mocha Mousse */
+      --orange:#a07855;--orange2:#c9a07a;
+      --blue:#636366;
+      --shadow:0 1px 0 rgba(60,60,67,.1),0 4px 16px rgba(0,0,0,.06);
+      --shadow-card:0 2px 8px rgba(0,0,0,.07),0 1px 0 rgba(60,60,67,.1);
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{
-      font-family:'Inter',system-ui,sans-serif;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;
       color:var(--text);min-height:100vh;
-      background:var(--bg0);
+      background:
+        radial-gradient(800px 400px at 15% 0%,rgba(160,120,85,.09),transparent 55%),
+        radial-gradient(600px 350px at 85% 5%,rgba(201,160,122,.07),transparent 55%),
+        var(--bg0);
     }
     header{
       position:fixed;top:0;left:0;right:0;z-index:10;
-      background:rgba(16,16,16,.94);backdrop-filter:blur(16px);
-      border-bottom:1px solid var(--line);
+      background:rgba(242,242,247,.88);
+      backdrop-filter:saturate(180%) blur(20px);
+      -webkit-backdrop-filter:saturate(180%) blur(20px);
+      border-bottom:1px solid rgba(60,60,67,.12);
       transition:transform .3s cubic-bezier(.4,0,.2,1);
     }
     header.header-hidden{transform:translateY(-110%)}
     body{padding-top:56px}
    .wrap{max-width:1200px;margin:0 auto;padding:8px 16px}
 .brand{display:flex;gap:10px;align-items:center;flex-wrap:wrap;min-width:unset}
-.brandLogo{width:36px;height:36px;object-fit:contain;background:transparent;border:none;outline:none;filter:none;mix-blend-mode:screen}
-.brandName{font-weight:950;letter-spacing:.2px;font-size:16px;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.brandLogo{width:36px;height:36px;object-fit:contain;background:transparent;border:none;outline:none;filter:none;mix-blend-mode:normal}
+.brandName{font-weight:950;letter-spacing:.2px;font-size:16px;line-height:1;background:linear-gradient(135deg,#a07855,#c9a07a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
 .brandSub{opacity:.75;white-space:nowrap;font-size:12px}
 .row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .brandMark{display:flex;align-items:center;gap:8px;user-select:none}
-.btn{border:1px solid var(--line);background:var(--bg2);color:var(--text);padding:7px 12px;border-radius:10px;cursor:pointer;font-size:13px;transition:all .18s;font-weight:600;font-family:inherit}
-.btn:hover{border-color:rgba(59,130,246,.45);background:var(--bg3);transform:translateY(-1px)}
-.btn.primary{border-color:rgba(59,130,246,.45);background:rgba(37,99,235,.13)}
-.btn.primary:hover{background:rgba(37,99,235,.26)}
-.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.btn.brand-fiat:hover{border-color:rgba(220,38,38,.6);background:rgba(220,38,38,.1)}
-.btn.brand-jeep:hover{border-color:rgba(34,197,94,.6);background:rgba(34,197,94,.1)}
-.btn.brand-alfa:hover{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)}
-.btn.brand-lancia:hover{border-color:rgba(59,130,246,.6);background:rgba(59,130,246,.1)}
-.centroAutoLink{display:inline-flex;align-items:center;padding:4px 10px;border:2px solid rgba(34,197,94,.35);background:rgba(34,197,94,.07);border-radius:10px;transition:all .3s;text-decoration:none;box-shadow:0 2px 8px rgba(34,197,94,.15)}
-.centroAutoLink:hover{border-color:rgba(34,197,94,.7);background:rgba(34,197,94,.18);transform:translateY(-2px);box-shadow:0 4px 16px rgba(34,197,94,.3)}
-.centroAutoLogo{height:32px;width:auto;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.2))}
-.pill{padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg2);font-size:12px;white-space:nowrap}
+.btn{border:1px solid rgba(60,60,67,.2);background:rgba(255,255,255,.9);color:var(--text);padding:7px 12px;border-radius:10px;cursor:pointer;font-size:13px;transition:all .18s;font-weight:600;font-family:inherit;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.btn:hover{border-color:rgba(160,120,85,.4);background:#f9f6f2;transform:translateY(-1px);box-shadow:0 2px 8px rgba(160,120,85,.12)}
+.btn.primary{border-color:rgba(160,120,85,.45);background:rgba(160,120,85,.1);color:#7a5c3d}
+.btn.primary:hover{background:rgba(160,120,85,.18)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.brand-fiat:hover{border-color:rgba(220,38,38,.45);background:rgba(220,38,38,.07);color:#b91c1c}
+.btn.brand-jeep:hover{border-color:rgba(22,163,74,.45);background:rgba(22,163,74,.07);color:#15803d}
+.btn.brand-alfa:hover{border-color:rgba(220,38,38,.45);background:rgba(220,38,38,.07);color:#b91c1c}
+.btn.brand-lancia:hover{border-color:rgba(160,120,85,.5);background:rgba(160,120,85,.1);color:#7a5c3d}
+.centroAutoLink{display:inline-flex;align-items:center;padding:4px 10px;border:1.5px solid rgba(22,163,74,.3);background:rgba(22,163,74,.07);border-radius:10px;transition:all .3s;text-decoration:none;box-shadow:0 1px 4px rgba(22,163,74,.1)}
+.centroAutoLink:hover{border-color:rgba(22,163,74,.6);background:rgba(22,163,74,.13);transform:translateY(-2px);box-shadow:0 4px 14px rgba(22,163,74,.18)}
+.centroAutoLogo{height:32px;width:auto;object-fit:contain}
+.pill{padding:4px 10px;border-radius:999px;border:1px solid rgba(60,60,67,.15);background:rgba(255,255,255,.7);font-size:12px;white-space:nowrap}
 .muted{color:var(--muted)}
 
 /* LAYOUT E PANEL */
@@ -61,8 +68,8 @@
 
 /* tutti i pannelli scorrono normalmente */
 .panel{
-  background:var(--bg1);
-  border:1px solid var(--line);
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(60,60,67,.12);
   border-radius:16px;
   box-shadow:4px 0 20px rgba(0,0,0,.5);
   max-height:none;      /* niente limite sul pannello intero */
@@ -84,16 +91,16 @@
 }
 
 
-.panelHeader{padding:14px 14px 10px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.3);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.panelHeader{padding:14px 14px 10px;border-bottom:1px solid rgba(60,60,67,.1);background:rgba(255,255,255,.5);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .panelTitle{font-weight:950;font-size:18px}
 .panelSub{margin-top:6px}
 .newsScroll::-webkit-scrollbar{width:4px}
-.newsScroll::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:999px}
+.newsScroll::-webkit-scrollbar-thumb{background:rgba(248,248,252,.9);border-radius:999px}
 .newsScroll::-webkit-scrollbar-track{background:transparent}
 #status{margin:10px 0 0}
 #newsList{display:grid;gap:12px}
-.newsItem{display:block;padding:12px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:inherit;background:var(--bg2);transition:all .18s}
-.newsItem:hover{border-color:rgba(59,130,246,.4);background:var(--bg3);transform:translateX(3px)}
+.newsItem{display:block;padding:12px;border:1px solid rgba(60,60,67,.12);border-radius:12px;text-decoration:none;color:inherit;background:rgba(255,255,255,.9);transition:all .18s}
+.newsItem:hover{border-color:rgba(59,130,246,.4);background:rgba(248,248,252,.9);transform:translateX(3px)}
 .newsTitle{font-weight:850;margin-bottom:8px}
 .newsMeta{opacity:.75;font-size:12px;margin-top:6px}
 .newsDate{opacity:.75;font-size:12px;margin-top:6px;font-style:italic}
@@ -102,96 +109,96 @@
 .weekDow{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase}
 .weekDay{font-size:16px;font-weight:950}
 .weekTasks{margin-top:2px;display:grid;gap:4px;overflow:hidden}
-.weekTask{font-size:10px;line-height:1.2;color:var(--text);opacity:.9;padding:4px 6px;border-radius:7px;border:1px solid var(--line);background:var(--bg3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.weekTask{font-size:10px;line-height:1.2;color:var(--text);opacity:.9;padding:4px 6px;border-radius:7px;border:1px solid rgba(60,60,67,.12);background:rgba(248,248,252,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .weekTask.done{opacity:.55;text-decoration:line-through}
-.weekMore{font-size:11px;color:#fb923c;opacity:.85;font-weight:700}
+.weekMore{font-size:11px;color:#b05030;opacity:.85;font-weight:700}
 
-.cmpSuggest{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);border-radius:999px;padding:4px 10px;color:#93c5fd;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
-.cmpSuggest:hover{background:rgba(59,130,246,.25);border-color:rgba(59,130,246,.6)}
+.cmpSuggest{background:rgba(59,130,246,.12);border:1px solid rgba(160,120,85,.2);border-radius:999px;padding:4px 10px;color:#7a5c3d;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
+.cmpSuggest:hover{background:rgba(59,130,246,.25);border-color:rgba(160,120,85,.5)}
 
 .widgetStack{display:grid;gap:16px;margin-top:16px}
-.widgetPanel{background:var(--bg1);border:1px solid var(--line);border-radius:16px;overflow:hidden}
-.widgetHeader{padding:13px 18px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.22);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.widgetPanel{background:rgba(255,255,255,.78);border:1px solid rgba(60,60,67,.12);border-radius:16px;overflow:hidden}
+.widgetHeader{padding:13px 18px;border-bottom:1px solid rgba(60,60,67,.1);background:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .widgetTitle{font-weight:950;font-size:18px}
-.widgetSub{color:#9ca3af;font-size:13px;margin-top:4px}
+.widgetSub{color:#8e8e93;font-size:13px;margin-top:4px}
 .widgetBody{padding:14px 18px}
 .formRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.field{flex:1;min-width:220px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s,background .2s}
-.field:focus{border-color:var(--orange);background:var(--bg3)}
-.seg{display:inline-flex;border:1px solid var(--line);background:var(--bg2);border-radius:999px;overflow:hidden}
+.field{flex:1;min-width:220px;background:rgba(255,255,255,.9);border:1px solid rgba(60,60,67,.12);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s,background .2s}
+.field:focus{border-color:var(--orange);background:rgba(248,248,252,.9)}
+.seg{display:inline-flex;border:1px solid rgba(60,60,67,.12);background:rgba(255,255,255,.9);border-radius:999px;overflow:hidden}
 .seg button{border:none;background:transparent;color:var(--muted);padding:8px 10px;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit;font-weight:700;white-space:nowrap}
-.seg button.active{color:#fff;background:linear-gradient(135deg,rgba(249,115,22,.28),rgba(251,146,60,.22))}
-.seg button:hover{background:rgba(249,115,22,.14);color:#ffe6d5}
+.seg button.active{color:#7a5c3d;background:rgba(160,120,85,.18)}
+.seg button:hover{background:rgba(160,120,85,.12);color:#7a5c3d}
 .split3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;align-items:start}
-.dayCol{background:var(--bg2);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.dayHead{padding:10px 14px;font-weight:800;font-size:13px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(59,130,246,.07)}
-.dayMeta{color:#9ca3af;font-weight:700;font-size:12px}
+.dayCol{background:rgba(255,255,255,.9);border:1px solid rgba(60,60,67,.12);border-radius:12px;overflow:hidden}
+.dayHead{padding:10px 14px;font-weight:800;font-size:13px;border-bottom:1px solid rgba(60,60,67,.1);display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(160,120,85,.07)}
+.dayMeta{color:#8e8e93;font-weight:700;font-size:12px}
 .list{padding:10px 12px;display:grid;gap:8px;max-height:260px;overflow:auto}
-.item{display:flex;align-items:flex-start;gap:10px;padding:10px;border:1px solid var(--line);border-radius:11px;background:var(--bg1)}
+.item{display:flex;align-items:flex-start;gap:10px;padding:10px;border:1px solid rgba(60,60,67,.12);border-radius:11px;background:rgba(255,255,255,.78)}
 .itemMain{flex:1;min-width:0}
 .itemText{font-size:13px;line-height:1.35;word-break:break-word}
 .itemText.done{text-decoration:line-through;opacity:.65}
 .itemActions{display:flex;gap:6px;align-items:center}
-.iconBtn{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:var(--bg3);color:var(--text);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900}
-.iconBtn:hover{border-color:rgba(249,115,22,.5);background:var(--bg2);transform:translateY(-1px)}
+.iconBtn{width:30px;height:30px;border-radius:9px;border:1px solid rgba(60,60,67,.12);background:rgba(248,248,252,.9);color:var(--text);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900}
+.iconBtn:hover{border-color:rgba(249,115,22,.5);background:rgba(255,255,255,.9);transform:translateY(-1px)}
 .chk{width:18px;height:18px;flex:0 0 auto;accent-color:var(--orange);margin-top:2px;cursor:pointer}
 .smallNote{margin-top:10px;color:var(--muted);font-size:12px}
 .memoArea{width:100%;min-height:100px;resize:vertical}
-.syncBadge{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg2);color:var(--muted);white-space:nowrap}
-.syncBadge.ok{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10);color:#bbf7d0}
-.syncBadge.warn{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.10);color:#fde68a}
+.syncBadge{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid rgba(60,60,67,.12);background:rgba(255,255,255,.9);color:var(--muted);white-space:nowrap}
+.syncBadge.ok{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.09);color:#1a6040}
+.syncBadge.warn{border-color:rgba(160,120,85,.4);background:rgba(160,120,85,.09);color:#7a5c3d}
 #agendaPanel .widgetHeader,#memoPanel .widgetHeader{background:rgba(249,115,22,.06)}
 
-.venditePanel{background:var(--bg1);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:16px}
-.venditeHeader{padding:14px 18px;border-bottom:1px solid var(--line);background:rgba(10,12,18,.35);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.venditePanel{background:rgba(255,255,255,.78);border:1px solid rgba(60,60,67,.12);border-radius:16px;overflow:hidden;margin-top:16px}
+.venditeHeader{padding:14px 18px;border-bottom:1px solid rgba(60,60,67,.1);background:rgba(255,255,255,.45);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .venditeTitleRow{display:flex;align-items:center;gap:10px}
 .venditeTitle{font-weight:950;font-size:18px}
-.venditeSyncBadge{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);color:var(--muted);white-space:nowrap}
-.venditeSyncBadge.ok{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10);color:#bbf7d0}
+.venditeSyncBadge{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid rgba(60,60,67,.15);background:rgba(255,255,255,.5);color:var(--muted);white-space:nowrap}
+.venditeSyncBadge.ok{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.09);color:#1a6040}
 .venditeNav{display:flex;align-items:center;gap:8px}
-.navArrow{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--bg2);color:var(--text);cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.navArrow:hover{border-color:rgba(59,130,246,.5);background:var(--bg3);transform:translateY(-1px)}
+.navArrow{width:32px;height:32px;border-radius:9px;border:1px solid rgba(60,60,67,.12);background:rgba(255,255,255,.9);color:var(--text);cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.navArrow:hover{border-color:rgba(59,130,246,.5);background:rgba(248,248,252,.9);transform:translateY(-1px)}
 .navArrow:disabled{opacity:.35;cursor:not-allowed;transform:none}
 .venditeMonthLabel{font-weight:900;font-size:15px;min-width:140px;text-align:center;padding:0 4px}
-.venditeTotali{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)}
+.venditeTotali{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid rgba(60,60,67,.1)}
 .totCard{padding:14px 18px;display:flex;flex-direction:column;gap:4px}
-.totCard:not(:last-child){border-right:1px solid var(--line)}
+.totCard:not(:last-child){border-right:1px solid rgba(60,60,67,.1)}
 .totLabel{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
 .totNum{font-size:36px;font-weight:950;line-height:1}
-.totNum.nuova{color:#60a5fa}.totNum.usata{color:#f97316}.totNum.all{color:#22c55e}
-.venditeForm{padding:12px 18px;border-bottom:1px solid rgba(31,41,55,.5);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
-.venditeForm .fld{flex:1;min-width:150px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px 13px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
-.venditeForm .fld:focus{border-color:var(--accent)}
+.totNum.nuova{color:#a07855}.totNum.usata{color:#a04020}.totNum.all{color:#22a05a}
+.venditeForm{padding:12px 18px;border-bottom:1px solid rgba(118,118,128,.08);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.venditeForm .fld{flex:1;min-width:150px;background:rgba(255,255,255,.9);border:1px solid rgba(60,60,67,.12);border-radius:10px;padding:9px 13px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
+.venditeForm .fld:focus{border-color:var(--accent);background:#fff}
 .venditeForm .fld::placeholder{color:var(--muted)}
-.tipoSeg{display:inline-flex;border:1px solid var(--line);background:var(--bg2);border-radius:999px;overflow:hidden;flex-shrink:0}
+.tipoSeg{display:inline-flex;border:1px solid rgba(60,60,67,.12);background:rgba(255,255,255,.9);border-radius:999px;overflow:hidden;flex-shrink:0}
 .tipoBtn{border:none;background:transparent;color:var(--muted);padding:9px 14px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;white-space:nowrap}
-.tipoBtn.nuova.active{background:linear-gradient(135deg,rgba(59,130,246,.28),rgba(96,165,250,.2));color:#93c5fd}
-.tipoBtn.usata.active{background:linear-gradient(135deg,rgba(249,115,22,.28),rgba(251,146,60,.2));color:#fdba74}
+.tipoBtn.nuova.active{background:rgba(160,120,85,.18);color:#7a5c3d}
+.tipoBtn.usata.active{background:rgba(201,100,50,.15);color:#a04020}
 .tipoBtn:hover{opacity:.85}
 .venditeListe{display:grid;grid-template-columns:1fr 1fr;min-height:160px}
 .venditeCol{padding:12px 14px}
-.venditeCol:first-child{border-right:1px solid var(--line)}
+.venditeCol:first-child{border-right:1px solid rgba(60,60,67,.1)}
 .venditeColTitle{font-size:12px;font-weight:900;letter-spacing:.3px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.venditeColTitle.nuova{color:#60a5fa}.venditeColTitle.usata{color:#f97316}
+.venditeColTitle.nuova{color:#a07855}.venditeColTitle.usata{color:#a04020}
 .venditeCount{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700}
-.venditeCount.nuova{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd}
+.venditeCount.nuova{background:rgba(160,120,85,.12);border:1px solid rgba(160,120,85,.2);color:#7a5c3d}
 .venditeCount.usata{background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);color:#fdba74}
 .venditeList{display:grid;gap:6px;max-height:320px;overflow-y:auto}
 .venditeList::-webkit-scrollbar{width:4px}
-.venditeList::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:999px}
-.autoItem{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);animation:itemIn .2s ease}
+.venditeList::-webkit-scrollbar-thumb{background:rgba(248,248,252,.9);border-radius:999px}
+.autoItem{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid rgba(60,60,67,.12);border-radius:10px;background:rgba(255,255,255,.9);animation:itemIn .2s ease}
 @keyframes itemIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
 .autoN{font-size:11px;font-weight:900;min-width:20px;color:var(--muted)}
 .autoModello{flex:1;font-size:13px;line-height:1.3;word-break:break-word}
-.autoProvv{font-size:12px;font-weight:700;color:#4ade80;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
-.autoProvv.zero{color:var(--muted);background:transparent;border-color:rgba(31,41,55,.5);font-weight:400}
-.autoDelBtn{width:24px;height:24px;border-radius:7px;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.4);color:var(--muted);cursor:pointer;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.autoProvv{font-size:12px;font-weight:700;color:#22a05a;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
+.autoProvv.zero{color:var(--muted);background:transparent;border-color:rgba(118,118,128,.08);font-weight:400}
+.autoDelBtn{width:24px;height:24px;border-radius:7px;border:1px solid rgba(60,60,67,.15);background:rgba(255,255,255,.55);color:var(--muted);cursor:pointer;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
 .autoDelBtn:hover{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:#fca5a5}
 .emptyList{font-size:12px;color:var(--muted);font-style:italic;padding:8px 2px}
-.venditeProvvBar{border-top:1px solid var(--line);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:rgba(34,197,94,.04)}
+.venditeProvvBar{border-top:1px solid rgba(60,60,67,.1);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:rgba(34,197,94,.03)}
 .provvMeseGroup{display:flex;flex-direction:column;gap:2px}
 .provvMeseLabel{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
-.provvMeseNum{font-size:24px;font-weight:950;color:#4ade80;font-variant-numeric:tabular-nums}
+.provvMeseNum{font-size:24px;font-weight:950;color:#22a05a;font-variant-numeric:tabular-nums}
 .provvMeseSplit{font-size:11px;color:var(--muted);margin-top:2px}
 .vendite2026Bar{border-top:2px solid rgba(251,191,36,.2);padding:14px 18px;background:rgba(251,191,36,.04);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .bar2026Left{display:flex;align-items:center;gap:10px}
@@ -199,51 +206,51 @@
 .bar2026Title{font-weight:900;font-size:14px}
 .bar2026Sub{font-size:11px;color:var(--muted);margin-top:2px}
 .bar2026Right{text-align:right}
-.bar2026Num{font-size:30px;font-weight:950;color:#fbbf24;font-variant-numeric:tabular-nums}
+.bar2026Num{font-size:30px;font-weight:950;color:#b8860b;font-variant-numeric:tabular-nums}
 .bar2026Mesi{font-size:11px;color:var(--muted);margin-top:2px}
-.obiettivoBar{border-top:1px solid var(--line);padding:14px 18px;background:rgba(0,0,0,.18)}
+.obiettivoBar{border-top:1px solid rgba(60,60,67,.1);padding:14px 18px;background:rgba(255,255,255,.4)}
 .obiettivoHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
 .obiettivoLeft{display:flex;align-items:center;gap:8px}
 .obiettivoIcon{font-size:18px}
 .obiettivoTitle{font-weight:900;font-size:14px}
 .obiettivoSub{font-size:11px;color:var(--muted);margin-top:2px}
 .obiettivoRight{display:flex;align-items:center;gap:8px}
-.obiettivoInput{width:110px;background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:7px 11px;color:var(--text);font-size:13px;font-weight:700;outline:none;font-family:inherit;transition:border-color .2s;text-align:right}
-.obiettivoInput:focus{border-color:var(--accent)}
+.obiettivoInput{width:110px;background:rgba(255,255,255,.9);border:1px solid rgba(60,60,67,.12);border-radius:9px;padding:7px 11px;color:var(--text);font-size:13px;font-weight:700;outline:none;font-family:inherit;transition:border-color .2s;text-align:right}
+.obiettivoInput:focus{border-color:var(--accent);background:#fff}
 .obiettivoInputLabel{font-size:12px;color:var(--muted);white-space:nowrap}
-.progressWrap{background:var(--bg3);border-radius:999px;height:12px;overflow:hidden}
+.progressWrap{background:rgba(248,248,252,.9);border-radius:999px;height:12px;overflow:hidden}
 .progressFill{height:100%;border-radius:999px;transition:width .5s cubic-bezier(.4,0,.2,1),background .4s;min-width:0}
-.progressFill.low{background:linear-gradient(90deg,#f97316,#fb923c)}
-.progressFill.mid{background:linear-gradient(90deg,#eab308,#fbbf24)}
-.progressFill.high{background:linear-gradient(90deg,#22c55e,#4ade80)}
-.progressFill.done{background:linear-gradient(90deg,#a855f7,#c084fc)}
+.progressFill.low{background:linear-gradient(90deg,#c06030,#d07840)}
+.progressFill.mid{background:linear-gradient(90deg,#c09010,#d4a820)}
+.progressFill.high{background:linear-gradient(90deg,#1a9e50,#2abe65)}
+.progressFill.done{background:linear-gradient(90deg,#a07855,#c9a07a)}
 .progressMeta{display:flex;align-items:center;justify-content:space-between;margin-top:7px;font-size:12px}
 .progressPct{font-weight:900;font-size:15px}
-.progressPct.low{color:#fb923c}.progressPct.mid{color:#fbbf24}.progressPct.high{color:#4ade80}.progressPct.done{color:#c084fc}
+.progressPct.low{color:#b05030}.progressPct.mid{color:#b8860b}.progressPct.high{color:#22a05a}.progressPct.done{color:#7a5c3d}
 .progressManca{color:var(--muted)}
 .progressManca.done{color:#c084fc;font-weight:700}
 
     #telefonoPanel .widgetHeader{background:rgba(168,85,247,.06)}
     .telFormRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-    .telInput{flex:1;min-width:120px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
-    .telInput:focus{border-color:#a855f7}
+    .telInput{flex:1;min-width:120px;background:rgba(255,255,255,.9);border:1px solid rgba(60,60,67,.12);border-radius:10px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
+    .telInput:focus{border-color:#7a5c3d}
     .telInput::placeholder{color:var(--muted)}
-    .telSeg{display:inline-flex;border:1px solid var(--line);background:var(--bg2);border-radius:999px;overflow:hidden;flex-shrink:0}
+    .telSeg{display:inline-flex;border:1px solid rgba(60,60,67,.12);background:rgba(255,255,255,.9);border-radius:999px;overflow:hidden;flex-shrink:0}
     .telBtn{border:none;background:transparent;color:var(--muted);padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;white-space:nowrap}
     .telBtn.caldo.active{background:rgba(239,68,68,.25);color:#fca5a5}
     .telBtn.tiepido.active{background:rgba(251,191,36,.2);color:#fde68a}
-    .telBtn.freddo.active{background:rgba(59,130,246,.2);color:#93c5fd}
+    .telBtn.freddo.active{background:rgba(59,130,246,.2);color:#7a5c3d}
     .telBtn:hover{opacity:.8}
-    .telWhenSeg{display:inline-flex;border:1px solid var(--line);background:var(--bg2);border-radius:999px;overflow:hidden;flex-shrink:0}
+    .telWhenSeg{display:inline-flex;border:1px solid rgba(60,60,67,.12);background:rgba(255,255,255,.9);border-radius:999px;overflow:hidden;flex-shrink:0}
     .telWhenBtn{border:none;background:transparent;color:var(--muted);padding:8px 10px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;white-space:nowrap}
     .telWhenBtn.active{background:rgba(168,85,247,.22);color:#d8b4fe}
     .telList{display:grid;gap:8px;max-height:360px;overflow-y:auto}
     .telList::-webkit-scrollbar{width:4px}
-    .telList::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:999px}
-    .telCard{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);animation:itemIn .2s ease;transition:border-color .2s}
-    .telCard.caldo{border-left:3px solid rgba(239,68,68,.7)}
-    .telCard.tiepido{border-left:3px solid rgba(251,191,36,.7)}
-    .telCard.freddo{border-left:3px solid rgba(59,130,246,.7)}
+    .telList::-webkit-scrollbar-thumb{background:rgba(248,248,252,.9);border-radius:999px}
+    .telCard{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid rgba(60,60,67,.12);border-radius:12px;background:rgba(255,255,255,.9);animation:itemIn .2s ease;transition:border-color .2s}
+    .telCard.caldo{border-left:3px solid rgba(200,50,50,.6)}
+    .telCard.tiepido{border-left:3px solid rgba(180,140,20,.6)}
+    .telCard.freddo{border-left:3px solid rgba(50,100,200,.6)}
     .telCard.chiamato{opacity:.5}
     .telCardMain{flex:1;min-width:0}
     .telCardName{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -251,22 +258,22 @@
     .telCardMeta{display:flex;gap:8px;align-items:center;margin-top:3px;flex-wrap:wrap}
     .telCardModello{font-size:12px;color:var(--muted)}
     .telStatoBadge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
-    .telStatoBadge.caldo{background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.35);color:#fca5a5}
-    .telStatoBadge.tiepido{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.35);color:#fde68a}
-    .telStatoBadge.freddo{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.35);color:#93c5fd}
+    .telStatoBadge.caldo{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);color:#b91c1c}
+    .telStatoBadge.tiepido{background:rgba(180,130,20,.1);border:1px solid rgba(180,130,20,.25);color:#a07020}
+    .telStatoBadge.freddo{background:rgba(160,120,85,.12);border:1px solid rgba(59,130,246,.35);color:#7a5c3d}
     .telCardActions{display:flex;gap:6px;flex-shrink:0}
     .telSection{margin-top:14px}
     .telSectionLabel{font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding:0 2px;display:flex;align-items:center;gap:6px}
     .telEmpty{font-size:12px;color:var(--muted);font-style:italic;padding:6px 2px}
 
-    .chatTrigger{position:fixed;bottom:24px;right:24px;width:70px;height:70px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:all .3s;z-index:1000}
+    .chatTrigger{position:fixed;bottom:24px;right:24px;width:70px;height:70px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.12);transition:all .3s;z-index:1000}
     .chatTrigger:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(0,0,0,.5)}
     .chatTrigger img{width:70px;height:70px;object-fit:contain}
     .chatBox{position:fixed;bottom:24px;right:24px;width:420px;max-width:calc(100vw - 32px);height:600px;max-height:calc(100vh - 48px);background:rgba(17,17,17,.98);border:1px solid rgba(255,255,255,.1);border-radius:20px;display:none;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.85);z-index:1001;overflow:hidden;backdrop-filter:blur(20px)}
     .chatBox.open{display:flex}
-    .chatBox.minimized{width:70px;height:70px;background:transparent;border:none;border-radius:50%;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+    .chatBox.minimized{width:70px;height:70px;background:transparent;border:none;border-radius:50%;box-shadow:0 8px 24px rgba(0,0,0,.12)}
     .chatBox.minimized .chatHeader,.chatBox.minimized .chatMessages,.chatBox.minimized .chatInput{display:none}
-    .chatHeader{background:linear-gradient(135deg,var(--accent),var(--accent2));padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.15)}
+    .chatHeader{background:linear-gradient(135deg,#a07855,#c9a07a);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.15)}
     .chatHeaderLeft{display:flex;align-items:center;gap:10px}
     .chatHeaderLogo{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);padding:4px}
     .chatHeaderTitle{font-weight:700;font-size:16px;color:#fff}
@@ -274,88 +281,88 @@
     .chatHeaderBtns{display:flex;gap:8px}
     .chatHeaderBtn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.15);border:none;color:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-weight:700}
     .chatHeaderBtn:hover{background:rgba(255,255,255,.25);transform:scale(1.05)}
-    .chatMessages{flex:1;overflow-y:auto;padding:16px;background:var(--bg0);display:flex;flex-direction:column;gap:12px}
+    .chatMessages{flex:1;overflow-y:auto;padding:16px;background:var(--bgTop);display:flex;flex-direction:column;gap:12px}
     .chatMessages::-webkit-scrollbar{width:8px}
     .chatMessages::-webkit-scrollbar-thumb{background:rgba(59,130,246,.3);border-radius:999px}
     .message{display:flex;gap:8px;animation:slideIn .3s ease}
     @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     .message.user{flex-direction:row-reverse}
     .messageBubble{max-width:85%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.6;word-wrap:break-word;white-space:pre-line}
-    .message.ai .messageBubble{background:var(--bg2);border:1px solid var(--line);color:var(--text);border-bottom-left-radius:4px}
-    .message.user .messageBubble{background:rgba(255,255,255,.92);color:#1a1d23;border-bottom-right-radius:4px}
-    .typingIndicator{display:flex;gap:8px;padding:12px 16px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;border-bottom-left-radius:4px;max-width:75%}
+    .message.ai .messageBubble{background:rgba(255,255,255,.9);border:1px solid rgba(60,60,67,.12);color:var(--text);border-bottom-left-radius:4px}
+    .message.user .messageBubble{background:rgba(240,240,248,.95);color:#1c1c1e;border-bottom-right-radius:4px}
+    .typingIndicator{display:flex;gap:8px;padding:12px 16px;background:rgba(255,255,255,.9);border:1px solid rgba(60,60,67,.12);border-radius:18px;border-bottom-left-radius:4px;max-width:75%}
     .typingDot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.9);animation:bounce 1.4s infinite ease-in-out}
     .typingDot:nth-child(1){animation-delay:0s}.typingDot:nth-child(2){animation-delay:.2s}.typingDot:nth-child(3){animation-delay:.4s}
     @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
-    .chatInput{padding:13px;background:var(--bg1);border-top:1px solid var(--line);display:flex;gap:10px}
-    .chatInputField{flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 16px;color:var(--text);font-size:14px;outline:none;transition:all .2s;font-family:inherit}
-    .chatInputField:focus{border-color:var(--accent);background:var(--bg3)}
+    .chatInput{padding:13px;background:rgba(255,255,255,.78);border-top:1px solid rgba(60,60,67,.1);display:flex;gap:10px}
+    .chatInputField{flex:1;background:rgba(255,255,255,.9);border:1px solid rgba(60,60,67,.12);border-radius:12px;padding:12px 16px;color:var(--text);font-size:14px;outline:none;transition:all .2s;font-family:inherit}
+    .chatInputField:focus{border-color:var(--accent);background:rgba(248,248,252,.9)}
     .chatInputField::placeholder{color:var(--muted)}
     .chatSendBtn{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all .2s}
     .chatSendBtn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 4px 16px rgba(59,130,246,.4)}
     .chatSendBtn:disabled{opacity:.5;cursor:not-allowed}
 
-    .oggiPanel{background:var(--bg1);border:1px solid rgba(59,130,246,.18);border-radius:16px;overflow:hidden;margin-bottom:16px}
+    .oggiPanel{background:rgba(255,255,255,.78);border:1px solid rgba(59,130,246,.18);border-radius:16px;overflow:hidden;margin-bottom:16px}
     .oggiHeader{padding:13px 18px;background:rgba(59,130,246,.05);border-bottom:1px solid rgba(59,130,246,.13);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .oggiTitle{font-weight:950;font-size:20px;background:linear-gradient(135deg,#60a5fa,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .oggiDate{font-size:12px;color:#9ca3af;margin-top:3px}
-    .oggiKpiRow{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
-    .oggiKpi{padding:12px 16px;display:flex;flex-direction:column;gap:4px;border-right:1px solid var(--line)}
+    .oggiTitle{font-weight:950;font-size:20px;background:linear-gradient(135deg,#a07855,#c9a07a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .oggiDate{font-size:12px;color:#8e8e93;margin-top:3px}
+    .oggiKpiRow{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(60,60,67,.1)}
+    .oggiKpi{padding:12px 16px;display:flex;flex-direction:column;gap:4px;border-right:1px solid rgba(60,60,67,.1)}
     .oggiKpi:last-child{border-right:none}
-    .oggiKpiLabel{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#9ca3af}
+    .oggiKpiLabel{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#8e8e93}
     .oggiKpiNum{font-size:28px;font-weight:950;line-height:1}
-    .oggiKpiSub{font-size:11px;color:#9ca3af;margin-top:2px}
-    .oggiKpiNum.blue{color:#60a5fa}.oggiKpiNum.orange{color:#f97316}.oggiKpiNum.green{color:#22c55e}.oggiKpiNum.purple{color:#a855f7}
-    .oggiSummary{padding:13px 18px;border-bottom:1px solid var(--line);background:rgba(59,130,246,.03)}
-    .oggiSummaryText{font-size:13px;line-height:1.75;color:#e5e7eb;white-space:pre-line}
-    .oggiAskBtn{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);border-radius:10px;padding:9px 18px;color:#93c5fd;font-size:13px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;display:flex;align-items:center;gap:8px}
+    .oggiKpiSub{font-size:11px;color:#8e8e93;margin-top:2px}
+    .oggiKpiNum.blue{color:#a07855}.oggiKpiNum.orange{color:#a04020}.oggiKpiNum.green{color:#22a05a}.oggiKpiNum.purple{color:#7a5c3d}
+    .oggiSummary{padding:13px 18px;border-bottom:1px solid rgba(60,60,67,.1);background:rgba(160,120,85,.03)}
+    .oggiSummaryText{font-size:13px;line-height:1.75;color:#1c1c1e;white-space:pre-line}
+    .oggiAskBtn{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);border-radius:10px;padding:9px 18px;color:#7a5c3d;font-size:13px;cursor:pointer;font-family:inherit;font-weight:700;transition:all .2s;display:flex;align-items:center;gap:8px}
     .oggiAskBtn:hover{background:rgba(59,130,246,.2);transform:translateY(-1px)}
     .oggiGrid{display:grid;grid-template-columns:1fr 1fr}
-    .oggiCol{padding:13px 18px;border-right:1px solid var(--line)}
+    .oggiCol{padding:13px 18px;border-right:1px solid rgba(60,60,67,.1)}
     .oggiCol:last-child{border-right:none}
-    .oggiColTitle{font-size:12px;font-weight:900;letter-spacing:.3px;text-transform:uppercase;color:#9ca3af;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-    .oggiItem{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);margin-bottom:6px;font-size:12px;line-height:1.4}
+    .oggiColTitle{font-size:12px;font-weight:900;letter-spacing:.3px;text-transform:uppercase;color:#8e8e93;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .oggiItem{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border:1px solid rgba(60,60,67,.12);border-radius:10px;background:rgba(255,255,255,.9);margin-bottom:6px;font-size:12px;line-height:1.4}
     .oggiDot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
     .oggiDot.red{background:#ef4444}.oggiDot.yellow{background:#eab308}.oggiDot.blue{background:#3b82f6}.oggiDot.green{background:#22c55e}.oggiDot.purple{background:#a855f7}
-    .oggiEmpty{font-size:12px;color:#6b7280;font-style:italic;padding:6px 2px}
+    .oggiEmpty{font-size:12px;color:#8e8e93;font-style:italic;padding:6px 2px}
 
-    .consegnePanel{background:var(--panel);border:1px solid rgba(34,197,94,.25);border-radius:16px;overflow:hidden}
-    #consegnePanel .widgetHeader{background:linear-gradient(180deg,rgba(34,197,94,.09),rgba(10,12,18,.35) 70%)}
-    .consegnaCard{border:1px solid var(--line);border-radius:13px;background:var(--bg2);margin-bottom:10px;overflow:hidden;animation:itemIn .2s ease}
-    .consegnaHead{padding:11px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
-    .consegnaHead:hover{background:rgba(34,197,94,.04)}
+    .consegnePanel{background:var(--panel);border:1px solid rgba(34,197,94,.2);border-radius:16px;overflow:hidden}
+    #consegnePanel .widgetHeader{background:linear-gradient(180deg,rgba(34,197,94,.09),rgba(255,255,255,.45) 70%)}
+    .consegnaCard{border:1px solid rgba(60,60,67,.12);border-radius:13px;background:rgba(255,255,255,.9);margin-bottom:10px;overflow:hidden;animation:itemIn .2s ease}
+    .consegnaHead{padding:11px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(60,60,67,.1);cursor:pointer;user-select:none}
+    .consegnaHead:hover{background:rgba(34,197,94,.03)}
     .consegnaDate{font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#6ee7b7;white-space:nowrap;flex-shrink:0}
     .consegnaDate.oggi{background:rgba(249,115,22,.18);border-color:rgba(249,115,22,.4);color:#fdba74}
     .consegnaDate.scaduta{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.35);color:#fca5a5}
     .consegnaModello{font-size:14px;font-weight:700;flex:1}
-    .consegnaCliente{font-size:12px;color:#9ca3af}
-    .consegnaChevron{font-size:12px;color:#9ca3af;transition:transform .2s;flex-shrink:0}
+    .consegnaCliente{font-size:12px;color:#8e8e93}
+    .consegnaChevron{font-size:12px;color:#8e8e93;transition:transform .2s;flex-shrink:0}
     .consegnaCard.open .consegnaChevron{transform:rotate(180deg)}
     .consegnaBody{display:none;padding:12px 14px}
     .consegnaCard.open .consegnaBody{display:block}
     .consegnaChecks{display:grid;gap:6px}
-    .consegnaCheckItem{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg1);transition:all .2s}
-    .consegnaCheckItem:hover{background:var(--bg2);border-color:rgba(34,197,94,.3)}
+    .consegnaCheckItem{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid rgba(60,60,67,.12);border-radius:10px;background:rgba(255,255,255,.78);transition:all .2s}
+    .consegnaCheckItem:hover{background:rgba(255,255,255,.9);border-color:rgba(34,197,94,.3)}
     .consegnaCheckBox{width:18px;height:18px;flex-shrink:0;accent-color:#22c55e;cursor:pointer}
     .consegnaCheckLabel{font-size:13px;flex:1}
-    .consegnaCheckLabel.done{text-decoration:line-through;color:#9ca3af}
-    .consegnaProgress{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:#9ca3af}
-    .consegnaProgressBar{flex:1;height:6px;background:rgba(31,41,55,.8);border-radius:999px;overflow:hidden}
+    .consegnaCheckLabel.done{text-decoration:line-through;color:#8e8e93}
+    .consegnaProgress{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:#8e8e93}
+    .consegnaProgressBar{flex:1;height:6px;background:rgba(118,118,128,.15);border-radius:999px;overflow:hidden}
     .consegnaProgressFill{height:100%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#4ade80);transition:width .4s}
     .consegnaDelBtn{margin-top:10px;width:100%;padding:7px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);border-radius:9px;color:#fca5a5;font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s}
     .consegnaDelBtn:hover{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.5)}
     .consegnaFormRow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-    .consegnaInput{flex:1;min-width:120px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
-    .consegnaInput:focus{border-color:#22c55e}
+    .consegnaInput{flex:1;min-width:120px;background:rgba(255,255,255,.9);border:1px solid rgba(60,60,67,.12);border-radius:10px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
+    .consegnaInput:focus{border-color:#22a05a}
     .consegnaInput[type="date"]{color-scheme:dark;max-width:160px}
 
-    .postPanel{background:var(--panel);border:1px solid rgba(251,191,36,.25);border-radius:16px;overflow:hidden}
-    #postPanel .widgetHeader{background:linear-gradient(180deg,rgba(251,191,36,.09),rgba(10,12,18,.35) 70%)}
-    .postCard{border:1px solid var(--line);border-radius:12px;background:var(--bg2);padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;animation:itemIn .2s ease;transition:border-color .2s}
+    .postPanel{background:var(--panel);border:1px solid rgba(251,191,36,.2);border-radius:16px;overflow:hidden}
+    #postPanel .widgetHeader{background:linear-gradient(180deg,rgba(251,191,36,.09),rgba(255,255,255,.45) 70%)}
+    .postCard{border:1px solid rgba(60,60,67,.12);border-radius:12px;background:rgba(255,255,255,.9);padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;animation:itemIn .2s ease;transition:border-color .2s}
     .postCard.urgente{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.05)}
     .postCardLeft{flex:1;min-width:0}
     .postCardCliente{font-size:14px;font-weight:700}
-    .postCardModello{font-size:12px;color:#9ca3af;margin-top:2px}
+    .postCardModello{font-size:12px;color:#8e8e93;margin-top:2px}
     .postCardBadges{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
     .postBadge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;cursor:pointer;transition:all .2s;border:1px solid}
     .postBadge.intervista{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.35);color:#fde68a}
@@ -364,7 +371,7 @@
     .postBadge.recensione.done{opacity:.4;text-decoration:line-through;cursor:default}
     .postBadge.scaduto{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5;animation:pulse 1.5s infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-    .postDays{font-size:11px;color:#9ca3af;margin-top:5px}
+    .postDays{font-size:11px;color:#8e8e93;margin-top:5px}
 
     @media(max-width:980px){
       .layout{grid-template-columns:1fr}
@@ -372,7 +379,7 @@
       .brand{min-width:unset}
       .split3{grid-template-columns:1fr}
       .venditeListe{grid-template-columns:1fr}
-      .venditeCol:first-child{border-right:none;border-bottom:1px solid rgba(31,41,55,.75)}
+      .venditeCol:first-child{border-right:none;border-bottom:1px solid rgba(60,60,67,.12)}
       .chatBox{width:100%;max-width:100%;height:100vh;max-height:100vh;bottom:0;right:0;border-radius:0}
       .chatTrigger{bottom:16px;right:16px;width:60px;height:60px}
       .weekGrid{gap:4px}
@@ -390,13 +397,13 @@
     /* ══ GLOBAL DARK OVERRIDES ══ */
     input,textarea,select{color-scheme:dark}
     ::-webkit-scrollbar{width:4px;height:4px}
-    ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:999px}
+    ::-webkit-scrollbar-thumb{background:rgba(248,248,252,.9);border-radius:999px}
     ::-webkit-scrollbar-track{background:transparent}
     .emptyList{font-size:12px;color:var(--muted);font-style:italic;padding:8px 2px}
     .smallNote{color:var(--muted)}
     .dayMeta{color:var(--muted)}
     .autoN{color:var(--muted)}
-    select option{background:var(--bg2);color:var(--text)}
+    select option{background:rgba(255,255,255,.9);color:var(--text)}
 
 
     /* ══ POPUP AUTO ══ */
@@ -404,17 +411,17 @@
     .autoPopupBox{background:#111827;border:1px solid #374151;border-radius:18px;width:420px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.7);}
     .autoPopupHead{padding:16px 20px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:18px 18px 0 0;}
     .autoPopupTitle{font-weight:900;font-size:16px;}
-    .autoPopupClose{width:32px;height:32px;border-radius:9px;border:1px solid #374151;background:#1f2937;color:#e5e7eb;cursor:pointer;font-size:20px;font-weight:900;display:flex;align-items:center;justify-content:center;}
+    .autoPopupClose{width:32px;height:32px;border-radius:9px;border:1px solid #374151;background:#1f2937;color:#1c1c1e;cursor:pointer;font-size:20px;font-weight:900;display:flex;align-items:center;justify-content:center;}
     .autoPopupClose:hover{background:#374151;}
     .autoPopupList{padding:14px 16px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
-    .autoPopupItem{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid #1f2937;border-radius:12px;background:#1a1d23;}
-    .autoPopupN{font-size:12px;font-weight:900;color:#6b7280;min-width:24px;}
+    .autoPopupItem{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid rgba(60,60,67,.12);border-radius:12px;background:#1a1d23;}
+    .autoPopupN{font-size:12px;font-weight:900;color:#8e8e93;min-width:24px;}
     .autoPopupModello{flex:1;font-size:14px;font-weight:600;}
-    .autoPopupProvv{font-size:13px;font-weight:700;color:#4ade80;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:6px;padding:2px 8px;white-space:nowrap;}
-    .autoPopupProvv.zero{color:#6b7280;background:transparent;border-color:#374151;font-weight:400;}
-    .autoPopupDel{width:28px;height:28px;border-radius:8px;border:1px solid #374151;background:#111827;color:#6b7280;cursor:pointer;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .autoPopupProvv{font-size:13px;font-weight:700;color:#22a05a;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:6px;padding:2px 8px;white-space:nowrap;}
+    .autoPopupProvv.zero{color:#8e8e93;background:transparent;border-color:#374151;font-weight:400;}
+    .autoPopupDel{width:28px;height:28px;border-radius:8px;border:1px solid #374151;background:#111827;color:#8e8e93;cursor:pointer;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
     .autoPopupDel:hover{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.1);color:#fca5a5;}
-    .autoPopupEmpty{padding:20px;text-align:center;color:#6b7280;font-style:italic;font-size:13px;}
+    .autoPopupEmpty{padding:20px;text-align:center;color:#8e8e93;font-style:italic;font-size:13px;}
   </style>
 </head>
 <body>
@@ -472,7 +479,7 @@
           <div style="background:rgba(34,197,94,.08);border-bottom:1px solid rgba(34,197,94,.2);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
             <div>
               <div style="font-weight:950;font-size:16px;">🚗 Pre-Consegna</div>
-              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Checklist consegne — sempre visibile</div>
+              <div style="color:#8e8e93;font-size:12px;margin-top:3px;">Checklist consegne — sempre visibile</div>
             </div>
             <button id="consegnaClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completate</button>
           </div>
@@ -492,7 +499,7 @@
           <div style="background:rgba(251,191,36,.07);border-bottom:1px solid rgba(251,191,36,.2);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
             <div>
               <div style="font-weight:950;font-size:16px;">⭐ Post-Vendita</div>
-              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Follow-up: intervista (2gg) · recensione (3gg)</div>
+              <div style="color:#8e8e93;font-size:12px;margin-top:3px;">Follow-up: intervista (2gg) · recensione (3gg)</div>
             </div>
             <button id="postClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completati</button>
           </div>
@@ -510,16 +517,16 @@
         <!-- ═══════════════════════════════════
              OBIETTIVO MENSILE
         ═══════════════════════════════════ -->
-        <div id="obiettivoPanel" style="background:var(--bg1);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:16px;">
+        <div id="obiettivoPanel" style="background:var(--bg1);border:1px solid rgba(60,60,67,.12);border-radius:16px;overflow:hidden;margin-bottom:16px;">
 
           <!-- Header -->
           <div style="padding:14px 20px;background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(249,115,22,.07));border-bottom:1px solid rgba(251,191,36,.2);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
             <div>
               <div style="font-weight:950;font-size:18px;">🎯 Obiettivo Mensile</div>
-              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Target: <strong style="color:#fbbf24;">11 auto</strong> · di cui <strong style="color:#4ade80;">70% finanziate</strong> · 3+3+3+2 a settimana</div>
+              <div style="color:#8e8e93;font-size:12px;margin-top:3px;">Target: <strong style="color:#b8860b;">11 auto</strong> · di cui <strong style="color:#22a05a;">70% finanziate</strong> · 3+3+3+2 a settimana</div>
             </div>
             <div style="display:flex;gap:8px;align-items:center;">
-              <button id="obAddBtn" style="background:linear-gradient(135deg,rgba(251,191,36,.2),rgba(249,115,22,.15));border:1px solid rgba(251,191,36,.4);border-radius:10px;padding:8px 16px;color:#fbbf24;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;">+ Auto</button>
+              <button id="obAddBtn" style="background:linear-gradient(135deg,rgba(251,191,36,.2),rgba(249,115,22,.15));border:1px solid rgba(251,191,36,.4);border-radius:10px;padding:8px 16px;color:#b8860b;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;">+ Auto</button>
             </div>
           </div>
 
@@ -532,8 +539,8 @@
             <!-- Barra consegnate -->
             <div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                <span style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">🚗 Auto consegnate</span>
-                <span id="obProgAutoTxt" style="font-size:13px;font-weight:900;color:#60a5fa;">0 / 11</span>
+                <span style="font-size:12px;font-weight:700;color:#8e8e93;text-transform:uppercase;letter-spacing:.4px;">🚗 Auto consegnate</span>
+                <span id="obProgAutoTxt" style="font-size:13px;font-weight:900;color:#a07855;">0 / 11</span>
               </div>
               <div style="background:rgba(31,41,55,.7);border-radius:999px;height:12px;overflow:hidden;">
                 <div id="obProgAutoBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#3b82f6,#60a5fa);transition:width .5s cubic-bezier(.4,0,.2,1);width:0%;"></div>
@@ -543,8 +550,8 @@
             <!-- Barra finanziate -->
             <div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                <span style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">💳 Finanziate</span>
-                <span id="obProgFinTxt" style="font-size:13px;font-weight:900;color:#4ade80;">0% / 70%</span>
+                <span style="font-size:12px;font-weight:700;color:#8e8e93;text-transform:uppercase;letter-spacing:.4px;">💳 Finanziate</span>
+                <span id="obProgFinTxt" style="font-size:13px;font-weight:900;color:#22a05a;">0% / 70%</span>
               </div>
               <div style="background:rgba(31,41,55,.7);border-radius:999px;height:12px;overflow:hidden;">
                 <div id="obProgFinBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#4ade80);transition:width .5s cubic-bezier(.4,0,.2,1);width:0%;"></div>
@@ -566,26 +573,26 @@
         </div>
 
         <!-- COMPARATORE -->
-        <div style="background:var(--bg1);border:1px solid var(--line);border-radius:16px;overflow:hidden;">
+        <div style="background:var(--bg1);border:1px solid rgba(60,60,67,.12);border-radius:16px;overflow:hidden;">
           <div style="padding:13px 18px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.22);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
             <div>
               <div style="font-weight:950;font-size:18px">⚔ Comparatore Auto</div>
-              <div style="color:#9ca3af;font-size:13px;margin-top:4px">Confronta due auto nuove — cerca sui configuratori ufficiali</div>
+              <div style="color:#8e8e93;font-size:13px;margin-top:4px">Confronta due auto nuove — cerca sui configuratori ufficiali</div>
             </div>
             <button id="cmpResetBtn" class="btn" style="font-size:12px;padding:7px 12px;">↩ Reset</button>
           </div>
-          <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.5);display:flex;gap:10px;flex-wrap:wrap;">
+          <div style="padding:16px 20px;border-bottom:1px solid rgba(60,60,67,.09);display:flex;gap:10px;flex-wrap:wrap;">
             <input id="cmpInput1" type="text" placeholder="Es: Grande Panda, Compass, Stelvio..."
-              style="flex:1;min-width:180px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
-              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='rgba(255,255,255,.07)'"/>
-            <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;font-weight:700;">VS</div>
+              style="flex:1;min-width:180px;background:var(--bg2);border:1px solid rgba(60,60,67,.12);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
+              onfocus="this.style.borderColor='#a07855'" onblur="this.style.borderColor='rgba(255,255,255,.07)'"/>
+            <div style="display:flex;align-items:center;color:#8e8e93;font-size:18px;font-weight:700;">VS</div>
             <input id="cmpInput2" type="text" placeholder="Es: Junior, Avenger, Ypsilon..."
-              style="flex:1;min-width:180px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
-              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'"/>
-            <button id="cmpBtn" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);border:none;border-radius:10px;padding:10px 20px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit;">🔎 Confronta</button>
+              style="flex:1;min-width:180px;background:var(--bg2);border:1px solid rgba(60,60,67,.12);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
+              onfocus="this.style.borderColor='#a07855'" onblur="this.style.borderColor='rgba(60,60,67,.12)'"/>
+            <button id="cmpBtn" style="background:linear-gradient(135deg,#a07855,#c9a07a);border:none;border-radius:10px;padding:10px 20px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit;">🔎 Confronta</button>
           </div>
           <div style="padding:10px 18px;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;">
-            <span style="color:#9ca3af;font-size:12px;align-self:center;">Rapido:</span>
+            <span style="color:#8e8e93;font-size:12px;align-self:center;">Rapido:</span>
             <button class="cmpSuggest" data-s1="Grande Panda" data-s2="Junior">Grande Panda vs Junior</button>
             <button class="cmpSuggest" data-s1="Compass" data-s2="Tonale">Compass vs Tonale</button>
             <button class="cmpSuggest" data-s1="Stelvio" data-s2="Renegade">Stelvio vs Renegade</button>
@@ -596,28 +603,28 @@
           </div>
         </div>
 <!-- ══ ANALISI GARANZIE ══ -->
-<div style="background:rgba(17,24,39,.78);border:1px solid #1f2937;border-radius:16px;overflow:hidden;margin-top:16px;" id="garanziePanel">
-  <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.75);background:linear-gradient(180deg,rgba(139,92,246,.12),rgba(10,12,18,.35) 70%);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+<div style="background:rgba(255,255,255,.82);border:1px solid rgba(60,60,67,.12);border-radius:16px;overflow:hidden;margin-top:16px;" id="garanziePanel">
+  <div style="padding:16px 20px;border-bottom:1px solid rgba(60,60,67,.1);background:linear-gradient(180deg,rgba(139,92,246,.12),rgba(10,12,18,.35) 70%);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
     <div>
       <div style="font-weight:950;font-size:18px;">🛡 Analisi Garanzie</div>
-      <div style="color:#9ca3af;font-size:13px;margin-top:4px;">Carica il PDF della garanzia → AI estrae tutto e genera il sunto Word</div>
+      <div style="color:#8e8e93;font-size:13px;margin-top:4px;">Carica il PDF della garanzia → AI estrae tutto e genera il sunto Word</div>
     </div>
     <span style="font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid rgba(139,92,246,.4);background:rgba(139,92,246,.12);color:#d8b4fe;white-space:nowrap;">✨ AI Powered</span>
   </div>
   <div style="padding:16px 20px;">
 
     <!-- TABS -->
-    <div style="display:flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+    <div style="display:flex;border:1px solid rgba(31,41,55,.9);background:rgba(255,255,255,.5);border-radius:12px;overflow:hidden;margin-bottom:16px;">
       <button id="garTabNuova"   onclick="switchGarTab('nuova')"   style="flex:1;border:none;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(167,139,250,.18));color:#d8b4fe;padding:9px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;">📄 Nuova Analisi</button>
-      <button id="garTabStorico" onclick="switchGarTab('storico')" style="flex:1;border:none;background:transparent;color:#9ca3af;padding:9px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;">📋 Storico</button>
-      <button id="garTabGuida"   onclick="switchGarTab('guida')"   style="flex:1;border:none;background:transparent;color:#9ca3af;padding:9px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;">💡 Guida</button>
+      <button id="garTabStorico" onclick="switchGarTab('storico')" style="flex:1;border:none;background:transparent;color:#8e8e93;padding:9px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;">📋 Storico</button>
+      <button id="garTabGuida"   onclick="switchGarTab('guida')"   style="flex:1;border:none;background:transparent;color:#8e8e93;padding:9px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;">💡 Guida</button>
     </div>
 
     <!-- TAB NUOVA -->
     <div id="garContentNuova">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-        <input id="garNome"    type="text" placeholder="👤 Nome Cliente (es: Mario Rossi)"         style="background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:9px 13px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;width:100%;transition:border-color .2s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#1f2937'"/>
-        <input id="garModello" type="text" placeholder="🚗 Modello auto (es: Jeep Compass 2024)"  style="background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:9px 13px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;width:100%;transition:border-color .2s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#1f2937'"/>
+        <input id="garNome"    type="text" placeholder="👤 Nome Cliente (es: Mario Rossi)"         style="background:rgba(118,118,128,.1);border:1px solid rgba(60,60,67,.12);border-radius:10px;padding:9px 13px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;width:100%;transition:border-color .2s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='rgba(60,60,67,.12)'"/>
+        <input id="garModello" type="text" placeholder="🚗 Modello auto (es: Jeep Compass 2024)"  style="background:rgba(118,118,128,.1);border:1px solid rgba(60,60,67,.12);border-radius:10px;padding:9px 13px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;width:100%;transition:border-color .2s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='rgba(60,60,67,.12)'"/>
       </div>
 
       <!-- DROP ZONE -->
@@ -625,7 +632,7 @@
         <input type="file" id="garFileInput" accept=".pdf,application/pdf" style="display:none;"/>
         <div id="garDropIcon" style="font-size:36px;margin-bottom:8px;">📄</div>
         <div id="garDropTitle" style="font-size:14px;font-weight:700;color:#d8b4fe;margin-bottom:4px;">Trascina il PDF qui oppure clicca per selezionare</div>
-        <div style="font-size:12px;color:#9ca3af;">Garanzia, contratto, libretto — max 20MB</div>
+        <div style="font-size:12px;color:#8e8e93;">Garanzia, contratto, libretto — max 20MB</div>
         <div id="garFileLabel" style="display:none;font-size:12px;color:#6ee7b7;margin-top:8px;font-weight:700;"></div>
       </div>
 
@@ -652,7 +659,7 @@
     <!-- TAB STORICO -->
     <div id="garContentStorico" style="display:none;">
       <div id="garStoricoBox">
-        <div style="text-align:center;padding:32px 20px;color:#9ca3af;">
+        <div style="text-align:center;padding:32px 20px;color:#8e8e93;">
           <div style="font-size:40px;margin-bottom:10px;opacity:.5;">📂</div>
           <div style="font-size:13px;">Nessuna garanzia analizzata ancora.<br>Usa "Nuova Analisi" per iniziare!</div>
         </div>
@@ -666,12 +673,12 @@
           <div style="font-weight:900;font-size:14px;color:#d8b4fe;margin-bottom:8px;">📋 Passo 1 — Inserisci i dati</div>
           <div style="font-size:13px;color:#e5e7eb;line-height:1.6;">Scrivi il <strong>nome e cognome del cliente</strong> e il <strong>modello dell'auto</strong>.</div>
         </div>
-        <div style="padding:14px 16px;border:1px solid rgba(59,130,246,.3);border-radius:12px;background:rgba(59,130,246,.07);">
-          <div style="font-weight:900;font-size:14px;color:#93c5fd;margin-bottom:8px;">📄 Passo 2 — Carica il PDF</div>
+        <div style="padding:14px 16px;border:1px solid rgba(160,120,85,.2);border-radius:12px;background:rgba(59,130,246,.07);">
+          <div style="font-weight:900;font-size:14px;color:#7a5c3d;margin-bottom:8px;">📄 Passo 2 — Carica il PDF</div>
           <div style="font-size:13px;color:#e5e7eb;line-height:1.6;">Trascina o clicca per caricare il documento PDF della garanzia (max 20MB).</div>
         </div>
         <div style="padding:14px 16px;border:1px solid rgba(34,197,94,.3);border-radius:12px;background:rgba(34,197,94,.07);">
-          <div style="font-weight:900;font-size:14px;color:#6ee7b7;margin-bottom:8px;">🤖 Passo 3 — Analisi AI</div>
+          <div style="font-weight:900;font-size:14px;color:#1a7a50;margin-bottom:8px;">🤖 Passo 3 — Analisi AI</div>
           <div style="font-size:13px;color:#e5e7eb;line-height:1.6;">L'AI estrae: data inizio, durata, cosa è coperto, cosa è escluso, condizioni principali.</div>
         </div>
         <div style="padding:14px 16px;border:1px solid rgba(249,115,22,.3);border-radius:12px;background:rgba(249,115,22,.07);">
@@ -700,11 +707,11 @@
           <div class="venditeTotali">
             <div class="totCard" id="totCardNuove" style="cursor:pointer;" title="Clicca per vedere le auto nuove">
               <div class="totLabel">🆕 Nuove</div><div class="totNum nuova" id="totNuove">0</div>
-              <div style="font-size:10px;color:#60a5fa;margin-top:4px;">👆 clicca per vedere</div>
+              <div style="font-size:10px;color:#a07855;margin-top:4px;">👆 clicca per vedere</div>
             </div>
             <div class="totCard" id="totCardUsate" style="cursor:pointer;" title="Clicca per vedere le auto usate">
               <div class="totLabel">🔄 Usate</div><div class="totNum usata" id="totUsate">0</div>
-              <div style="font-size:10px;color:#f97316;margin-top:4px;">👆 clicca per vedere</div>
+              <div style="font-size:10px;color:#a04020;margin-top:4px;">👆 clicca per vedere</div>
             </div>
             <div class="totCard"><div class="totLabel">📦 Totale</div><div class="totNum all" id="totAll">0</div></div>
           </div>
@@ -1391,7 +1398,7 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     }
 
     function setLoadingStatus(msg){
-      $("cmpResults").innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:20px;color:#60a5fa;font-size:13px;">🔍 ${escapeHtml(msg)}</div>`;
+      $("cmpResults").innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:20px;color:#a07855;font-size:13px;">🔍 ${escapeHtml(msg)}</div>`;
     }
 
     const COMPARATORE_SYSTEM=`Sei un esperto di auto nuove italiane (Fiat, Jeep, Alfa Romeo, Lancia).
@@ -1432,7 +1439,7 @@ Nessun testo extra. Solo lo schema sopra.`;
     async function runComparatore(){
       const m1raw=$("cmpInput1").value.trim(), m2raw=$("cmpInput2").value.trim();
       if(!m1raw||!m2raw){
-        $("cmpResults").innerHTML='<div style="color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">⚠ Inserisci entrambi i modelli!</div>';
+        $("cmpResults").innerHTML='<div style="color:#c0392b;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">⚠ Inserisci entrambi i modelli!</div>';
         return;
       }
       const btn=$("cmpBtn");
@@ -1457,8 +1464,8 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
 
       const ctx = `DATI REALI DAI CONFIGURATORI UFFICIALI 2025:\n\n${dbToContext(d1,m1raw)}\n\n${dbToContext(d2,m2raw)}`;
       const badge = (d1&&d2)
-        ?`<div style="font-size:11px;color:#6ee7b7;margin-bottom:10px;padding:5px 10px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;">✅ Dati dai configuratori ufficiali Fiat / Jeep / Alfa Romeo / Lancia (2025)</div>`
-        :`<div style="font-size:11px;color:#fde68a;margin-bottom:10px;padding:5px 10px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;">⚠ ${!d1?m1raw:m2raw} non nel DB locale — dati integrati da conoscenza generale</div>`;
+        ?`<div style="font-size:11px;color:#1a7a50;margin-bottom:10px;padding:5px 10px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);border-radius:8px;">✅ Dati dai configuratori ufficiali Fiat / Jeep / Alfa Romeo / Lancia (2025)</div>`
+        :`<div style="font-size:11px;color:#a07020;margin-bottom:10px;padding:5px 10px;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.18);border-radius:8px;">⚠ ${!d1?m1raw:m2raw} non nel DB locale — dati integrati da conoscenza generale</div>`;
 
       try{
         setLoadingStatus("Elaboro il confronto...");
@@ -1477,7 +1484,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         ai=ai.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
         $("cmpResults").innerHTML=`<div style="background:rgba(31,41,55,.35);border:1px solid rgba(31,41,55,.7);border-radius:12px;padding:14px 16px;">${badge}<div style="white-space:pre-line;font-size:13px;line-height:1.7">${ai}</div></div>`;
       }catch(err){
-        $("cmpResults").innerHTML=`<div style="color:#fca5a5;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">❌ Errore: ${escapeHtml(err?.message||"connessione fallita")}. Riprova.</div>`;
+        $("cmpResults").innerHTML=`<div style="color:#c0392b;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 16px;font-size:13px;">❌ Errore: ${escapeHtml(err?.message||"connessione fallita")}. Riprova.</div>`;
       }finally{
         btn.disabled=false; btn.textContent="🔎 Confronta";
       }
@@ -1490,7 +1497,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     }));
     $("cmpResetBtn").addEventListener("click",()=>{
       $("cmpInput1").value="";$("cmpInput2").value="";
-      $("cmpResults").innerHTML='<div style="text-align:center;color:#9ca3af;padding:30px 0;font-size:14px;">↑ Scrivi il modello e premi Confronta</div>';
+      $("cmpResults").innerHTML='<div style="text-align:center;color:#8e8e93;padding:30px 0;font-size:14px;">↑ Scrivi il modello e premi Confronta</div>';
     });
     $("cmpBtn").addEventListener("click",runComparatore);
     $("cmpInput1").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();runComparatore()}});
@@ -1542,7 +1549,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       const editabile=isMeseEditabile(k);
       $("vendMonthLabel").innerHTML=escapeHtml(monthLabel(k))
         +(isCurrent?' <span style="color:#22c55e;font-weight:700;font-size:11px;">● in corso</span>':"")
-        +(!isCurrent&&editabile?' <span style="color:#fbbf24;font-weight:700;font-size:11px;">✏ editabile</span>':"")
+        +(!isCurrent&&editabile?' <span style="color:#b8860b;font-weight:700;font-size:11px;">✏ editabile</span>':"")
         +(!editabile?' <span style="color:#ef4444;font-weight:700;font-size:10px;">🔒 chiuso</span>':"");
       $("vendNextBtn").disabled=(k===TODAY_KEY);
       $("vendPrevBtn").disabled=false; // sempre libero scorrere indietro
@@ -1834,7 +1841,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
               <div class="consegnaModello">${escapeHtml(con.modello||"")}</div>
               <div class="consegnaCliente">${escapeHtml(con.cliente||"")}</div>
             </div>
-            <div style="font-size:11px;color:#9ca3af;white-space:nowrap;margin-right:6px">${doneCnt}/${checks.length} ✓</div>
+            <div style="font-size:11px;color:#8e8e93;white-space:nowrap;margin-right:6px">${doneCnt}/${checks.length} ✓</div>
             <div class="consegnaChevron" id="chev_${con.id}">▼</div>
           </div>
           <div class="consegnaBody" id="cbody_${con.id}" style="display:none;">
@@ -2187,15 +2194,15 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
               <div style="flex:1;min-width:0;">
                 <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(a.modello)}</div>
                 <div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap;">
-                  <span style="font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;${a.tipo==="nuova"?"background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd":"background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);color:#fdba74"}">${a.tipo==="nuova"?"🆕 Nuova":"🔄 Usata"}</span>
-                  <span style="font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;${a.fin?"background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);color:#93c5fd":"background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#6ee7b7"}">${a.fin?"💳 Finanz.":"💵 Cash"}</span>
+                  <span style="font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;${a.tipo==="nuova"?"background:rgba(160,120,85,.12);border:1px solid rgba(160,120,85,.2);color:#7a5c3d":"background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);color:#fdba74"}">${a.tipo==="nuova"?"🆕 Nuova":"🔄 Usata"}</span>
+                  <span style="font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;${a.fin?"background:rgba(59,130,246,.12);border:1px solid rgba(160,120,85,.2);color:#7a5c3d":"background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#6ee7b7"}">${a.fin?"💳 Finanz.":"💵 Cash"}</span>
                 </div>
               </div>
               <button onclick="obDelete(${wi},'${a.id}')" style="width:26px;height:26px;border-radius:7px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);color:#fca5a5;cursor:pointer;font-size:15px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
             </div>`).join("");
 
           return `<div style="border-radius:12px;overflow:hidden;border:${isCurrent?"1px solid rgba(251,191,36,.5)":"1px solid rgba(31,41,55,.6)"};${isCurrent?"box-shadow:0 0 0 3px rgba(251,191,36,.08);":""}">
-            <div style="padding:8px 12px;background:${isCurrent?"rgba(251,191,36,.1)":"rgba(0,0,0,.2)"};border-bottom:1px solid rgba(31,41,55,.5);display:flex;align-items:center;justify-content:space-between;">
+            <div style="padding:8px 12px;background:${isCurrent?"rgba(251,191,36,.1)":"rgba(0,0,0,.2)"};border-bottom:1px solid rgba(60,60,67,.09);display:flex;align-items:center;justify-content:space-between;">
               <span style="font-size:12px;font-weight:900;color:${isCurrent?"#fbbf24":"#9ca3af"};text-transform:uppercase;letter-spacing:.4px;">
                 ${isCurrent?"📍 ":""}Settimana ${wi+1}${isCurrent?" — in corso":""}
               </span>
@@ -2637,7 +2644,7 @@ function garRenderResult(p){
 function garRenderStorico(){
   const box=document.getElementById("garStoricoBox");
   if(!garStorico.length){
-    box.innerHTML='<div style="text-align:center;padding:32px 20px;color:#9ca3af;"><div style="font-size:40px;margin-bottom:10px;opacity:.5;">📂</div><div style="font-size:13px;">Nessuna garanzia analizzata ancora.</div></div>';
+    box.innerHTML='<div style="text-align:center;padding:32px 20px;color:#8e8e93;"><div style="font-size:40px;margin-bottom:10px;opacity:.5;">📂</div><div style="font-size:13px;">Nessuna garanzia analizzata ancora.</div></div>';
     return;
   }
   box.innerHTML=garStorico.map(item=>`
@@ -2645,10 +2652,10 @@ function garRenderStorico(){
       <div style="font-size:24px;">🛡</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:700;">👤 ${esc(item.cliente)} — 🚗 ${esc(item.modello||"—")}</div>
-        <div style="font-size:11px;color:#9ca3af;margin-top:2px;">📅 ${esc(item.dataInizio||"—")} · ⏱ ${esc(item.durataAnni||"—")}</div>
+        <div style="font-size:11px;color:#8e8e93;margin-top:2px;">📅 ${esc(item.dataInizio||"—")} · ⏱ ${esc(item.durataAnni||"—")}</div>
       </div>
       <div style="text-align:right;">
-        <div style="font-size:11px;color:#9ca3af;">${esc(item.ts)}</div>
+        <div style="font-size:11px;color:#8e8e93;">${esc(item.ts)}</div>
         <div style="font-size:11px;color:#d8b4fe;margin-top:3px;">Clicca per riaprire →</div>
       </div>
     </div>`).join("");
@@ -2717,24 +2724,24 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
 
   <!-- POPUP OBIETTIVO — step 1: tipo, step 2: finanziamento -->
   <div id="obPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
-    <div style="background:#111827;border:1px solid #1f2937;border-radius:20px;width:340px;max-width:92vw;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8);">
+    <div style="background:#111827;border:1px solid rgba(60,60,67,.12);border-radius:20px;width:340px;max-width:92vw;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8);">
 
       <!-- Intestazione -->
       <div style="padding:16px 20px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;">
         <div>
           <div id="obPopupTitle" style="font-weight:900;font-size:16px;"></div>
-          <div id="obPopupSub" style="font-size:12px;color:#9ca3af;margin-top:2px;"></div>
+          <div id="obPopupSub" style="font-size:12px;color:#8e8e93;margin-top:2px;"></div>
         </div>
         <button id="obPopupClose" style="width:30px;height:30px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#e5e7eb;cursor:pointer;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
 
       <!-- Step 1: tipo -->
       <div id="obPopupTipoBox" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
-        <button id="obBtnNuova" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+        <button id="obBtnNuova" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#22a05a;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
           onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
           🆕 <span>Auto Nuova</span>
         </button>
-        <button id="obBtnUsata" style="padding:16px;border-radius:14px;border:2px solid rgba(249,115,22,.5);background:rgba(249,115,22,.1);color:#fb923c;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+        <button id="obBtnUsata" style="padding:16px;border-radius:14px;border:2px solid rgba(249,115,22,.5);background:rgba(249,115,22,.1);color:#b05030;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
           onmouseover="this.style.background='rgba(249,115,22,.2)'" onmouseout="this.style.background='rgba(249,115,22,.1)'">
           🔄 <span>Auto Usata</span>
         </button>
@@ -2742,11 +2749,11 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
 
       <!-- Step 2: finanziamento -->
       <div id="obPopupFinBox" style="padding:20px;display:none;flex-direction:column;gap:12px;">
-        <button id="obBtnCash" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+        <button id="obBtnCash" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#22a05a;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
           onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
           💵 <span>Cash</span>
         </button>
-        <button id="obBtnFin" style="padding:16px;border-radius:14px;border:2px solid rgba(59,130,246,.5);background:rgba(59,130,246,.1);color:#60a5fa;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+        <button id="obBtnFin" style="padding:16px;border-radius:14px;border:2px solid rgba(59,130,246,.5);background:rgba(59,130,246,.1);color:#a07855;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
           onmouseover="this.style.background='rgba(59,130,246,.2)'" onmouseout="this.style.background='rgba(59,130,246,.1)'">
           💳 <span>Finanziamento</span>
         </button>
@@ -2795,24 +2802,24 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
 
   <!-- POPUP OBIETTIVO — step 1: tipo, step 2: finanziamento -->
   <div id="obPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
-    <div style="background:#111827;border:1px solid #1f2937;border-radius:20px;width:340px;max-width:92vw;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8);">
+    <div style="background:#111827;border:1px solid rgba(60,60,67,.12);border-radius:20px;width:340px;max-width:92vw;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8);">
 
       <!-- Intestazione -->
       <div style="padding:16px 20px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;">
         <div>
           <div id="obPopupTitle" style="font-weight:900;font-size:16px;"></div>
-          <div id="obPopupSub" style="font-size:12px;color:#9ca3af;margin-top:2px;"></div>
+          <div id="obPopupSub" style="font-size:12px;color:#8e8e93;margin-top:2px;"></div>
         </div>
         <button id="obPopupClose" style="width:30px;height:30px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#e5e7eb;cursor:pointer;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
 
       <!-- Step 1: tipo -->
       <div id="obPopupTipoBox" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
-        <button id="obBtnNuova" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+        <button id="obBtnNuova" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#22a05a;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
           onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
           🆕 <span>Auto Nuova</span>
         </button>
-        <button id="obBtnUsata" style="padding:16px;border-radius:14px;border:2px solid rgba(249,115,22,.5);background:rgba(249,115,22,.1);color:#fb923c;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+        <button id="obBtnUsata" style="padding:16px;border-radius:14px;border:2px solid rgba(249,115,22,.5);background:rgba(249,115,22,.1);color:#b05030;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
           onmouseover="this.style.background='rgba(249,115,22,.2)'" onmouseout="this.style.background='rgba(249,115,22,.1)'">
           🔄 <span>Auto Usata</span>
         </button>
@@ -2820,11 +2827,11 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
 
       <!-- Step 2: finanziamento -->
       <div id="obPopupFinBox" style="padding:20px;display:none;flex-direction:column;gap:12px;">
-        <button id="obBtnCash" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+        <button id="obBtnCash" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#22a05a;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
           onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
           💵 <span>Cash</span>
         </button>
-        <button id="obBtnFin" style="padding:16px;border-radius:14px;border:2px solid rgba(59,130,246,.5);background:rgba(59,130,246,.1);color:#60a5fa;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
+        <button id="obBtnFin" style="padding:16px;border-radius:14px;border:2px solid rgba(59,130,246,.5);background:rgba(59,130,246,.1);color:#a07855;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
           onmouseover="this.style.background='rgba(59,130,246,.2)'" onmouseout="this.style.background='rgba(59,130,246,.1)'">
           💳 <span>Finanziamento</span>
         </button>
