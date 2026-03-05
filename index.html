@@ -2577,14 +2577,14 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         $("userPill").style.borderColor="rgba(34,197,94,.5)";
         $("userPill").style.background="rgba(34,197,94,.1)";
         $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";$("refreshBtn").disabled=false;
-        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();renderWeekCalendar();
+        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);window.startObSync(user);renderOggi();renderWeekCalendar();
       }else{
         $("userPill").textContent="🔒 Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor="";$("userPill").style.background="";
         $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";$("refreshBtn").disabled=true;
         $("newsList").innerHTML="";setStatus("🔒 Effettua il login per caricare le news.");
-        stopPlannerSync();stopVenditeSync();stopTelSync();stopConsegneSync();stopPostSync();renderOggi();
+        stopPlannerSync();stopVenditeSync();stopTelSync();stopConsegneSync();stopPostSync();if(window.stopObSync)window.stopObSync();renderOggi();
       }
     });
 
@@ -2969,15 +2969,36 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         // restituisce 0,1,2,3 = settimana 1,2,3,4 del mese
       }
 
-      function loadOb(){
-        try{ const s=localStorage.getItem(OB_KEY); if(s) return JSON.parse(s); }catch{}
-        return { settimane:[[],[],[],[]] };
-      }
-      function saveOb(){ try{ localStorage.setItem(OB_KEY, JSON.stringify(obState)); }catch{} }
-      function obUid(){ return Math.random().toString(36).slice(2); }
+      function obUid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
+      function defaultObState(){ return { settimane:[[],[],[],[]] }; }
 
-      let obState = loadOb();
+      let obState = defaultObState();
+      let obDocRef = null, obUnsub = null;
       let pendingModello = "";
+
+      // ── Firebase sync ─────────────────────────────────────────
+      function saveOb(){
+        if(!obDocRef){ return; }
+        setDoc(obDocRef, obState, {merge:false}).catch(()=>{});
+      }
+      function startObSync(user){
+        if(obUnsub){ try{ obUnsub(); }catch{} }
+        obDocRef = doc(db,"users",user.uid,"obiettivo","data");
+        obUnsub = onSnapshot(obDocRef, snap=>{
+          if(snap.exists()){
+            const d = snap.data();
+            obState = { settimane: (d.settimane||[[],[],[],[]]).map(s=>Array.isArray(s)?s:[]) };
+          } else {
+            obState = defaultObState();
+            setDoc(obDocRef, obState, {merge:false}).catch(()=>{});
+          }
+          renderObiettivo();
+        }, ()=>{ renderObiettivo(); });
+      }
+      function stopObSync(){
+        if(obUnsub){ try{ obUnsub(); }catch{} }
+        obUnsub=null; obDocRef=null; obState=defaultObState(); renderObiettivo();
+      }
 
       // ── Popup step 1: tipo (nuova/usata) ──────────────────────
       function showPopupTipo(modello){
@@ -3092,6 +3113,10 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       };
 
       renderObiettivo();
+
+      // Esponi sync functions per l'auth state
+      window.startObSync = startObSync;
+      window.stopObSync  = stopObSync;
     })();
 
         /* ══ VISTA OGGI ══ */
