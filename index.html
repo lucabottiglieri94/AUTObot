@@ -1410,62 +1410,59 @@
 <div
   id="garanziePanel"
   style="
-    /* pannello: vetro grigio scuro, niente viola dentro */
-    background: rgba(17, 17, 19, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    /* contenitore: vetro grigio chiaro, ben staccato */
+    background: rgba(88, 88, 90, 0.40);
+    border: 1px solid rgba(255, 255, 255, 0.30);
     border-radius: 16px;
     overflow: hidden;
     margin-top: 16px;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.70);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.80);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
   "
 >
-  <!-- TOP BAR viola "soft", stile terza foto -->
   <div
     style="
+      /* header: grigio un po’ più chiaro */
       padding:16px 20px;
-      border-bottom:1px solid rgba(148, 163, 184, 0.35);
+      border-bottom:1px solid rgba(255,255,255,0.22);
       background: linear-gradient(
         135deg,
-        rgba(203, 180, 255, 0.45),  /* lilla chiaro */
-        rgba(109, 40, 217, 0.55)    /* viola ma non troppo saturo */
+        rgba(199, 199, 204, 0.85),
+        rgba(99, 99, 102, 0.90)
       );
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
       flex-wrap:wrap;
-      color:#111827;
+      color:#111111;
     "
   >
-    <div>
-      <div style="font-weight:950;font-size:18px;">🛡 Analisi Garanzie</div>
-      <div style="color:#4b5563;font-size:13px;margin-top:4px;">
-        Carica il PDF della garanzia → AI estrae tutto e genera il sunto Word
-      </div>
-    </div>
-    <span
-      style="
-        font-size:11px;
-        padding:4px 10px;
-        border-radius:999px;
-        border:1px solid rgba(168, 85, 247, 0.50);
-        background:rgba(168, 85, 247, 0.12);
-        color:#f5e1ff;
-        white-space:nowrap;
-      "
-    >
-      ✨ AI Powered
-    </span>
-  </div>
 
-  <!-- resto del pannello (tab, form, ecc.) resta identico sotto -->
-  <div style="padding:16px;">
-    <!-- qui continua il tuo HTML originale del pannello -->
+  <div
+    style="
+      padding:16px 20px;
+      border-bottom:1px solid rgba(255,255,255,0.18);
+      background: linear-gradient(
+        135deg,
+        rgba(142,142,147,0.55),
+        rgba(72,72,74,0.85)
+      );
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    "
+  >
+
+      <div style="font-weight:950;font-size:18px;">🛡 Analisi Garanzie</div>
+      <div style="color:#9ca3af;font-size:13px;margin-top:4px;">Carica il PDF della garanzia → AI estrae tutto e genera il sunto Word</div>
+    </div>
+    <span style="font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid rgba(139,92,246,.4);background:rgba(139,92,246,.12);color:#d8b4fe;white-space:nowrap;">✨ AI Powered</span>
   </div>
-</div>
-20px;">
+  <div style="padding:16px 20px;">
 
     <!-- TABS -->
     <div style="display:flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:12px;overflow:hidden;margin-bottom:16px;">
