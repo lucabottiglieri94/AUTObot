@@ -2497,6 +2497,8 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     $("vendAddBtn").addEventListener("click",addAuto);
     $("vendModello").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
     $("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
+    $("vendPrevBtn").addEventListener("click",()=>{vendViewKey=prevMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite()});
+    $("vendNextBtn").addEventListener("click",()=>{if(vendViewKey===TODAY_KEY)return;vendViewKey=nextMonthKey(vendViewKey);ensureMonth(vendViewKey);renderVendite()});
     $("obiettivoInput").addEventListener("input",async()=>{
       vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
       const k=vendViewKey;ensureMonth(k);const m=vendState.months[k];
@@ -3645,7 +3647,7 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
 
 
   <!-- POPUP OBIETTIVO — step 1: tipo, step 2: finanziamento -->
-  <div id="obPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div id="obPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
     <div style="background:#111827;border:1px solid #1f2937;border-radius:20px;width:340px;max-width:92vw;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8);">
 
       <!-- Intestazione -->
@@ -3694,32 +3696,11 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
   document.body.removeChild(a);URL.revokeObjectURL(url);
 };
 /* ══ FINE GARANZIE ══ */
-    // ══ NAVIGAZIONE VENDITE - esposta globalmente ══
-// ══ NAVIGAZIONE VENDITE ══
-    $("vendPrevBtn").addEventListener("click", ()=>{
-      vendViewKey = prevMonthKey(vendViewKey);
-      ensureMonth(vendViewKey);
-      renderVendite();
-    });
-    $("vendNextBtn").addEventListener("click", ()=>{
-      if(vendViewKey === TODAY_KEY) return;
-      vendViewKey = nextMonthKey(vendViewKey);
-      ensureMonth(vendViewKey);
-      renderVendite();
-    });
+
 
   </script>
 
   <!-- POPUP AUTO VENDUTE -->
-  <div id="autoPopupOverlay" class="autoPopupOverlay" style="display:none;" onclick="if(event.target===this)closeAutoPopup()">
-    <div class="autoPopupBox">
-      <div class="autoPopupHead">
-        <div class="autoPopupTitle" id="autoPopupTitle">Auto</div>
-        <button class="autoPopupClose" onclick="closeAutoPopup()">×</button>
-      </div>
-      <div class="autoPopupList" id="autoPopupList"></div>
-    </div>
-  </div>
 
 
   
