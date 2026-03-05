@@ -1442,8 +1442,8 @@ border-bottom:1px solid var(--tintBorder, var(--line));
             <!-- Barra finanziate -->
             <div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                <span style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">💳 Finanziate</span>
-                <span id="obProgFinTxt" style="font-size:13px;font-weight:900;color:#4ade80;">0% / 70%</span>
+                <span style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">💳 Finanziate <span style="font-size:11px;color:#6b7280;font-weight:500;text-transform:none;">(obiettivo: 8 su 11 = 70%)</span></span>
+                <span id="obProgFinTxt" style="font-size:13px;font-weight:900;color:#4ade80;">0 / 8 (0%)</span>
               </div>
               <div style="background:rgba(31,41,55,.7);border-radius:999px;height:12px;overflow:hidden;">
                 <div id="obProgFinBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#4ade80);transition:width .5s cubic-bezier(.4,0,.2,1);width:0%;"></div>
@@ -3037,14 +3037,26 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         const pctFin   = totAuto>0 ? Math.round(totFin/totAuto*100) : 0;
 
         // Barre
-        const pAuto = Math.min(totAuto/OB_TARGET_AUTO*100,100);
-        const pFin  = Math.min(pctFin/OB_TARGET_FIN*100,100);
+        // ── Obiettivi reali ──────────────────────────────────────────
+        // Auto totali: obiettivo fisso 11
+        // Finanziate:  obiettivo = 11 × 70% = 7.7 → arrotondato a 8
+        const OB_TARGET_FIN_AUTO = Math.round(OB_TARGET_AUTO * OB_TARGET_FIN / 100); // = 8
+
+        // Barra AUTO: quante auto vendute / 11
+        const pAuto = Math.min(totAuto / OB_TARGET_AUTO * 100, 100);
+
+        // Barra FINANZIAMENTO: quante auto finanziate / 8 (obiettivo)
+        // Esempio: 3 finanziate su 8 → 37.5%
+        const pFin  = Math.min(totFin / OB_TARGET_FIN_AUTO * 100, 100);
+
         const colorAuto = pAuto>=100?"linear-gradient(90deg,#a855f7,#c084fc)":pAuto>=60?"linear-gradient(90deg,#22c55e,#4ade80)":"linear-gradient(90deg,#3b82f6,#60a5fa)";
-        const colorFin  = pFin>=100?"linear-gradient(90deg,#a855f7,#c084fc)":pFin>=60?"linear-gradient(90deg,#22c55e,#4ade80)":"linear-gradient(90deg,#eab308,#fbbf24)";
+        const colorFin  = pFin>=100?"linear-gradient(90deg,#a855f7,#c084fc)":pFin>=66?"linear-gradient(90deg,#22c55e,#4ade80)":pFin>=33?"linear-gradient(90deg,#eab308,#fbbf24)":"linear-gradient(90deg,#f97316,#fb923c)";
+
         document.getElementById("obProgAutoBar").style.cssText += ";width:"+pAuto+"%;background:"+colorAuto;
         document.getElementById("obProgAutoTxt").textContent   = totAuto+" / "+OB_TARGET_AUTO;
         document.getElementById("obProgFinBar").style.cssText  += ";width:"+pFin+"%;background:"+colorFin;
-        document.getElementById("obProgFinTxt").textContent    = pctFin+"% / "+OB_TARGET_FIN+"%";
+        // Mostra: "3 / 8 finanziate (37%)"
+        document.getElementById("obProgFinTxt").textContent    = totFin+" / "+OB_TARGET_FIN_AUTO+" ("+Math.round(pFin)+"%)";
 
         box.innerHTML = obState.settimane.map((sett,wi)=>{
           const isCurrent = wi===settimanaCorrente;
