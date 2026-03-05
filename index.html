@@ -415,57 +415,57 @@
   <main class="wrap">
     <div class="layout">
 
-      <!-- SINISTRA: NEWS + CALENDARIO -->
-      <aside class="panel">
-        <div class="panelHeader">
-          <div>
-            <div class="panelTitle">📰 Ultime News</div>
-            <div class="muted panelSub">Visibili solo dopo login.</div>
-            <div id="status" class="muted">Effettua il login per caricare le news.</div>
-          </div>
-          <div style="display:flex;gap:6px;align-items:center;">
-            <button id="refreshBtn" class="btn" disabled>🔄</button>
-            <button id="newsToggleBtn" class="btn" title="Mostra/Nascondi news" style="font-size:16px;font-weight:900;padding:6px 10px;min-width:32px;">−</button>
-          </div>
-        </div>
-        <div class="newsScroll" id="newsScrollBox"><div id="newsList"></div></div>
+      <!-- SINISTRA: 3 card separate con gap -->
+      <aside style="display:flex;flex-direction:column;gap:16px;align-items:stretch;">
 
-        <!-- SEPARATORE iMessage style -->
-        <div style="margin:0 12px;padding:18px 0 6px;">
-          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:14px 18px;display:flex;align-items:center;gap:10px;">
-            <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;box-shadow:0 0 8px rgba(34,197,94,.6);"></div>
-            <div style="font-size:13px;color:#9ca3af;font-weight:600;letter-spacing:.2px;">Gestione consegne e follow-up</div>
+        <!-- NEWS -->
+        <div class="panel" style="position:sticky;top:72px;">
+          <div class="panelHeader">
+            <div>
+              <div class="panelTitle">📰 Ultime News</div>
+              <div class="muted panelSub">Visibili solo dopo login.</div>
+              <div id="status" class="muted">Effettua il login per caricare le news.</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button id="refreshBtn" class="btn" disabled>🔄</button>
+              <button id="newsToggleBtn" class="btn" title="Mostra/Nascondi news" style="font-size:16px;font-weight:900;padding:6px 10px;min-width:32px;">−</button>
+            </div>
           </div>
+          <div class="newsScroll" id="newsScrollBox"><div id="newsList"></div></div>
         </div>
 
         <!-- PRE-CONSEGNA -->
-        <div style="border-top:2px solid rgba(34,197,94,.2);background:rgba(0,0,0,.2);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-          <div>
-            <div style="font-weight:950;font-size:16px;">🚗 Pre-Consegna</div>
-            <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Checklist consegne — sempre visibile</div>
+        <div class="panel" style="position:static;">
+          <div style="background:rgba(34,197,94,.08);border-bottom:1px solid rgba(34,197,94,.2);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+            <div>
+              <div style="font-weight:950;font-size:16px;">🚗 Pre-Consegna</div>
+              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Checklist consegne — sempre visibile</div>
+            </div>
+            <button id="consegnaClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completate</button>
           </div>
-          <button id="consegnaClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completate</button>
-        </div>
-        <div style="padding:12px;">
-          <div class="consegnaFormRow">
-            <input id="consegnaCliente" class="consegnaInput" type="text" placeholder="Nome cliente"/>
-            <input id="consegnaModello" class="consegnaInput" type="text" placeholder="Modello"/>
-            <input id="consegnaData"    class="consegnaInput" type="date"/>
-            <button id="consegnaAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;white-space:nowrap;">+ Aggiungi</button>
+          <div style="padding:12px;">
+            <div class="consegnaFormRow">
+              <input id="consegnaCliente" class="consegnaInput" type="text" placeholder="Nome cliente"/>
+              <input id="consegnaModello" class="consegnaInput" type="text" placeholder="Modello"/>
+              <input id="consegnaData"    class="consegnaInput" type="date"/>
+              <button id="consegnaAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;white-space:nowrap;">+ Aggiungi</button>
+            </div>
+            <div id="consegnaList"></div>
           </div>
-          <div id="consegnaList"></div>
         </div>
 
         <!-- POST VENDITA -->
-        <div style="border-top:2px solid rgba(251,191,36,.2);background:rgba(0,0,0,.2);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-          <div>
-            <div style="font-weight:950;font-size:16px;">⭐ Post-Vendita</div>
-            <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Follow-up: intervista (2gg) · recensione (3gg)</div>
+        <div class="panel" style="position:static;">
+          <div style="background:rgba(251,191,36,.07);border-bottom:1px solid rgba(251,191,36,.2);padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+            <div>
+              <div style="font-weight:950;font-size:16px;">⭐ Post-Vendita</div>
+              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Follow-up: intervista (2gg) · recensione (3gg)</div>
+            </div>
+            <button id="postClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completati</button>
           </div>
-          <button id="postClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completati</button>
-        </div>
-        <div style="padding:12px 12px 16px;">
-          <div id="postList"></div>
+          <div style="padding:12px 12px 16px;">
+            <div id="postList"></div>
+          </div>
         </div>
 
       </aside>
