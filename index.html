@@ -761,7 +761,64 @@
           </div>
         </div>
 
-       
+        <!-- AGENDA + MEMO + TELEFONO -->
+        <div class="widgetStack">
+          <div class="widgetPanel" id="agendaPanel">
+            <div class="widgetHeader">
+              <div>
+                <div class="widgetTitle">📅 Agenda 3 giorni</div>
+                <div class="widgetSub">Task sincronizzati su Firebase.</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <span id="syncBadge" class="syncBadge warn">Sync: non attivo</span>
+                <button id="agendaClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci fatti</button>
+              </div>
+            </div>
+            <div class="widgetBody">
+              <div class="formRow">
+                <input id="taskInput" class="field" type="text" placeholder="Scrivi un task..."/>
+                <div class="seg">
+                  <button id="dayBtn0" class="active" type="button">Oggi</button>
+                  <button id="dayBtn1" type="button">Domani</button>
+                  <button id="dayBtn2" type="button">+2</button>
+                </div>
+                <button id="addTaskBtn" class="btn primary" type="button">Aggiungi</button>
+              </div>
+              <div class="split3" style="margin-top:14px;">
+                <div class="dayCol">
+                  <div class="dayHead"><span id="dayLabel0">Oggi</span><span id="dayDate0" class="dayMeta"></span></div>
+                  <div id="taskList0" class="list"></div>
+                </div>
+                <div class="dayCol">
+                  <div class="dayHead" style="background:rgba(59,130,246,.04);"><span id="dayLabel1">Domani</span><span id="dayDate1" class="dayMeta"></span></div>
+                  <div id="taskList1" class="list"></div>
+                </div>
+                <div class="dayCol">
+                  <div class="dayHead" style="background:rgba(59,130,246,.06);"><span id="dayLabel2">+2 giorni</span><span id="dayDate2" class="dayMeta"></span></div>
+                  <div id="taskList2" class="list"></div>
+                </div>
+              </div>
+              <div class="smallNote">Se fai login su telefono, vedi gli stessi task e memo.</div>
+            </div>
+          </div>
+
+          <div class="widgetPanel" id="memoPanel">
+            <div class="widgetHeader">
+              <div>
+                <div class="widgetTitle">📝 Memo</div>
+                <div class="widgetSub">Sincronizzate su Firebase.</div>
+              </div>
+              <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
+            </div>
+            <div class="widgetBody">
+              <div class="formRow" style="align-items:stretch;">
+                <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
+                <button id="addMemoBtn" class="btn primary" type="button" style="align-self:flex-start;">Aggiungi</button>
+              </div>
+              <div style="margin-top:14px;"><div id="memoList" class="list" style="max-height:320px;"></div></div>
+              <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
+            </div>
+          </div>
 
           <!-- COLPI DI TELEFONO -->
           <div class="widgetPanel" id="telefonoPanel">
@@ -2031,64 +2088,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       postUnsub=null; postDocRef=null; postState={followup:{}};
       renderPostVendita();
     }
- <!-- AGENDA + MEMO + TELEFONO -->
-        <div class="widgetStack">
-          <div class="widgetPanel" id="agendaPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">📅 Agenda 3 giorni</div>
-                <div class="widgetSub">Task sincronizzati su Firebase.</div>
-              </div>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                <span id="syncBadge" class="syncBadge warn">Sync: non attivo</span>
-                <button id="agendaClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci fatti</button>
-              </div>
-            </div>
-            <div class="widgetBody">
-              <div class="formRow">
-                <input id="taskInput" class="field" type="text" placeholder="Scrivi un task..."/>
-                <div class="seg">
-                  <button id="dayBtn0" class="active" type="button">Oggi</button>
-                  <button id="dayBtn1" type="button">Domani</button>
-                  <button id="dayBtn2" type="button">+2</button>
-                </div>
-                <button id="addTaskBtn" class="btn primary" type="button">Aggiungi</button>
-              </div>
-              <div class="split3" style="margin-top:14px;">
-                <div class="dayCol">
-                  <div class="dayHead"><span id="dayLabel0">Oggi</span><span id="dayDate0" class="dayMeta"></span></div>
-                  <div id="taskList0" class="list"></div>
-                </div>
-                <div class="dayCol">
-                  <div class="dayHead" style="background:rgba(59,130,246,.04);"><span id="dayLabel1">Domani</span><span id="dayDate1" class="dayMeta"></span></div>
-                  <div id="taskList1" class="list"></div>
-                </div>
-                <div class="dayCol">
-                  <div class="dayHead" style="background:rgba(59,130,246,.06);"><span id="dayLabel2">+2 giorni</span><span id="dayDate2" class="dayMeta"></span></div>
-                  <div id="taskList2" class="list"></div>
-                </div>
-              </div>
-              <div class="smallNote">Se fai login su telefono, vedi gli stessi task e memo.</div>
-            </div>
-          </div>
 
-          <div class="widgetPanel" id="memoPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">📝 Memo</div>
-                <div class="widgetSub">Sincronizzate su Firebase.</div>
-              </div>
-              <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
-            </div>
-            <div class="widgetBody">
-              <div class="formRow" style="align-items:stretch;">
-                <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
-                <button id="addMemoBtn" class="btn primary" type="button" style="align-self:flex-start;">Aggiungi</button>
-              </div>
-              <div style="margin-top:14px;"><div id="memoList" class="list" style="max-height:320px;"></div></div>
-              <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
-            </div>
-          </div>
     /* ══ OBIETTIVO MENSILE ══ */
     (function(){
       const OB_TARGET_AUTO = 11;
