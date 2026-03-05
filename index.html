@@ -1408,11 +1408,10 @@
         </div>
 <!-- ══ ANALISI GARANZIE ══ -->
 <div
-<div
   id="garanziePanel"
   style="
-    /* pannello: stesso feeling del Pre‑Consegna, solo un filo più chiaro */
-    background: rgba(28, 28, 30, 0.92);
+    /* pannello: vetro grigio scuro, niente viola dentro */
+    background: rgba(17, 17, 19, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.10);
     border-radius: 16px;
     overflow: hidden;
@@ -1422,49 +1421,51 @@
     -webkit-backdrop-filter: blur(20px);
   "
 >
-  <div
-    style="
-      /* TOP BAR: come il Pre‑Consegna ma viola invece che verde */
-      padding: 16px 20px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.40);
-      background: linear-gradient(
-        135deg,
-        rgba(191, 148, 255, 0.32),  /* violetto chiaro */
-        rgba(88, 28, 135, 0.85)     /* violetto scuro */
-      );
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      color: #111827;
-    "
-  >
-
-
+  <!-- TOP BAR viola "soft", stile terza foto -->
   <div
     style="
       padding:16px 20px;
-      border-bottom:1px solid rgba(255,255,255,0.18);
+      border-bottom:1px solid rgba(148, 163, 184, 0.35);
       background: linear-gradient(
         135deg,
-        rgba(142,142,147,0.55),
-        rgba(72,72,74,0.85)
+        rgba(203, 180, 255, 0.45),  /* lilla chiaro */
+        rgba(109, 40, 217, 0.55)    /* viola ma non troppo saturo */
       );
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
       flex-wrap:wrap;
+      color:#111827;
     "
   >
-
+    <div>
       <div style="font-weight:950;font-size:18px;">🛡 Analisi Garanzie</div>
-      <div style="color:#9ca3af;font-size:13px;margin-top:4px;">Carica il PDF della garanzia → AI estrae tutto e genera il sunto Word</div>
+      <div style="color:#4b5563;font-size:13px;margin-top:4px;">
+        Carica il PDF della garanzia → AI estrae tutto e genera il sunto Word
+      </div>
     </div>
-    <span style="font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid rgba(139,92,246,.4);background:rgba(139,92,246,.12);color:#d8b4fe;white-space:nowrap;">✨ AI Powered</span>
+    <span
+      style="
+        font-size:11px;
+        padding:4px 10px;
+        border-radius:999px;
+        border:1px solid rgba(168, 85, 247, 0.50);
+        background:rgba(168, 85, 247, 0.12);
+        color:#f5e1ff;
+        white-space:nowrap;
+      "
+    >
+      ✨ AI Powered
+    </span>
   </div>
-  <div style="padding:16px 20px;">
+
+  <!-- resto del pannello (tab, form, ecc.) resta identico sotto -->
+  <div style="padding:16px;">
+    <!-- qui continua il tuo HTML originale del pannello -->
+  </div>
+</div>
+20px;">
 
     <!-- TABS -->
     <div style="display:flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:12px;overflow:hidden;margin-bottom:16px;">
