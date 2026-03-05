@@ -1218,136 +1218,13 @@ border-bottom:1px solid var(--tintBorder, var(--line));
       bottom:0;right:0;border-radius:0;
     }
     .chatTrigger{bottom:16px;right:16px;width:60px;height:60px}
-    /* Mobile: card comparatore/garanzie a tutta larghezza */
-    #comparatorePanel,#garanziePanel{margin-left:0;margin-right:0;}
-    .cmpSuggest{padding:8px 12px;font-size:12px;}
-    /* Mobile: bottoni più grandi */
-    .btn{padding:10px 14px;font-size:14px;min-height:40px;}
-    .obAddBtn{min-height:44px!important;}
-    #cmpBtn{padding:12px 18px!important;font-size:14px!important;min-height:44px;}
   }
   @media(max-width:768px){
-    .btn{padding:10px 12px;font-size:13px}
+    .btn{padding:8px 10px;font-size:13px}
     .brandLogo{width:30px;height:30px}
     .brandName{font-size:16px}
     .centroAutoLogo{height:36px}
     .centroAutoLink{padding:4px 8px}
-    /* Mobile: form rows stack verticalmente */
-    .consegnaFormRow{flex-direction:column;}
-    .consegnaInput{width:100%;max-width:100%!important;}
-    .telFormRow{flex-direction:column;align-items:stretch;}
-    .telSeg,.telWhenSeg{width:100%;justify-content:center;}
-    .venditeForm{flex-direction:column;}
-    .venditeForm .fld{width:100%!important;max-width:100%!important;}
-    /* Mobile: task columns */
-    .split3{gap:8px;}
-    .dayCol{border-radius:12px;}
-  }
-
-  /* ══════════════════════════════════════
-     SEZIONI COLLASSABILI
-  ══════════════════════════════════════ */
-  .collapsible-header{
-    cursor:pointer;user-select:none;
-    transition:background .2s;
-  }
-  .collapsible-header:hover{
-    background:rgba(255,255,255,.03)!important;
-  }
-  .collapse-btn{
-    width:28px;height:28px;
-    border-radius:8px;
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(255,255,255,.06);
-    color:rgba(235,235,245,.7);
-    cursor:pointer;
-    font-size:16px;font-weight:700;
-    display:inline-flex;align-items:center;justify-content:center;
-    transition:all .18s;
-    flex-shrink:0;
-    line-height:1;
-  }
-  .collapse-btn:hover{
-    background:rgba(255,255,255,.12);
-    color:#fff;
-    border-color:rgba(255,255,255,.22);
-  }
-  .collapsible-body{
-    transition:opacity .22s ease,max-height .28s cubic-bezier(.4,0,.2,1);
-    overflow:hidden;
-    max-height:3000px;
-    opacity:1;
-  }
-  .collapsible-body.collapsed{
-    max-height:0!important;
-    opacity:0;
-    pointer-events:none;
-  }
-
-  /* ══════════════════════════════════════
-     TASK PRIORITY COLOR CODING
-     oggi=arancio, domani=blu, +2=grigio
-  ══════════════════════════════════════ */
-  .dayCol.day-today .dayHead{
-    background:rgba(255,149,0,.12)!important;
-    border-bottom:1px solid rgba(255,149,0,.25)!important;
-  }
-  .dayCol.day-today .dayHead span{color:#ffb84d;}
-  .dayCol.day-tomorrow .dayHead{
-    background:rgba(0,122,255,.09)!important;
-    border-bottom:1px solid rgba(0,122,255,.22)!important;
-  }
-  .dayCol.day-tomorrow .dayHead span{color:#5ac8ff;}
-  .dayCol.day-d2 .dayHead{
-    background:rgba(255,255,255,.04)!important;
-    border-bottom:1px solid rgba(255,255,255,.1)!important;
-  }
-  /* Task items colorati per giorno */
-  .dayCol.day-today .item{border-left:2px solid rgba(255,149,0,.45);}
-  .dayCol.day-tomorrow .item{border-left:2px solid rgba(0,122,255,.35);}
-
-  /* ══════════════════════════════════════
-     UNDO TOAST
-  ══════════════════════════════════════ */
-  #undoToast{
-    position:fixed;
-    bottom:100px;left:50%;
-    transform:translateX(-50%) translateY(20px);
-    background:rgba(30,30,34,0.97);
-    border:1px solid rgba(255,255,255,.18);
-    border-radius:14px;
-    padding:12px 20px;
-    display:flex;align-items:center;gap:14px;
-    font-size:13px;font-weight:600;
-    box-shadow:0 12px 40px rgba(0,0,0,.7);
-    z-index:9999;
-    opacity:0;
-    transition:all .28s cubic-bezier(.34,1.56,.64,1);
-    pointer-events:none;
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-    white-space:nowrap;
-  }
-  #undoToast.show{
-    opacity:1;
-    transform:translateX(-50%) translateY(0);
-    pointer-events:auto;
-  }
-  #undoToastBtn{
-    background:rgba(0,122,255,.22);
-    border:1px solid rgba(0,122,255,.4);
-    border-radius:8px;
-    padding:5px 12px;
-    color:#5ac8ff;
-    font-size:12px;font-weight:700;
-    cursor:pointer;
-    font-family:inherit;
-    transition:all .15s;
-    flex-shrink:0;
-  }
-  #undoToastBtn:hover{
-    background:rgba(0,122,255,.36);
-    border-color:rgba(0,122,255,.6);
   }
 
   /* PANEL TINT SYSTEM (Post-Vendita style, but unique per panel) */
@@ -1421,27 +1298,22 @@ border-bottom:1px solid var(--tintBorder, var(--line));
     <div style="display:flex;gap:6px;align-items:center;">
       <button id="refreshBtn" class="btn" disabled>🔄</button>
       <button id="newsToggleBtn" class="btn" title="Mostra/Nascondi news" style="font-size:16px;font-weight:900;padding:6px 10px;min-width:32px;">−</button>
-      <button class="collapse-btn" data-target="newsBody" title="Comprimi sezione">−</button>
     </div>
   </div>
-  <div class="collapsible-body" id="newsBody">
-    <div class="newsScroll" id="newsScrollBox">
-      <div id="newsList"></div>
-    </div>
+  <div class="newsScroll" id="newsScrollBox">
+    <div id="newsList"></div>
   </div>
 </div>
+
+        <!-- PRE-CONSEGNA -->
         <div class="panel tintedPanel" id="preConsegnaPanel" style="position:static;">
-          <div class="tintedHeader collapsible-header" data-target="preConsegnaBody">
+          <div class="tintedHeader">
             <div>
               <div style="font-weight:950;font-size:16px;">🚗 Pre-Consegna</div>
               <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Checklist consegne — sempre visibile</div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <button id="consegnaClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;" onclick="event.stopPropagation()">Pulisci completate</button>
-              <button class="collapse-btn" data-target="preConsegnaBody" onclick="event.stopPropagation()">−</button>
-            </div>
+            <button id="consegnaClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completate</button>
           </div>
-          <div class="collapsible-body" id="preConsegnaBody">
           <div style="padding:12px;">
             <div class="consegnaFormRow">
               <input id="consegnaCliente" class="consegnaInput" type="text" placeholder="Nome cliente"/>
@@ -1451,25 +1323,19 @@ border-bottom:1px solid var(--tintBorder, var(--line));
             </div>
             <div id="consegnaList"></div>
           </div>
-          </div>
         </div>
 
         <!-- POST VENDITA -->
         <div class="panel tintedPanel" id="postVenditaLeftPanel" style="position:static;">
-          <div class="tintedHeader collapsible-header" data-target="postVenditaBody">
+          <div class="tintedHeader">
             <div>
               <div style="font-weight:950;font-size:16px;">⭐ Post-Vendita</div>
               <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Follow-up: intervista (2gg) · recensione (3gg)</div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <button id="postClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;" onclick="event.stopPropagation()">Pulisci completati</button>
-              <button class="collapse-btn" data-target="postVenditaBody" onclick="event.stopPropagation()">−</button>
-            </div>
+            <button id="postClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completati</button>
           </div>
-          <div class="collapsible-body" id="postVenditaBody">
           <div style="padding:12px 12px 16px;">
             <div id="postList"></div>
-          </div>
           </div>
         </div>
 
@@ -1762,18 +1628,16 @@ border-bottom:1px solid var(--tintBorder, var(--line));
         <!-- AGENDA + MEMO + TELEFONO -->
         <div class="widgetStack">
           <div class="widgetPanel" id="agendaPanel">
-            <div class="widgetHeader collapsible-header" data-target="agendaBody">
+            <div class="widgetHeader">
               <div>
                 <div class="widgetTitle">📅 Agenda 3 giorni</div>
                 <div class="widgetSub">Task sincronizzati su Firebase.</div>
               </div>
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                 <span id="syncBadge" class="syncBadge warn">Sync: non attivo</span>
-                <button id="agendaClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;" onclick="event.stopPropagation()">Pulisci fatti</button>
-                <button class="collapse-btn" data-target="agendaBody" onclick="event.stopPropagation()">−</button>
+                <button id="agendaClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci fatti</button>
               </div>
             </div>
-            <div class="collapsible-body" id="agendaBody">
             <div class="widgetBody">
               <div class="formRow">
                 <input id="taskInput" class="field" type="text" placeholder="Scrivi un task..."/>
@@ -1785,36 +1649,31 @@ border-bottom:1px solid var(--tintBorder, var(--line));
                 <button id="addTaskBtn" class="btn primary" type="button">Aggiungi</button>
               </div>
               <div class="split3" style="margin-top:14px;">
-                <div class="dayCol day-today">
+                <div class="dayCol">
                   <div class="dayHead"><span id="dayLabel0">Oggi</span><span id="dayDate0" class="dayMeta"></span></div>
                   <div id="taskList0" class="list"></div>
                 </div>
-                <div class="dayCol day-tomorrow">
-                  <div class="dayHead"><span id="dayLabel1">Domani</span><span id="dayDate1" class="dayMeta"></span></div>
+                <div class="dayCol">
+                  <div class="dayHead" style="background:rgba(59,130,246,.04);"><span id="dayLabel1">Domani</span><span id="dayDate1" class="dayMeta"></span></div>
                   <div id="taskList1" class="list"></div>
                 </div>
-                <div class="dayCol day-d2">
-                  <div class="dayHead"><span id="dayLabel2">+2 giorni</span><span id="dayDate2" class="dayMeta"></span></div>
+                <div class="dayCol">
+                  <div class="dayHead" style="background:rgba(59,130,246,.06);"><span id="dayLabel2">+2 giorni</span><span id="dayDate2" class="dayMeta"></span></div>
                   <div id="taskList2" class="list"></div>
                 </div>
               </div>
               <div class="smallNote">Se fai login su telefono, vedi gli stessi task e memo.</div>
             </div>
-            </div><!-- /agendaBody -->
           </div>
 
           <div class="widgetPanel" id="memoPanel">
-            <div class="widgetHeader collapsible-header" data-target="memoBody">
+            <div class="widgetHeader">
               <div>
                 <div class="widgetTitle">📝 Memo</div>
                 <div class="widgetSub">Sincronizzate su Firebase.</div>
               </div>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;" onclick="event.stopPropagation()">Pulisci barrate</button>
-                <button class="collapse-btn" data-target="memoBody" onclick="event.stopPropagation()">−</button>
-              </div>
+              <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
             </div>
-            <div class="collapsible-body" id="memoBody">
             <div class="widgetBody">
               <div class="formRow" style="align-items:stretch;">
                 <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
@@ -1823,23 +1682,20 @@ border-bottom:1px solid var(--tintBorder, var(--line));
               <div style="margin-top:14px;"><div id="memoList" class="list" style="max-height:320px;"></div></div>
               <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
             </div>
-            </div><!-- /memoBody -->
           </div>
 
           <!-- COLPI DI TELEFONO -->
           <div class="widgetPanel" id="telefonoPanel">
-            <div class="widgetHeader collapsible-header" data-target="telefonoBody">
+            <div class="widgetHeader">
               <div>
                 <div class="widgetTitle">📞 Colpi di telefono</div>
                 <div class="widgetSub">Chi spingere oggi, domani, prossima settimana.</div>
               </div>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <button id="telClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;" onclick="event.stopPropagation()">Pulisci chiamati</button>
-                <button class="collapse-btn" data-target="telefonoBody" onclick="event.stopPropagation()">−</button>
-              </div>
+              <button id="telClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci chiamati</button>
             </div>
-            <div class="collapsible-body" id="telefonoBody">
-            <div class="widgetBody">    class="telInput" type="text" placeholder="Nome (es: Marco R.)"/>
+            <div class="widgetBody">
+              <div class="telFormRow">
+                <input id="telNome"    class="telInput" type="text" placeholder="Nome (es: Marco R.)"/>
                 <input id="telModello" class="telInput" type="text" placeholder="Modello interesse" style="max-width:160px"/>
                 <div class="telSeg">
                   <button class="telBtn caldo   active" id="telBtnCaldo"  >🔥 Caldo</button>
@@ -1868,7 +1724,6 @@ border-bottom:1px solid var(--tintBorder, var(--line));
                 <div id="telListSettimana" class="telList"></div>
               </div>
             </div>
-            </div><!-- /telefonoBody -->
           </div>
 
         </div>
@@ -2106,16 +1961,7 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       $("taskInput").value="";
     });
     $("taskInput").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();$("addTaskBtn").click()}});
-    $("agendaClearDoneBtn").addEventListener("click",()=>{
-      const snapshot = JSON.parse(JSON.stringify(SYNC.data));
-      const removed = Object.values(snapshot.tasks||{}).filter(t=>t&&t.done).length;
-      if(!removed) return;
-      safeWrite(d=>{for(const[id,t]of Object.entries(d.tasks)){if(t&&t.done)delete d.tasks[id]}return cleanupOldTasks(d)});
-      if(window.showUndoToast) showUndoToast(`${removed} task completat${removed===1?'o':'i'} rimoss${removed===1?'o':'i'}`, ()=>{
-        SYNC.data = snapshot; renderTasksAndMemos(); renderWeekCalendar();
-        writePlanner(snapshot).catch(()=>{});
-      });
-    });
+    $("agendaClearDoneBtn").addEventListener("click",()=>safeWrite(d=>{for(const[id,t]of Object.entries(d.tasks)){if(t&&t.done)delete d.tasks[id]}return cleanupOldTasks(d)}));
     $("addMemoBtn").addEventListener("click",()=>{
       const text=$("memoInput").value.trim();if(!text)return;
       const id=mkUid();
@@ -2123,16 +1969,7 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       $("memoInput").value="";
     });
     $("memoInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("addMemoBtn").click()}});
-    $("memoClearDoneBtn").addEventListener("click",()=>{
-      const snapshot = JSON.parse(JSON.stringify(SYNC.data));
-      const removed = Object.values(snapshot.memos||{}).filter(m=>m&&m.done).length;
-      if(!removed) return;
-      safeWrite(d=>{for(const[id,m]of Object.entries(d.memos)){if(m&&m.done)delete d.memos[id]}return d});
-      if(window.showUndoToast) showUndoToast(`${removed} memo barrat${removed===1?'a':'e'} rimoss${removed===1?'a':'e'}`, ()=>{
-        SYNC.data = snapshot; renderTasksAndMemos();
-        writePlanner(snapshot).catch(()=>{});
-      });
-    });
+    $("memoClearDoneBtn").addEventListener("click",()=>safeWrite(d=>{for(const[id,m]of Object.entries(d.memos)){if(m&&m.done)delete d.memos[id]}return d}));
 
     /* ══ COLPI DI TELEFONO ══ */
     let telState={contatti:{}};
@@ -2208,16 +2045,7 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       $("telNome").value="";$("telModello").value="";
     });
     $("telNome").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();$("telAddBtn").click()}});
-    $("telClearDoneBtn").addEventListener("click",()=>{
-      const snapshot = JSON.parse(JSON.stringify(telState));
-      const removed = Object.values(snapshot.contatti||{}).filter(c=>c?.chiamato).length;
-      if(!removed) return;
-      telSafeWrite(d=>{for(const[id,c]of Object.entries(d.contatti)){if(c?.chiamato)delete d.contatti[id]}return d});
-      if(window.showUndoToast) showUndoToast(`${removed} contatt${removed===1?'o':'i'} rimoss${removed===1?'o':'i'}`, ()=>{
-        telState = snapshot; renderTelefono();
-        telWrite().catch(()=>{});
-      });
-    });
+    $("telClearDoneBtn").addEventListener("click",()=>telSafeWrite(d=>{for(const[id,c]of Object.entries(d.contatti)){if(c?.chiamato)delete d.contatti[id]}return d}));
 
     function startTelSync(user){
       if(telUnsub){try{telUnsub()}catch{}}
@@ -3001,17 +2829,11 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     });
     $("consegnaCliente").addEventListener("keypress", e=>{ if(e.key==="Enter") $("consegnaAddBtn").click(); });
     $("consegnaClearDoneBtn").addEventListener("click", () => {
-      const snapshot = JSON.parse(JSON.stringify(consegneState));
-      let removed = 0;
       for(const [id,c] of Object.entries(consegneState.consegne)){
         const checks = c.checks || [];
-        if(checks.length && checks.every(ch=>ch.done)){ delete consegneState.consegne[id]; removed++; }
+        if(checks.length && checks.every(ch=>ch.done)) delete consegneState.consegne[id];
       }
-      if(!removed) return;
       consegneWrite(); renderConsegne(); renderPostVendita();
-      if(window.showUndoToast) showUndoToast(`${removed} consegn${removed===1?'a':'e'} rimoss${removed===1?'a':'e'}`, ()=>{
-        consegneState = snapshot; consegneWrite(); renderConsegne(); renderPostVendita();
-      });
     });
 
     function startConsegneSync(user){
@@ -3103,16 +2925,10 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     }
 
     $("postClearDoneBtn").addEventListener("click", ()=>{
-      const snapshot = JSON.parse(JSON.stringify(postState));
-      let removed = 0;
       for(const[id,f] of Object.entries(postState.followup)){
-        if(f.intervistaFatta && f.recensioneFatta){ delete postState.followup[id]; removed++; }
+        if(f.intervistaFatta && f.recensioneFatta) delete postState.followup[id];
       }
-      if(!removed) return;
       postWrite(); renderPostVendita();
-      if(window.showUndoToast) showUndoToast(`${removed} follow-up rimoss${removed===1?'o':'i'}`, ()=>{
-        postState = snapshot; postWrite(); renderPostVendita();
-      });
     });
 
     function startPostSync(user){
@@ -3250,7 +3066,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
               <span style="font-size:12px;font-weight:700;color:${sett.length>=OB_WEEK_TARGET[wi]?"#4ade80":"#9ca3af"}">${sett.length} / ${OB_WEEK_TARGET[wi]}</span>
             </div>
             <div style="padding:8px;display:flex;flex-direction:column;gap:5px;">
-              ${cards||`<div style="padding:6px 4px;color:#6b7280;font-size:12px;font-style:italic;">Nessuna auto — obiettivo: ${OB_WEEK_TARGET[wi]}</div>`}
+              ${cards||'<div style="padding:6px 4px;color:#6b7280;font-size:12px;font-style:italic;">Nessuna auto — obiettivo: ${OB_WEEK_TARGET[wi]}</div>'}
             </div>
           </div>`;
         }).join("");
@@ -3395,8 +3211,19 @@ Sii diretto, pratico, motivante. Max 25 righe totali.`},
       }
     });
 
-    /* ══ NEWS TOGGLE (ora gestito dal sistema collassabile) ══ */
-    // Il vecchio toggle btn è stato sostituito dal collapse-btn universale
+    /* ══ NEWS TOGGLE ══ */
+    (function(){
+      const btn = $("newsToggleBtn");
+      const box = $("newsScrollBox");
+      if(!btn||!box) return;
+      let visible = true;
+      btn.addEventListener("click", ()=>{
+        visible = !visible;
+        box.style.display = visible ? "" : "none";
+        btn.textContent   = visible ? "−" : "+";
+        btn.title         = visible ? "Nascondi news" : "Mostra news";
+      });
+    })();
 
     /* ══ SMART HEADER ══ */
     (function(){
@@ -3894,89 +3721,6 @@ ${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImp
       </div>
 
     </div>
-  </div>  <!-- UNDO TOAST -->
-  <div id="undoToast">
-    <span id="undoToastMsg">Elementi rimossi</span>
-    <button id="undoToastBtn">↩ Annulla</button>
   </div>
-
-  <script>
-  /* ══════════════════════════════════════════════
-     SEZIONI COLLASSABILI — logica universale
-  ══════════════════════════════════════════════ */
-  (function(){
-    // Salva stato collapsed in sessionStorage
-    function getCollapseState(id){ return sessionStorage.getItem('col_'+id)==='1'; }
-    function setCollapseState(id,v){ sessionStorage.setItem('col_'+id,v?'1':'0'); }
-
-    function applyCollapse(targetId, collapsed){
-      const body = document.getElementById(targetId);
-      if(!body) return;
-      // Trova il pulsante collapse
-      const btn = document.querySelector(`.collapse-btn[data-target="${targetId}"]`);
-      if(collapsed){
-        body.classList.add('collapsed');
-        if(btn) btn.textContent = '+';
-      } else {
-        body.classList.remove('collapsed');
-        if(btn) btn.textContent = '−';
-      }
-    }
-
-    function toggleCollapse(targetId){
-      const wasCollapsed = getCollapseState(targetId);
-      const nowCollapsed = !wasCollapsed;
-      setCollapseState(targetId, nowCollapsed);
-      applyCollapse(targetId, nowCollapsed);
-    }
-
-    // Inizializza stato salvato
-    const targets = ['newsBody','preConsegnaBody','postVenditaBody','agendaBody','memoBody','telefonoBody'];
-    targets.forEach(id => applyCollapse(id, getCollapseState(id)));
-
-    // Click su collapse-btn
-    document.addEventListener('click', function(e){
-      const btn = e.target.closest('.collapse-btn');
-      if(btn){
-        e.stopPropagation();
-        const targetId = btn.getAttribute('data-target');
-        if(targetId) toggleCollapse(targetId);
-        return;
-      }
-      // Click sull'header collassabile
-      const header = e.target.closest('.collapsible-header');
-      if(header && !e.target.closest('button') && !e.target.closest('input') && !e.target.closest('a')){
-        const targetId = header.getAttribute('data-target');
-        if(targetId) toggleCollapse(targetId);
-      }
-    });
-  })();
-
-  /* ══════════════════════════════════════════════
-     UNDO TOAST — sistema globale
-  ══════════════════════════════════════════════ */
-  window._undoStack = [];
-  window._undoTimer = null;
-
-  window.showUndoToast = function(msg, undoFn){
-    clearTimeout(window._undoTimer);
-    const toast = document.getElementById('undoToast');
-    const msgEl = document.getElementById('undoToastMsg');
-    const btn   = document.getElementById('undoToastBtn');
-    if(!toast || !msgEl || !btn) return;
-    msgEl.textContent = msg || 'Elementi rimossi';
-    toast.classList.add('show');
-    // Salva la funzione undo
-    window._undoFn = undoFn;
-    btn.onclick = function(){
-      if(window._undoFn){ window._undoFn(); window._undoFn = null; }
-      toast.classList.remove('show');
-      clearTimeout(window._undoTimer);
-    };
-    window._undoTimer = setTimeout(()=>{
-      toast.classList.remove('show');
-      window._undoFn = null;
-    }, 5000);
-  };
-  </script>
-</body></html>
+</body>
+</html>
