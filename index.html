@@ -2577,7 +2577,8 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         $("userPill").style.borderColor="rgba(34,197,94,.5)";
         $("userPill").style.background="rgba(34,197,94,.1)";
         $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";$("refreshBtn").disabled=false;
-        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();renderWeekCalendar();
+        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();
+        if(window._startObSync) window._startObSync(user);renderWeekCalendar();
       }else{
         $("userPill").textContent="🔒 Non autenticato";
         $("userPill").classList.add("muted");
@@ -2585,6 +2586,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";$("refreshBtn").disabled=true;
         $("newsList").innerHTML="";setStatus("🔒 Effettua il login per caricare le news.");
         stopPlannerSync();stopVenditeSync();stopTelSync();stopConsegneSync();stopPostSync();renderOggi();
+        if(window._stopObSync) window._stopObSync();
       }
     });
 
@@ -2955,28 +2957,107 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       renderPostVendita();
     }
 
-    /* ══ OBIETTIVO MENSILE ══ */
+    /* ══ OBIETTIVO MENSILE — Firebase sync ══ */
     (function(){
       const OB_TARGET_AUTO = 11;
       const OB_TARGET_FIN  = 70;
       const OB_WEEK_TARGET = [3,3,3,2]; // 3+3+3+2 = 11
-      const OB_KEY         = "obiettivoMensile_v2";
+
+      // ── Firebase refs ──────────────────────────────────────────
+      let obDocRef  = null;
+      let obUnsub   = null;
+      let obSynced  = false; // true dopo il primo snapshot
+
+      function setSyncBadgeOb(s){
+        const b = $("obSyncBadge");
+        if(!b) return;
+        if(s==="ok")  { b.style.borderColor="rgba(34,197,94,.5)";  b.style.background="rgba(34,197,94,.08)";  b.style.color="#bbf7d0"; b.textContent="Sync ✓"; }
+        else if(s==="sync"){ b.style.borderColor="rgba(251,191,36,.4)"; b.style.background="rgba(251,191,36,.08)"; b.style.color="#fde68a"; b.textContent="Sync …"; }
+        else          { b.style.borderColor="rgba(31,41,55,.9)";   b.style.background="rgba(17,24,39,.45)";   b.style.color="#9ca3af"; b.textContent="Sync —"; }
+      }
+
+      function normalizeOb(d){
+        if(!d || !Array.isArray(d.settimane) || d.settimane.length!==4)
+          return { settimane:[[],[],[],[]] };
+        return { settimane: d.settimane.map(s=>Array.isArray(s)?s:[]) };
+      }
+
+      async function saveOb(){
+        if(!obDocRef) return;
+        try{ await setDoc(obDocRef, obState, {merge:false}); }catch{}
+      }
+
+      // ── MIGRAZIONE ONE-SHOT localStorage → Firebase ──────────
+      // Attiva SOLO fino al 06/03/2026 ore 10:00 (poi il codice non fa nulla)
+      async function migraLocalStorage(user){
+        const SCADENZA = new Date("2026-03-06T10:00:00").getTime();
+        if(Date.now() > SCADENZA) return; // scaduta → non fare niente
+
+        const GIA_MIGRATO_KEY = "obMigrato_firebase_v1";
+        if(localStorage.getItem(GIA_MIGRATO_KEY)) return; // già migrato → non fare niente
+
+        const vecchi = localStorage.getItem("obiettivoMensile_v2");
+        if(!vecchi) return; // niente da migrare
+
+        try {
+          const parsed = JSON.parse(vecchi);
+          const dati   = normalizeOb(parsed);
+          const ref    = doc(db, "users", user.uid, "obiettivoMensile", "data");
+
+          // Scrivi su Firebase solo se il documento è ancora vuoto
+          const snap = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js")
+            .then(m => m.getDoc(ref));
+          const firebaseVuoto = !snap.exists() ||
+            (snap.data()?.settimane || []).flat().length === 0;
+
+          if(firebaseVuoto && dati.settimane.flat().length > 0){
+            await setDoc(ref, dati, {merge:false});
+            console.log("✅ Migrazione OB localStorage → Firebase completata");
+          }
+
+          // Segna come già migrato (così non ripete)
+          localStorage.setItem(GIA_MIGRATO_KEY, "1");
+        } catch(e){
+          console.warn("Migrazione OB fallita:", e);
+        }
+      }
+      // ── FINE MIGRAZIONE ───────────────────────────────────────
+
+      function startObSync(user){
+        if(obUnsub){ try{ obUnsub(); }catch{} }
+        obDocRef = doc(db, "users", user.uid, "obiettivoMensile", "data");
+        setSyncBadgeOb("sync");
+        migraLocalStorage(user); // one-shot, scade 06/03/2026 10:00
+        obUnsub = onSnapshot(obDocRef, snap => {
+          obState   = normalizeOb(snap.exists() ? snap.data() : null);
+          obSynced  = true;
+          setSyncBadgeOb("ok");
+          renderObiettivo();
+          if(!snap.exists()) setDoc(obDocRef, obState, {merge:false}).catch(()=>{});
+        }, () => { setSyncBadgeOb("warn"); });
+      }
+
+      function stopObSync(){
+        if(obUnsub){ try{ obUnsub(); }catch{} }
+        obUnsub=null; obDocRef=null; obSynced=false;
+        obState = { settimane:[[],[],[],[]] };
+        setSyncBadgeOb("warn");
+        renderObiettivo();
+      }
+
+      // Esporta per onAuthStateChanged
+      window._startObSync = startObSync;
+      window._stopObSync  = stopObSync;
 
       function getWeekOfMonth(){
         const oggi = new Date();
         const primoGiorno = new Date(oggi.getFullYear(), oggi.getMonth(), 1);
         return Math.min(3, Math.floor((oggi.getDate() - 1 + primoGiorno.getDay()) / 7));
-        // restituisce 0,1,2,3 = settimana 1,2,3,4 del mese
       }
 
-      function loadOb(){
-        try{ const s=localStorage.getItem(OB_KEY); if(s) return JSON.parse(s); }catch{}
-        return { settimane:[[],[],[],[]] };
-      }
-      function saveOb(){ try{ localStorage.setItem(OB_KEY, JSON.stringify(obState)); }catch{} }
       function obUid(){ return Math.random().toString(36).slice(2); }
 
-      let obState = loadOb();
+      let obState = { settimane:[[],[],[],[]] };
       let pendingModello = "";
 
       // ── Popup step 1: tipo (nuova/usata) ──────────────────────
@@ -3088,7 +3169,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
 
       window.obDelete = function(wi,id){
         obState.settimane[wi] = obState.settimane[wi].filter(a=>a.id!==id);
-        saveOb(); renderObiettivo();
+        renderObiettivo(); saveOb();
       };
 
       renderObiettivo();
