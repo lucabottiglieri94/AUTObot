@@ -3623,131 +3623,237 @@ window.garLoadStorico = function(id){
 };
 
 window.garDownload = function(){
-  const p=window._garUltimo;
-  if(!p){alert("Nessuna analisi da scaricare!");return;}
-  const now=new Date().toLocaleDateString("it-IT");
-  const li=arr=>(arr||[]).map(v=>`<li style="padding:3px 0">${v}</li>`).join("");
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
-<style>
-body{font-family:Calibri,Arial,sans-serif;color:#1a1a2e;margin:40px;line-height:1.6}
-h1{color:#1e3a5f;font-size:22px;border-bottom:3px solid #1e3a5f;padding-bottom:8px;margin-bottom:20px}
-h2{color:#2563eb;font-size:16px;margin-top:24px;margin-bottom:10px;border-left:4px solid #2563eb;padding-left:10px}
-.box{background:#eff6ff;border:2px solid #2563eb;border-radius:8px;padding:16px;margin:16px 0}
-.cliente{font-size:22px;font-weight:bold;color:#1e3a5f}
-table{width:100%;border-collapse:collapse;margin-bottom:10px}
-td{padding:8px 12px;border:1px solid #e2e8f0}
-td:first-child{background:#f8fafc;font-weight:bold;width:40%}
-ul{padding-left:20px;margin:6px 0}
-.inc{color:#15803d}.exc{color:#dc2626}.warn{color:#92400e}
-.footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;text-align:center}
+  const p = window._garUltimo;
+  if(!p){ alert("Nessuna analisi da scaricare!"); return; }
 
-  /* PANEL TINT SYSTEM (Post-Vendita style, but unique per panel) */
-  .tintedPanel{background:var(--panel);border:1px solid var(--tintBorder,var(--line));border-radius:18px;overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.75);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);}
-  .tintedHeader{padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
-    background:linear-gradient(180deg,var(--tintTop,rgba(255,255,255,.06)), rgba(10,12,18,.95) 70%);
-    border-bottom:1px solid var(--tintBorder,var(--line));
-  }
+  const now = new Date().toLocaleDateString("it-IT");
 
-  /* Left column panels */
-  #newsPanel{--tintTop:rgba(0,122,255,.14);--tintBorder:rgba(0,122,255,.26);}
-  #preConsegnaPanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
-  #postVenditaLeftPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
+  // Genera righe per ogni lista
+  const liInc = (p.cosaInclude||[]).map(v =>
+    `<tr>
+      <td style="width:32px;text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;font-size:16px;">✅</td>
+      <td style="padding:10px 14px;border:1px solid #d1fae5;background:#f9fff9;font-size:13px;color:#14532d;">${v}</td>
+    </tr>`).join("");
 
-  /* Common widget panels (right side) */
-  #agendaPanel{--tintTop:rgba(255,149,0,.14);--tintBorder:rgba(255,149,0,.26);}
-  #memoPanel{--tintTop:rgba(168,85,247,.14);--tintBorder:rgba(168,85,247,.26);}
-  #telefonoPanel{--tintTop:rgba(59,130,246,.14);--tintBorder:rgba(59,130,246,.26);}
-  #consegnePanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
-  #postPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
-  #obiettivoPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.26);}
-  #comparatorePanel{--tintTop:rgba(239,68,68,.12);--tintBorder:rgba(239,68,68,.22);}
-  #venditePanel{--tintTop:rgba(34,197,94,.12);--tintBorder:rgba(34,197,94,.22);}
+  const liExc = (p.cosaEscluso||[]).map(v =>
+    `<tr>
+      <td style="width:32px;text-align:center;background:#fff1f2;border:1px solid #fecdd3;font-size:16px;">❌</td>
+      <td style="padding:10px 14px;border:1px solid #fecdd3;background:#fffafa;font-size:13px;color:#7f1d1d;">${v}</td>
+    </tr>`).join("");
 
-  /* Fallback: each widgetPanel can opt-in by setting vars on its root */
-  .widgetPanel{border-color:var(--tintBorder,var(--line));}
+  const liCond = (p.condizioniPrincipali||[]).map(v =>
+    `<tr>
+      <td style="width:32px;text-align:center;background:#fffbeb;border:1px solid #fde68a;font-size:16px;">⚠️</td>
+      <td style="padding:10px 14px;border:1px solid #fde68a;background:#fffef0;font-size:13px;color:#78350f;">${v}</td>
+    </tr>`).join("");
 
-</style></head><body>
-<h1>🛡 Sunto Garanzia — AI BOTT Automotive</h1>
-<div class="box">
-  <div class="cliente">👤 ${p.cliente||"—"}</div>
-  <div style="font-size:16px;color:#2563eb;margin-top:4px;">🚗 ${p.modello||"Non specificato"}</div>
-  <div style="font-size:12px;color:#64748b;margin-top:6px;">Generato il ${now} · AI BOTT Automotive</div>
-</div>
-<h2>📅 Dati Garanzia</h2>
-<table>
-  <tr><td>Inizio Garanzia</td><td>${p.dataInizio||"—"}</td></tr>
-  <tr><td>Durata</td><td>${p.durataAnni||"—"}</td></tr>
-  <tr><td>Scadenza</td><td>${p.dataFine||"—"}</td></tr>
-</table>
-${p.sunto?`<h2>📝 Sunto</h2><p style="background:#faf5ff;border:1px solid #c084fc;border-radius:6px;padding:14px;color:#581c87;font-style:italic">${p.sunto}</p>`:""}
-<h2>✅ Cosa Include</h2>
-<ul class="inc">${li(p.cosaInclude)||"<li>Vedere documento originale</li>"}</ul>
-<h2>❌ Cosa NON Include (Esclusioni)</h2>
-<ul class="exc">${li(p.cosaEscluso)||"<li>Vedere documento originale</li>"}</ul>
-${(p.condizioniPrincipali||[]).length?`<h2>⚠ Condizioni Principali</h2><ul class="warn">${li(p.condizioniPrincipali)}</ul>`:""}
-${(p.noteImportanti||[]).length?`<h2>📌 Note Importanti</h2><ul>${li(p.noteImportanti)}</ul>`:""}
-<div class="footer">Documento generato da AI BOTT Automotive · ${now} · Solo a scopo informativo. Fare sempre riferimento al documento originale.</div>
+  const liNote = (p.noteImportanti||[]).map(v =>
+    `<tr>
+      <td style="width:32px;text-align:center;background:#f0f9ff;border:1px solid #bae6fd;font-size:16px;">📌</td>
+      <td style="padding:10px 14px;border:1px solid #bae6fd;background:#f8fbff;font-size:13px;color:#0c4a6e;">${v}</td>
+    </tr>`).join("");
 
-  <!-- POPUP AUTO VENDUTE -->
-  <div id="autoPopupOverlay" class="autoPopupOverlay" style="display:none;" onclick="if(event.target===this)closeAutoPopup()">
-    <div class="autoPopupBox">
-      <div class="autoPopupHead">
-        <div class="autoPopupTitle" id="autoPopupTitle">Auto</div>
-        <button class="autoPopupClose" onclick="closeAutoPopup()">×</button>
-      </div>
-      <div class="autoPopupList" id="autoPopupList"></div>
-    </div>
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Garanzia — ${p.cliente||"Cliente"}</title>
+  <style>
+    body {
+      font-family: 'Calibri', Arial, sans-serif;
+      color: #1a1a2e;
+      margin: 48px 56px;
+      line-height: 1.65;
+      font-size: 13px;
+    }
+    .header-box {
+      background: linear-gradient(135deg, #1e3a5f, #1d4ed8);
+      color: white;
+      padding: 28px 32px;
+      border-radius: 10px;
+      margin-bottom: 28px;
+    }
+    .header-box h1 {
+      margin: 0 0 6px 0;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.3px;
+    }
+    .header-box .sub {
+      font-size: 13px;
+      opacity: 0.80;
+    }
+    .cliente-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 6px;
+      padding: 4px 14px;
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    /* TABELLA DATI */
+    .dati-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 28px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .dati-table td {
+      padding: 10px 16px;
+      border: 1px solid #e2e8f0;
+      font-size: 13px;
+    }
+    .dati-table td:first-child {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #334155;
+      width: 38%;
+    }
+
+    /* SUNTO */
+    .sunto-box {
+      background: #faf5ff;
+      border: 2px solid #c084fc;
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 28px;
+      font-size: 13px;
+      color: #3b0764;
+      line-height: 1.75;
+    }
+    .sunto-box .sunto-label {
+      font-size: 14px;
+      font-weight: 900;
+      color: #7c3aed;
+      margin-bottom: 8px;
+    }
+
+    /* SECTION TITLES */
+    h2 {
+      font-size: 15px;
+      font-weight: 800;
+      margin: 28px 0 10px 0;
+      padding: 8px 14px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h2.inc  { background: #dcfce7; color: #14532d; border-left: 5px solid #22c55e; }
+    h2.exc  { background: #fee2e2; color: #7f1d1d; border-left: 5px solid #ef4444; }
+    h2.warn { background: #fef9c3; color: #78350f; border-left: 5px solid #eab308; }
+    h2.note { background: #e0f2fe; color: #0c4a6e; border-left: 5px solid #0ea5e9; }
+
+    /* LISTS AS TABLES */
+    .list-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+    }
+    .list-table tr:nth-child(even) td:last-child { filter: brightness(0.97); }
+
+    .empty-note {
+      padding: 10px 14px;
+      color: #64748b;
+      font-style: italic;
+      font-size: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      margin-bottom: 4px;
+    }
+
+    .footer {
+      margin-top: 44px;
+      padding-top: 16px;
+      border-top: 2px solid #e2e8f0;
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+    }
+    .disclaimer {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 11px;
+      color: #78350f;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INTESTAZIONE -->
+  <div class="header-box">
+    <h1>🛡 Estensione di Garanzia</h1>
+    <div class="sub">Documento informativo preparato da AI BOTT Automotive · ${now}</div>
+    <div class="cliente-tag">👤 ${p.cliente||"—"}</div>
   </div>
 
+  <!-- DATI VEICOLO E GARANZIA -->
+  <table class="dati-table">
+    <tr><td>👤 Intestatario</td><td><strong>${p.cliente||"—"}</strong></td></tr>
+    <tr><td>🚗 Veicolo</td><td><strong>${p.modello||"Non specificato"}</strong></td></tr>
+    <tr><td>📅 Data inizio garanzia</td><td>${p.dataInizio||"—"}</td></tr>
+    <tr><td>⏱ Durata</td><td>${p.durataAnni||"—"}</td></tr>
+    <tr><td>📆 Scadenza</td><td>${p.dataFine||"—"}</td></tr>
+  </table>
 
-  <!-- POPUP OBIETTIVO — step 1: tipo, step 2: finanziamento -->
-  <div id="obPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
-    <div style="background:#111827;border:1px solid #1f2937;border-radius:20px;width:340px;max-width:92vw;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8);">
+  <!-- SUNTO -->
+  ${p.sunto ? `
+  <div class="sunto-box">
+    <div class="sunto-label">📝 Riepilogo</div>
+    ${p.sunto}
+  </div>` : ""}
 
-      <!-- Intestazione -->
-      <div style="padding:16px 20px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div id="obPopupTitle" style="font-weight:900;font-size:16px;"></div>
-          <div id="obPopupSub" style="font-size:12px;color:#9ca3af;margin-top:2px;"></div>
-        </div>
-        <button id="obPopupClose" style="width:30px;height:30px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#e5e7eb;cursor:pointer;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;">×</button>
-      </div>
+  <!-- ✅ COSA È COPERTO -->
+  <h2 class="inc">✅ Cosa copre l'estensione di garanzia</h2>
+  ${liInc ? `<table class="list-table">${liInc}</table>`
+           : `<div class="empty-note">Nessuna copertura specificata nel documento — fare riferimento al contratto originale.</div>`}
 
-      <!-- Step 1: tipo -->
-      <div id="obPopupTipoBox" style="padding:20px;display:flex;flex-direction:column;gap:12px;">
-        <button id="obBtnNuova" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
-          onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
-          🆕 <span>Auto Nuova</span>
-        </button>
-        <button id="obBtnUsata" style="padding:16px;border-radius:14px;border:2px solid rgba(249,115,22,.5);background:rgba(249,115,22,.1);color:#fb923c;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
-          onmouseover="this.style.background='rgba(249,115,22,.2)'" onmouseout="this.style.background='rgba(249,115,22,.1)'">
-          🔄 <span>Auto Usata</span>
-        </button>
-      </div>
+  <!-- ❌ COSA NON È COPERTO -->
+  <h2 class="exc">❌ Cosa NON è coperto (Esclusioni)</h2>
+  ${liExc ? `<table class="list-table">${liExc}</table>`
+           : `<div class="empty-note">Nessuna esclusione specificata nel documento — fare riferimento al contratto originale.</div>`}
 
-      <!-- Step 2: finanziamento -->
-      <div id="obPopupFinBox" style="padding:20px;display:none;flex-direction:column;gap:12px;">
-        <button id="obBtnCash" style="padding:16px;border-radius:14px;border:2px solid rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#4ade80;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
-          onmouseover="this.style.background='rgba(34,197,94,.2)'" onmouseout="this.style.background='rgba(34,197,94,.1)'">
-          💵 <span>Cash</span>
-        </button>
-        <button id="obBtnFin" style="padding:16px;border-radius:14px;border:2px solid rgba(59,130,246,.5);background:rgba(59,130,246,.1);color:#60a5fa;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;"
-          onmouseover="this.style.background='rgba(59,130,246,.2)'" onmouseout="this.style.background='rgba(59,130,246,.1)'">
-          💳 <span>Finanziamento</span>
-        </button>
-      </div>
+  <!-- ⚠ CONDIZIONI -->
+  ${liCond ? `
+  <h2 class="warn">⚠️ Condizioni da rispettare</h2>
+  <table class="list-table">${liCond}</table>` : ""}
 
-    </div>
+  <!-- 📌 NOTE -->
+  ${liNote ? `
+  <h2 class="note">📌 Note importanti</h2>
+  <table class="list-table">${liNote}</table>` : ""}
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer">
+    ⚠️ <strong>Documento informativo</strong>: questo sunto è generato automaticamente dall'AI e ha scopo puramente orientativo.
+    Per le condizioni contrattuali complete e vincolanti, fare sempre riferimento al documento originale della garanzia.
   </div>
-</body></html>`;
 
-  const blob=new Blob([html],{type:"application/msword"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;
-  a.download=`Garanzia_${(p.cliente||"cliente").replace(/\s+/g,"_")}_${(p.modello||"auto").replace(/\s+/g,"_")}.doc`;
-  document.body.appendChild(a);a.click();
-  document.body.removeChild(a);URL.revokeObjectURL(url);
+  <div class="footer">
+    Generato da <strong>AI BOTT Automotive</strong> · ${now} · CentroAuto VT
+  </div>
+
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: "application/msword" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = `Garanzia_${(p.cliente||"cliente").replace(/\s+/g,"_")}_${(p.modello||"auto").replace(/\s+/g,"_")}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 };
 /* ══ FINE GARANZIE ══ */
     // ══ NAVIGAZIONE VENDITE - esposta globalmente ══
