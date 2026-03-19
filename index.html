@@ -3852,8 +3852,50 @@ window.garDownload = function(){
   a.download = `Garanzia_${(p.cliente||"cliente").replace(/\s+/g,"_")}_${(p.modello||"auto").replace(/\s+/g,"_")}.doc`;
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
+document.body.removeChild(a);
   URL.revokeObjectURL(url);
+
+  // ── Reset analisi dopo download ──
+  window._garUltimo = null;
+  garPdfB64 = null;
+  garPdfName = "";
+
+  // Resetta UI campi
+  const nomeFld   = document.getElementById("garNome");
+  const modFld    = document.getElementById("garModello");
+  const dropZone  = document.getElementById("garDropZone");
+  const dropIcon  = document.getElementById("garDropIcon");
+  const dropTitle = document.getElementById("garDropTitle");
+  const fileLabel = document.getElementById("garFileLabel");
+  const resultBox = document.getElementById("garResultBox");
+  const loadBox   = document.getElementById("garLoading");
+  const btnIcon   = document.getElementById("garBtnIcon");
+  const btnTxt    = document.getElementById("garBtnTxt");
+  const btn2      = document.getElementById("garAnalizzaBtn");
+
+  if(nomeFld)   nomeFld.value   = "";
+  if(modFld)    modFld.value    = "";
+  if(resultBox) resultBox.innerHTML = "";
+  if(loadBox)   loadBox.style.display = "none";
+
+  // Ripristina dropzone
+  if(dropZone)  { dropZone.style.borderColor="rgba(139,92,246,.4)"; dropZone.style.background="rgba(139,92,246,.06)"; }
+  if(dropIcon)  dropIcon.textContent  = "📄";
+  if(dropTitle) dropTitle.textContent = "Trascina il PDF qui oppure clicca per selezionare";
+  if(fileLabel) { fileLabel.style.display="none"; fileLabel.textContent=""; }
+
+  // Ripristina bottone analizza
+  if(btn2)    { btn2.disabled=true; btn2.style.opacity=".5"; }
+  if(btnIcon) btnIcon.textContent = "🔍";
+  if(btnTxt)  btnTxt.textContent  = "Inserisci nome cliente e carica un PDF";
+
+  // Piccolo feedback visivo prima del reset
+  // (il toast sparisce da solo dopo 2.5s)
+  const toast = document.createElement("div");
+  toast.textContent = "✅ Word scaricato! Pronto per una nuova analisi.";
+  toast.style.cssText = "position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:12px 24px;border-radius:999px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:slideIn .3s ease;pointer-events:none;";
+  document.body.appendChild(toast);
+  setTimeout(()=>{ toast.style.opacity="0"; toast.style.transition="opacity .4s"; setTimeout(()=>toast.remove(), 400); }, 2500);
 };
 /* ══ FINE GARANZIE ══ */
     // ══ NAVIGAZIONE VENDITE - esposta globalmente ══
