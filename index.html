@@ -2607,31 +2607,130 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     function showTyping(){const d=document.createElement("div");d.className="message ai";d.id="typingIndicator";d.innerHTML='<div class="typingIndicator"><div class="typingDot"></div><div class="typingDot"></div><div class="typingDot"></div></div>';chatMessages.appendChild(d);chatMessages.scrollTop=chatMessages.scrollHeight}
     function hideTyping(){const t=$("typingIndicator");if(t)t.remove()}
 
+    /* ══ MAPPA MARCHE → SITO UFFICIALE (usata per prendere i dati direttamente dalla fonte) ══ */
+    const BRAND_SITES={
+      'alfa romeo':{name:'Alfa Romeo',domain:'alfaromeo.it'},'alfa':{name:'Alfa Romeo',domain:'alfaromeo.it'},
+      'fiat':{name:'Fiat',domain:'fiat.it'},
+      'jeep':{name:'Jeep',domain:'jeep-official.it'},
+      'lancia':{name:'Lancia',domain:'lancia.it'},
+      'ford':{name:'Ford',domain:'ford.it'},
+      'kia':{name:'Kia',domain:'kia.com'},
+      'land rover':{name:'Land Rover',domain:'landrover.it'},'range rover':{name:'Land Rover',domain:'landrover.it'},
+      'mazda':{name:'Mazda',domain:'mazda.it'},
+      'aixam':{name:'Aixam',domain:'aixam.it'},
+      'mg':{name:'MG',domain:'mgmotor.it'},
+      'opel':{name:'Opel',domain:'opel.it'},
+      'peugeot':{name:'Peugeot',domain:'peugeot.it'},
+      'renault':{name:'Renault',domain:'renault.it'},
+      'seat':{name:'Seat',domain:'seat.it'},
+      'cupra':{name:'Cupra',domain:'cupraofficial.it'},
+      'smart':{name:'Smart',domain:'smart.com'},
+      'suzuki':{name:'Suzuki',domain:'suzuki.it'},
+      'volkswagen':{name:'Volkswagen',domain:'volkswagen.it'},'vw':{name:'Volkswagen',domain:'volkswagen.it'},
+      'audi':{name:'Audi',domain:'audi.it'},
+      'bmw':{name:'BMW',domain:'bmw.it'},
+      'mercedes':{name:'Mercedes-Benz',domain:'mercedes-benz.it'},
+      'volvo':{name:'Volvo',domain:'volvocars.com'},
+      'toyota':{name:'Toyota',domain:'toyota.it'},
+      'honda':{name:'Honda',domain:'honda.it'},
+      'nissan':{name:'Nissan',domain:'nissan.it'},
+      'hyundai':{name:'Hyundai',domain:'hyundai.it'},
+      'citroen':{name:'Citroën',domain:'citroen.it'},'citroën':{name:'Citroën',domain:'citroen.it'},
+      'dacia':{name:'Dacia',domain:'dacia.it'},
+      'skoda':{name:'Skoda',domain:'skoda.it'},'škoda':{name:'Skoda',domain:'skoda.it'},
+      'mini':{name:'Mini',domain:'mini.it'},
+      'ds':{name:'DS Automobiles',domain:'dsautomobiles.it'},
+      'tesla':{name:'Tesla',domain:'tesla.com'},
+      'byd':{name:'BYD',domain:'byd.com'}
+    };
+    const NEW_BRAND_KEYS=['fiat','jeep','alfa romeo','alfa','lancia','mazda','aixam']; // marche vendute NUOVE da CentroAuto
+
+    /* Modelli → marca: così il bot riconosce la marca anche se scrivi solo il nome del modello */
+    const MODEL_TO_BRAND={
+      'panda':'fiat','pandina':'fiat','punto':'fiat','500x':'fiat','500l':'fiat','500':'fiat','tipo':'fiat','ducato':'fiat','doblo':'fiat','scudo':'fiat','topolino':'fiat',
+      'renegade':'jeep','compass':'jeep','wrangler':'jeep','cherokee':'jeep','avenger':'jeep','gladiator':'jeep',
+      'giulia':'alfa romeo','stelvio':'alfa romeo','tonale':'alfa romeo','giulietta':'alfa romeo','junior':'alfa romeo',
+      'ypsilon':'lancia','delta':'lancia',
+      'crossline':'aixam','crossover':'aixam','scouty':'aixam','roadline':'aixam',
+      'focus':'ford','fiesta':'ford','kuga':'ford','puma':'ford','ecosport':'ford','ranger':'ford',
+      'sportage':'kia','picanto':'kia','ceed':'kia','niro':'kia','sorento':'kia','stonic':'kia','ev6':'kia','ev9':'kia','xceed':'kia',
+      'defender':'land rover','discovery':'land rover','evoque':'land rover','velar':'land rover',
+      'corsa':'opel','astra':'opel','mokka':'opel','grandland':'opel','crossland':'opel',
+      '208':'peugeot','308':'peugeot','2008':'peugeot','3008':'peugeot','5008':'peugeot',
+      'clio':'renault','captur':'renault','megane':'renault','austral':'renault','arkana':'renault','scenic':'renault',
+      'ibiza':'seat','arona':'seat','ateca':'seat','leon':'seat',
+      'vitara':'suzuki','swift':'suzuki','jimny':'suzuki','s-cross':'suzuki',
+      'golf':'volkswagen','polo':'volkswagen','tiguan':'volkswagen','passat':'volkswagen','t-cross':'volkswagen','t-roc':'volkswagen','id.3':'volkswagen','id.4':'volkswagen',
+      'xc40':'volvo','xc60':'volvo','xc90':'volvo','ex30':'volvo',
+      'yaris':'toyota','corolla':'toyota','c-hr':'toyota','rav4':'toyota','aygo':'toyota',
+      'civic':'honda','cr-v':'honda','hr-v':'honda',
+      'qashqai':'nissan','juke':'nissan','x-trail':'nissan','micra':'nissan',
+      'tucson':'hyundai','kona':'hyundai','bayon':'hyundai',
+      'c3':'citroen','c4':'citroen','c5 aircross':'citroen','berlingo':'citroen',
+      'sandero':'dacia','duster':'dacia','jogger':'dacia','spring':'dacia',
+      'fabia':'skoda','octavia':'skoda','kamiq':'skoda','karoq':'skoda',
+      'cooper':'mini','countryman':'mini'
+    };
+
+    function detectBrand(text){
+      const low=text.toLowerCase();
+      for(const key of Object.keys(BRAND_SITES).sort((a,b)=>b.length-a.length)){
+        if(low.includes(key))return{key,...BRAND_SITES[key]};
+      }
+      for(const model of Object.keys(MODEL_TO_BRAND).sort((a,b)=>b.length-a.length)){
+        if(low.includes(model)){const bk=MODEL_TO_BRAND[model];return{key:bk,...BRAND_SITES[bk]}}
+      }
+      return null;
+    }
+
     function needsSearch(text){
-      const kw=['prezzo','costo','listino','allestimento','versione','dotazione','optional','motore','cavalli','cv','kw','consumi','autonomia','dimensioni','bagagliaio','colori','confronto','differenza','meglio','vs','ibrida','elettrica','plug-in','diesel','benzina','gpl','trazione','integrale','cambio','automatico','garanzia','manutenzione','panda','punto','500','tipo','ducato','renegade','compass','wrangler','cherokee','avenger','giulia','stelvio','tonale','giulietta','ypsilon','delta','usato','usata','usati','usate','seconda mano','km zero','centroauto','occasione','ford','kia','lancia','land rover','man','mazda','mg','opel','peugeot','renault','seat','smart','suzuki','volkswagen','audi','bmw','mercedes','volvo','toyota','honda','nissan','hyundai','citroen','dacia','skoda','mini','focus','fiesta','kuga','sportage','picanto','defender','corsa','astra','mokka','208','308','2008','clio','captur','megane','ibiza','leon','vitara','swift','golf','polo','tiguan'];
+      if(detectBrand(text))return true;
+      const kw=['prezzo','costo','listino','allestimento','versione','dotazione','optional','motore','cavalli','cv','kw','consumi','autonomia','dimensioni','bagagliaio','colori','confronto','differenza','meglio','vs','ibrida','elettrica','plug-in','diesel','benzina','gpl','trazione','integrale','cambio','automatico','garanzia','manutenzione','usato','usata','usati','usate','seconda mano','km zero','centroauto','occasione'];
       const low=text.toLowerCase();return kw.some(k=>low.includes(k));
     }
-    async function searchCarInfo(query){
+
+    async function runSearch(eQ,allowedDomains){
       try{
-        const low=query.toLowerCase();
-        const usedBrands=['ford','jeep','kia','lancia','land rover','man','mazda','mg','opel','peugeot','renault','seat','smart','suzuki','volkswagen','audi','bmw','mercedes','volvo','toyota','honda','nissan','hyundai','citroen','dacia','skoda','mini'];
-        const isUsed=['usato','usata','usati','usate','seconda mano','km zero','centroauto','occasione'].some(k=>low.includes(k))||usedBrands.some(b=>low.includes(b));
-        let eQ,aD;
-        if(isUsed){const mb=usedBrands.find(b=>low.includes(b));eQ=`${mb?mb+" ":""}${query} site:centroautovt.it/ricerca-auto/usate`;aD=['centroautovt.it']}
-        else{eQ=`${query} allestimenti versioni site:fiat.it OR site:jeep-official.it OR site:alfaromeo.it OR site:lancia.it`;aD=['fiat.it','jeep-official.it','alfaromeo.it','lancia.it']}
         const r=await fetch(`${BACKEND_SEARCH}?q=${encodeURIComponent(eQ)}`);
-        if(!r.ok)throw new Error();
+        if(!r.ok)return[];
         const data=await r.json();
-        if(data.results?.length){
-          const valid=data.results.filter(r=>aD.some(d=>r.url.toLowerCase().includes(d)));
-          if(!valid.length)return null;
-          if(isUsed)return valid.slice(0,6).map(r=>`🚗 ${r.title}\n${r.description}\n🔗 ${r.url}`).join("\n\n────────────────\n\n");
-          return valid.slice(0,3).map(r=>{const b=r.url.includes('fiat')?'Fiat':r.url.includes('jeep')?'Jeep':r.url.includes('alfa')?'Alfa Romeo':'Lancia';return`━━━ ${b.toUpperCase()} ━━━\n${r.title}\n\n${r.description}\n\n🔗 ${r.url}`}).join("\n\n");
-        }
-        return null;
-      }catch{return null}
+        if(!data.results?.length)return[];
+        return data.results.filter(r=>allowedDomains.some(d=>r.url.toLowerCase().includes(d)));
+      }catch{return[]}
     }
-    const SYSTEM_PROMPT=`Sei un assistente esperto di auto NUOVE e USATE. AUTO NUOVE: Fiat, Jeep, Alfa Romeo, Lancia. AUTO USATE: CentroAuto VT. Risposte SCHEMATICHE e CONCISE (max 10 righe), usa elenchi puntati, solo dati concreti e verificabili.`;
+
+    async function searchCarInfo(query){
+      const low=query.toLowerCase();
+      const wantsUsed=['usato','usata','usati','usate','seconda mano','km zero','centroauto','occasione'].some(k=>low.includes(k));
+      const brand=detectBrand(query);
+      const sections=[];
+
+      // Se la marca non è tra le 4 vendute nuove da CentroAuto, o l'utente chiede esplicitamente dell'usato,
+      // controlla anche la disponibilità nell'usato del dealer
+      if(wantsUsed||(brand&&!NEW_BRAND_KEYS.includes(brand.key))){
+        const usedResults=await runSearch(`${query} site:centroautovt.it/ricerca-auto/usate`,['centroautovt.it']);
+        if(usedResults.length){
+          sections.push(`━━━ DISPONIBILE USATO DA CENTROAUTO VT ━━━\n\n${usedResults.slice(0,5).map(r=>`🚗 ${r.title}\n${r.description}\n🔗 ${r.url}`).join("\n\n")}`);
+        }
+      }
+
+      // Cerca SEMPRE le informazioni ufficiali e aggiornate direttamente sul sito della marca rilevata
+      if(brand){
+        const officialResults=await runSearch(`${query} scheda tecnica allestimenti versioni site:${brand.domain}`,[brand.domain]);
+        if(officialResults.length){
+          sections.push(`━━━ FONTE UFFICIALE: ${brand.name.toUpperCase()} (${brand.domain}) ━━━\n\n${officialResults.slice(0,3).map(r=>`${r.title}\n\n${r.description}\n\n🔗 ${r.url}`).join("\n\n")}`);
+        }
+      }else{
+        // Nessuna marca riconosciuta nel testo: fallback sulle 4 marche nuove di CentroAuto
+        const genericResults=await runSearch(`${query} allestimenti versioni site:fiat.it OR site:jeep-official.it OR site:alfaromeo.it OR site:lancia.it OR site:mazda.it OR site:aixam.it`,['fiat.it','jeep-official.it','alfaromeo.it','lancia.it','mazda.it','aixam.it']);
+        if(genericResults.length){
+          sections.push(genericResults.slice(0,3).map(r=>{const b=r.url.includes('fiat')?'Fiat':r.url.includes('jeep')?'Jeep':r.url.includes('alfa')?'Alfa Romeo':r.url.includes('lancia')?'Lancia':r.url.includes('mazda')?'Mazda':'Aixam';return`━━━ ${b.toUpperCase()} ━━━\n${r.title}\n\n${r.description}\n\n🔗 ${r.url}`}).join("\n\n"));
+        }
+      }
+
+      return sections.length?sections.join("\n\n────────────────\n\n"):null;
+    }
+    const SYSTEM_PROMPT=`Sei un assistente esperto di auto NUOVE e USATE. AUTO NUOVE vendute da CentroAuto: Fiat, Jeep, Alfa Romeo, Lancia, Mazda, Aixam. AUTO USATE (tutte le marche): CentroAuto VT. Quando ricevi "DATI UFFICIALI" nel messaggio, trattali come fonte primaria aggiornata (anche per marche diverse da quelle vendute nuove, utile per confronti o per schede di auto usate). Risposte SCHEMATICHE e CONCISE (max 10 righe), usa elenchi puntati, solo dati concreti e verificabili. Se un modello recentissimo non compare nei dati ricevuti, dillo chiaramente invece di inventare specifiche.`;
 
     async function sendMessage(){
       const msg=chatInputField.value.trim();if(!msg)return;
@@ -2640,7 +2739,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       try{
         const sr=needsSearch(msg)?await searchCarInfo(msg):null;
         const messages=[{role:"system",content:SYSTEM_PROMPT},...chatHistory];
-        if(sr)messages.push({role:"system",content:`DATI UFFICIALI:\n\n${sr}\n\nRispondi usando SOLO questi dati in formato schematico.`});
+        if(sr)messages.push({role:"system",content:`DATI UFFICIALI:\n\n${sr}\n\nRispondi usando SOLO questi dati in formato schematico. Se il modello richiesto non compare nei dati sopra, dillo esplicitamente invece di inventare.`});
         const r=await fetch(BACKEND_CHAT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages})});
         if(!r.ok)throw new Error();
         const data=await r.json();hideTyping();
