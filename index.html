@@ -1271,6 +1271,37 @@ border-bottom:1px solid var(--tintBorder, var(--line));
       .pdfImportActions{justify-content:flex-start}
     }
 
+
+    #openVendPdfBtn,#deleteVendPdfBtn{white-space:nowrap}
+    .pdfViewerOverlay{
+      position:fixed;inset:0;z-index:99999;display:none;
+      background:rgba(3,7,18,.78);backdrop-filter:blur(12px);
+      align-items:center;justify-content:center;padding:20px;
+    }
+    .pdfViewerCard{
+      width:min(1100px,96vw);height:min(92vh,900px);
+      background:#1b2430;border:1px solid rgba(148,163,184,.28);
+      border-radius:28px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5);
+      display:flex;flex-direction:column;
+    }
+    .pdfViewerHead{
+      min-height:58px;padding:10px 14px 10px 18px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .pdfViewerTitle{font-weight:900}
+    .pdfViewerBody{flex:1;background:#111827;overflow:auto;text-align:center;padding:16px}
+    .pdfViewerBody iframe{width:100%;height:100%;min-height:70vh;border:0;border-radius:16px;background:white}
+    .pdfDeleteConfirm{
+      position:fixed;inset:0;z-index:100000;display:none;
+      background:rgba(3,7,18,.65);backdrop-filter:blur(8px);
+      align-items:center;justify-content:center;padding:20px;
+    }
+    .pdfDeleteCard{
+      width:min(440px,94vw);background:#1b2430;border:1px solid rgba(248,113,113,.28);
+      border-radius:26px;padding:22px;box-shadow:0 24px 70px rgba(0,0,0,.5);
+    }
+
 </style>
 
 </head>
@@ -1649,16 +1680,6 @@ border-bottom:1px solid var(--tintBorder, var(--line));
             </div>
             <div class="totCard"><div class="totLabel">📦 Totale</div><div class="totNum all" id="totAll">0</div></div>
           </div>
-          <div class="venditeForm">
-            <input id="vendModello" type="text" class="fld" placeholder="Modello auto (es: Jeep Compass…)" style="min-width:160px;"/>
-            <input id="vendProvv"   type="number" class="fld" placeholder="Provvigione €" min="0" step="1" style="max-width:140px;min-width:110px;"/>
-            <div class="tipoSeg">
-              <button class="tipoBtn nuova active" id="tipoBtnNuova">🆕 Nuova</button>
-              <button class="tipoBtn usata"        id="tipoBtnUsata">🔄 Usata</button>
-            </div>
-            <button id="vendAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
-          </div>
-
           <div class="pdfImportBox" id="pdfImportBox">
             <div class="pdfImportLeft">
               <div class="pdfImportIcon">📄</div>
@@ -1669,6 +1690,8 @@ border-bottom:1px solid var(--tintBorder, var(--line));
             </div>
             <div class="pdfImportActions">
               <label class="btn pdfImportBtn" for="vendPdfInput">📥 Carica PDF</label>
+              <button id="openVendPdfBtn" class="btn" type="button" disabled>👁 Apri PDF</button>
+              <button id="deleteVendPdfBtn" class="btn" type="button" disabled>🗑 Cancella salvataggio</button>
               <input id="vendPdfInput" type="file" accept="application/pdf,.pdf" hidden/>
             </div>
             <div id="vendPdfStatus" class="pdfImportStatus">Nessun PDF caricato.</div>
@@ -1794,6 +1817,35 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
   <!-- PDF + OCR: lettura automatica dei report provvigioni -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <div id="vendPdfViewer" class="pdfViewerOverlay">
+    <div class="pdfViewerCard">
+      <div class="pdfViewerHead">
+        <div>
+          <div class="pdfViewerTitle">📄 Report provvigioni</div>
+          <div id="vendPdfViewerName" style="font-size:11px;color:#94a3b8;margin-top:3px;">PDF salvato</div>
+        </div>
+        <button id="closeVendPdfBtn" class="btn" type="button">✕ Chiudi</button>
+      </div>
+      <div class="pdfViewerBody">
+        <iframe id="vendPdfFrame" title="Report provvigioni PDF"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div id="vendPdfDeleteConfirm" class="pdfDeleteConfirm">
+    <div class="pdfDeleteCard">
+      <div style="font-size:18px;font-weight:900;">🗑 Cancellare il salvataggio?</div>
+      <div style="font-size:12px;color:#aab4c3;line-height:1.5;margin-top:8px;">
+        Verrà cancellato il PDF salvato e, se confermi, anche le vendite importate da quel PDF nel mese.
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px;">
+        <button id="cancelDeleteVendPdfBtn" class="btn" type="button">Annulla</button>
+        <button id="confirmDeleteVendPdfBtn" class="btn" type="button" style="border-color:rgba(248,113,113,.4);">Cancella tutto</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
@@ -2474,6 +2526,113 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     // ── IMPORTAZIONE AUTOMATICA REPORT PDF ─────────────────────────────
     // Il PDF viene elaborato nel browser: non viene inviato a un server.
     // Il report mostrato dall'utente è una scansione, quindi usiamo OCR.
+
+    // ── PDF ORIGINALE: apertura e cancellazione ─────────────────────────
+    let vendPdfObjectUrl=null;
+
+    function vendPdfStorageKey(){
+      const uid=auth.currentUser?.uid||"guest";
+      return `aiBott_vendite_pdf_${uid}_${vendViewKey}`;
+    }
+
+    async function saveVendPdf(file,monthKey){
+      if(!file)return;
+      const key=`aiBott_vendite_pdf_${auth.currentUser?.uid||"guest"}_${monthKey}`;
+      const buffer=await file.arrayBuffer();
+      const bytes=new Uint8Array(buffer);
+      let binary="";
+      const chunk=0x8000;
+      for(let i=0;i<bytes.length;i+=chunk){
+        binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+chunk,bytes.length)));
+      }
+      localStorage.setItem(key,JSON.stringify({
+        name:file.name,
+        type:"application/pdf",
+        size:file.size,
+        monthKey,
+        savedAt:Date.now(),
+        data:btoa(binary)
+      }));
+      updateVendPdfButtons();
+    }
+
+    function getSavedVendPdf(){
+      try{
+        const raw=localStorage.getItem(vendPdfStorageKey());
+        return raw?JSON.parse(raw):null;
+      }catch(e){console.warn("PDF salvato:",e);return null}
+    }
+
+    function deleteSavedVendPdf(){
+      localStorage.removeItem(vendPdfStorageKey());
+      updateVendPdfButtons();
+    }
+
+    function openSavedVendPdf(){
+      const saved=getSavedVendPdf();
+      if(!saved?.data)return;
+
+      try{
+        const binary=atob(saved.data);
+        const bytes=new Uint8Array(binary.length);
+        for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+        const blob=new Blob([bytes],{type:"application/pdf"});
+
+        if(vendPdfObjectUrl)URL.revokeObjectURL(vendPdfObjectUrl);
+        vendPdfObjectUrl=URL.createObjectURL(blob);
+
+        $("vendPdfViewerName").textContent=saved.name||"Report provvigioni PDF";
+        $("vendPdfFrame").src=vendPdfObjectUrl;
+        $("vendPdfViewer").style.display="flex";
+      }catch(e){
+        console.error("Apertura PDF:",e);
+        setStatus("❌ Impossibile aprire il PDF salvato.");
+      }
+    }
+
+    function closeSavedVendPdf(){
+      $("vendPdfViewer").style.display="none";
+      $("vendPdfFrame").src="";
+      if(vendPdfObjectUrl){URL.revokeObjectURL(vendPdfObjectUrl);vendPdfObjectUrl=null;}
+    }
+
+    function updateVendPdfButtons(){
+      const saved=getSavedVendPdf();
+      const open=$("openVendPdfBtn"), del=$("deleteVendPdfBtn");
+      if(open)open.disabled=!saved;
+      if(del)del.disabled=!saved;
+      if(saved){
+        $("vendPdfStatus").textContent=`📄 PDF salvato: ${saved.name||"report"} · ${monthLabel(saved.monthKey)}`;
+      }
+    }
+
+    $("openVendPdfBtn")?.addEventListener("click",openSavedVendPdf);
+    $("closeVendPdfBtn")?.addEventListener("click",closeSavedVendPdf);
+    $("vendPdfViewer")?.addEventListener("click",e=>{
+      if(e.target.id==="vendPdfViewer")closeSavedVendPdf();
+    });
+
+    $("deleteVendPdfBtn")?.addEventListener("click",()=>{
+      $("vendPdfDeleteConfirm").style.display="flex";
+    });
+    $("cancelDeleteVendPdfBtn")?.addEventListener("click",()=>{
+      $("vendPdfDeleteConfirm").style.display="none";
+    });
+    $("confirmDeleteVendPdfBtn")?.addEventListener("click",async()=>{
+      $("vendPdfDeleteConfirm").style.display="none";
+
+      const k=vendViewKey;
+      const mese=vendState.months?.[k];
+      if(mese){
+        mese.nuove=(mese.nuove||[]).filter(x=>x.source!=="pdf");
+        mese.usate=(mese.usate||[]).filter(x=>x.source!=="pdf");
+        await vendWrite();
+        renderVendite();
+      }
+      deleteSavedVendPdf();
+      $("vendPdfStatus").textContent="🗑 Salvataggio PDF e vendite importate cancellati.";
+    });
+
     async function importVenditePdf(file){
       const status=$("vendPdfStatus");
       if(!file || !status)return;
@@ -2563,6 +2722,8 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
 
         let k=reportMonth||vendViewKey;
         vendViewKey=k;
+
+        await saveVendPdf(file,k);
 
         if(!isMeseEditabile(k)){
           renderVendite();
@@ -2785,6 +2946,8 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       if(file)await importVenditePdf(file);
       e.target.value="";
     });
+
+    updateVendPdfButtons();
 
     async function deleteAuto(k,tipo,id){
       if(!isMeseEditabile(k)){
