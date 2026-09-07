@@ -148,15 +148,6 @@
     -webkit-backdrop-filter:blur(22px);
   }
 
-  .panel--news{max-height:360px;}
-  .newsScroll{
-    max-height:360px;
-    min-height:260px;
-    overflow-y:auto;
-    overflow-x:hidden;
-    padding:12px;
-  }
-
   .panelHeader{
     padding:14px 14px 10px;
     border-bottom:1px solid var(--line);
@@ -169,31 +160,7 @@ border-bottom:1px solid var(--tintBorder, var(--line));
   }
   .panelTitle{font-weight:950;font-size:18px}
   .panelSub{margin-top:6px}
-
-  .newsScroll::-webkit-scrollbar{width:4px}
-  .newsScroll::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:999px}
-  .newsScroll::-webkit-scrollbar-track{background:transparent}
-  #status{margin:10px 0 0}
-  #newsList{display:grid;gap:12px}
-  .newsItem{
-    display:block;
-    padding:12px;
-    border:1px solid var(--line);
-    border-radius:12px;
-    text-decoration:none;
-    color:inherit;
-    background:rgba(44,44,46,0.85);
-    transition:all .18s;
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-  }
-  .newsItem:hover{
-    border-color:rgba(0,122,255,0.55);
-    background:rgba(58,58,60,0.95);
-    transform:translateX(3px);
-  }
-
-  .weekTop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.weekTop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
   .weekDow{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase}
   .weekDay{font-size:16px;font-weight:950}
   .weekTasks{margin-top:2px;display:grid;gap:4px;overflow:hidden}
@@ -1207,7 +1174,6 @@ border-bottom:1px solid var(--tintBorder, var(--line));
 
   @media(max-width:980px){
     .layout{grid-template-columns:1fr}
-    .newsScroll{max-height:60vh}
     .brand{min-width:unset}
     .split3{grid-template-columns:1fr}
     .venditeListe{grid-template-columns:1fr}
@@ -1235,7 +1201,6 @@ border-bottom:1px solid var(--tintBorder, var(--line));
   }
 
   /* Left column panels */
-  #newsPanel{--tintTop:rgba(0,122,255,.14);--tintBorder:rgba(0,122,255,.26);}
   #preConsegnaPanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
   #postVenditaLeftPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
 
@@ -1285,25 +1250,6 @@ border-bottom:1px solid var(--tintBorder, var(--line));
     <div class="layout">
 
       <!-- SINISTRA: 3 card separate con gap --><aside style="display:flex;flex-direction:column;gap:16px;align-items:stretch;align-self:flex-start;">
-
-
-       <!-- NEWS -->
-<div class="panel panel--news tintedPanel" id="newsPanel">
-  <div class="panelHeader">
-    <div>
-      <div class="panelTitle">📰 Ultime News</div>
-      <div class="muted panelSub">Visibili solo dopo login.</div>
-      <div id="status" class="muted">Effettua il login per caricare le news.</div>
-    </div>
-    <div style="display:flex;gap:6px;align-items:center;">
-      <button id="refreshBtn" class="btn" disabled>🔄</button>
-      <button id="newsToggleBtn" class="btn" title="Mostra/Nascondi news" style="font-size:16px;font-weight:900;padding:6px 10px;min-width:32px;">−</button>
-    </div>
-  </div>
-  <div class="newsScroll" id="newsScrollBox">
-    <div id="newsList"></div>
-  </div>
-</div>
 
         <!-- PRE-CONSEGNA -->
         <div class="panel tintedPanel" id="preConsegnaPanel" style="position:static;margin-top:16px;">
@@ -1551,7 +1497,6 @@ border-bottom:1px solid var(--tintBorder, var(--line));
   }
 
   /* Left column panels */
-  #newsPanel{--tintTop:rgba(0,122,255,.14);--tintBorder:rgba(0,122,255,.26);}
   #preConsegnaPanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
   #postVenditaLeftPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
 
@@ -1771,7 +1716,6 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       getFirestore, doc, onSnapshot, setDoc, enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    const BACKEND_NEWS   = "/api/news";
     const BACKEND_CHAT   = "https://auto-backend-three.vercel.app/api/chat";
     const BACKEND_SEARCH = "https://auto-backend-three.vercel.app/api/search";
     const BRAND_LINKS = {
@@ -1790,19 +1734,8 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       measurementId:"G-WYM78KQWQJ"
     };
     const $ = id => document.getElementById(id);
-    const setStatus = t => { $("status").textContent = t; };
+    const setStatus = t => { console.log("[AI BOTT]", t); };
     function escapeHtml(s=""){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-    function safeHost(url){try{return new URL(url).hostname}catch{return""}}
-    function fmtDate(d){if(!d)return"";const dt=new Date(d);if(Number.isNaN(dt.getTime()))return String(d);return dt.toLocaleString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}
-    function renderItems(items){
-      const box=$("newsList");
-      if(!items||!items.length){box.innerHTML='<div class="muted" style="padding:20px;text-align:center">Nessuna news.</div>';setStatus("Nessuna news trovata.");return}
-      box.innerHTML=items.map(n=>{
-        const link=n.url||n.link||"",title=n.title||"Senza titolo",date=fmtDate(n.date||n.pubDate||""),host=safeHost(link);
-        return`<a class="newsItem" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer"><div class="newsTitle">${escapeHtml(title)}</div>${host?`<div class="newsMeta">🔗 ${escapeHtml(host)}</div>`:""}${date?`<div class="newsDate">🕒 ${escapeHtml(date)}</div>`:""}</a>`;
-      }).join("");
-      setStatus(`✅ ${items.length} news caricate • ${new Date().toLocaleString("it-IT")}`);
-    }
 
     const app=initializeApp(firebaseConfig);
     const auth=getAuth(app);
@@ -1815,22 +1748,6 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       try{await setPersistence(auth,browserLocalPersistence)}catch{try{await setPersistence(auth,browserSessionPersistence)}catch{}}
       try{await getRedirectResult(auth)}catch{}
     })();
-
-    async function loadNews(){
-      if(!auth.currentUser){$("newsList").innerHTML="";setStatus("🔒 Login per vedere le news.");return}
-      setStatus("⏳ Caricamento...");$("refreshBtn").disabled=true;
-      try{
-        const r=await fetch(BACKEND_NEWS,{method:"GET",headers:{"Cache-Control":"no-cache"},cache:"no-store"});
-        if(!r.ok)throw new Error(`HTTP ${r.status}`);
-        const data=await r.json();
-        if(data.items&&Array.isArray(data.items))renderItems(data.items);
-        else if(Array.isArray(data))renderItems(data);
-        else throw new Error("Formato non valido");
-      }catch(err){
-        $("newsList").innerHTML='<div class="muted" style="padding:20px;text-align:center">❌ Errore news</div>';
-        setStatus("❌ "+(err?.message||err));
-      }finally{$("refreshBtn").disabled=!auth.currentUser}
-    }
 
     $("loginBtn").addEventListener("click",async()=>{
       try{
@@ -1845,8 +1762,7 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
         setStatus("❌ "+msg);
       }
     });
-    $("logoutBtn").addEventListener("click",async()=>{try{await signOut(auth);$("newsList").innerHTML="";setStatus("👋 Logout.")}catch(e){setStatus("❌ "+e.message)}});
-    $("refreshBtn").addEventListener("click",loadNews);
+    $("logoutBtn").addEventListener("click",async()=>{try{await signOut(auth);setStatus("👋 Logout.")}catch(e){setStatus("❌ "+e.message)}});
     $("fiatBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Fiat,"_blank","noopener,noreferrer"));
     $("jeepBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Jeep,"_blank","noopener,noreferrer"));
     $("alfaBtn").addEventListener("click",()=>window.open(BRAND_LINKS.AlfaRomeo,"_blank","noopener,noreferrer"));
@@ -2491,7 +2407,6 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     }
 
 
-
     $("tipoBtnNuova").addEventListener("click",()=>{vendTipo="nuova";$("tipoBtnNuova").classList.add("active");$("tipoBtnUsata").classList.remove("active")});
     $("tipoBtnUsata").addEventListener("click",()=>{vendTipo="usata";$("tipoBtnUsata").classList.add("active");$("tipoBtnNuova").classList.remove("active")});
     $("vendAddBtn").addEventListener("click",addAuto);
@@ -2576,15 +2491,14 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         $("userPill").classList.remove("muted");
         $("userPill").style.borderColor="rgba(34,197,94,.5)";
         $("userPill").style.background="rgba(34,197,94,.1)";
-        $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";$("refreshBtn").disabled=false;
-        loadNews();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();
+        $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";
+        ();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();
         if(window._startObSync) window._startObSync(user);renderWeekCalendar();
       }else{
         $("userPill").textContent="🔒 Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor="";$("userPill").style.background="";
-        $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";$("refreshBtn").disabled=true;
-        $("newsList").innerHTML="";setStatus("🔒 Effettua il login per caricare le news.");
+        $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";
         stopPlannerSync();stopVenditeSync();stopTelSync();stopConsegneSync();stopPostSync();renderOggi();
         if(window._stopObSync) window._stopObSync();
       }
@@ -3404,22 +3318,7 @@ Sii diretto, pratico, motivante. Max 25 righe totali.`},
         btn.textContent = "🤖 Chiedi all'AI: \"Cosa devo fare oggi?\"";
       }
     });
-
-    /* ══ NEWS TOGGLE ══ */
-    (function(){
-      const btn = $("newsToggleBtn");
-      const box = $("newsScrollBox");
-      if(!btn||!box) return;
-      let visible = true;
-      btn.addEventListener("click", ()=>{
-        visible = !visible;
-        box.style.display = visible ? "" : "none";
-        btn.textContent   = visible ? "−" : "+";
-        btn.title         = visible ? "Nascondi news" : "Mostra news";
-      });
-    })();
-
-    /* ══ SMART HEADER ══ */
+/* ══ SMART HEADER ══ */
     (function(){
       const hdr=document.querySelector("header");
       let lastY=0,ticking=false;
