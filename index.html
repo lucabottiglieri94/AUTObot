@@ -2515,7 +2515,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     function vendUid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}
     function ensureMonth(k){if(!vendState.months[k])vendState.months[k]={nuove:[],usate:[]}}
     function sumProvv(list){return(list||[]).reduce((s,c)=>s+(Number(c.provv)||0),0)}
-    function fmtEur(n){return"€ "+n.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0})}
+    function fmtEur(n){return"€ "+Number(n||0).toLocaleString("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2})}
 
     function renderObiettivo(provvMese){
       const target=vendState.obiettivo||0;
@@ -2808,12 +2808,12 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
 
         ensureMonth(k);
         const mese=vendState.months[k];
-        // Se il mese contiene già importazioni PDF, le sostituiamo con i dati
-        // appena letti. In questo modo una rilettura corretta non lascia dentro
-        // le vecchie provvigioni sbagliate dell'OCR. Le eventuali vendite
-        // inserite manualmente (source diverso da "pdf") vengono mantenute.
-        mese.nuove=(mese.nuove||[]).filter(x=>x.source!=="pdf");
-        mese.usate=(mese.usate||[]).filter(x=>x.source!=="pdf");
+        // Il PDF è la fonte ufficiale del mese.
+        // Sostituiamo TUTTE le vecchie righe del mese, non solo quelle
+        // marcate source="pdf": i vecchi inserimenti manuali non devono
+        // essere sommati alle righe appena lette dal report.
+        mese.nuove=[];
+        mese.usate=[];
 
         let added=0;
         for(const row of rows){
@@ -2843,8 +2843,6 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
             ?` · ✓ totale PDF ${fmtEur(pdfTotal)}`
             :` · ⚠ PDF ${fmtEur(pdfTotal)} / calcolato ${fmtEur(calcolato)}`;
         }
-        if(skipped)msg+=` · ${skipped} già presenti`;
-
         status.textContent=msg;
       }catch(err){
         console.error("Import PDF vendite:",err);
