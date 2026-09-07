@@ -1217,6 +1217,29 @@ border-bottom:1px solid var(--tintBorder, var(--line));
   /* Fallback: each widgetPanel can opt-in by setting vars on its root */
   .widgetPanel{border-color:var(--tintBorder,var(--line));}
 
+
+  /* NEWS RSS — card coerente con il tema iMessage */
+  #newsPanel{--tintTop:rgba(59,130,246,.14);--tintBorder:rgba(96,165,250,.28);}
+  #newsList{max-height:390px;overflow:auto;display:flex;flex-direction:column;gap:9px;}
+  #newsList::-webkit-scrollbar{width:6px;}
+  #newsList::-webkit-scrollbar-thumb{background:rgba(148,163,184,.28);border-radius:99px;}
+  .newsItem{
+    display:block;text-decoration:none;color:#f1f5f9;
+    background:rgba(38,53,76,.78);
+    border:1px solid rgba(148,163,184,.16);
+    border-radius:20px;
+    padding:12px 14px;
+    transition:transform .16s ease,background .16s ease,border-color .16s ease;
+  }
+  .newsItem:hover{
+    transform:translateY(-1px);
+    background:rgba(47,65,91,.92);
+    border-color:rgba(96,165,250,.38);
+  }
+  .newsTitle{font-weight:850;font-size:13px;line-height:1.35;}
+  .newsMeta{font-size:11px;color:#93c5fd;margin-top:7px;}
+  .newsDate{font-size:10px;color:#94a3b8;margin-top:4px;}
+
 </style>
 
 </head>
@@ -1249,7 +1272,22 @@ border-bottom:1px solid var(--tintBorder, var(--line));
   <main class="wrap">
     <div class="layout">
 
-      <!-- SINISTRA: 3 card separate con gap --><aside style="display:flex;flex-direction:column;gap:16px;align-items:stretch;align-self:flex-start;">
+      <!-- SINISTRA: 3 card separate con gap -->
+
+
+        <!-- NEWS RSS GRATUITO -->
+        <div class="panel tintedPanel" id="newsPanel" style="position:static;">
+          <div class="tintedHeader">
+            <div>
+              <div style="font-weight:950;font-size:16px;">📰 Ultime News</div>
+              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">News automotive da RSS gratuito</div>
+              <div id="newsStatus" style="color:#9ca3af;font-size:12px;margin-top:5px;">Effettua il login per caricare le news.</div>
+            </div>
+            <button id="refreshNewsBtn" class="btn" disabled style="font-size:12px;padding:7px 10px;">↻ Aggiorna</button>
+          </div>
+          <div id="newsList" style="padding:10px;"></div>
+        </div>
+<aside style="display:flex;flex-direction:column;gap:16px;align-items:stretch;align-self:flex-start;">
 
         <!-- PRE-CONSEGNA -->
         <div class="panel tintedPanel" id="preConsegnaPanel" style="position:static;margin-top:16px;">
@@ -1750,16 +1788,25 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     })();
 
     $("loginBtn").addEventListener("click",async()=>{
+      if(auth.currentUser)return;
+      const btn=$("loginBtn");
       try{
-        setStatus("🔐 Apertura login...");
-        try{const r=await signInWithPopup(auth,provider);setStatus("✅ Login riuscito! "+r.user.email)}
-        catch(pe){
-          if(["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(pe.code)){setStatus("🔄 Reindirizzamento...");await signInWithRedirect(auth,provider)}
-          else throw pe;
-        }
+        btn.disabled=true;
+        setStatus("🔐 Apertura login Google...");
+        const r=await signInWithPopup(auth,provider);
+        setStatus("✅ Login riuscito: "+(r.user.email||"utente"));
       }catch(e){
-        let msg=e.code==="auth/unauthorized-domain"?"Dominio non autorizzato":e.code||e.message;
+        console.error("[AI BOTT] Login Google:",e);
+        let msg=e?.code||e?.message||"Errore sconosciuto";
+        if(e?.code==="auth/unauthorized-domain") msg="Dominio non autorizzato in Firebase";
+        else if(e?.code==="auth/popup-blocked") msg="Popup bloccato dal browser";
+        else if(e?.code==="auth/popup-closed-by-user") msg="Finestra Google chiusa";
+        else if(e?.code==="auth/cancelled-popup-request") msg="Richiesta login annullata";
+        else if(e?.code==="auth/operation-not-allowed") msg="Accesso Google non abilitato in Firebase";
+        else if(e?.code==="auth/network-request-failed") msg="Errore di rete";
         setStatus("❌ "+msg);
+      }finally{
+        btn.disabled=!!auth.currentUser;
       }
     });
     $("logoutBtn").addEventListener("click",async()=>{try{await signOut(auth);setStatus("👋 Logout.")}catch(e){setStatus("❌ "+e.message)}});
@@ -2484,6 +2531,91 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     document.getElementById("totCardNuove").addEventListener("click",()=>openAutoPopup("nuova"));
     document.getElementById("totCardUsate").addEventListener("click",()=>openAutoPopup("usata"));
 
+
+    /* ══ NEWS RSS GRATUITO ══
+       Fonte: Motor1.com Italia RSS.
+       rss2json viene usato solo come convertitore gratuito RSS → JSON,
+       senza Brave API e senza API key.
+    */
+    const NEWS_RSS = "https://it.motor1.com/rss/articles/all/";
+    const NEWS_PROXY = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(NEWS_RSS);
+
+    function newsEscape(s=""){
+      return String(s ?? "").replace(/[&<>"']/g,c=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+
+    function newsDate(value){
+      if(!value) return "";
+      const d = new Date(value);
+      if(Number.isNaN(d.getTime())) return String(value);
+      return d.toLocaleString("it-IT",{
+        day:"2-digit",month:"2-digit",year:"numeric",
+        hour:"2-digit",minute:"2-digit"
+      });
+    }
+
+    async function loadNews(){
+      const list = $("newsList");
+      const status = $("newsStatus");
+      const btn = $("refreshNewsBtn");
+      if(!list || !status || !btn) return;
+
+      if(!auth.currentUser){
+        list.innerHTML="";
+        status.textContent="Effettua il login per caricare le news.";
+        btn.disabled=true;
+        return;
+      }
+
+      btn.disabled=true;
+      status.textContent="⏳ Caricamento news...";
+      list.innerHTML='<div style="padding:18px;text-align:center;color:#94a3b8;font-size:12px;">Caricamento...</div>';
+
+      try{
+        const r = await fetch(NEWS_PROXY,{cache:"no-store"});
+        if(!r.ok) throw new Error("HTTP "+r.status);
+
+        const data = await r.json();
+        if(data.status !== "ok" || !Array.isArray(data.items)){
+          throw new Error(data.message || "RSS non disponibile");
+        }
+
+        const items = data.items.slice(0,8);
+
+        if(!items.length){
+          list.innerHTML='<div style="padding:18px;text-align:center;color:#94a3b8;font-size:12px;">Nessuna news disponibile.</div>';
+        }else{
+          list.innerHTML = items.map(item=>{
+            const link = item.link || item.guid || "#";
+            const title = item.title || "Senza titolo";
+            const date = newsDate(item.pubDate);
+            return `
+              <a class="newsItem" href="${newsEscape(link)}" target="_blank" rel="noopener noreferrer">
+                <div class="newsTitle">${newsEscape(title)}</div>
+                <div class="newsMeta">🔗 Motor1.com Italia</div>
+                ${date ? `<div class="newsDate">🕒 ${newsEscape(date)}</div>` : ""}
+              </a>`;
+          }).join("");
+        }
+
+        status.textContent=`✅ ${items.length} news caricate`;
+      }catch(err){
+        list.innerHTML=`
+          <div style="padding:18px;text-align:center;color:#fca5a5;font-size:12px;">
+            ❌ Impossibile caricare le news.<br>
+            <span style="color:#94a3b8;">Riprova tra qualche secondo.</span>
+          </div>`;
+        status.textContent="❌ Errore caricamento RSS";
+        console.warn("RSS News:",err);
+      }finally{
+        btn.disabled=!auth.currentUser;
+      }
+    }
+
+    $("refreshNewsBtn")?.addEventListener("click",loadNews);
+
     /* ══ AUTH STATE ══ */
     onAuthStateChanged(auth,user=>{
       if(user){
@@ -2491,14 +2623,14 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         $("userPill").classList.remove("muted");
         $("userPill").style.borderColor="rgba(34,197,94,.5)";
         $("userPill").style.background="rgba(34,197,94,.1)";
-        $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";
-        ();refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();
+        $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";$("refreshNewsBtn").disabled=false;loadNews();
+        refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();
         if(window._startObSync) window._startObSync(user);renderWeekCalendar();
       }else{
         $("userPill").textContent="🔒 Non autenticato";
         $("userPill").classList.add("muted");
         $("userPill").style.borderColor="";$("userPill").style.background="";
-        $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";
+        $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";$("refreshNewsBtn").disabled=true;$("newsList").innerHTML="";$("newsStatus").textContent="Effettua il login per caricare le news.";
         stopPlannerSync();stopVenditeSync();stopTelSync();stopConsegneSync();stopPostSync();renderOggi();
         if(window._stopObSync) window._stopObSync();
       }
