@@ -41,7 +41,8 @@
   }
 
   header{
-    position:fixed;top:0;left:0;right:0;z-index:10;
+    position:fixed;top:0;left:0;right:0;z-index:99999;
+    pointer-events:auto;
     background:rgba(18,18,18,0.78);
     backdrop-filter:blur(22px);
     -webkit-backdrop-filter:blur(22px);
@@ -65,6 +66,9 @@
   .brandMark{display:flex;align-items:center;gap:8px;user-select:none}
 
   .btn{
+    position:relative;
+    z-index:2;
+    pointer-events:auto;
     border:1px solid var(--line);
     background:rgba(44,44,46,0.75);
     color:var(--text);
@@ -1331,6 +1335,52 @@ border-bottom:1px solid var(--tintBorder, var(--line));
     </div>
   </header>
 
+  <!-- Fallback login: se il modulo Firebase principale non parte, il pulsante resta comunque funzionante. -->
+  <script>
+    (function(){
+      const btn=document.getElementById("loginBtn");
+      const pill=document.getElementById("userPill");
+      if(!btn) return;
+      window.__AI_BOTT_LOGIN_HANDLER_BOUND = window.__AI_BOTT_LOGIN_HANDLER_BOUND || false;
+      if(window.__AI_BOTT_LOGIN_HANDLER_BOUND) return;
+      window.__AI_BOTT_LOGIN_HANDLER_BOUND=true;
+      btn.addEventListener("click", async function(){
+        if(btn.disabled) return;
+        btn.disabled=true;
+        if(pill) pill.textContent="🔐 Apertura Google...";
+        try{
+          const [{initializeApp},{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect}]=await Promise.all([
+            import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js"),
+            import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js")
+          ]);
+          const cfg={apiKey:"AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",authDomain:"auto-1af60.firebaseapp.com",projectId:"auto-1af60",storageBucket:"auto-1af60.firebasestorage.app",messagingSenderId:"498320258984",appId:"1:498320258984:web:bac67d7634273d10464f9d"};
+          let app;
+          try{app=initializeApp(cfg,"loginFallback")}catch(e){app=e?.code==="app/duplicate-app"?undefined:null}
+          if(!app){
+            const apps=await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js");
+            app=apps.getApps().find(a=>a.name==="loginFallback") || apps.getApps()[0];
+          }
+          const auth=getAuth(app);
+          const provider=new GoogleAuthProvider();
+          provider.setCustomParameters({prompt:"select_account"});
+          try{await signInWithPopup(auth,provider)}
+          catch(e){
+            if(["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(e?.code)){
+              if(pill) pill.textContent="🔄 Reindirizzamento Google...";
+              await signInWithRedirect(auth,provider);
+              return;
+            }
+            throw e;
+          }
+        }catch(e){
+          console.error("[AI BOTT] Fallback login:",e);
+          if(pill) pill.textContent="❌ "+(e?.code||e?.message||"Errore login");
+          btn.disabled=false;
+        }
+      });
+    })();
+  </script>
+
   <main class="wrap">
     <div class="layout">
 
@@ -1890,9 +1940,12 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       try{await getRedirectResult(auth)}catch(e){console.warn("[AI BOTT] Redirect Google:",e)}
     })();
 
-    $("loginBtn").addEventListener("click",async()=>{
-      if(auth.currentUser)return;
-      const btn=$("loginBtn");
+    // Bind once: the fallback loader below uses the same global guard.
+    if(!window.__AI_BOTT_LOGIN_HANDLER_BOUND){
+      window.__AI_BOTT_LOGIN_HANDLER_BOUND=true;
+      $("loginBtn").addEventListener("click",async()=>{
+        if(auth.currentUser)return;
+        const btn=$("loginBtn");
       try{
         btn.disabled=true;
         $("userPill").textContent="🔐 Accesso Google...";
@@ -1928,10 +1981,11 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
           msg="Credenziali Google non valide";
 
         $("userPill").textContent="❌ "+msg;
-      }finally{
-        btn.disabled=!!auth.currentUser;
-      }
-    });
+        }finally{
+          btn.disabled=!!auth.currentUser;
+        }
+      });
+    }
 
     $("logoutBtn").addEventListener("click",async()=>{try{await signOut(auth);setStatus("👋 Logout.")}catch(e){setStatus("❌ "+e.message)}});
     $("fiatBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Fiat,"_blank","noopener,noreferrer"));
