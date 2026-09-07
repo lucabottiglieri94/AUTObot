@@ -2808,15 +2808,16 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
 
         ensureMonth(k);
         const mese=vendState.months[k];
-        const existingKeys=new Set(
-          [...(mese.nuove||[]),...(mese.usate||[])].map(x=>x.sourceKey).filter(Boolean)
-        );
+        // Se il mese contiene già importazioni PDF, le sostituiamo con i dati
+        // appena letti. In questo modo una rilettura corretta non lascia dentro
+        // le vecchie provvigioni sbagliate dell'OCR. Le eventuali vendite
+        // inserite manualmente (source diverso da "pdf") vengono mantenute.
+        mese.nuove=(mese.nuove||[]).filter(x=>x.source!=="pdf");
+        mese.usate=(mese.usate||[]).filter(x=>x.source!=="pdf");
 
-        let added=0, skipped=0;
+        let added=0;
         for(const row of rows){
           const sourceKey=`${row.contract}|${row.date}|${row.modello}|${row.provv}`;
-          if(existingKeys.has(sourceKey)){skipped++;continue;}
-
           const entry={
             id:vendUid(),
             modello:row.modello,
@@ -2827,7 +2828,6 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
           };
 
           (row.tipo==="usata"?mese.usate:mese.nuove).push(entry);
-          existingKeys.add(sourceKey);
           added++;
         }
 
@@ -2869,19 +2869,15 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         monthKey=`${mm[2]}-${String(mesi[mm[1].toLowerCase()]).padStart(2,"0")}`;
       }
 
-      // Cerca il totale generale anche se l'OCR lo ha separato dalla parola "Totale".
+      // Il "Tot:" in alto nel report Epson è il totale dei margini, NON
+      // delle provvigioni. Il totale provvigioni va quindi ricavato dalla
+      // somma delle singole righe riconosciute.
       let totalProvv=null;
-      for(let i=0;i<Math.min(lines.length,30);i++){
-        if(/totale/i.test(lines[i])){
-          const vals=[...lines[i].matchAll(/(\d{1,4}(?:[.]\d{3})?,\d{1,2})/g)]
-            .map(m=>parseMoneyIT(m[1]));
-          if(vals.length)totalProvv=vals[vals.length-1];
-        }
-      }
 
       // Normalizza gli errori OCR più comuni.
       const normalized=clean
         .replace(/\bCNO1\b/gi,"CN01")
+        .replace(/\bCNOI\b/gi,"CN01")
         .replace(/\bCUO1\b/gi,"CU01")
         .replace(/\bCVO1\b/gi,"CU01")
         .replace(/\bNum\s*\.?\s*/gi,"Num. ");
@@ -2890,7 +2886,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       // CU01 Num. XXXX del DD/MM/YYYY
       // Usiamo regex globale invece delle righe: l'OCR può spostare le colonne
       // su righe diverse.
-      const re=/\b(CN01|CU01)\s+Num\.?\s*(\d+)\s+del\s+(\d{2}\/\d{2}\/\d{4})/gi;
+      const re=/\b(CN01|CU01)\s+Num\.?\s*(\d+)\s+del\b[\s\S]{0,100}?\b(\d{2}\/\d{2}\/\d{4})\b/gi;
       const matches=[...normalized.matchAll(re)];
 
       const brands=[
@@ -2908,8 +2904,12 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         const next=i+1<matches.length?matches[i+1].index:normalized.length;
         const block=normalized.slice(m.index,next).replace(/\s+/g," ").trim();
 
-        // Importi presenti nella singola vendita. L'ultimo è la provvigione.
-        const money=[...block.matchAll(moneyRe)].map(x=>x[0]);
+        // Il report ha questa struttura: MARGINE → VEICOLO → PROVVIGIONE
+        // → PERCENTUALI. L'OCR precedente prendeva erroneamente una
+        // percentuale (es. 50,0%) come provvigione. Rimuoviamo prima tutte le
+        // percentuali e poi prendiamo l'ultimo importo monetario del blocco.
+        const blockNoPct=block.replace(/\b\d+(?:[.,]\d+)?%/g," ");
+        const money=[...blockNoPct.matchAll(moneyRe)].map(x=>x[0]);
         if(!money.length)continue;
 
         const provv=parseMoneyIT(money[money.length-1]);
@@ -2926,7 +2926,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         before=before
           .replace(m[0],"")
           .replace(/\b(?:Totale|BOTTI?GLIERI|LUCA)\b/gi," ")
-          .replace(/\b\d+(?:[.,]\d+)?%\b/g," ")
+          .replace(/\b\d+(?:[.,]\d+)?%/g," ")
           .replace(/\s+/g," ").trim();
 
         for(const brand of brands){
@@ -2969,32 +2969,45 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         });
       }
 
-      // Il PDF di esempio usa CU01 anche per le quattro vendite.
-      // Se il parser OCR ha letto il totale ma non le righe, prova una seconda
-      // strategia basata sulle quattro date + provvigioni.
+      // Fallback: se l'OCR ha spezzato la riga del contratto, usiamo le date
+      // come delimitatori. Per ogni vendita prendiamo gli importi compresi
+      // tra quella data e la data successiva, ignorando le percentuali. Nel
+      // report Epson il primo importo è il margine e l'ultimo è la provvigione.
       if(!out.length){
-        const dates=[...normalized.matchAll(/\b(\d{2}\/\d{2}\/\d{4})\b/g)].map(x=>x[1]);
-        const amounts=[...normalized.matchAll(moneyRe)].map(x=>x[0]);
-        const provs=amounts
-          .map(parseMoneyIT)
-          .filter(n=>Number.isFinite(n) && n<1000);
+        const dateMatches=[...normalized.matchAll(/\b(\d{2}\/\d{2}\/\d{4})\b/g)];
+        for(let i=0;i<dateMatches.length;i++){
+          const dm=dateMatches[i];
+          const date=dm[1];
+          const segEnd=i+1<dateMatches.length?dateMatches[i+1].index:normalized.length;
+          const segment=normalized.slice(dm.index,segEnd).replace(/\s+/g," ").trim();
+          const noPct=segment.replace(/\b\d+(?:[.,]\d+)?%/g," ");
+          const amounts=[...noPct.matchAll(moneyRe)].map(x=>x[0]);
+          if(amounts.length<2)continue;
+          const provv=parseMoneyIT(amounts[amounts.length-1]);
+          if(!Number.isFinite(provv))continue;
 
-        const candidates=[];
-        for(let i=0;i<dates.length;i++){
-          const date=dates[i];
-          const around=normalized.slice(
-            Math.max(0,(normalized.indexOf(date)-180)),
-            Math.min(normalized.length,normalized.indexOf(date)+350)
-          );
-          const local=[...around.matchAll(moneyRe)].map(x=>parseMoneyIT(x[0]));
-          const pv=local.filter(n=>Number.isFinite(n) && n<500).slice(-1)[0];
-          if(pv!=null)candidates.push({
-            tipo:"nuova",contract:String(i+1),date,modello:"Auto",provv:pv
-          });
-        }
+          // Recupera contratto dalla porzione immediatamente precedente alla data.
+          const beforeDate=normalized.slice(Math.max(0,dm.index-140),dm.index);
+          const cm=beforeDate.match(/\b(CN01|CU01)\s+Num\.?\s*(\d+)\s+del\b/i);
+          const tipo=cm&&cm[1].toUpperCase()==="CU01"?"usata":"nuova";
+          const contract=cm?cm[2]:String(i+1);
 
-        for(const c of candidates){
-          if(!out.some(x=>x.date===c.date&&x.provv===c.provv))out.push(c);
+          // Il modello si trova tra il primo importo (margine) e la provvigione.
+          const firstAmount=amounts[0];
+          const firstPos=noPct.indexOf(firstAmount);
+          const lastAmount=amounts[amounts.length-1];
+          const lastPos=noPct.lastIndexOf(lastAmount);
+          let modello=firstPos>=0&&lastPos>firstPos
+            ?noPct.slice(firstPos+firstAmount.length,lastPos).trim()
+            :"Auto";
+          modello=modello
+            .replace(/\b(?:CN01|CU01)\b/gi,"")
+            .replace(/\bNum\.?\s*\d+\b/gi,"")
+            .replace(/\bdel\b/gi,"")
+            .replace(/\s+/g," ").trim();
+
+          if(modello.length<2)modello="Auto";
+          out.push({tipo,contract,date,modello,provv});
         }
       }
 
@@ -3005,6 +3018,12 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         seen.add(key);
         return true;
       });
+
+      // Il totale mostrato dall'app deve essere il totale reale delle
+      // provvigioni delle righe, non il "Tot:" dei margini del PDF.
+      if(rows.length){
+        totalProvv=Math.round(rows.reduce((s,r)=>s+(Number(r.provv)||0),0)*100)/100;
+      }
 
       return {rows,monthKey,totalProvv};
     }
