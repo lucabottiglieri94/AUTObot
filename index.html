@@ -2947,8 +2947,6 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       e.target.value="";
     });
 
-    updateVendPdfButtons();
-
     async function deleteAuto(k,tipo,id){
       if(!isMeseEditabile(k)){
         alert("⏰ Questo mese è chiuso. Non puoi modificare le vendite.");
