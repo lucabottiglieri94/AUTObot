@@ -1883,11 +1883,11 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     const db=getFirestore(app);
     enableIndexedDbPersistence(db).catch(()=>{});
     const provider=new GoogleAuthProvider();
-    provider.setCustomParameters({prompt:"select_account",display:"popup"});
+    provider.setCustomParameters({prompt:"select_account"});
 
     (async function(){
       try{await setPersistence(auth,browserLocalPersistence)}catch{try{await setPersistence(auth,browserSessionPersistence)}catch{}}
-      try{await getRedirectResult(auth)}catch{}
+      try{await getRedirectResult(auth)}catch(e){console.warn("[AI BOTT] Redirect Google:",e)}
     })();
 
     $("loginBtn").addEventListener("click",async()=>{
@@ -1895,23 +1895,44 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       const btn=$("loginBtn");
       try{
         btn.disabled=true;
-        setStatus("🔐 Apertura login Google...");
-        const r=await signInWithPopup(auth,provider);
-        setStatus("✅ Login riuscito: "+(r.user.email||"utente"));
+        $("userPill").textContent="🔐 Accesso Google...";
+        $("userPill").classList.remove("muted");
+
+        try{
+          const r=await signInWithPopup(auth,provider);
+          console.log("[AI BOTT] Login Google riuscito:",r.user?.email);
+        }catch(popErr){
+          console.warn("[AI BOTT] Popup Google:",popErr);
+
+          // Se il popup è bloccato, usa automaticamente il redirect.
+          if(["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(popErr?.code)){
+            $("userPill").textContent="🔄 Reindirizzamento Google...";
+            await signInWithRedirect(auth,provider);
+            return;
+          }
+          throw popErr;
+        }
       }catch(e){
         console.error("[AI BOTT] Login Google:",e);
         let msg=e?.code||e?.message||"Errore sconosciuto";
-        if(e?.code==="auth/unauthorized-domain") msg="Dominio non autorizzato in Firebase";
-        else if(e?.code==="auth/popup-blocked") msg="Popup bloccato dal browser";
-        else if(e?.code==="auth/popup-closed-by-user") msg="Finestra Google chiusa";
-        else if(e?.code==="auth/cancelled-popup-request") msg="Richiesta login annullata";
-        else if(e?.code==="auth/operation-not-allowed") msg="Accesso Google non abilitato in Firebase";
-        else if(e?.code==="auth/network-request-failed") msg="Errore di rete";
-        setStatus("❌ "+msg);
+
+        if(e?.code==="auth/unauthorized-domain")
+          msg="Dominio non autorizzato in Firebase";
+        else if(e?.code==="auth/operation-not-allowed")
+          msg="Accesso Google non abilitato in Firebase";
+        else if(e?.code==="auth/network-request-failed")
+          msg="Errore di rete";
+        else if(e?.code==="auth/invalid-api-key")
+          msg="API Key Firebase non valida";
+        else if(e?.code==="auth/invalid-credential")
+          msg="Credenziali Google non valide";
+
+        $("userPill").textContent="❌ "+msg;
       }finally{
         btn.disabled=!!auth.currentUser;
       }
     });
+
     $("logoutBtn").addEventListener("click",async()=>{try{await signOut(auth);setStatus("👋 Logout.")}catch(e){setStatus("❌ "+e.message)}});
     $("fiatBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Fiat,"_blank","noopener,noreferrer"));
     $("jeepBtn").addEventListener("click",()=>window.open(BRAND_LINKS.Jeep,"_blank","noopener,noreferrer"));
@@ -3151,16 +3172,42 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         $("userPill").classList.remove("muted");
         $("userPill").style.borderColor="rgba(34,197,94,.5)";
         $("userPill").style.background="rgba(34,197,94,.1)";
-        $("loginBtn").style.display="none";$("logoutBtn").style.display="inline-block";$("refreshNewsBtn").disabled=false;loadNews();
-        refreshDayHeaders();startPlannerSync(user);startVenditeSync(user);startTelSync(user);startConsegneSync(user);startPostSync(user);renderOggi();
-        if(window._startObSync) window._startObSync(user);renderWeekCalendar();
+        $("loginBtn").style.display="none";
+        $("logoutBtn").style.display="inline-block";
+        if($("refreshNewsBtn"))$("refreshNewsBtn").disabled=false;
+
+        // Le funzioni secondarie non devono mai impedire al login di completarsi.
+        try{loadNews()}catch(e){console.warn("News:",e)}
+        try{refreshDayHeaders()}catch(e){console.warn("Planner headers:",e)}
+        try{startPlannerSync(user)}catch(e){console.warn("Planner:",e)}
+        try{startVenditeSync(user)}catch(e){console.warn("Vendite:",e)}
+        try{startTelSync(user)}catch(e){console.warn("Telefono:",e)}
+        try{startConsegneSync(user)}catch(e){console.warn("Consegne:",e)}
+        try{startPostSync(user)}catch(e){console.warn("Post vendita:",e)}
+        try{renderOggi()}catch(e){console.warn("Oggi:",e)}
+        try{if(window._startObSync)window._startObSync(user)}catch(e){console.warn("Obiettivo:",e)}
+        try{renderWeekCalendar()}catch(e){console.warn("Calendario:",e)}
+        try{updateVendPdfButtons()}catch(e){console.warn("PDF:",e)}
       }else{
         $("userPill").textContent="🔒 Non autenticato";
         $("userPill").classList.add("muted");
-        $("userPill").style.borderColor="";$("userPill").style.background="";
-        $("loginBtn").style.display="inline-block";$("logoutBtn").style.display="none";$("refreshNewsBtn").disabled=true;$("newsList").innerHTML="";$("newsStatus").textContent="Effettua il login per caricare le news.";
-        stopPlannerSync();stopVenditeSync();stopTelSync();stopConsegneSync();stopPostSync();renderOggi();
-        if(window._stopObSync) window._stopObSync();
+        $("userPill").style.borderColor="";
+        $("userPill").style.background="";
+        $("loginBtn").style.display="inline-block";
+        $("loginBtn").disabled=false;
+        $("logoutBtn").style.display="none";
+        if($("refreshNewsBtn"))$("refreshNewsBtn").disabled=true;
+        if($("newsList"))$("newsList").innerHTML="";
+        if($("newsStatus"))$("newsStatus").textContent="Effettua il login per caricare le news.";
+
+        try{stopPlannerSync()}catch{}
+        try{stopVenditeSync()}catch{}
+        try{stopTelSync()}catch{}
+        try{stopConsegneSync()}catch{}
+        try{stopPostSync()}catch{}
+        try{renderOggi()}catch{}
+        try{if(window._stopObSync)window._stopObSync()}catch{}
+        try{updateVendPdfButtons()}catch{}
       }
     });
 
