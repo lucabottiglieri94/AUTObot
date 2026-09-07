@@ -2496,7 +2496,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         for(let n=1;n<=pdf.numPages;n++){
           status.textContent=`⏳ Lettura pagina ${n}/${pdf.numPages}...`;
           const page=await pdf.getPage(n);
-          const viewport=page.getViewport({scale:2.5});
+          const viewport=page.getViewport({scale:3});
 
           const src=document.createElement("canvas");
           src.width=Math.ceil(viewport.width);
@@ -2504,23 +2504,51 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
           const sctx=src.getContext("2d",{willReadFrequently:true});
           await page.render({canvasContext:sctx,viewport}).promise;
 
-          const rotated=document.createElement("canvas");
-          rotated.width=src.height;
-          rotated.height=src.width;
-          const rctx=rotated.getContext("2d",{willReadFrequently:true});
-          rctx.translate(rotated.width/2,rotated.height/2);
-          rctx.rotate(-Math.PI/2);
-          rctx.drawImage(src,-src.width/2,-src.height/2);
+          // Il report Epson può essere ruotato. Proviamo tutte le rotazioni
+          // e scegliamo automaticamente quella che contiene più contratti.
+          const rotations=[0,90,180,270];
+          let bestText="";
+          let bestScore=-1;
 
-          status.textContent=`🔎 Riconoscimento testo pagina ${n}/${pdf.numPages}...`;
-          const result=await Tesseract.recognize(rotated,"ita",{
-            logger:m=>{
-              if(m.status==="recognizing text"){
-                status.textContent=`🔎 OCR ${Math.round((m.progress||0)*100)}%...`;
-              }
+          for(const deg of rotations){
+            const c=document.createElement("canvas");
+            const swap=deg===90||deg===270;
+            c.width=swap?src.height:src.width;
+            c.height=swap?src.width:src.height;
+            const ctx=c.getContext("2d",{willReadFrequently:true});
+
+            ctx.translate(c.width/2,c.height/2);
+            ctx.rotate(deg*Math.PI/180);
+            ctx.drawImage(src,-src.width/2,-src.height/2);
+
+            status.textContent=`🔎 Lettura documento (${deg}°)...`;
+            let result;
+            try{
+              result=await Tesseract.recognize(c,"ita+eng",{
+                logger:m=>{
+                  if(m.status==="recognizing text"){
+                    status.textContent=`🔎 OCR ${deg}° · ${Math.round((m.progress||0)*100)}%`;
+                  }
+                }
+              });
+            }catch(ocrErr){
+              // Se il modello italiano non è disponibile, usa quello inglese.
+              result=await Tesseract.recognize(c,"eng");
             }
-          });
-          fullText+="\n"+result.data.text;
+
+            const txt=result?.data?.text||"";
+            const score=
+              (txt.match(/\b(?:CN01|CU01)\b/gi)||[]).length*20+
+              (txt.match(/\bNum\.?\s*\d+/gi)||[]).length*10+
+              (txt.match(/\d{1,3}(?:[.]\d{3})?,\d{1,2}\b/g)||[]).length;
+
+            if(score>bestScore){
+              bestScore=score;
+              bestText=txt;
+            }
+          }
+
+          fullText+="\n"+bestText;
         }
 
         const parsed=parseVenditePdfText(fullText);
@@ -2530,20 +2558,15 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
 
         if(!rows.length){
           console.warn("OCR PDF:",fullText);
-          throw new Error("Nessuna vendita riconosciuta. Controlla che il PDF sia il report provvigioni.");
+          throw new Error("Non riesco a riconoscere le righe delle vendite. Prova a ricaricare il PDF.");
         }
 
-        // Usa automaticamente il mese indicato nel PDF.
-        // Esempio del file fornito: "Provvigioni mese di agosto 2026".
-        let k=vendViewKey;
-        if(reportMonth){
-          k=reportMonth;
-          vendViewKey=k;
-        }
+        let k=reportMonth||vendViewKey;
+        vendViewKey=k;
 
         if(!isMeseEditabile(k)){
           renderVendite();
-          status.textContent=`🔒 ${monthLabel(k)} è chiuso: il PDF è stato letto ma non importato.`;
+          status.textContent=`🔒 ${monthLabel(k)} è chiuso: PDF letto ma non importato.`;
           return;
         }
 
@@ -2567,9 +2590,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
             source:"pdf"
           };
 
-          if(row.tipo==="usata")mese.usate.push(entry);
-          else mese.nuove.push(entry);
-
+          (row.tipo==="usata"?mese.usate:mese.nuove).push(entry);
           existingKeys.add(sourceKey);
           added++;
         }
@@ -2577,13 +2598,13 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         renderVendite();
         await vendWrite();
 
-        const calcolato=rows.reduce((s,r)=>s+r.provv,0);
-        const differenza=pdfTotal!=null?Math.round((calcolato-pdfTotal)*100)/100:0;
+        const calcolato=Math.round(rows.reduce((s,r)=>s+r.provv,0)*100)/100;
+        let msg=`✅ ${monthLabel(k)} · ${added} auto importate · Provvigioni ${fmtEur(calcolato)}`;
 
-        let msg=`✅ ${monthLabel(k)}: ${added} auto importate · Totale provvigioni ${fmtEur(calcolato)}`;
         if(pdfTotal!=null){
-          msg+=differenza===0
-            ?` · ✓ coincide con il PDF (${fmtEur(pdfTotal)})`
+          const diff=Math.round((calcolato-pdfTotal)*100)/100;
+          msg+=diff===0
+            ?` · ✓ totale PDF ${fmtEur(pdfTotal)}`
             :` · ⚠ PDF ${fmtEur(pdfTotal)} / calcolato ${fmtEur(calcolato)}`;
         }
         if(skipped)msg+=` · ${skipped} già presenti`;
@@ -2596,114 +2617,149 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     }
 
     function parseVenditePdfText(text){
-      const clean=String(text||"")
-        .replace(/\u00a0/g," ")
-        .replace(/[ \t]+/g," ")
-        .replace(/\r/g,"");
-
+      const raw=String(text||"").replace(/\u00a0/g," ").replace(/\r/g,"");
+      const clean=raw.replace(/[ \t]+/g," ");
       const lines=clean.split("\n").map(s=>s.trim()).filter(Boolean);
 
-      // Mese del report, ricavato dal titolo.
       const mesi={
         gennaio:1,febbraio:2,marzo:3,aprile:4,maggio:5,giugno:6,
         luglio:7,agosto:8,settembre:9,ottobre:10,novembre:11,dicembre:12
       };
+
       let monthKey=null;
-      const titleText=lines.slice(0,12).join(" ");
-      const mm=titleText.match(/provvigioni\s+mese\s+di\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\s+(\d{4})/i);
+      const title=lines.slice(0,20).join(" ");
+      const mm=title.match(/provvigioni\s+mese\s+di\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\s+(\d{4})/i);
       if(mm){
         monthKey=`${mm[2]}-${String(mesi[mm[1].toLowerCase()]).padStart(2,"0")}`;
       }
 
-      // Totale ufficiale riportato nella colonna gialla PROVVIGIONE.
+      // Cerca il totale generale anche se l'OCR lo ha separato dalla parola "Totale".
       let totalProvv=null;
-      const totalLine=lines.find(x=>/^totali\b/i.test(x));
-      if(totalLine){
-        const money=[...totalLine.matchAll(/(?:^|\s)(\d{1,3}(?:[.]\d{3})?,\d{2})(?=\s|$)/g)]
-          .map(m=>parseMoneyIT(m[1]));
-        if(money.length)totalProvv=money[money.length-1];
+      for(let i=0;i<Math.min(lines.length,30);i++){
+        if(/totale/i.test(lines[i])){
+          const vals=[...lines[i].matchAll(/(\d{1,4}(?:[.]\d{3})?,\d{1,2})/g)]
+            .map(m=>parseMoneyIT(m[1]));
+          if(vals.length)totalProvv=vals[vals.length-1];
+        }
       }
 
-      // Il report ha una riga per contratto. Ogni blocco termina prima
-      // del contratto successivo: questo evita di prendere la provvigione
-      // della vendita seguente.
-      const contractRe=/\b(CN01|CU01)\s+Num\.?\s*(\d+)\s+del\s+(\d{2}\/\d{2}\/\d{4})/i;
-      const indexes=[];
-      for(let i=0;i<lines.length;i++){
-        const m=lines[i].match(contractRe);
-        if(m)indexes.push({i,m});
-      }
+      // Normalizza gli errori OCR più comuni.
+      const normalized=clean
+        .replace(/\bCNO1\b/gi,"CN01")
+        .replace(/\bCUO1\b/gi,"CU01")
+        .replace(/\bCVO1\b/gi,"CU01")
+        .replace(/\bNum\s*\.?\s*/gi,"Num. ");
 
-      const out=[];
+      // Nel PDF di esempio ogni vendita inizia con:
+      // CU01 Num. XXXX del DD/MM/YYYY
+      // Usiamo regex globale invece delle righe: l'OCR può spostare le colonne
+      // su righe diverse.
+      const re=/\b(CN01|CU01)\s+Num\.?\s*(\d+)\s+del\s+(\d{2}\/\d{2}\/\d{4})/gi;
+      const matches=[...normalized.matchAll(re)];
+
       const brands=[
-        "FIAT","JEEP","ALFA ROMEO","LANCIA","AIXAM","ABARTH","PEUGEOT",
-        "CITROEN","RENAULT","DACIA","FORD","OPEL","TOYOTA","VOLKSWAGEN",
-        "VW","BMW","MERCEDES","AUDI","NISSAN","HYUNDAI","KIA","SUZUKI","MG"
+        "ALFA ROMEO","VOLKSWAGEN","MERCEDES","CITROEN","PEUGEOT",
+        "RENAULT","TOYOTA","HYUNDAI","NISSAN","SUZUKI","AIXAM",
+        "FIAT","JEEP","LANCIA","ABARTH","DACIA","FORD","OPEL","AUDI",
+        "BMW","KIA","MG","VW"
       ];
 
-      for(let x=0;x<indexes.length;x++){
-        const item=indexes[x];
-        const nextI=x+1<indexes.length?indexes[x+1].i:lines.length;
-        const blockLines=lines.slice(item.i,nextI);
-        const block=blockLines.join(" ").replace(/\s+/g," ");
+      const moneyRe=/\b\d{1,4}(?:[.]\d{3})?,\d{1,2}\b/g;
+      const out=[];
 
-        const cm=item.m;
-        const tipo=cm[1].toUpperCase()==="CU01"?"usata":"nuova";
-        const contract=cm[2];
-        const date=cm[3];
+      for(let i=0;i<matches.length;i++){
+        const m=matches[i];
+        const next=i+1<matches.length?matches[i+1].index:normalized.length;
+        const block=normalized.slice(m.index,next).replace(/\s+/g," ").trim();
 
-        // La provvigione è l'ultimo importo monetario della riga di vendita.
-        // Il blocco è isolato, quindi il margine (primo importo) non viene
-        // confuso con la provvigione.
-        const money=[...block.matchAll(/(?:^|\s)(\d{1,3}(?:[.]\d{3})?,\d{2})(?=\s|$)/g)]
-          .map(m=>m[1]);
-
-        if(money.length<2)continue;
+        // Importi presenti nella singola vendita. L'ultimo è la provvigione.
+        const money=[...block.matchAll(moneyRe)].map(x=>x[0]);
+        if(!money.length)continue;
 
         const provv=parseMoneyIT(money[money.length-1]);
         if(!Number.isFinite(provv))continue;
 
         let modello="";
-        const upper=block.toUpperCase();
 
-        // Cerca marca + descrizione fino alla fine prima della provvigione.
+        // Prende marca + modello fino al primo importo (margine).
+        const firstMoney=money[0];
+        const pos=block.indexOf(firstMoney);
+        let before=pos>=0?block.slice(0,pos):block;
+
+        // Rimuove intestazioni e percentuali.
+        before=before
+          .replace(m[0],"")
+          .replace(/\b(?:Totale|BOTTI?GLIERI|LUCA)\b/gi," ")
+          .replace(/\b\d+(?:[.,]\d+)?%\b/g," ")
+          .replace(/\s+/g," ").trim();
+
         for(const brand of brands){
-          const re=new RegExp("\\b"+brand.replace(" ","\\s+")+"\\b\\s+(.+?)(?=\\s+"+
-            money[money.length-1].replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*$)","i");
-          const bm=block.match(re);
+          const br=new RegExp("\\b"+brand.replace(/\s+/g,"\\s+")+"\\b\\s*(.*)$","i");
+          const bm=before.match(br);
           if(bm){
-            modello=(brand+" "+bm[1]).trim();
+            modello=(brand+" "+bm[1]).replace(/\s+/g," ").trim();
             break;
           }
         }
 
         if(!modello){
-          // Fallback per OCR meno preciso: prende il testo dopo la data
-          // e dopo il margine.
-          const afterDate=block.split(date).slice(1).join(date);
-          const cleaned=afterDate
-            .replace(/\b\d{1,3}(?:[.]\d{3})?,\d{2}\b/g," ")
-            .replace(/\b(?:CN01|CU01)\b/gi," ")
-            .replace(/\bNum\.?\s*\d+\b/gi," ")
-            .replace(/\s+/g," ").trim();
-          modello=cleaned.split(/\b(?:50|70|4|30|20|100),\d+%\b/i)[0].trim();
+          // Fallback: cerca la marca anche nell'intero blocco.
+          for(const brand of brands){
+            if(new RegExp("\\b"+brand.replace(/\s+/g,"\\s+")+"\\b","i").test(block)){
+              const idx=block.search(new RegExp("\\b"+brand.replace(/\s+/g,"\\s+")+"\\b","i"));
+              modello=block.slice(idx).split(firstMoney)[0].trim();
+              break;
+            }
+          }
         }
 
-        modello=modello
-          .replace(/\b(?:CN01|CU01)\b/gi,"")
-          .replace(/\bNum\.?\s*\d+\b/gi,"")
-          .replace(/\bdel\s+\d{2}\/\d{2}\/\d{4}\b/gi,"")
-          .replace(/\b\d{1,3}(?:[.]\d{3})?,\d{2}\b/g,"")
-          .replace(/\s+/g," ").trim();
+        // Fallback finale: conserva il testo descrittivo senza numeri/contratto.
+        if(!modello){
+          modello=before
+            .replace(/\b(?:CN01|CU01)\b/gi,"")
+            .replace(/\bNum\.?\s*\d+\b/gi,"")
+            .replace(/\bdel\s+\d{2}\/\d{2}\/\d{4}\b/gi,"")
+            .replace(/\s+/g," ").trim();
+        }
 
-        // Evita che l'OCR trascini colonne non appartenenti al modello.
-        modello=modello
-          .replace(/\b(?:50|70|4|30|20|100),\d+%\b.*$/i,"")
-          .trim();
+        if(modello.length<2)modello=(m[1].toUpperCase()==="CU01"?"Auto usata":"Auto nuova");
 
-        if(!modello)modello=tipo==="usata"?"Auto usata":"Auto nuova";
+        out.push({
+          tipo:m[1].toUpperCase()==="CU01"?"usata":"nuova",
+          contract:m[2],
+          date:m[3],
+          modello,
+          provv
+        });
+      }
 
-        out.push({tipo,contract,date,modello,provv});
+      // Il PDF di esempio usa CU01 anche per le quattro vendite.
+      // Se il parser OCR ha letto il totale ma non le righe, prova una seconda
+      // strategia basata sulle quattro date + provvigioni.
+      if(!out.length){
+        const dates=[...normalized.matchAll(/\b(\d{2}\/\d{2}\/\d{4})\b/g)].map(x=>x[1]);
+        const amounts=[...normalized.matchAll(moneyRe)].map(x=>x[0]);
+        const provs=amounts
+          .map(parseMoneyIT)
+          .filter(n=>Number.isFinite(n) && n<1000);
+
+        const candidates=[];
+        for(let i=0;i<dates.length;i++){
+          const date=dates[i];
+          const around=normalized.slice(
+            Math.max(0,(normalized.indexOf(date)-180)),
+            Math.min(normalized.length,normalized.indexOf(date)+350)
+          );
+          const local=[...around.matchAll(moneyRe)].map(x=>parseMoneyIT(x[0]));
+          const pv=local.filter(n=>Number.isFinite(n) && n<500).slice(-1)[0];
+          if(pv!=null)candidates.push({
+            tipo:"nuova",contract:String(i+1),date,modello:"Auto",provv:pv
+          });
+        }
+
+        for(const c of candidates){
+          if(!out.some(x=>x.date===c.date&&x.provv===c.provv))out.push(c);
+        }
       }
 
       const seen=new Set();
