@@ -1442,7 +1442,7 @@ border-bottom:1px solid var(--tintBorder, var(--line));
             <!-- Barra finanziate -->
             <div>
               <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                <span style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">💳 Finanziate <span style="font-size:11px;color:#6b7280;font-weight:500;text-transform:none;">(obiettivo: 8 su 11 = 70%)</span></span>
+                <span style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">💳 Finanziate <span style="font-size:11px;color:#6b7280;font-weight:500;text-transform:none;">(obiettivo: 70% delle auto vendute)</span></span>
                 <span id="obProgFinTxt" style="font-size:13px;font-weight:900;color:#4ade80;">0 / 8 (0%)</span>
               </div>
               <div style="background:rgba(31,41,55,.7);border-radius:999px;height:12px;overflow:hidden;">
@@ -1643,6 +1643,7 @@ border-bottom:1px solid var(--tintBorder, var(--line));
             </div>
             <button type="button" id="vendAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
             <button type="button" id="vendPdfBtn" class="btn" style="flex-shrink:0;font-weight:700;border:1px solid rgba(96,165,250,.4);background:rgba(59,130,246,.10);color:#93c5fd;">📄 Importa PDF</button>
+            <button type="button" id="vendPdfReadBtn" class="btn" style="flex-shrink:0;font-weight:700;border:1px solid rgba(34,197,94,.35);background:rgba(34,197,94,.08);color:#86efac;">🔎 Leggi PDF</button>
             <button type="button" id="vendPdfDeleteImportBtn" class="btn" style="flex-shrink:0;font-weight:700;border:1px solid rgba(251,191,36,.35);background:rgba(245,158,11,.08);color:#fbbf24;">🧹 Cancella importazione</button>
             <input type="file" id="vendPdfInput" accept=".pdf,application/pdf" style="display:none;"/>
             <div id="vendPdfFileLabel" style="flex-basis:100%;font-size:11px;color:#9ca3af;margin-top:2px;">Nessun PDF selezionato.</div>
@@ -2131,7 +2132,7 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     }
 
     /* ══ IMPORT PDF PROVVIGIONI — REPORT BOTTIGLIERI: AUTO-IMPORT ══ */
-    const vendPdfBtn=$("vendPdfBtn"), vendPdfInput=$("vendPdfInput"), vendPdfDeleteImportBtn=$("vendPdfDeleteImportBtn"), vendPdfFileLabel=$("vendPdfFileLabel");
+    const vendPdfBtn=$("vendPdfBtn"), vendPdfReadBtn=$("vendPdfReadBtn"), vendPdfInput=$("vendPdfInput"), vendPdfDeleteImportBtn=$("vendPdfDeleteImportBtn"), vendPdfFileLabel=$("vendPdfFileLabel");
     let vendPdfSelectedFile=null;
 
     function setPdfFileLabel(file){
@@ -2355,6 +2356,25 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       if(!f) return;
       setPdfFileLabel(f);
       await importProvvPdf(f);
+    });
+
+    // Legge il PDF senza salvarlo: utile per verificare il risultato prima dell'importazione.
+    vendPdfReadBtn?.addEventListener("click",async()=>{
+      const f=vendPdfInput?.files?.[0]||null;
+      if(!f){ alert("📄 Seleziona prima un PDF con Importa PDF."); return; }
+      if(!auth.currentUser){ alert("🔒 Devi essere loggato per leggere il PDF."); return; }
+      vendPdfReadBtn.disabled=true;
+      vendPdfReadBtn.textContent="⏳ Lettura…";
+      try{
+        const parsed=await readProvvPdf(f);
+        const elenco=parsed.rows.map((r,i)=>`${i+1}. ${r.modello} — € ${r.provv.toFixed(2).replace(".",",")}`).join("\n");
+        alert(`🔎 PDF letto correttamente\n\n${elenco}\n\nTOTALE: € ${parsed.total.toFixed(2).replace(".",",")}`);
+      }catch(e){
+        alert("❌ Lettura PDF: "+(e?.message||e));
+      }finally{
+        vendPdfReadBtn.disabled=false;
+        vendPdfReadBtn.textContent="🔎 Leggi PDF";
+      }
     });
 
     // Unico pulsante di cancellazione: elimina SOLO le righe importate dal PDF del mese visualizzato.
@@ -3516,17 +3536,11 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         const pctFin   = totAuto>0 ? Math.round(totFin/totAuto*100) : 0;
 
         // Barre
-        // ── Obiettivi reali ──────────────────────────────────────────
-        // Auto totali: obiettivo fisso 11
-        // Finanziate:  obiettivo = 11 × 70% = 7.7 → arrotondato a 8
-        const OB_TARGET_FIN_AUTO = Math.round(OB_TARGET_AUTO * OB_TARGET_FIN / 100); // = 8
-
-        // Barra AUTO: quante auto vendute / 11
+        // Auto totali: obiettivo fisso 11.
+        // Finanziamenti: la percentuale mostrata è SEMPRE calcolata sulle auto realmente vendute.
+        // Esempio: 2 auto vendute, 1 finanziata = 50%.
         const pAuto = Math.min(totAuto / OB_TARGET_AUTO * 100, 100);
-
-        // Barra FINANZIAMENTO: quante auto finanziate / 8 (obiettivo)
-        // Esempio: 3 finanziate su 8 → 37.5%
-        const pFin  = Math.min(totFin / OB_TARGET_FIN_AUTO * 100, 100);
+        const pFin  = totAuto > 0 ? Math.round((totFin / totAuto) * 100) : 0;
 
         const colorAuto = pAuto>=100?"linear-gradient(90deg,#a855f7,#c084fc)":pAuto>=60?"linear-gradient(90deg,#22c55e,#4ade80)":"linear-gradient(90deg,#3b82f6,#60a5fa)";
         const colorFin  = pFin>=100?"linear-gradient(90deg,#a855f7,#c084fc)":pFin>=66?"linear-gradient(90deg,#22c55e,#4ade80)":pFin>=33?"linear-gradient(90deg,#eab308,#fbbf24)":"linear-gradient(90deg,#f97316,#fb923c)";
@@ -3534,8 +3548,8 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         document.getElementById("obProgAutoBar").style.cssText += ";width:"+pAuto+"%;background:"+colorAuto;
         document.getElementById("obProgAutoTxt").textContent   = totAuto+" / "+OB_TARGET_AUTO;
         document.getElementById("obProgFinBar").style.cssText  += ";width:"+pFin+"%;background:"+colorFin;
-        // Mostra: "3 / 8 finanziate (37%)"
-        document.getElementById("obProgFinTxt").textContent    = totFin+" / "+OB_TARGET_FIN_AUTO+" ("+Math.round(pFin)+"%)";
+        // Mostra la percentuale reale delle auto vendute che sono finanziate: "1 / 2 (50%)".
+        document.getElementById("obProgFinTxt").textContent    = totFin+" / "+totAuto+" ("+pFin+"%)";
 
         box.innerHTML = obState.settimane.map((sett,wi)=>{
           const isCurrent = wi===settimanaCorrente;
