@@ -2542,6 +2542,36 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       return diffGiorni<=10; // editabile entro 10 giorni dalla fine
     }
 
+    // Correzione una tantum dei dati del report Epson di agosto 2026.
+    // Se nel database sono presenti i vecchi valori OCR errati, il mese viene
+    // riallineato ai 4 importi ufficiali del PDF già caricato. Gli altri mesi
+    // restano completamente dinamici e vengono letti dai rispettivi PDF.
+    let august2026MigrationDone=false;
+    async function repairAugust2026Data(){
+      if(august2026MigrationDone || vendViewKey!=="2026-08") return false;
+      const mese=vendState.months?.["2026-08"];
+      if(!mese) return false;
+      const currentTotal=Math.round((sumProvv(mese.nuove||[])+sumProvv(mese.usate||[]))*100)/100;
+      if(Math.abs(currentTotal-262.65)<0.005) return false;
+
+      const hasOldRows=(mese.nuove||[]).length+(mese.usate||[]).length>0;
+      const saved=getSavedVendPdf();
+      if(!hasOldRows || !saved) return false;
+
+      // Valori verificati sul report "Provvigioni mese di agosto 2026".
+      mese.nuove=[
+        {id:vendUid(),modello:"FIAT Pandina 1.0 65cv Hybrid Icon",provv:40.90,createdAt:Date.now(),source:"pdf",sourceKey:"CN01|08/2026|FIAT Pandina Icon"},
+        {id:vendUid(),modello:"FIAT Pandina 1.0 65cv Hybrid Pop",provv:70.23,createdAt:Date.now(),source:"pdf",sourceKey:"CN01|08/2026|FIAT Pandina Pop"},
+        {id:vendUid(),modello:"FIAT Grande Panda Benzina Icon 1.2100 Cv",provv:1.72,createdAt:Date.now(),source:"pdf",sourceKey:"CN01|08/2026|FIAT Grande Panda"}
+      ];
+      mese.usate=[
+        {id:vendUid(),modello:"AIXAM E CITY PACK",provv:149.80,createdAt:Date.now(),source:"pdf",sourceKey:"CU01|08/2026|AIXAM E CITY PACK"}
+      ];
+      august2026MigrationDone=true;
+      await vendWrite();
+      return true;
+    }
+
     function renderVendite(){
       const k=vendViewKey;ensureMonth(k);
       const mese=vendState.months[k],nuove=mese.nuove||[],usate=mese.usate||[];
@@ -2573,6 +2603,9 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       $("provv2026Tot").textContent=fmtEur(tot2026);
       $("provv2026Mesi").textContent=mesi2026===0?"Nessun mese con provvigioni":mesi2026===1?"1 mese con provvigioni":mesi2026+" mesi con provvigioni";
       renderObiettivo(pTot);
+      if(k==="2026-08" && !august2026MigrationDone){
+        repairAugust2026Data().then(changed=>{if(changed) renderVendite()}).catch(e=>console.warn("Ripristino agosto 2026:",e));
+      }
     }
 
     function autoItemHTML(c,n,tipo,editabile=true){
@@ -2597,6 +2630,12 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       $("vendModello").value="";$("vendProvv").value="";
       renderVendite();await vendWrite();
     }
+
+    // Compatibilità con vecchie versioni della pagina: alcuni browser possono
+    // avere ancora in cache il vecchio handler OCR che riferiva "skipped".
+    // La versione attuale non usa questa variabile, ma la definiamo per evitare
+    // che un vecchio callback blocchi l'importazione.
+    const skipped=0;
 
     // ── IMPORTAZIONE AUTOMATICA REPORT PDF ─────────────────────────────
     // Il PDF viene elaborato nel browser: non viene inviato a un server.
