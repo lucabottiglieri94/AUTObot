@@ -4247,6 +4247,68 @@ document.body.removeChild(a);
 
   </script>
 
+  <!-- AUTH FALLBACK ROBUSTO: si attiva solo se il modulo principale non ha collegato il login -->
+  <script>
+  (function(){
+    function bootLoginFallback(){
+      const btn=document.getElementById("loginBtn");
+      if(!btn || window.__AI_BOTT_LOGIN_HANDLER_BOUND) return;
+      window.__AI_BOTT_LOGIN_FALLBACK=true;
+      btn.addEventListener("click", async function(){
+        if(window.__AI_BOTT_AUTH?.auth?.currentUser) return;
+        const pill=document.getElementById("userPill");
+        const diag=document.getElementById("authDiagnostic");
+        btn.disabled=true;
+        if(pill) pill.textContent="🔐 Apertura Google...";
+        try{
+          const mod=await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js");
+          const authMod=await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js");
+          const cfg={
+            apiKey:"AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",
+            authDomain:"auto-1af60.firebaseapp.com",
+            projectId:"auto-1af60",
+            storageBucket:"auto-1af60.firebasestorage.app",
+            messagingSenderId:"498320258984",
+            appId:"1:498320258984:web:bac67d7634273d10464f9d",
+            measurementId:"G-WYM78KQWQJ"
+          };
+          const app=mod.getApps().length ? mod.getApp() : mod.initializeApp(cfg);
+          const auth=authMod.getAuth(app);
+          const provider=new authMod.GoogleAuthProvider();
+          provider.setCustomParameters({prompt:"select_account"});
+          window.__AI_BOTT_AUTH={auth,provider,authMod};
+          await authMod.setPersistence(auth,authMod.browserLocalPersistence);
+          try{
+            if(pill) pill.textContent="🔐 Apertura Google...";
+            const r=await authMod.signInWithPopup(auth,provider);
+            if(pill) pill.textContent="☁️ Sync in corso...";
+            console.log("[AI BOTT] Login fallback riuscito",r.user?.email);
+          }catch(e){
+            if(["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(e?.code)){
+              if(pill) pill.textContent="🔄 Reindirizzamento Google...";
+              await authMod.signInWithRedirect(auth,provider);
+              return;
+            }
+            throw e;
+          }
+        }catch(e){
+          console.error("[AI BOTT] Login fallback:",e);
+          const code=e?.code||"";
+          let msg=code||e?.message||"Errore login Google";
+          if(code==="auth/unauthorized-domain") msg="Dominio non autorizzato: aggiungi il dominio GitHub Pages in Firebase > Authentication > Impostazioni > Domini autorizzati.";
+          if(code==="auth/operation-not-allowed") msg="Accesso Google non abilitato: abilita Google in Firebase > Authentication > Metodo di accesso.";
+          if(code==="auth/invalid-api-key") msg="API Key Firebase non valida.";
+          if(pill) pill.textContent="❌ Login non riuscito";
+          if(diag){diag.textContent=msg;diag.classList.add("show");}
+          btn.disabled=false;
+        }
+      }, {once:false});
+    }
+    if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",bootLoginFallback);
+    else bootLoginFallback();
+  })();
+  </script>
+
   <!-- POPUP AUTO VENDUTE -->
   <div id="autoPopupOverlay" class="autoPopupOverlay" style="display:none;" onclick="if(event.target===this)closeAutoPopup()">
     <div class="autoPopupBox">
