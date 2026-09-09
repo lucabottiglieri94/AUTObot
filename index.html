@@ -132,6 +132,13 @@
     -webkit-backdrop-filter:blur(14px);
   }
   .muted{color:var(--muted)}
+  .accountBox{display:flex;align-items:center;gap:9px;min-width:0;padding:5px 9px 5px 6px;border:1px solid var(--line);border-radius:999px;background:rgba(44,44,46,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .accountAvatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 30px;background:rgba(255,255,255,.10);font-size:15px;border:1px solid rgba(255,255,255,.12)}
+  .accountAvatar img{width:100%;height:100%;object-fit:cover}
+  .accountInfo{min-width:0;line-height:1.12}
+  .accountState{font-size:12px;font-weight:800;white-space:nowrap}
+  .accountEmail{font-size:10px;color:var(--muted);max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .accountBox.logged{border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.07)}
 
   .layout{
     margin-top:16px;
@@ -1326,575 +1333,21 @@ border-bottom:1px solid var(--tintBorder, var(--line));
             <img src="https://image2url.com/r2/default/images/1770805237740-1db65b1e-5553-4b5b-b28a-750e3520a0a2.png" alt="CentroAuto VT" class="centroAutoLogo"/>
           </a>
         </div>
-        <div class="row" style="gap:10px">
-          <span id="userPill" class="pill muted">Non autenticato</span>
-          <button id="loginBtn"  class="btn primary">Login Google</button>
-          <button id="logoutBtn" class="btn" style="display:none">Logout</button>
+        <div class="row" style="gap:10px;align-items:center">
+          <div id="accountBox" class="accountBox">
+            <div id="accountAvatar" class="accountAvatar">👤</div>
+            <div class="accountInfo">
+              <div id="accountState" class="accountState">🔒 Non loggato</div>
+              <div id="accountEmail" class="accountEmail">Accedi con Google per sincronizzare i tuoi dati</div>
+            </div>
+          </div>
+          <span id="userPill" class="pill muted">Sync non attivo</span>
+          <button id="loginBtn" class="btn primary">🔐 Login Google</button>
+          <button id="logoutBtn" class="btn" style="display:none">↪ Logout</button>
         </div>
       </div>
     </div>
   </header>
-
-  <!-- Fallback login: se il modulo Firebase principale non parte, il pulsante resta comunque funzionante. -->
-  <script>
-    (function(){
-      const btn=document.getElementById("loginBtn");
-      const pill=document.getElementById("userPill");
-      if(!btn) return;
-      window.__AI_BOTT_LOGIN_HANDLER_BOUND = window.__AI_BOTT_LOGIN_HANDLER_BOUND || false;
-      if(window.__AI_BOTT_LOGIN_HANDLER_BOUND) return;
-      window.__AI_BOTT_LOGIN_HANDLER_BOUND=true;
-      btn.addEventListener("click", async function(){
-        if(btn.disabled) return;
-        btn.disabled=true;
-        if(pill) pill.textContent="🔐 Apertura Google...";
-        try{
-          const [{initializeApp},{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect}]=await Promise.all([
-            import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js"),
-            import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js")
-          ]);
-          const cfg={apiKey:"AIzaSyALsFF_dpL39GlPfMyKBFIKtZi5coOk9I8",authDomain:"auto-1af60.firebaseapp.com",projectId:"auto-1af60",storageBucket:"auto-1af60.firebasestorage.app",messagingSenderId:"498320258984",appId:"1:498320258984:web:bac67d7634273d10464f9d"};
-          let app;
-          try{app=initializeApp(cfg,"loginFallback")}catch(e){app=e?.code==="app/duplicate-app"?undefined:null}
-          if(!app){
-            const apps=await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js");
-            app=apps.getApps().find(a=>a.name==="loginFallback") || apps.getApps()[0];
-          }
-          const auth=getAuth(app);
-          const provider=new GoogleAuthProvider();
-          provider.setCustomParameters({prompt:"select_account"});
-          try{await signInWithPopup(auth,provider)}
-          catch(e){
-            if(["auth/popup-blocked","auth/popup-closed-by-user","auth/cancelled-popup-request"].includes(e?.code)){
-              if(pill) pill.textContent="🔄 Reindirizzamento Google...";
-              await signInWithRedirect(auth,provider);
-              return;
-            }
-            throw e;
-          }
-        }catch(e){
-          console.error("[AI BOTT] Fallback login:",e);
-          if(pill) pill.textContent="❌ "+(e?.code||e?.message||"Errore login");
-          btn.disabled=false;
-        }
-      });
-    })();
-  </script>
-
-  <main class="wrap">
-    <div class="layout">
-
-      <!-- SINISTRA: 3 card separate con gap -->
-
-
-<aside style="display:flex;flex-direction:column;gap:16px;align-items:stretch;align-self:flex-start;">
-
-        <!-- NEWS RSS GRATUITO -->
-        <div class="panel tintedPanel" id="newsPanel" style="position:static;">
-          <div class="tintedHeader">
-            <div>
-              <div style="font-weight:950;font-size:16px;">📰 Ultime News</div>
-              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">News automotive da RSS gratuito</div>
-              <div id="newsStatus" style="color:#9ca3af;font-size:12px;margin-top:5px;">Effettua il login per caricare le news.</div>
-            </div>
-            <button id="refreshNewsBtn" class="btn" disabled style="font-size:12px;padding:7px 10px;">↻ Aggiorna</button>
-          </div>
-          <div id="newsList" style="padding:10px;"></div>
-        </div>
-
-
-        <!-- PRE-CONSEGNA -->
-        <div class="panel tintedPanel" id="preConsegnaPanel" style="position:static;">
-          <div class="tintedHeader">
-            <div>
-              <div style="font-weight:950;font-size:16px;">🚗 Pre-Consegna</div>
-              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Checklist consegne — sempre visibile</div>
-            </div>
-            <button id="consegnaClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completate</button>
-          </div>
-          <div style="padding:12px;">
-            <div class="consegnaFormRow">
-              <input id="consegnaCliente" class="consegnaInput" type="text" placeholder="Nome cliente"/>
-              <input id="consegnaModello" class="consegnaInput" type="text" placeholder="Modello"/>
-              <input id="consegnaData"    class="consegnaInput" type="date"/>
-              <button id="consegnaAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;white-space:nowrap;">+ Aggiungi</button>
-            </div>
-            <div id="consegnaList"></div>
-          </div>
-        </div>
-
-        <!-- POST VENDITA -->
-        <div class="panel tintedPanel" id="postVenditaLeftPanel" style="position:static;">
-          <div class="tintedHeader">
-            <div>
-              <div style="font-weight:950;font-size:16px;">⭐ Post-Vendita</div>
-              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Follow-up: intervista (2gg) · recensione (3gg)</div>
-            </div>
-            <button id="postClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci completati</button>
-          </div>
-          <div style="padding:12px 12px 16px;">
-            <div id="postList"></div>
-          </div>
-        </div>
-
-        <!-- MEMO -->
-        <div class="panel tintedPanel" id="memoPanel" style="position:static;">
-          <div class="tintedHeader">
-            <div>
-              <div style="font-weight:950;font-size:16px;">📝 Memo</div>
-              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Sincronizzate su Firebase.</div>
-            </div>
-            <button id="memoClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci barrate</button>
-          </div>
-          <div style="padding:12px 12px 16px;">
-            <div class="formRow" style="align-items:stretch;">
-              <textarea id="memoInput" class="field memoArea" placeholder="Scrivi una memo..."></textarea>
-              <button id="addMemoBtn" class="btn primary" type="button" style="align-self:flex-start;">Aggiungi</button>
-            </div>
-            <div style="margin-top:14px;"><div id="memoList" class="list" style="max-height:320px;"></div></div>
-            <div class="smallNote">Ctrl+Enter nella memo = aggiungi.</div>
-          </div>
-        </div>
-
-        <!-- COLPI DI TELEFONO -->
-        <div class="panel tintedPanel" id="telefonoPanel" style="position:static;">
-          <div class="tintedHeader">
-            <div>
-              <div style="font-weight:950;font-size:16px;">📞 Colpi di telefono</div>
-              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Chi spingere oggi, domani, prossima settimana.</div>
-            </div>
-            <button id="telClearDoneBtn" class="btn" style="font-size:12px;padding:6px 10px;">Pulisci chiamati</button>
-          </div>
-          <div style="padding:12px 12px 16px;">
-            <div class="telFormRow">
-              <input id="telNome"    class="telInput" type="text" placeholder="Nome (es: Marco R.)"/>
-              <input id="telModello" class="telInput" type="text" placeholder="Modello interesse" style="max-width:160px"/>
-              <div class="telSeg">
-                <button class="telBtn caldo   active" id="telBtnCaldo"  >🔥 Caldo</button>
-                <button class="telBtn tiepido"        id="telBtnTiepido">🌡 Tiepido</button>
-                <button class="telBtn freddo"         id="telBtnFreddo" >❄ Freddo</button>
-              </div>
-            </div>
-            <div class="telFormRow">
-              <div class="telWhenSeg">
-                <button class="telWhenBtn active" id="telWhenOggi">📅 Oggi</button>
-                <button class="telWhenBtn"        id="telWhenDomani">Domani</button>
-                <button class="telWhenBtn"        id="telWhenSettimana">Settimana</button>
-              </div>
-              <button id="telAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
-            </div>
-            <div class="telSection">
-              <div class="telSectionLabel">📅 Da chiamare oggi <span id="telCntOggi" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
-              <div id="telListOggi" class="telList"></div>
-            </div>
-            <div class="telSection">
-              <div class="telSectionLabel">🌅 Domani <span id="telCntDomani" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
-              <div id="telListDomani" class="telList"></div>
-            </div>
-            <div class="telSection">
-              <div class="telSectionLabel">📆 Prossima settimana <span id="telCntSettimana" style="font-size:10px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;padding:1px 7px;border-radius:999px;">0</span></div>
-              <div id="telListSettimana" class="telList"></div>
-            </div>
-          </div>
-        </div>
-
-      </aside>
-
-      <!-- DESTRA -->
-      <section style="padding:0;border:none;background:none;">
-
-        <!-- VISTA OGGI -->
-        <!-- ═══════════════════════════════════
-             OBIETTIVO MENSILE
-        ═══════════════════════════════════ -->
-        <div id="obiettivoPanel" style="background:var(--bg1);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:16px;">
-
-          <!-- Header -->
-          <div style="padding:14px 20px;background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(249,115,22,.07));border-bottom:1px solid rgba(251,191,36,.2);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-            <div>
-              <div style="font-weight:950;font-size:18px;">🎯 Obiettivo Mensile</div>
-              <div style="color:#9ca3af;font-size:12px;margin-top:3px;">Target: <strong style="color:#fbbf24;">11 auto</strong> · di cui <strong style="color:#4ade80;">70% finanziate</strong> · 3+3+3+2 a settimana</div>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <button id="obAddBtn" style="background:linear-gradient(135deg,rgba(251,191,36,.2),rgba(249,115,22,.15));border:1px solid rgba(251,191,36,.4);border-radius:10px;padding:8px 16px;color:#fbbf24;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;">+ Auto</button>
-            </div>
-          </div>
-
-          <!-- Settimane -->
-          <div id="obSettimaneListe" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;"></div>
-
-          <!-- Barre progresso -->
-          <div style="padding:14px 20px;border-top:1px solid var(--line);background:rgba(0,0,0,.15);display:flex;flex-direction:column;gap:12px;">
-
-            <!-- Barra consegnate -->
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                <span style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">🚗 Auto consegnate</span>
-                <span id="obProgAutoTxt" style="font-size:13px;font-weight:900;color:#60a5fa;">0 / 11</span>
-              </div>
-              <div style="background:rgba(31,41,55,.7);border-radius:999px;height:12px;overflow:hidden;">
-                <div id="obProgAutoBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#3b82f6,#60a5fa);transition:width .5s cubic-bezier(.4,0,.2,1);width:0%;"></div>
-              </div>
-            </div>
-
-            <!-- Barra finanziate -->
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-                <span style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;">💳 Finanziate <span style="font-size:11px;color:#6b7280;font-weight:500;text-transform:none;">(obiettivo: 8 su 11 = 70%)</span></span>
-                <span id="obProgFinTxt" style="font-size:13px;font-weight:900;color:#4ade80;">0 / 8 (0%)</span>
-              </div>
-              <div style="background:rgba(31,41,55,.7);border-radius:999px;height:12px;overflow:hidden;">
-                <div id="obProgFinBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#22c55e,#4ade80);transition:width .5s cubic-bezier(.4,0,.2,1);width:0%;"></div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- ids nascosti per compatibilità renderOggi -->
-        <div style="display:none">
-          <div id="oggiDateLabel"></div>
-          <div id="oggiSummaryBox"><div id="oggiSummaryText"></div></div>
-          <div id="oggiListaTel"></div><div id="oggiListaTask"></div>
-          <div id="oggiListaPost"></div><div id="oggiListaVendite"></div>
-          <div id="oggiKpiChiamate"></div><div id="oggiKpiCaldi"></div>
-          <div id="oggiKpiConsegne"></div><div id="oggiKpiTask"></div>
-          <button id="oggiRiepilogoBtn"></button>
-        </div>
-
-        <!-- COMPARATORE -->
-        <div id="comparatorePanel" class="tintedPanel" style="background:var(--bg1);border:1px solid var(--tintBorder,var(--line));border-radius:16px;overflow:hidden;">
-          <div class="tintedHeader" style="padding:13px 18px;">
-            <div>
-              <div style="font-weight:950;font-size:18px">⚔ Comparatore Auto</div>
-              <div style="color:#9ca3af;font-size:13px;margin-top:4px">Confronta due auto nuove — cerca sui configuratori ufficiali</div>
-            </div>
-            <button id="cmpResetBtn" class="btn" style="font-size:12px;padding:7px 12px;">↩ Reset</button>
-          </div>
-          <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.5);display:flex;gap:10px;flex-wrap:wrap;">
-            <input id="cmpInput1" type="text" placeholder="Es: Grande Panda, Compass, Stelvio..."
-              style="flex:1;min-width:180px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
-              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='rgba(255,255,255,.07)'"/>
-            <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;font-weight:700;">VS</div>
-            <input id="cmpInput2" type="text" placeholder="Es: Junior, Avenger, Ypsilon..."
-              style="flex:1;min-width:180px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
-              onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#1f2937'"/>
-            <button id="cmpBtn" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);border:none;border-radius:10px;padding:10px 20px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit;">🔎 Confronta</button>
-          </div>
-          <div style="padding:10px 18px;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;">
-            <span style="color:#9ca3af;font-size:12px;align-self:center;">Rapido:</span>
-            <button class="cmpSuggest" data-s1="Grande Panda" data-s2="Junior">Grande Panda vs Junior</button>
-            <button class="cmpSuggest" data-s1="Compass" data-s2="Tonale">Compass vs Tonale</button>
-            <button class="cmpSuggest" data-s1="Stelvio" data-s2="Renegade">Stelvio vs Renegade</button>
-            <button class="cmpSuggest" data-s1="Ypsilon" data-s2="Avenger">Ypsilon vs Avenger</button>
-          </div>
-          <div id="cmpResults" style="padding:16px;min-height:120px;">
-            <div style="text-align:center;color:var(--muted);padding:30px 0;font-size:14px;">↑ Scrivi il modello e premi Confronta</div>
-          </div>
-        </div>
-<!-- ══ ANALISI GARANZIE ══ -->
-<div style="background:rgba(17,24,39,.78);border:1px solid #1f2937;border-radius:16px;overflow:hidden;margin-top:16px;" id="garanziePanel">
-  <div style="padding:16px 20px;border-bottom:1px solid rgba(31,41,55,.75);background:linear-gradient(180deg,rgba(139,92,246,.12),rgba(10,12,18,.35) 70%);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-    <div>
-      <div style="font-weight:950;font-size:18px;">🛡 Analisi Garanzie</div>
-      <div style="color:#9ca3af;font-size:13px;margin-top:4px;">Carica il PDF della garanzia → AI estrae tutto e genera il sunto Word</div>
-    </div>
-    <span style="font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid rgba(139,92,246,.4);background:rgba(139,92,246,.12);color:#d8b4fe;white-space:nowrap;">✨ AI Powered</span>
-  </div>
-  <div style="padding:16px 20px;">
-
-    <!-- TABS -->
-    <div style="display:flex;border:1px solid rgba(31,41,55,.9);background:rgba(17,24,39,.35);border-radius:12px;overflow:hidden;margin-bottom:16px;">
-      <button id="garTabNuova"   onclick="switchGarTab('nuova')"   style="flex:1;border:none;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(167,139,250,.18));color:#d8b4fe;padding:9px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;">📄 Nuova Analisi</button>
-      <button id="garTabStorico" onclick="switchGarTab('storico')" style="flex:1;border:none;background:transparent;color:#9ca3af;padding:9px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;">📋 Storico</button>
-      <button id="garTabGuida"   onclick="switchGarTab('guida')"   style="flex:1;border:none;background:transparent;color:#9ca3af;padding:9px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;">💡 Guida</button>
-    </div>
-
-    <!-- TAB NUOVA -->
-    <div id="garContentNuova">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-        <input id="garNome"    type="text" placeholder="👤 Nome Cliente (es: Mario Rossi)"         style="background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:9px 13px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;width:100%;transition:border-color .2s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#1f2937'"/>
-        <input id="garModello" type="text" placeholder="🚗 Modello auto (es: Jeep Compass 2024)"  style="background:rgba(31,41,55,.6);border:1px solid #1f2937;border-radius:10px;padding:9px 13px;color:#e5e7eb;font-size:13px;outline:none;font-family:inherit;width:100%;transition:border-color .2s;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#1f2937'"/>
-      </div>
-
-      <!-- DROP ZONE -->
-      <div id="garDropZone" onclick="document.getElementById('garFileInput').click()" style="border:2px dashed rgba(139,92,246,.4);background:rgba(139,92,246,.06);border-radius:14px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:14px;">
-        <input type="file" id="garFileInput" accept=".pdf,application/pdf" style="display:none;"/>
-        <div id="garDropIcon" style="font-size:36px;margin-bottom:8px;">📄</div>
-        <div id="garDropTitle" style="font-size:14px;font-weight:700;color:#d8b4fe;margin-bottom:4px;">Trascina il PDF qui oppure clicca per selezionare</div>
-        <div style="font-size:12px;color:#9ca3af;">Garanzia, contratto, libretto — max 20MB</div>
-        <div id="garFileLabel" style="display:none;font-size:12px;color:#6ee7b7;margin-top:8px;font-weight:700;"></div>
-      </div>
-
-      <!-- BOTTONE ANALIZZA -->
-      <button id="garAnalizzaBtn" disabled onclick="garAnalizza()"
-        style="width:100%;padding:13px;background:linear-gradient(135deg,rgba(139,92,246,.28),rgba(167,139,250,.2));border:1px solid rgba(139,92,246,.5);border-radius:12px;color:#d8b4fe;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;opacity:.5;">
-        <span id="garBtnIcon">🔍</span>
-        <span id="garBtnTxt">Inserisci nome cliente e carica un PDF</span>
-      </button>
-
-      <!-- LOADING -->
-      <div id="garLoading" style="display:none;margin-bottom:16px;text-align:center;">
-        <div style="font-size:13px;color:#d8b4fe;margin-bottom:8px;"><span id="garLoadMsg">⏳ Analisi in corso...</span></div>
-        <div style="width:100%;height:4px;background:rgba(31,41,55,.5);border-radius:999px;overflow:hidden;">
-          <div style="height:100%;width:60%;background:linear-gradient(90deg,#8b5cf6,#a78bfa,#8b5cf6);background-size:200% 100%;border-radius:999px;animation:garLoad 1.5s infinite linear;"></div>
-        </div>
-      </div>
-      <style>@keyframes garLoad{0%{background-position:200% 0}100%{background-position:-200% 0}}
-  /* PANEL TINT SYSTEM (Post-Vendita style, but unique per panel) */
-  .tintedPanel{background:var(--panel);border:1px solid var(--tintBorder,var(--line));border-radius:18px;overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.75);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);}
-  .tintedHeader{padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
-    background:linear-gradient(180deg,var(--tintTop,rgba(255,255,255,.06)), rgba(10,12,18,.95) 70%);
-    border-bottom:1px solid var(--tintBorder,var(--line));
-  }
-
-  /* Left column panels */
-  #preConsegnaPanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
-  #postVenditaLeftPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
-
-  /* Common widget panels (right side) */
-  #agendaPanel{--tintTop:rgba(255,149,0,.14);--tintBorder:rgba(255,149,0,.26);}
-  #memoPanel{--tintTop:rgba(168,85,247,.14);--tintBorder:rgba(168,85,247,.26);}
-  #telefonoPanel{--tintTop:rgba(59,130,246,.14);--tintBorder:rgba(59,130,246,.26);}
-  #consegnePanel{--tintTop:rgba(34,197,94,.14);--tintBorder:rgba(34,197,94,.28);}
-  #postPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.28);}
-  #obiettivoPanel{--tintTop:rgba(251,191,36,.14);--tintBorder:rgba(251,191,36,.26);}
-  #comparatorePanel{--tintTop:rgba(239,68,68,.12);--tintBorder:rgba(239,68,68,.22);}
-  #venditePanel{--tintTop:rgba(34,197,94,.12);--tintBorder:rgba(34,197,94,.22);}
-
-  /* Fallback: each widgetPanel can opt-in by setting vars on its root */
-  .widgetPanel{border-color:var(--tintBorder,var(--line));}
-
-</style>
-
-      <!-- RISULTATO -->
-      <div id="garResultBox"></div>
-    </div>
-
-    <!-- TAB STORICO -->
-    <div id="garContentStorico" style="display:none;">
-      <div id="garStoricoBox">
-        <div style="text-align:center;padding:32px 20px;color:#9ca3af;">
-          <div style="font-size:40px;margin-bottom:10px;opacity:.5;">📂</div>
-          <div style="font-size:13px;">Nessuna garanzia analizzata ancora.<br>Usa "Nuova Analisi" per iniziare!</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB GUIDA -->
-    <div id="garContentGuida" style="display:none;">
-      <div style="display:grid;gap:12px;">
-        <div style="padding:14px 16px;border:1px solid rgba(139,92,246,.3);border-radius:12px;background:rgba(139,92,246,.07);">
-          <div style="font-weight:900;font-size:14px;color:#d8b4fe;margin-bottom:8px;">📋 Passo 1 — Inserisci i dati</div>
-          <div style="font-size:13px;color:#e5e7eb;line-height:1.6;">Scrivi il <strong>nome e cognome del cliente</strong> e il <strong>modello dell'auto</strong>.</div>
-        </div>
-        <div style="padding:14px 16px;border:1px solid rgba(59,130,246,.3);border-radius:12px;background:rgba(59,130,246,.07);">
-          <div style="font-weight:900;font-size:14px;color:#93c5fd;margin-bottom:8px;">📄 Passo 2 — Carica il PDF</div>
-          <div style="font-size:13px;color:#e5e7eb;line-height:1.6;">Trascina o clicca per caricare il documento PDF della garanzia (max 20MB).</div>
-        </div>
-        <div style="padding:14px 16px;border:1px solid rgba(34,197,94,.3);border-radius:12px;background:rgba(34,197,94,.07);">
-          <div style="font-weight:900;font-size:14px;color:#6ee7b7;margin-bottom:8px;">🤖 Passo 3 — Analisi AI</div>
-          <div style="font-size:13px;color:#e5e7eb;line-height:1.6;">L'AI estrae: data inizio, durata, cosa è coperto, cosa è escluso, condizioni principali.</div>
-        </div>
-        <div style="padding:14px 16px;border:1px solid rgba(249,115,22,.3);border-radius:12px;background:rgba(249,115,22,.07);">
-          <div style="font-weight:900;font-size:14px;color:#fdba74;margin-bottom:8px;">📥 Passo 4 — Scarica Word</div>
-          <div style="font-size:13px;color:#e5e7eb;line-height:1.6;">Ottieni un <strong>.doc</strong> formattato con nome cliente in evidenza, pronto da consegnare o archiviare.</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-<!-- FINE ANALISI GARANZIE -->
-        <!-- VENDITE MENSILI -->
-        <div class="venditePanel" id="venditePanel">
-          <div class="venditeHeader">
-            <div class="venditeTitleRow">
-              <div class="venditeTitle">🚗 Vendite mensili</div>
-              <span id="venditeSyncBadge" class="venditeSyncBadge">Sync —</span>
-            </div>
-            <div class="venditeNav">
-<button class="navArrow" id="vendPrevBtn">&#8249;</button>
-<div class="venditeMonthLabel" id="vendMonthLabel">—</div>
-<button class="navArrow" id="vendNextBtn">&#8250;</button>
-            </div>
-          </div>
-          <div class="venditeTotali">
-            <div class="totCard" id="totCardNuove" style="cursor:pointer;" title="Clicca per vedere le auto nuove">
-              <div class="totLabel">🆕 Nuove</div><div class="totNum nuova" id="totNuove">0</div>
-              <div style="font-size:10px;color:#60a5fa;margin-top:4px;">👆 clicca per vedere</div>
-            </div>
-            <div class="totCard" id="totCardUsate" style="cursor:pointer;" title="Clicca per vedere le auto usate">
-              <div class="totLabel">🔄 Usate</div><div class="totNum usata" id="totUsate">0</div>
-              <div style="font-size:10px;color:#f97316;margin-top:4px;">👆 clicca per vedere</div>
-            </div>
-            <div class="totCard"><div class="totLabel">📦 Totale</div><div class="totNum all" id="totAll">0</div></div>
-          </div>
-          <div class="pdfImportBox" id="pdfImportBox">
-            <div class="pdfImportLeft">
-              <div class="pdfImportIcon">📄</div>
-              <div>
-                <div class="pdfImportTitle">Importa report provvigioni PDF</div>
-                <div class="pdfImportSub">Carica il PDF: il sistema legge automaticamente auto, tipo e provvigione e aggiorna il mese.</div>
-              </div>
-            </div>
-            <div class="pdfImportActions">
-              <label class="btn pdfImportBtn" for="vendPdfInput">📥 Carica PDF</label>
-              <button id="openVendPdfBtn" class="btn" type="button" disabled>👁 Apri PDF</button>
-              <button id="deleteVendPdfBtn" class="btn" type="button" disabled>🗑 Cancella salvataggio</button>
-              <input id="vendPdfInput" type="file" accept="application/pdf,.pdf" hidden/>
-            </div>
-            <div id="vendPdfStatus" class="pdfImportStatus">Nessun PDF caricato.</div>
-          </div>
-          <!-- liste nascoste, dati visibili nel popup cliccando sui totali -->
-          <div style="display:none"><div id="listNuove"></div><div id="listUsate"></div><span id="cntNuove"></span><span id="cntUsate"></span></div>
-          <div class="venditeProvvBar">
-            <div class="provvMeseGroup">
-              <div class="provvMeseLabel">💰 Provvigioni del mese</div>
-              <div class="provvMeseNum" id="provvMeseTot">€ 0</div>
-              <div class="provvMeseSplit" id="provvMeseSplit"></div>
-            </div>
-          </div>
-          <div class="vendite2026Bar">
-            <div class="bar2026Left">
-              <div class="bar2026Icon">🏆</div>
-              <div>
-                <div class="bar2026Title">Totale provvigioni 2026</div>
-                <div class="bar2026Sub">Somma cumulativa di tutti i mesi</div>
-              </div>
-            </div>
-            <div class="bar2026Right">
-              <div class="bar2026Num" id="provv2026Tot">€ 0</div>
-              <div class="bar2026Mesi" id="provv2026Mesi">0 mesi con provvigioni</div>
-            </div>
-          </div>
-          <div class="obiettivoBar">
-            <div class="obiettivoHead">
-              <div class="obiettivoLeft">
-                <div class="obiettivoIcon">🎯</div>
-                <div>
-                  <div class="obiettivoTitle">Obiettivo mensile</div>
-                  <div class="obiettivoSub">Imposta il tuo target provvigioni per questo mese</div>
-                </div>
-              </div>
-              <div class="obiettivoRight">
-                <span class="obiettivoInputLabel">Target €</span>
-                <input id="obiettivoInput" type="number" class="obiettivoInput" placeholder="es. 3000" min="0" step="100"/>
-              </div>
-            </div>
-            <div class="progressWrap"><div class="progressFill low" id="progressFill" style="width:0%"></div></div>
-            <div class="progressMeta">
-              <span class="progressPct low" id="progressPct">0%</span>
-              <span class="progressManca" id="progressManca">Imposta un obiettivo ↑</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- AGENDA + MEMO + TELEFONO -->
-        <div class="widgetStack">
-          <div class="widgetPanel" id="agendaPanel">
-            <div class="widgetHeader">
-              <div>
-                <div class="widgetTitle">📅 Agenda 3 giorni</div>
-                <div class="widgetSub">Task sincronizzati su Firebase.</div>
-              </div>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                <span id="syncBadge" class="syncBadge warn">Sync: non attivo</span>
-                <button id="agendaClearDoneBtn" class="btn" style="font-size:12px;padding:7px 12px;">Pulisci fatti</button>
-              </div>
-            </div>
-            <div class="widgetBody">
-              <div class="formRow">
-                <input id="taskInput" class="field" type="text" placeholder="Scrivi un task..."/>
-                <div class="seg">
-                  <button id="dayBtn0" class="active" type="button">Oggi</button>
-                  <button id="dayBtn1" type="button">Domani</button>
-                  <button id="dayBtn2" type="button">+2</button>
-                </div>
-                <button id="addTaskBtn" class="btn primary" type="button">Aggiungi</button>
-              </div>
-              <div class="split3" style="margin-top:14px;">
-                <div class="dayCol">
-                  <div class="dayHead"><span id="dayLabel0">Oggi</span><span id="dayDate0" class="dayMeta"></span></div>
-                  <div id="taskList0" class="list"></div>
-                </div>
-                <div class="dayCol">
-                  <div class="dayHead" style="background:rgba(59,130,246,.04);"><span id="dayLabel1">Domani</span><span id="dayDate1" class="dayMeta"></span></div>
-                  <div id="taskList1" class="list"></div>
-                </div>
-                <div class="dayCol">
-                  <div class="dayHead" style="background:rgba(59,130,246,.06);"><span id="dayLabel2">+2 giorni</span><span id="dayDate2" class="dayMeta"></span></div>
-                  <div id="taskList2" class="list"></div>
-                </div>
-              </div>
-              <div class="smallNote">Se fai login su telefono, vedi gli stessi task e memo.</div>
-            </div>
-          </div>
-
-
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <!-- CHATBOT -->
-  <div class="chatTrigger" id="chatTrigger">
-    <img src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI Agent"/>
-  </div>
-  <div class="chatBox" id="chatBox">
-    <img id="chatMinimizedLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI Agent" style="display:none;width:70px;height:70px;object-fit:contain;cursor:pointer;"/>
-    <div class="chatHeader">
-      <div class="chatHeaderLeft">
-        <img class="chatHeaderLogo" src="https://image2url.com/r2/default/images/1770729951588-711e8f2c-9f48-4ef1-9af3-be4b1f7b5d9f.png" alt="AI"/>
-        <div><div class="chatHeaderTitle">AI BOTT Assistant</div><div class="chatHeaderSub">Esperto configurazioni</div></div>
-      </div>
-      <div class="chatHeaderBtns">
-        <button class="chatHeaderBtn" id="minimizeBtn">−</button>
-        <button class="chatHeaderBtn" id="closeBtn">×</button>
-      </div>
-    </div>
-    <div class="chatMessages" id="chatMessages">
-      <div class="message ai"><div class="messageBubble">👋 Ciao! Sono AI BOTT.
-Posso aiutarti con auto nuove (Fiat, Jeep, Alfa, Lancia) e usate (CentroAuto VT).
-Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div>
-    </div>
-    <div class="chatInput">
-      <input type="text" class="chatInputField" id="chatInputField" placeholder="Scrivi..." autocomplete="off"/>
-      <button class="chatSendBtn" id="chatSendBtn">➤</button>
-    </div>
-  </div>
-
-  <!-- PDF + OCR: lettura automatica dei report provvigioni -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-  <div id="vendPdfViewer" class="pdfViewerOverlay">
-    <div class="pdfViewerCard">
-      <div class="pdfViewerHead">
-        <div>
-          <div class="pdfViewerTitle">📄 Report provvigioni</div>
-          <div id="vendPdfViewerName" style="font-size:11px;color:#94a3b8;margin-top:3px;">PDF salvato</div>
-        </div>
-        <button id="closeVendPdfBtn" class="btn" type="button">✕ Chiudi</button>
-      </div>
-      <div class="pdfViewerBody">
-        <iframe id="vendPdfFrame" title="Report provvigioni PDF"></iframe>
-      </div>
-    </div>
-  </div>
-
-  <div id="vendPdfDeleteConfirm" class="pdfDeleteConfirm">
-    <div class="pdfDeleteCard">
-      <div style="font-size:18px;font-weight:900;">🗑 Cancellare il salvataggio?</div>
-      <div style="font-size:12px;color:#aab4c3;line-height:1.5;margin-top:8px;">
-        Verrà cancellato il PDF salvato e, se confermi, anche le vendite importate da quel PDF nel mese.
-      </div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px;">
-        <button id="cancelDeleteVendPdfBtn" class="btn" type="button">Annulla</button>
-        <button id="confirmDeleteVendPdfBtn" class="btn" type="button" style="border-color:rgba(248,113,113,.4);">Cancella tutto</button>
-      </div>
-    </div>
-  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -2044,12 +1497,35 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
     function normalizePlanner(p){
       return{tasks:(p&&typeof p.tasks==="object"&&p.tasks)?p.tasks:{},memos:(p&&typeof p.memos==="object"&&p.memos)?p.memos:{}};
     }
-    async function writePlanner(next){if(!SYNC.docRef)return;await setDoc(SYNC.docRef,next,{merge:false}).catch(()=>{})}
+    function firebaseErr(e){
+      const code=e?.code||"";
+      if(code==="permission-denied") return "Permesso Firebase negato: controlla le Firestore Rules.";
+      if(code==="failed-precondition") return "Firestore non disponibile in questa scheda/browser.";
+      if(code==="unavailable") return "Firebase temporaneamente non raggiungibile.";
+      return e?.message||code||"Errore Firebase";
+    }
+    async function writePlanner(next){
+      if(!SYNC.docRef) throw new Error("Sync planner non attivo");
+      await setDoc(SYNC.docRef,next,{merge:false});
+    }
     async function safeWrite(fn){
-      if(!SYNC.docRef)return;
+      if(!SYNC.docRef || !SYNC.ready){
+        setSyncBadge("warn");
+        console.warn("[AI BOTT] Planner non ancora sincronizzato: operazione non salvata.");
+        return;
+      }
+      const prev=JSON.parse(JSON.stringify(SYNC.data));
       const next=fn(JSON.parse(JSON.stringify(SYNC.data)));
       SYNC.data=next;renderTasksAndMemos();renderWeekCalendar();
-      try{await writePlanner(next)}catch{}
+      try{
+        await writePlanner(next);
+        setSyncBadge("ok");
+      }catch(e){
+        SYNC.data=prev;renderTasksAndMemos();renderWeekCalendar();
+        setSyncBadge("warn");
+        console.error("[AI BOTT] Salvataggio planner fallito:",e);
+        alert("❌ Non riesco a salvare su Firebase.\n"+firebaseErr(e));
+      }
     }
     function cleanupOldTasks(data){
       const limitKey=dateKey(addDays(new Date(),-30));
@@ -2208,12 +1684,24 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       stopPlannerSync();
       SYNC.docRef=doc(db,"users",user.uid,"planner","main");
       setSyncBadge("...");
-      SYNC.unsub=onSnapshot(SYNC.docRef,snap=>{
-        const data=snap.exists()?snap.data():{tasks:{},memos:{}};
-        SYNC.data=normalizePlanner(data);SYNC.data=cleanupOldTasks(SYNC.data);SYNC.ready=true;
-        setSyncBadge("ok");renderTasksAndMemos();renderWeekCalendar();
-        if(!snap.exists())setDoc(SYNC.docRef,SYNC.data,{merge:false}).catch(()=>{});
-      },()=>setSyncBadge("warn"));
+      SYNC.unsub=onSnapshot(SYNC.docRef,async snap=>{
+        try{
+          const data=snap.exists()?snap.data():{tasks:{},memos:{}};
+          SYNC.data=normalizePlanner(data);SYNC.data=cleanupOldTasks(SYNC.data);
+          renderTasksAndMemos();renderWeekCalendar();
+          if(!snap.exists()) await setDoc(SYNC.docRef,SYNC.data,{merge:false});
+          SYNC.ready=true;
+          setSyncBadge("ok");
+          renderTasksAndMemos();renderWeekCalendar();
+        }catch(e){
+          SYNC.ready=false;setSyncBadge("warn");
+          console.error("[AI BOTT] Inizializzazione planner fallita:",e);
+          alert("❌ Firebase non permette il salvataggio di Agenda/Memo.\n"+firebaseErr(e));
+        }
+      },e=>{
+        SYNC.ready=false;setSyncBadge("warn");
+        console.error("[AI BOTT] Sync planner:",e);
+      });
     }
     function stopPlannerSync(){
       if(SYNC.unsub){try{SYNC.unsub()}catch{}}
@@ -2614,7 +2102,10 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       return`<div class="autoItem"><span class="autoN">#${n}</span><span class="autoModello">${escapeHtml(c.modello)}</span><span class="${cls}">${pStr}</span>${delBtn}</div>`;
     }
 
-    async function vendWrite(){if(!vendDocRef)return;try{await setDoc(vendDocRef,vendState,{merge:false})}catch{}}
+    async function vendWrite(){
+      if(!vendDocRef) throw new Error("Sync vendite non attivo");
+      await setDoc(vendDocRef,vendState,{merge:false});
+    }
     async function addAuto(){
       const modello=$("vendModello").value.trim();if(!modello)return;
       const k=vendViewKey;
@@ -3093,12 +2584,24 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       if(vendUnsub){try{vendUnsub()}catch{}}
       vendDocRef=doc(db,"users",user.uid,"vendite","data");
       setSyncVendite("sync");
-      vendUnsub=onSnapshot(vendDocRef,snap=>{
-        if(snap.exists()){const d=snap.data();vendState={months:d.months||{},obiettivo:d.obiettivo||0}}
-        else{vendState={months:{},obiettivo:0}}
-        ensureMonth(TODAY_KEY);setSyncVendite("ok");renderVendite();
-        if(!snap.exists())setDoc(vendDocRef,vendState,{merge:false}).catch(()=>{});
-      },()=>setSyncVendite("warn"));
+      vendUnsub=onSnapshot(vendDocRef,async snap=>{
+        try{
+          if(snap.exists()){const d=snap.data();vendState={months:d.months||{},obiettivo:d.obiettivo||0}}
+          else{vendState={months:{},obiettivo:0}}
+          ensureMonth(TODAY_KEY);renderVendite();
+          if(!snap.exists()) await setDoc(vendDocRef,vendState,{merge:false});
+          setSyncVendite("ok");
+          renderVendite();
+        }catch(e){
+          console.error("[AI BOTT] Inizializzazione vendite fallita:",e);
+          setSyncVendite("warn");
+          const st=$("vendPdfStatus"); if(st) st.textContent="❌ Firebase: "+firebaseErr(e);
+        }
+      },e=>{
+        console.error("[AI BOTT] Sync vendite:",e);
+        setSyncVendite("warn");
+        const st=$("vendPdfStatus"); if(st) st.textContent="❌ Firebase: "+firebaseErr(e);
+      });
     }
     function stopVenditeSync(){
       if(vendUnsub){try{vendUnsub()}catch{}}
@@ -3119,10 +2622,15 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     $("vendModello").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
     $("vendProvv").addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();addAuto()}});
     $("obiettivoInput").addEventListener("input",async()=>{
+      const prev=JSON.parse(JSON.stringify(vendState));
       vendState.obiettivo=parseFloat($("obiettivoInput").value)||0;
       const k=vendViewKey;ensureMonth(k);const m=vendState.months[k];
       renderObiettivo(sumProvv(m.nuove||[])+sumProvv(m.usate||[]));
-      await vendWrite();
+      try{await vendWrite()}catch(e){
+        vendState=prev;renderVendite();
+        console.error("[AI BOTT] Salvataggio obiettivo fallito:",e);
+        alert("❌ Non riesco a salvare su Firebase.\n"+firebaseErr(e));
+      }
     });
 
     ensureMonth(TODAY_KEY);renderVendite();
@@ -3277,47 +2785,26 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
 
     /* ══ AUTH STATE ══ */
     onAuthStateChanged(auth,user=>{
+      const accountBox=$("accountBox"), accountAvatar=$("accountAvatar"), accountState=$("accountState"), accountEmail=$("accountEmail");
+      const userPill=$("userPill"), loginBtn=$("loginBtn"), logoutBtn=$("logoutBtn");
       if(user){
-        $("userPill").textContent="✅ "+(user.email||"Utente");
-        $("userPill").classList.remove("muted");
-        $("userPill").style.borderColor="rgba(34,197,94,.5)";
-        $("userPill").style.background="rgba(34,197,94,.1)";
-        $("loginBtn").style.display="none";
-        $("logoutBtn").style.display="inline-block";
+        const displayName=user.displayName||"Account Google", email=user.email||"Account Google";
+        userPill.textContent="☁️ Sync in corso…"; userPill.classList.remove("muted"); userPill.style.borderColor="rgba(34,197,94,.35)"; userPill.style.background="rgba(34,197,94,.08)";
+        accountBox.classList.add("logged"); accountState.textContent="✅ Loggato con Google"; accountEmail.textContent=email; accountEmail.title=email;
+        accountAvatar.innerHTML=user.photoURL?`<img src="${escapeHtml(user.photoURL)}" alt="">`:(displayName.trim()[0]||"👤").toUpperCase();
+        loginBtn.style.display="none"; logoutBtn.style.display="inline-block";
         if($("refreshNewsBtn"))$("refreshNewsBtn").disabled=false;
-
-        // Le funzioni secondarie non devono mai impedire al login di completarsi.
-        try{loadNews()}catch(e){console.warn("News:",e)}
-        try{refreshDayHeaders()}catch(e){console.warn("Planner headers:",e)}
-        try{startPlannerSync(user)}catch(e){console.warn("Planner:",e)}
-        try{startVenditeSync(user)}catch(e){console.warn("Vendite:",e)}
-        try{startTelSync(user)}catch(e){console.warn("Telefono:",e)}
-        try{startConsegneSync(user)}catch(e){console.warn("Consegne:",e)}
-        try{startPostSync(user)}catch(e){console.warn("Post vendita:",e)}
-        try{renderOggi()}catch(e){console.warn("Oggi:",e)}
-        try{if(window._startObSync)window._startObSync(user)}catch(e){console.warn("Obiettivo:",e)}
-        try{renderWeekCalendar()}catch(e){console.warn("Calendario:",e)}
-        try{updateVendPdfButtons()}catch(e){console.warn("PDF:",e)}
+        try{loadNews()}catch(e){console.warn("News:",e)} try{refreshDayHeaders()}catch(e){console.warn("Planner headers:",e)}
+        try{startPlannerSync(user)}catch(e){console.warn("Planner:",e)} try{startVenditeSync(user)}catch(e){console.warn("Vendite:",e)}
+        try{startTelSync(user)}catch(e){console.warn("Telefono:",e)} try{startConsegneSync(user)}catch(e){console.warn("Consegne:",e)}
+        try{startPostSync(user)}catch(e){console.warn("Post vendita:",e)} try{renderOggi()}catch(e){console.warn("Oggi:",e)}
+        try{if(window._startObSync)window._startObSync(user)}catch(e){console.warn("Obiettivo:",e)} try{renderWeekCalendar()}catch(e){console.warn("Calendario:",e)} try{updateVendPdfButtons()}catch(e){console.warn("PDF:",e)}
       }else{
-        $("userPill").textContent="🔒 Non autenticato";
-        $("userPill").classList.add("muted");
-        $("userPill").style.borderColor="";
-        $("userPill").style.background="";
-        $("loginBtn").style.display="inline-block";
-        $("loginBtn").disabled=false;
-        $("logoutBtn").style.display="none";
-        if($("refreshNewsBtn"))$("refreshNewsBtn").disabled=true;
-        if($("newsList"))$("newsList").innerHTML="";
-        if($("newsStatus"))$("newsStatus").textContent="Effettua il login per caricare le news.";
-
-        try{stopPlannerSync()}catch{}
-        try{stopVenditeSync()}catch{}
-        try{stopTelSync()}catch{}
-        try{stopConsegneSync()}catch{}
-        try{stopPostSync()}catch{}
-        try{renderOggi()}catch{}
-        try{if(window._stopObSync)window._stopObSync()}catch{}
-        try{updateVendPdfButtons()}catch{}
+        userPill.textContent="🔒 Sync non attivo"; userPill.classList.add("muted"); userPill.style.borderColor=""; userPill.style.background="";
+        accountBox.classList.remove("logged"); accountState.textContent="🔒 Non loggato"; accountEmail.textContent="Accedi con Google per sincronizzare i tuoi dati"; accountEmail.title=""; accountAvatar.innerHTML="👤";
+        loginBtn.style.display="inline-block"; loginBtn.disabled=false; logoutBtn.style.display="none";
+        if($("refreshNewsBtn"))$("refreshNewsBtn").disabled=true; if($("newsList"))$("newsList").innerHTML=""; if($("newsStatus"))$("newsStatus").textContent="Effettua il login per caricare le news.";
+        try{stopPlannerSync()}catch{} try{stopVenditeSync()}catch{} try{stopTelSync()}catch{} try{stopConsegneSync()}catch{} try{stopPostSync()}catch{} try{renderOggi()}catch{} try{if(window._stopObSync)window._stopObSync()}catch{} try{updateVendPdfButtons()}catch{}
       }
     });
 
