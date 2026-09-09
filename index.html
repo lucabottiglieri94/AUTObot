@@ -1634,13 +1634,16 @@ border-bottom:1px solid var(--tintBorder, var(--line));
             <div class="totCard"><div class="totLabel">📦 Totale</div><div class="totNum all" id="totAll">0</div></div>
           </div>
           <div class="venditeForm">
+            <input id="vendData" type="date" class="fld" title="Data vendita" style="max-width:155px;min-width:140px;"/>
             <input id="vendModello" type="text" class="fld" placeholder="Modello auto (es: Jeep Compass…)" style="min-width:160px;"/>
-            <input id="vendProvv"   type="number" class="fld" placeholder="Provvigione €" min="0" step="1" style="max-width:140px;min-width:110px;"/>
+            <input id="vendProvv" type="number" class="fld" placeholder="Provvigione €" min="0" step="0.01" style="max-width:140px;min-width:110px;"/>
             <div class="tipoSeg">
-              <button class="tipoBtn nuova active" id="tipoBtnNuova">🆕 Nuova</button>
-              <button class="tipoBtn usata"        id="tipoBtnUsata">🔄 Usata</button>
+              <button type="button" class="tipoBtn nuova active" id="tipoBtnNuova">🆕 Nuova</button>
+              <button type="button" class="tipoBtn usata" id="tipoBtnUsata">🔄 Usata</button>
             </div>
-            <button id="vendAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
+            <button type="button" id="vendAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
+            <button type="button" id="vendPdfBtn" class="btn" style="flex-shrink:0;font-weight:700;border:1px solid rgba(96,165,250,.4);background:rgba(59,130,246,.10);color:#93c5fd;">📄 Importa PDF</button>
+            <input type="file" id="vendPdfInput" accept=".pdf,application/pdf" style="display:none;"/>
           </div>
           <!-- liste nascoste, dati visibili nel popup cliccando sui totali -->
           <div style="display:none"><div id="listNuove"></div><div id="listUsate"></div><span id="cntNuove"></span><span id="cntUsate"></span></div>
@@ -1771,18 +1774,26 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       getFirestore, doc, onSnapshot, setDoc, enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    // NEWS: RSS Motor1 filtrato esclusivamente per Fiat, Jeep, Mazda, Alfa Romeo e Lancia.
-    // Usiamo RSS2JSON solo come convertitore RSS -> JSON: nessuna API key richiesta.
-    const NEWS_RSS = "https://it.motor1.com/rss/articles/all/";
-    const NEWS_PROXY = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(NEWS_RSS);
+    // NEWS: feed RSS mirati per le sole marche richieste.
+    // Usiamo Google News RSS con filtro sul dominio Motor1 Italia, poi RSS2JSON solo per convertire XML -> JSON.
+    const NEWS_QUERIES = [
+      'Fiat site:it.motor1.com when:7d',
+      'Jeep site:it.motor1.com when:7d',
+      'Mazda site:it.motor1.com when:7d',
+      'Alfa Romeo site:it.motor1.com when:7d',
+      'Lancia site:it.motor1.com when:7d'
+    ];
+    const NEWS_RSS_FEEDS = NEWS_QUERIES.map(q =>
+      'https://news.google.com/rss/search?q=' + encodeURIComponent(q) + '&hl=it&gl=IT&ceid=IT:it'
+    );
+    const NEWS_PROXY = rss =>
+      'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rss);
     const NEWS_BRANDS = [
-      "fiat", "jeep", "mazda", "alfa romeo", "alfa-romeo", "lancia",
-      // modelli per intercettare articoli che citano il modello ma non la marca nel titolo
-      "panda", "pandina", "grande panda", "500", "500e", "500x", "600", "tipo", "topolino", "ducato", "doblo", "scudo",
-      "avenger", "compass", "renegade", "wrangler", "gladiator", "cherokee",
-      "cx-3", "cx-30", "cx-5", "cx-60", "cx-80", "mx-5", "mazda3", "mazda6",
-      "giulia", "stelvio", "tonale", "junior", "33 stradale",
-      "ypsilon", "gamma", "delta"
+      'fiat','jeep','mazda','alfa romeo','alfa-romeo','lancia',
+      'panda','pandina','grande panda','500','500e','500x','600','tipo','topolino','ducato','doblo','scudo',
+      'avenger','compass','renegade','wrangler','gladiator','cherokee',
+      'cx-3','cx-30','cx-5','cx-60','cx-80','mx-5','mazda3','mazda6',
+      'giulia','stelvio','tonale','junior','33 stradale','ypsilon','gamma','delta'
     ];
     const BACKEND_CHAT   = "https://auto-backend-three.vercel.app/api/chat";
     const BACKEND_SEARCH = "https://auto-backend-three.vercel.app/api/search";
@@ -1837,20 +1848,30 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       if(!auth.currentUser){$("newsList").innerHTML="";setStatus("🔒 Login per vedere le news.");return}
       setStatus("⏳ Caricamento news Fiat · Jeep · Mazda · Alfa Romeo · Lancia...");$("refreshBtn").disabled=true;
       try{
-        const r=await fetch(NEWS_PROXY,{method:"GET",headers:{"Accept":"application/json"},cache:"no-store"});
-        if(!r.ok)throw new Error(`HTTP ${r.status}`);
-        const data=await r.json();
-        if(data.status && data.status !== "ok") throw new Error(data.message||"RSS non disponibile");
-        const raw=Array.isArray(data.items)?data.items:[];
+        // Interroghiamo 5 feed RSS separati: così non dipendiamo dai soli ultimi 10 articoli
+        // del feed generale e otteniamo realmente notizie pertinenti alle marche richieste.
+        const responses = await Promise.allSettled(NEWS_RSS_FEEDS.map(async rss=>{
+          const r=await fetch(NEWS_PROXY(rss),{method:"GET",headers:{"Accept":"application/json"},cache:"no-store"});
+          if(!r.ok) throw new Error(`HTTP ${r.status}`);
+          const data=await r.json();
+          if(data.status && data.status !== "ok") throw new Error(data.message||"RSS non disponibile");
+          return Array.isArray(data.items)?data.items:[];
+        }));
+
+        const raw=responses.flatMap(x=>x.status==="fulfilled"?x.value:[]);
+        const seen=new Set();
         const filtered=raw
           .filter(newsMatchesBrand)
           .sort((a,b)=>new Date(b.pubDate||b.date||0)-new Date(a.pubDate||a.date||0))
+          .filter(x=>{
+            const key=(x.link||x.url||x.title||"").trim();
+            if(!key||seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          })
           .slice(0,12)
-          .map(x=>({
-            ...x,
-            url:x.link||x.url||"",
-            date:x.pubDate||x.date||""
-          }));
+          .map(x=>({...x,url:x.link||x.url||"",date:x.pubDate||x.date||""}));
+
         renderItems(filtered);
         if(filtered.length) setStatus(`✅ ${filtered.length} news selezionate • Fiat · Jeep · Mazda · Alfa Romeo · Lancia`);
       }catch(err){
@@ -2106,6 +2127,98 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       SYNC.unsub=null;SYNC.docRef=null;SYNC.data={tasks:{},memos:{}};SYNC.ready=false;
       setSyncBadge("warn");renderTasksAndMemos();renderWeekCalendar();
     }
+
+    /* ══ IMPORT PDF PROVVIGIONI ══ */
+    const vendPdfBtn=$("vendPdfBtn"), vendPdfInput=$("vendPdfInput");
+    async function loadPdfJsForProvv(){
+      if(window.pdfjsLib) return window.pdfjsLib;
+      return new Promise((resolve,reject)=>{
+        const sc=document.createElement("script"); sc.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+        sc.onload=()=>{try{window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";}catch{} resolve(window.pdfjsLib)};
+        sc.onerror=()=>reject(new Error("Impossibile caricare PDF.js")); document.head.appendChild(sc);
+      });
+    }
+    async function extractProvvPdfText(file){
+      const pdfjs=await loadPdfJsForProvv(), buf=await file.arrayBuffer();
+      const pdf=await pdfjs.getDocument({data:new Uint8Array(buf)}).promise; let text="";
+      for(let i=1;i<=Math.min(pdf.numPages,20);i++){const page=await pdf.getPage(i),tc=await page.getTextContent();text+=tc.items.map(x=>x.str||"").join(" ")+"\n";}
+      return text.trim();
+    }
+    function parseProvvPdfText(text,fileName){
+      const raw=String(text||"").replace(/\r/g,"");
+      const t=raw.replace(/CNO1|CNOI|CUO1|CVO1|CVOI/gi,m=>m.replace(/O/gi,"0"));
+      const mesi={gennaio:1,febbraio:2,marzo:3,aprile:4,maggio:5,giugno:6,luglio:7,agosto:8,settembre:9,ottobre:10,novembre:11,dicembre:12};
+      let ym=null; const mm=t.match(/mese\s+di\s+([a-zà]+)\s+(20\d{2})/i);
+      if(mm&&mesi[mm[1].toLowerCase()]) ym=`${mm[2]}-${String(mesi[mm[1].toLowerCase()]).padStart(2,"0")}`;
+      if(!ym)ym=TODAY_KEY;
+      const rows=[];
+      const brands='FIAT|JEEP|MAZDA|ALFA\\s*ROMEO|LANCIA|AIXAM';
+      const re=new RegExp(`(?:^|\\s)((?:${brands})\\b[\\s\\S]*?)(?=\\s+(?:${brands})\\b|\\s+TOTALE\\b|$)`,`gi`);
+      for(const hit of t.matchAll(re)){
+        const line=hit[1].replace(/\s+/g," ").trim();
+        if(/^TOTALE\b/i.test(line))continue;
+        const money=[...line.matchAll(/(?:€\s*)?(\d{1,4}(?:[.,]\d{2}))/g)].map(m=>Number(m[1].replace(/\./g,"").replace(",","."))).filter(Number.isFinite);
+        const prov=money.length?money[money.length-1]:0; if(!prov)continue;
+        const modello=line.replace(/\b(?:CN01|CNO1|CNOI|CU01|CUO1|CVO1|CVOI)\b/gi," ").replace(/\b\d{1,2}\/\d{1,2}\/20\d{2}\b/g," ").replace(/(?:€\s*)?\d{1,4}(?:[.,]\d{2})\s*$/," ").replace(/\s+/g," ").trim();
+        if(modello.length<5 || /^TOTALE/i.test(modello))continue;
+        rows.push({id:vendUid(),modello,provv:prov,data:"",createdAt:Date.now(),source:"pdf",tipo:/\busat[aoe]?\b/i.test(line)?"usata":"nuova"});
+      }
+      const seen=new Set(); return {ym,rows:rows.filter(r=>{const k=r.modello.toLowerCase()+"|"+r.provv;if(seen.has(k))return false;seen.add(k);return true;})};
+    }
+    async function ocrProvvPdf(file){
+      if(!window.Tesseract){
+        await new Promise((resolve,reject)=>{const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";sc.onload=resolve;sc.onerror=()=>reject(new Error("Impossibile caricare OCR"));document.head.appendChild(sc)});
+      }
+      const pdfjs=await loadPdfJsForProvv(),buf=await file.arrayBuffer(),pdf=await pdfjs.getDocument({data:new Uint8Array(buf)}).promise;
+      let out="";
+      for(let i=1;i<=Math.min(pdf.numPages,5);i++){
+        const page=await pdf.getPage(i),vp=page.getViewport({scale:2.2});
+        const canvas=document.createElement("canvas"); canvas.width=vp.width; canvas.height=vp.height;
+        await page.render({canvasContext:canvas.getContext("2d"),viewport:vp}).promise;
+        const r=await window.Tesseract.recognize(canvas,"ita",{logger:()=>{}}); out+=r.data?.text||"\n";
+      }
+      return out;
+    }
+    async function importProvvPdf(file){
+      if(!file||!file.name.toLowerCase().endsWith(".pdf")){alert("⚠ Seleziona un PDF.");return}
+      if(!auth.currentUser){alert("🔒 Devi essere loggato per importare il PDF.");return}
+      vendPdfBtn.disabled=true; vendPdfBtn.textContent="⏳ Leggo PDF…";
+      try{
+        let text=await extractProvvPdfText(file); let parsed=parseProvvPdfText(text,file.name);
+        if(!parsed.rows.length){
+          vendPdfBtn.textContent="🔎 OCR…";
+          text=await ocrProvvPdf(file); parsed=parseProvvPdfText(text,file.name);
+        }
+        if(!parsed.rows.length)throw new Error("Non trovo righe di provvigione nel PDF, neanche tramite OCR.");
+        ensureMonth(parsed.ym); const old=vendState.months[parsed.ym]||{nuove:[],usate:[]};
+        const manual=[...(old.nuove||[]),...(old.usate||[])].filter(r=>r.source!=="pdf");
+        vendState.months[parsed.ym]={nuove:[],usate:[]};
+        parsed.rows.forEach(r=>(r.tipo==="usata"?vendState.months[parsed.ym].usate:vendState.months[parsed.ym].nuove).push(r));
+        manual.forEach(r=>vendState.months[parsed.ym].nuove.push(r));
+        await vendWrite(); vendViewKey=parsed.ym; renderVendite();
+        alert(`✅ Importate ${parsed.rows.length} provvigioni in ${monthLabel(parsed.ym)}.`);
+      }catch(e){alert("❌ Import PDF: "+(e?.message||e));}
+      finally{vendPdfBtn.disabled=false;vendPdfBtn.textContent="📄 Importa PDF";vendPdfInput.value="";}
+    }
+
+      if(!file||!file.name.toLowerCase().endsWith(".pdf")){alert("⚠ Seleziona un PDF.");return}
+      if(!auth.currentUser){alert("🔒 Devi essere loggato per importare il PDF.");return}
+      vendPdfBtn.disabled=true; vendPdfBtn.textContent="⏳ Importo…";
+      try{
+        const parsed=parseProvvPdfText(await extractProvvPdfText(file),file.name);
+        if(!parsed.rows.length)throw new Error("Non trovo righe di provvigione nel PDF. Se è una scansione, il PDF deve essere OCR.");
+        ensureMonth(parsed.ym); const old=vendState.months[parsed.ym]||{nuove:[],usate:[]};
+        const manual=[...(old.nuove||[]),...(old.usate||[])].filter(r=>r.source!=="pdf");
+        vendState.months[parsed.ym]={nuove:[],usate:[]};
+        parsed.rows.forEach(r=>(r.tipo==="usata"?vendState.months[parsed.ym].usate:vendState.months[parsed.ym].nuove).push(r));
+        manual.forEach(r=>vendState.months[parsed.ym].nuove.push(r));
+        await vendWrite(); vendViewKey=parsed.ym; renderVendite();
+        alert(`✅ Importate ${parsed.rows.length} provvigioni in ${monthLabel(parsed.ym)}.`);
+      }catch(e){alert("❌ Import PDF: "+(e?.message||e));}
+      finally{vendPdfBtn.disabled=false;vendPdfBtn.textContent="📄 Importa PDF";vendPdfInput.value="";}
+    }
+    vendPdfBtn?.addEventListener("click",()=>vendPdfInput?.click());
+    vendPdfInput?.addEventListener("change",()=>{const f=vendPdfInput.files?.[0];if(f)importProvvPdf(f)});
 
     /* ══ COMPARATORE — DATABASE REALE 2025 ══ */
     const AUTO_DB = {
@@ -2394,6 +2507,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     let vendDocRef=null,vendUnsub=null,vendTipo="nuova";
     const TODAY_KEY=(()=>{const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`})();
     let vendViewKey=TODAY_KEY;
+    if($("vendData")) $("vendData").value=dateKey(new Date());
 
     function monthLabel(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-1,1);const l=d.toLocaleDateString("it-IT",{month:"long",year:"numeric"});return l.charAt(0).toUpperCase()+l.slice(1)}
     function prevMonthKey(k){const[y,m]=k.split("-").map(Number);const d=new Date(y,m-2,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
@@ -2417,16 +2531,8 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       else{manca.textContent="Mancano "+fmtEur(target-provvMese)+" all'obiettivo";manca.className="progressManca"}
     }
 
-    // Controlla se un mese è ancora editabile (mese corrente O entro 10 giorni dalla fine)
-    function isMeseEditabile(k){
-      if(k===TODAY_KEY) return true;
-      // Calcola fine mese: ultimo giorno del mese k
-      const [y,m]=k.split("-").map(Number);
-      const fineMese=new Date(y,m,0); // giorno 0 del mese successivo = ultimo del mese corrente
-      const oggi=new Date(); oggi.setHours(0,0,0,0);
-      const diffGiorni=Math.round((oggi-fineMese)/(1000*60*60*24));
-      return diffGiorni<=10; // editabile entro 10 giorni dalla fine
-    }
+    // Le vendite restano sempre editabili, anche per mesi/settimane precedenti.
+    function isMeseEditabile(k){ return true; }
 
     function renderVendite(){
       const k=vendViewKey;ensureMonth(k);
@@ -2477,10 +2583,11 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       }
       const provv=parseFloat($("vendProvv").value)||0;
       ensureMonth(k);
-      const id=vendUid(),entry={id,modello,provv,createdAt:Date.now()};
+      const id=vendUid(),entry={id,modello,provv,data:$("vendData")?.value||"",createdAt:Date.now()};
       if(vendTipo==="nuova")vendState.months[k].nuove.push(entry);
       else vendState.months[k].usate.push(entry);
       $("vendModello").value="";$("vendProvv").value="";
+      if($("vendData")) $("vendData").value=dateKey(new Date());
       renderVendite();await vendWrite();
     }
     async function deleteAuto(k,tipo,id){
@@ -3187,8 +3294,16 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       let pendingModello = "";
 
       // ── Popup step 1: tipo (nuova/usata) ──────────────────────
+      let pendingData = "";
+      function getWeekOfMonthForDate(dateStr){
+        const d = dateStr ? new Date(dateStr+"T12:00:00") : new Date();
+        const primo = new Date(d.getFullYear(), d.getMonth(), 1);
+        return Math.min(3, Math.max(0, Math.floor((d.getDate() - 1 + primo.getDay()) / 7)));
+      }
       function showPopupTipo(modello){
         pendingModello = modello;
+        pendingData = dateKey(new Date());
+        const di=document.getElementById("obDataInput"); if(di) di.value=pendingData;
         const ov = document.getElementById("obPopupOverlay");
         document.getElementById("obPopupTipoBox").style.display = "flex";
         document.getElementById("obPopupFinBox").style.display  = "none";
@@ -3212,12 +3327,13 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       }
 
       function addAutoToOb(tipo, fin){
-        const wi = getWeekOfMonth();
-        obState.settimane[wi].push({id:obUid(), modello:pendingModello, tipo, fin});
+        const wi = getWeekOfMonthForDate(pendingData);
+        obState.settimane[wi].push({id:obUid(), modello:pendingModello, tipo, fin, data:pendingData});
         saveOb(); closeObPopup(); renderObiettivo();
       }
 
       // ── Listener popup ────────────────────────────────────────
+      document.getElementById("obDataInput")?.addEventListener("change",e=>{pendingData=e.target.value||dateKey(new Date())});
       document.getElementById("obBtnNuova").addEventListener("click",  ()=>showPopupFin("nuova"));
       document.getElementById("obBtnUsata").addEventListener("click",  ()=>showPopupFin("usata"));
       document.getElementById("obBtnCash").addEventListener("click",   ()=>addAutoToOb(window._obPendingTipo, false));
@@ -3270,7 +3386,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
           const cards = sett.map(a=>`
             <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid rgba(31,41,55,.8);border-radius:10px;background:rgba(17,24,39,.6);">
               <div style="flex:1;min-width:0;">
-                <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(a.modello)}</div>
+                <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(a.modello)}</div>${a.data?`<div style="font-size:10px;color:#9ca3af;margin-top:2px;">📅 ${new Date(a.data+"T12:00:00").toLocaleDateString("it-IT")}</div>`:""}${a.data?`<div style="font-size:10px;color:#9ca3af;margin-top:2px;">📅 ${new Date(a.data+"T12:00:00").toLocaleDateString("it-IT")}</div>`:""}
                 <div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap;">
                   <span style="font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;${a.tipo==="nuova"?"background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd":"background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);color:#fdba74"}">${a.tipo==="nuova"?"🆕 Nuova":"🔄 Usata"}</span>
                   <span style="font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;${a.fin?"background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);color:#93c5fd":"background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#6ee7b7"}">${a.fin?"💳 Finanz.":"💵 Cash"}</span>
@@ -4061,6 +4177,8 @@ document.body.removeChild(a);
         <div>
           <div id="obPopupTitle" style="font-weight:900;font-size:16px;"></div>
           <div id="obPopupSub" style="font-size:12px;color:#9ca3af;margin-top:2px;"></div>
+          <div style="margin-top:10px;"><label style="font-size:11px;color:#9ca3af;display:block;margin-bottom:4px;">Data vendita</label><input id="obDataInput" type="date" style="width:100%;box-sizing:border-box;background:#111827;border:1px solid #374151;color:#e5e7eb;border-radius:9px;padding:8px 9px;font-family:inherit;"></div>
+
         </div>
         <button id="obPopupClose" style="width:30px;height:30px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#e5e7eb;cursor:pointer;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
