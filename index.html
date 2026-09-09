@@ -3502,10 +3502,40 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         pendingModello=""; window._obPendingTipo=null;
       }
 
-      function addAutoToOb(tipo, fin){
-        const wi = getWeekOfMonthForDate(pendingData);
-        obState.settimane[wi].push({id:obUid(), modello:pendingModello, tipo, fin, data:pendingData});
-        saveOb(); closeObPopup(); renderObiettivo();
+      async function addAutoToOb(tipo, fin){
+        const data = pendingData || dateKey(new Date());
+        const modello = (pendingModello || "").trim();
+        if(!modello) return;
+
+        const wi = getWeekOfMonthForDate(data);
+        const obId = obUid();
+        const autoOb = {id:obId, modello, tipo, fin, data};
+
+        // Salva l'auto nell'Obiettivo Mensile
+        obState.settimane[wi].push(autoOb);
+        await saveOb();
+
+        // Sincronizza automaticamente la stessa auto con Vendite Mensili
+        const ym = data.slice(0,7);
+        ensureMonth(ym);
+        const giaPresente = [...(vendState.months[ym].nuove||[]), ...(vendState.months[ym].usate||[])]
+          .some(c => c.id === obId || c.obId === obId);
+
+        if(!giaPresente){
+          const entry = {
+            id: obId, obId, modello, provv: 0, data, createdAt: Date.now(),
+            source: "obiettivo", tipo: tipo === "usata" ? "usata" : "nuova", fin: !!fin
+          };
+          if(entry.tipo === "nuova") vendState.months[ym].nuove.push(entry);
+          else vendState.months[ym].usate.push(entry);
+          await vendWrite();
+        }
+
+        // Mostra immediatamente il mese della vendita nella sezione Vendite
+        vendViewKey = ym;
+        closeObPopup();
+        renderObiettivo();
+        renderVendite();
       }
 
       // ── Listener popup ────────────────────────────────────────
