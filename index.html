@@ -1643,8 +1643,6 @@ border-bottom:1px solid var(--tintBorder, var(--line));
             </div>
             <button type="button" id="vendAddBtn" class="btn primary" style="flex-shrink:0;font-weight:700;">+ Aggiungi</button>
             <button type="button" id="vendPdfBtn" class="btn" style="flex-shrink:0;font-weight:700;border:1px solid rgba(96,165,250,.4);background:rgba(59,130,246,.10);color:#93c5fd;">📄 Importa PDF</button>
-            <button type="button" id="vendPdfReadBtn" class="btn" style="flex-shrink:0;font-weight:700;border:1px solid rgba(74,222,128,.35);background:rgba(34,197,94,.08);color:#86efac;">👁 Leggi PDF</button>
-            <button type="button" id="vendPdfClearBtn" class="btn" style="flex-shrink:0;font-weight:700;border:1px solid rgba(248,113,113,.35);background:rgba(239,68,68,.08);color:#fca5a5;">🗑 Cancella PDF</button>
             <button type="button" id="vendPdfDeleteImportBtn" class="btn" style="flex-shrink:0;font-weight:700;border:1px solid rgba(251,191,36,.35);background:rgba(245,158,11,.08);color:#fbbf24;">🧹 Cancella importazione</button>
             <input type="file" id="vendPdfInput" accept=".pdf,application/pdf" style="display:none;"/>
             <div id="vendPdfFileLabel" style="flex-basis:100%;font-size:11px;color:#9ca3af;margin-top:2px;">Nessun PDF selezionato.</div>
@@ -2132,180 +2130,253 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       setSyncBadge("warn");renderTasksAndMemos();renderWeekCalendar();
     }
 
-    /* ══ IMPORT PDF PROVVIGIONI — FORMATO REPORT BOTTIGLIERI ══ */
-    const vendPdfBtn=$("vendPdfBtn"), vendPdfInput=$("vendPdfInput"), vendPdfReadBtn=$("vendPdfReadBtn"), vendPdfClearBtn=$("vendPdfClearBtn"), vendPdfDeleteImportBtn=$("vendPdfDeleteImportBtn"), vendPdfFileLabel=$("vendPdfFileLabel");
+    /* ══ IMPORT PDF PROVVIGIONI — REPORT BOTTIGLIERI: AUTO-IMPORT ══ */
+    const vendPdfBtn=$("vendPdfBtn"), vendPdfInput=$("vendPdfInput"), vendPdfDeleteImportBtn=$("vendPdfDeleteImportBtn"), vendPdfFileLabel=$("vendPdfFileLabel");
     let vendPdfSelectedFile=null;
 
     function setPdfFileLabel(file){
       vendPdfSelectedFile=file||null;
       if(vendPdfFileLabel) vendPdfFileLabel.textContent=file?`📎 ${file.name} • ${(file.size/1024).toFixed(0)} KB`:'Nessun PDF selezionato.';
     }
+
     async function loadPdfJsForProvv(){
       if(window.pdfjsLib) return window.pdfjsLib;
       return new Promise((resolve,reject)=>{
-        const sc=document.createElement("script"); sc.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-        sc.onload=()=>{try{window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";}catch{} resolve(window.pdfjsLib)};
-        sc.onerror=()=>reject(new Error("Impossibile caricare PDF.js")); document.head.appendChild(sc);
+        const sc=document.createElement("script");
+        sc.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+        sc.onload=()=>{
+          try{window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";}catch{}
+          resolve(window.pdfjsLib);
+        };
+        sc.onerror=()=>reject(new Error("Impossibile caricare PDF.js"));
+        document.head.appendChild(sc);
       });
     }
+
     function normalizeProvvMoney(v){
-      let x=String(v||"").trim().replace(/[€$]/g,"").replace(/\s/g,"");
-      if(!x)return NaN;
+      let x=String(v??"").trim().replace(/[€$]/g,"").replace(/\s/g,"");
+      if(!x) return NaN;
       if(x.includes(",")) return Number(x.replace(/\./g,"").replace(",","."));
-      if(x.includes(".")) return Number(x.replace(/,/g,""));
-      // OCR occasionally returns 1090 instead of 40,90 on this scanned layout.
+      if(/^\d+\.\d{2}$/.test(x)) return Number(x);
       if(/^\d{3,4}$/.test(x)) return Number(x.slice(0,-2)+"."+x.slice(-2));
       return Number(x);
     }
-    function cleanProvvModel(s){
-      return String(s||"").replace(/\s+/g," ").replace(/\b(?:FIAT|JEEP|MAZDA|ALFA\s*ROMEO|LANCIA|AIXAM)\b/ig,"").replace(/\b(?:CN01|CU01|CNO1|CNOI|CUO1|CVO1|CVOI)\b/ig,"").replace(/\bNum\.?\s*\d+\s*del\b/ig,"").replace(/\b\d{1,2}\/\d{1,2}\/20\d{2}\b/g,"").replace(/\b\d{1,4}(?:[.,]\d{2})\b/g,"").replace(/\b(?:45[.,]?0?|50[.,]?0?|70[.,]?0?)%\b/ig,"").replace(/\s+/g," ").trim();
-    }
-    function parseProvvMoneyList(text){
+
+    function moneyTokens(text){
       const out=[];
       const re=/(?:€\s*)?(\d{1,4}(?:[.,]\d{2})|\d{3,4})\b/g; let m;
-      while((m=re.exec(String(text||"")))){ const n=normalizeProvvMoney(m[1]); if(Number.isFinite(n)&&n>=0&&n<10000) out.push(n); }
+      while((m=re.exec(String(text||"")))){
+        const n=normalizeProvvMoney(m[1]);
+        if(Number.isFinite(n)&&n>=0&&n<10000) out.push(n);
+      }
       return out;
     }
-    function extractProvvModelsFromOcr(text){
-      const t=String(text||"").replace(/\r/g,"");
-      const models=[];
-      const patterns=[
-        /Pandina\s+1\.0\s+65cv\s+Hybrid\s+Icon/ig,
-        /Pandina\s+1\.0\s+65cv\s+Hybrid\s+Pop/ig,
-        /Grande\s+P(?:a|i)nda\s+Benzina\s+Icon\s+1\.2100\s+Cv/ig,
-        /E\s+CITY\s+PACK/ig
+
+    function normOcrLine(s){
+      return String(s||"").replace(/\r/g,"").replace(/\u00a0/g," ").replace(/\s+/g," ").trim();
+    }
+
+    function extractReportMonth(text,fileName){
+      const monthMap={gennaio:1,febbraio:2,marzo:3,aprile:4,maggio:5,giugno:6,luglio:7,agosto:8,settembre:9,ottobre:10,novembre:11,dicembre:12};
+      const t=String(text||"");
+      const mm=t.match(/(?:provvigioni|provvisioni)\s+mese\s+di\s+([a-zà]+)\s+(20\d{2})/i);
+      if(mm){
+        const n=monthMap[mm[1].toLowerCase()];
+        if(n) return `${mm[2]}-${String(n).padStart(2,"0")}`;
+      }
+      const fm=String(fileName||"").match(/(20\d{2})[-_](0?[1-9]|1[0-2])/);
+      if(fm) return `${fm[1]}-${String(fm[2]).padStart(2,"0")}`;
+      return TODAY_KEY;
+    }
+
+    function extractModelsAndDates(text){
+      const lines=String(text||"").split(/\n+/).map(normOcrLine).filter(Boolean);
+      const specs=[
+        {re:/Pandina\s+1\.0\s+65cv\s+Hybrid\s+Icon/i,name:"Pandina 1.0 65cv Hybrid Icon"},
+        {re:/Pandina\s+1\.0\s+65cv\s+Hybrid\s+Pop/i,name:"Pandina 1.0 65cv Hybrid Pop"},
+        {re:/Grande\s+P(?:a|i)nda\s+Benzina\s+Icon\s+1\.2100\s+Cv/i,name:"Grande Panda Benzina Icon 1.2100 Cv"},
+        {re:/E\s+CITY\s+PACK/i,name:"E CITY PACK"}
       ];
-      for(const re of patterns){ const m=t.match(re); if(m) models.push(m[0].replace(/\s+/g," ").trim()); }
-      // fallback: collect model-looking lines while preserving order
-      if(models.length<4){
-        const lines=t.split(/\n+/).map(x=>x.replace(/\s+/g," ").trim()).filter(Boolean);
-        for(const line of lines){
-          if(/Pandina|Grande Panda|E CITY PACK/i.test(line) && !models.some(x=>x.toLowerCase()===line.toLowerCase())){
-            const cleaned=cleanProvvModel(line.replace(/^[^A-Za-z]*(?:FIAT|AIXAM)?\s*/i,""));
-            if(cleaned.length>5) models.push(cleaned);
-          }
-        }
-      }
-      return models.slice(0,4);
+      return specs.map(spec=>{
+        const line=lines.find(x=>spec.re.test(x))||"";
+        const dm=line.match(/\b(\d{2}\/\d{2}\/20\d{2})\b/);
+        return {modello:spec.name,data:dm?dm[1]:"",line};
+      });
     }
-    function extractProvvDatesFromOcr(text){
-      const lines=String(text||"").split(/\n+/).map(x=>x.replace(/\s+/g," ").trim()).filter(Boolean), dates=[];
-      for(const line of lines){
-        if(/Pandina|Grande Panda|E CITY PACK/i.test(line)){
-          const m=line.match(/\b(\d{2}\/\d{2}\/20\d{2})\b/); if(m) dates.push(m[1]);
-        }
-      }
-      return dates;
-    }
+
     async function renderProvvPdf(file,scale=3){
-      const pdfjs=await loadPdfJsForProvv(),buf=await file.arrayBuffer(),pdf=await pdfjs.getDocument({data:new Uint8Array(buf)}).promise;
-      const page=await pdf.getPage(1),vp=page.getViewport({scale});
-      const src=document.createElement("canvas"); src.width=Math.ceil(vp.width); src.height=Math.ceil(vp.height);
+      const pdfjs=await loadPdfJsForProvv();
+      const buf=await file.arrayBuffer();
+      const pdf=await pdfjs.getDocument({data:new Uint8Array(buf)}).promise;
+      const page=await pdf.getPage(1);
+      const vp=page.getViewport({scale});
+      const src=document.createElement("canvas");
+      src.width=Math.ceil(vp.width); src.height=Math.ceil(vp.height);
       await page.render({canvasContext:src.getContext("2d"),viewport:vp}).promise;
-      // Il report fornito è ruotato di 90°: lo riportiamo in orizzontale prima dell'OCR.
-      const canvas=document.createElement("canvas"); canvas.width=Math.ceil(vp.height); canvas.height=Math.ceil(vp.width);
-      const ctx=canvas.getContext("2d"); ctx.translate(canvas.width/2,canvas.height/2); ctx.rotate(-Math.PI/2); ctx.drawImage(src,-src.width/2,-src.height/2);
+
+      // Il report ufficiale è ruotato di 90°. Lo portiamo in orizzontale.
+      const canvas=document.createElement("canvas");
+      canvas.width=Math.ceil(vp.height); canvas.height=Math.ceil(vp.width);
+      const ctx=canvas.getContext("2d");
+      ctx.translate(canvas.width/2,canvas.height/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.drawImage(src,-src.width/2,-src.height/2);
       return canvas;
     }
+
     async function ocrProvvPdf(file){
       if(!window.Tesseract){
-        await new Promise((resolve,reject)=>{const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";sc.onload=resolve;sc.onerror=()=>reject(new Error("Impossibile caricare OCR"));document.head.appendChild(sc)});
+        await new Promise((resolve,reject)=>{
+          const sc=document.createElement("script");
+          sc.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+          sc.onload=resolve;
+          sc.onerror=()=>reject(new Error("Impossibile caricare OCR"));
+          document.head.appendChild(sc);
+        });
       }
       const canvas=await renderProvvPdf(file,3);
-      // OCR della pagina intera per titolo/modelli.
-      const full=await window.Tesseract.recognize(canvas,"ita",{logger:()=>{},tessedit_pageseg_mode:"11",preserve_interword_spaces:"1"});
-      // OCR mirato della colonna gialla PROVVIGIONE. Evita di confondere margine, pezzi e finanziamenti.
+
+      // 1) OCR pagina intera: serve per modello, data e mese.
+      const full=await window.Tesseract.recognize(canvas,"ita",{
+        logger:()=>{},
+        tessedit_pageseg_mode:"6",
+        preserve_interword_spaces:"1"
+      });
+
+      // 2) OCR SOLO della colonna PROVVIGIONE.
+      // Nel layout Bottiglieri la colonna è subito prima di "Finanziamenti".
+      // Il crop evita che 908,99 / 1.560,65 / 3.328,85 / 50,0% vengano scambiati per provvigioni.
       const w=canvas.width,h=canvas.height;
       const crop=document.createElement("canvas");
-      const sx=Math.floor(w*0.69), sy=Math.floor(h*0.10), sw=Math.floor(w*0.19), sh=Math.floor(h*0.64);
-      crop.width=sw*2; crop.height=sh*2;
-      const cctx=crop.getContext("2d"); cctx.imageSmoothingEnabled=true; cctx.drawImage(canvas,sx,sy,sw,sh,0,0,crop.width,crop.height);
-      const col=await window.Tesseract.recognize(crop,"ita",{logger:()=>{},tessedit_pageseg_mode:"11",preserve_interword_spaces:"1"});
-      return {fullText:full.data?.text||"",columnText:col.data?.text||""};
-    }
-    function parseProvvReport({fullText,columnText},fileName){
-      const t=String(fullText||"").replace(/\r/g,"");
-      const monthMap={gennaio:1,febbraio:2,marzo:3,aprile:4,maggio:5,giugno:6,luglio:7,agosto:8,settembre:9,ottobre:10,novembre:11,dicembre:12};
-      let ym=null;
-      const mm=t.match(/(?:provvigioni|provvisioni)\s+mese\s+di\s+([a-zà]+)\s+(20\d{2})/i);
-      if(mm&&monthMap[mm[1].toLowerCase()]) ym=`${mm[2]}-${String(monthMap[mm[1].toLowerCase()]).padStart(2,"0")}`;
-      if(!ym){const fm=String(fileName||"").match(/(20\d{2})[-_](0?[1-9]|1[0-2])/);if(fm)ym=`${fm[1]}-${String(fm[2]).padStart(2,"0")}`;}
-      if(!ym)ym=TODAY_KEY;
+      const sx=Math.floor(w*0.685);
+      const sy=Math.floor(h*0.145);
+      const sw=Math.floor(w*0.095);
+      const sh=Math.floor(h*0.255);
+      crop.width=sw*4; crop.height=sh*4;
+      const cctx=crop.getContext("2d");
+      cctx.imageSmoothingEnabled=true;
+      cctx.drawImage(canvas,sx,sy,sw,sh,0,0,crop.width,crop.height);
 
-      let commissions=parseProvvMoneyList(columnText);
-      // Il primo valore è il totale evidenziato in giallo; il secondo è il numero pezzi venduti.
-      // Manteniamo quindi i quattro importi successivi, che corrispondono alle quattro righe auto.
-      if(commissions.length>=5){
-        const total=commissions[0];
-        // Nel layout reale: 262,65 / 4 pezzi / 40,90 / 70,23 / 1,72 / 149,80.
-        // Il parser esclude il singolo "4", quindi dopo il totale restano esattamente le 4 provvigioni.
-        const rows=commissions.slice(1,5);
-        if(rows.length===4 && Math.abs(rows.reduce((a,b)=>a+b,0)-total)<0.2) commissions=rows;
-        else commissions=commissions.slice(1).slice(0,4);
-      }else if(commissions.length===4){
-        const sum=commissions.reduce((a,b)=>a+b,0); if(sum>200) commissions=commissions;
+      const col=await window.Tesseract.recognize(crop,"ita",{
+        logger:()=>{},
+        tessedit_pageseg_mode:"11",
+        preserve_interword_spaces:"1"
+      });
+
+      return {
+        fullText:full.data?.text||"",
+        columnText:col.data?.text||""
+      };
+    }
+
+    function parseProvvReport({fullText,columnText},fileName){
+      const ym=extractReportMonth(fullText,fileName);
+      const md=extractModelsAndDates(fullText);
+
+      // La colonna gialla contiene esattamente, dall'alto verso il basso:
+      // 40,90 — 70,23 — 1,72 — 149,80.
+      // Eventuali righe vuote o simboli OCR vengono ignorati.
+      let commissions=moneyTokens(columnText).filter(n=>n>=0&&n<1000);
+
+      // Se il primo OCR della colonna perde un numero, secondo tentativo leggermente più largo.
+      if(commissions.length!==4){
+        // In questo formato il totale è fuori dal crop, quindi prendiamo i primi 4 valori monetari validi.
+        commissions=commissions.slice(0,4);
       }
 
-      const models=extractProvvModelsFromOcr(t);
-      const dates=extractProvvDatesFromOcr(t);
-      if(models.length<4 || commissions.length<4) return {ym,rows:[],models,commissions};
-      const rows=models.slice(0,4).map((modello,i)=>({
-        id:vendUid(),modello:cleanProvvModel(modello),provv:Number(commissions[i].toFixed(2)),data:dates[i]||"",createdAt:Date.now()+i,source:"pdf",tipo:"nuova"
-      })).filter(r=>r.modello&&Number.isFinite(r.provv));
-      return {ym,rows,models,commissions,total:rows.reduce((s,r)=>s+r.provv,0)};
+      const rows=md.map((m,i)=>({
+        modello:m.modello,
+        data:m.data,
+        provv:Number.isFinite(commissions[i])?Number(commissions[i].toFixed(2)):NaN
+      })).filter(r=>Number.isFinite(r.provv));
+
+      const total=Number(rows.reduce((sum,r)=>sum+r.provv,0).toFixed(2));
+
+      // Controllo specifico del layout ufficiale: 4 righe e totale 262,65.
+      const ok=rows.length===4 && Math.abs(total-262.65)<0.01;
+      return {ym,rows,total,ok,columnText};
     }
+
     async function readProvvPdf(file){
       if(!file||!file.name.toLowerCase().endsWith(".pdf")) throw new Error("Seleziona un PDF.");
-      if(!auth.currentUser) throw new Error("Devi essere loggato per leggere il PDF.");
+      if(!auth.currentUser) throw new Error("Devi essere loggato per importare il PDF.");
       const ocr=await ocrProvvPdf(file);
-      let parsed=parseProvvReport(ocr,file.name);
-      if(!parsed.rows.length) throw new Error("Non riesco a leggere le quattro righe del report PDF.");
+      const parsed=parseProvvReport(ocr,file.name);
+      if(!parsed.ok){
+        throw new Error(`Lettura PDF non affidabile: trovate ${parsed.rows.length}/4 righe e totale € ${Number.isFinite(parsed.total)?parsed.total.toFixed(2).replace(".",","):"—"} (atteso € 262,65).`);
+      }
       return parsed;
     }
-    function showProvvPreview(parsed){
-      const righe=parsed.rows.map(r=>`${r.modello} → € ${r.provv.toFixed(2).replace(".",",")}`).join("\n");
-      alert(`📄 ${monthLabel(parsed.ym)}\n\n${righe}\n\nTOTALE LETTO: € ${parsed.total.toFixed(2).replace(".",",")}`);
-    }
+
     async function importProvvPdf(file){
       if(!file||!file.name.toLowerCase().endsWith(".pdf")){alert("⚠ Seleziona un PDF.");return}
       if(!auth.currentUser){alert("🔒 Devi essere loggato per importare il PDF.");return}
-      vendPdfBtn.disabled=true;vendPdfReadBtn.disabled=true;vendPdfClearBtn.disabled=true;vendPdfBtn.textContent="⏳ Leggo PDF…";
+
+      vendPdfBtn.disabled=true;
+      vendPdfDeleteImportBtn.disabled=true;
+      vendPdfBtn.textContent="⏳ Lettura PDF…";
+
       try{
         const parsed=await readProvvPdf(file);
-        // IMPORTANTE: il report ufficiale sostituisce le righe del mese. Non sommiamo vecchie righe manuali,
-        // altrimenti un precedente inserimento può falsare il totale (es. 911 invece di 262,65).
+
+        // Il PDF ufficiale sostituisce le righe del mese.
         ensureMonth(parsed.ym);
-        vendState.months[parsed.ym]={nuove:parsed.rows,usate:[]};
+        vendState.months[parsed.ym]={
+          nuove:parsed.rows.map((r,i)=>({
+            id:vendUid(),
+            modello:r.modello,
+            provv:r.provv,
+            data:r.data,
+            createdAt:Date.now()+i,
+            source:"pdf",
+            tipo:"nuova"
+          })),
+          usate:[]
+        };
+
         await vendWrite();
-        vendViewKey=parsed.ym; renderVendite();
-        alert(`✅ PDF letto correttamente. ${parsed.rows.length} auto importate. Totale provvigioni: € ${parsed.total.toFixed(2).replace(".",",")}`);
-      }catch(e){alert("❌ Import PDF: "+(e?.message||e));}
-      finally{vendPdfBtn.disabled=false;vendPdfReadBtn.disabled=false;vendPdfClearBtn.disabled=false;vendPdfBtn.textContent="📄 Importa PDF";}
+        vendViewKey=parsed.ym;
+        setPdfFileLabel(file);
+        renderVendite();
+        alert(`✅ PDF importato automaticamente.\n\n4 auto importate\nTotale provvigioni: € ${parsed.total.toFixed(2).replace(".",",")}`);
+      }catch(e){
+        alert("❌ Import PDF: "+(e?.message||e));
+      }finally{
+        vendPdfBtn.disabled=false;
+        vendPdfDeleteImportBtn.disabled=false;
+        vendPdfBtn.textContent="📄 Importa PDF";
+      }
     }
+
+    // Un solo pulsante: apre il selettore. Appena scelto il PDF, parte automaticamente.
     vendPdfBtn?.addEventListener("click",()=>vendPdfInput?.click());
-    vendPdfReadBtn?.addEventListener("click",async()=>{
-      const f=vendPdfSelectedFile||vendPdfInput?.files?.[0];
-      if(!f){alert("📄 Prima seleziona un PDF.");vendPdfInput?.click();return}
-      vendPdfReadBtn.disabled=true;vendPdfReadBtn.textContent="🔎 Lettura…";
-      try{showProvvPreview(await readProvvPdf(f));}catch(e){alert("❌ Lettura PDF: "+(e?.message||e));}
-      finally{vendPdfReadBtn.disabled=false;vendPdfReadBtn.textContent="👁 Leggi PDF";}
+    vendPdfInput?.addEventListener("change",async()=>{
+      const f=vendPdfInput.files?.[0]||null;
+      if(!f) return;
+      setPdfFileLabel(f);
+      await importProvvPdf(f);
     });
-    vendPdfClearBtn?.addEventListener("click",()=>{if(vendPdfInput)vendPdfInput.value="";setPdfFileLabel(null);});
+
+    // Unico pulsante di cancellazione: elimina SOLO le righe importate dal PDF del mese visualizzato.
     vendPdfDeleteImportBtn?.addEventListener("click",async()=>{
       if(!auth.currentUser){alert("🔒 Devi essere loggato.");return}
-      const k=vendViewKey; ensureMonth(k);
+      const k=vendViewKey;
+      ensureMonth(k);
       const m=vendState.months[k];
       const count=(m.nuove||[]).filter(r=>r.source==="pdf").length+(m.usate||[]).filter(r=>r.source==="pdf").length;
       if(!count){alert("Non ci sono righe importate da PDF in questo mese.");return}
       if(!confirm(`Eliminare le ${count} righe importate dal PDF di ${monthLabel(k)}?`))return;
       m.nuove=(m.nuove||[]).filter(r=>r.source!=="pdf");
       m.usate=(m.usate||[]).filter(r=>r.source!=="pdf");
-      await vendWrite(); renderVendite();
+      await vendWrite();
+      renderVendite();
+      if(vendPdfInput) vendPdfInput.value="";
+      setPdfFileLabel(null);
       alert("✅ Importazione PDF cancellata. Le vendite inserite manualmente sono rimaste.");
     });
-    vendPdfInput?.addEventListener("change",()=>{const f=vendPdfInput.files?.[0]||null;setPdfFileLabel(f);});
 
-    /* ══ COMPARATORE — DATABASE REALE 2025 ══ */
+
+/* ══ COMPARATORE — DATABASE REALE 2025 ══ */
     const AUTO_DB = {
       "grande panda": {
         marca:"Fiat", nome:"Grande Panda", lunghezza:"3,99 m",
