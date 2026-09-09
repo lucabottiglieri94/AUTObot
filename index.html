@@ -1343,8 +1343,8 @@ border-bottom:1px solid var(--tintBorder, var(--line));
             </div>
           </div>
           <span id="userPill" class="pill muted">Sync non attivo</span>
-          <button id="loginBtn" class="btn primary">🔐 Login Google</button>
-          <button id="logoutBtn" class="btn" style="display:none">↪ Logout</button>
+          <button id="loginBtn" type="button" class="btn primary">🔐 Login Google</button>
+          <button id="logoutBtn" type="button" class="btn" style="display:none">↪ Logout</button>
           <div id="authDiagnostic" class="authDiagnostic"></div>
         </div>
       </div>
@@ -1389,6 +1389,7 @@ border-bottom:1px solid var(--tintBorder, var(--line));
     enableIndexedDbPersistence(db).catch(()=>{});
     const provider=new GoogleAuthProvider();
     provider.setCustomParameters({prompt:"select_account"});
+    window.__AI_BOTT_AUTH={auth,provider,authMod:{signInWithPopup,signInWithRedirect,signOut,setPersistence,browserLocalPersistence,browserSessionPersistence}};
 
     (async function(){
       try{await setPersistence(auth,browserLocalPersistence)}catch{try{await setPersistence(auth,browserSessionPersistence)}catch{}}
@@ -4174,7 +4175,7 @@ window.garDownload = function(){
     Generato da <strong>AI BOTT Automotive</strong> · ${now} · CentroAuto VT
   </div>
 
-</body>
+\n</body>
 </html>`;
 
   const blob = new Blob([html], { type: "application/msword" });
