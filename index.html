@@ -2148,22 +2148,29 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       const raw=String(text||"").replace(/\r/g,"");
       const t=raw.replace(/CNO1|CNOI|CUO1|CVO1|CVOI/gi,m=>m.replace(/O/gi,"0"));
       const mesi={gennaio:1,febbraio:2,marzo:3,aprile:4,maggio:5,giugno:6,luglio:7,agosto:8,settembre:9,ottobre:10,novembre:11,dicembre:12};
-      let ym=null; const mm=t.match(/mese\s+di\s+([a-zà]+)\s+(20\d{2})/i);
+      let ym=null;
+      const mm=t.match(/(?:provvigioni|provvisioni)\s+mese\s+di\s+([a-zà]+)\s+(20\d{2})/i);
       if(mm&&mesi[mm[1].toLowerCase()]) ym=`${mm[2]}-${String(mesi[mm[1].toLowerCase()]).padStart(2,"0")}`;
-      if(!ym)ym=TODAY_KEY;
+      if(!ym){ const fm=t.match(/\b(20\d{2})[-\/](0?[1-9]|1[0-2])\b/); if(fm) ym=`${fm[1]}-${String(fm[2]).padStart(2,"0")}`; }
+      if(!ym) ym=TODAY_KEY;
       const rows=[];
-      const brands='FIAT|JEEP|MAZDA|ALFA\\s*ROMEO|LANCIA|AIXAM';
-      const re=new RegExp(`(?:^|\\s)((?:${brands})\\b[\\s\\S]*?)(?=\\s+(?:${brands})\\b|\\s+TOTALE\\b|$)`,`gi`);
-      for(const hit of t.matchAll(re)){
-        const line=hit[1].replace(/\s+/g," ").trim();
-        if(/^TOTALE\b/i.test(line))continue;
-        const money=[...line.matchAll(/(?:€\s*)?(\d{1,4}(?:[.,]\d{2}))/g)].map(m=>Number(m[1].replace(/\./g,"").replace(",","."))).filter(Number.isFinite);
-        const prov=money.length?money[money.length-1]:0; if(!prov)continue;
-        const modello=line.replace(/\b(?:CN01|CNO1|CNOI|CU01|CUO1|CVO1|CVOI)\b/gi," ").replace(/\b\d{1,2}\/\d{1,2}\/20\d{2}\b/g," ").replace(/(?:€\s*)?\d{1,4}(?:[.,]\d{2})\s*$/," ").replace(/\s+/g," ").trim();
-        if(modello.length<5 || /^TOTALE/i.test(modello))continue;
-        rows.push({id:vendUid(),modello,provv:prov,data:"",createdAt:Date.now(),source:"pdf",tipo:/\busat[aoe]?\b/i.test(line)?"usata":"nuova"});
+      const brandRe=/\b(FIAT|JEEP|MAZDA|ALFA\s*ROMEO|LANCIA|AIXAM)\b/i;
+      const lines=t.split(/\n+/).map(x=>x.replace(/\s+/g," ").trim()).filter(Boolean);
+      for(let i=0;i<lines.length;i++){
+        if(!/BOTTIGLIERI/i.test(lines[i])) continue;
+        let block="";
+        for(let j=i;j<Math.min(lines.length,i+9);j++){ block+=" "+lines[j]; if(j>i&&/BOTTIGLIERI/i.test(lines[j])) break; }
+        const bm=block.match(brandRe); if(!bm||/BONUS|TOTALE\s+PROVVIGIONE/i.test(block)) continue;
+        const money=[...block.matchAll(/(?:€\s*)?(\d{1,4}(?:[.,]\d{2}))/g)].map(m=>Number(m[1].replace(/\./g,"").replace(",","."))).filter(Number.isFinite);
+        const prov=money.length?money[money.length-1]:0; if(!prov) continue;
+        let modello=block.slice(bm.index).replace(/\bBOTTIGLIERI\b/gi," ").replace(/\b(?:CN01|CU01|CNO1|CNOI|CUO1|CVO1|CVOI)\b/gi," ").replace(/\bNum\.?\s*\d+\s*del\b/gi," ").replace(/\b\d{1,2}\/\d{1,2}\/20\d{2}\b/g," ").replace(/\b\d{1,4}(?:[.,]\d{2})\b/g," ").replace(/\b(?:50[.,]0%|70[.,]0%|4[.,]5%|50%)\b/g," ").replace(/\s+/g," ").trim();
+        if(modello.length<5) continue;
+        const tipo=/\b(?:usata|usato)\b/i.test(block)?"usata":"nuova";
+        rows.push({id:vendUid(),modello,provv:prov,data:"",createdAt:Date.now(),source:"pdf",tipo});
+        i+=2;
       }
-      const seen=new Set(); return {ym,rows:rows.filter(r=>{const k=r.modello.toLowerCase()+"|"+r.provv;if(seen.has(k))return false;seen.add(k);return true;})};
+      const seen=new Set();
+      return {ym,rows:rows.filter(r=>{const k=r.modello.toLowerCase()+"|"+r.provv;if(seen.has(k))return false;seen.add(k);return true;})};
     }
     async function ocrProvvPdf(file){
       if(!window.Tesseract){
@@ -2172,10 +2179,13 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       const pdfjs=await loadPdfJsForProvv(),buf=await file.arrayBuffer(),pdf=await pdfjs.getDocument({data:new Uint8Array(buf)}).promise;
       let out="";
       for(let i=1;i<=Math.min(pdf.numPages,5);i++){
-        const page=await pdf.getPage(i),vp=page.getViewport({scale:2.2});
-        const canvas=document.createElement("canvas"); canvas.width=vp.width; canvas.height=vp.height;
-        await page.render({canvasContext:canvas.getContext("2d"),viewport:vp}).promise;
-        const r=await window.Tesseract.recognize(canvas,"ita",{logger:()=>{}}); out+=r.data?.text||"\n";
+        const page=await pdf.getPage(i),vp=page.getViewport({scale:2.5});
+        const src=document.createElement("canvas"); src.width=Math.ceil(vp.width); src.height=Math.ceil(vp.height);
+        await page.render({canvasContext:src.getContext("2d"),viewport:vp}).promise;
+        const canvas=document.createElement("canvas"); canvas.width=Math.ceil(vp.height); canvas.height=Math.ceil(vp.width);
+        const ctx=canvas.getContext("2d"); ctx.translate(canvas.width/2,canvas.height/2); ctx.rotate(-Math.PI/2); ctx.drawImage(src,-src.width/2,-src.height/2);
+        const r=await window.Tesseract.recognize(canvas,"ita",{logger:()=>{},tessedit_pageseg_mode:"11",preserve_interword_spaces:"1"});
+        out+=(r.data?.text||"")+"\n";
       }
       return out;
     }
