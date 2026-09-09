@@ -133,6 +133,7 @@
   }
   .muted{color:var(--muted)}
   .accountBox{display:flex;align-items:center;gap:9px;min-width:0;padding:5px 9px 5px 6px;border:1px solid var(--line);border-radius:999px;background:rgba(44,44,46,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .authDiagnostic{position:absolute;right:18px;top:74px;max-width:520px;font-size:11px;color:#fca5a5;display:none;z-index:30}.authDiagnostic.show{display:block}
   .accountAvatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 30px;background:rgba(255,255,255,.10);font-size:15px;border:1px solid rgba(255,255,255,.12)}
   .accountAvatar img{width:100%;height:100%;object-fit:cover}
   .accountInfo{min-width:0;line-height:1.12}
@@ -1344,6 +1345,7 @@ border-bottom:1px solid var(--tintBorder, var(--line));
           <span id="userPill" class="pill muted">Sync non attivo</span>
           <button id="loginBtn" class="btn primary">🔐 Login Google</button>
           <button id="logoutBtn" class="btn" style="display:none">↪ Logout</button>
+          <div id="authDiagnostic" class="authDiagnostic"></div>
         </div>
       </div>
     </div>
@@ -1390,7 +1392,12 @@ border-bottom:1px solid var(--tintBorder, var(--line));
 
     (async function(){
       try{await setPersistence(auth,browserLocalPersistence)}catch{try{await setPersistence(auth,browserSessionPersistence)}catch{}}
-      try{await getRedirectResult(auth)}catch(e){console.warn("[AI BOTT] Redirect Google:",e)}
+      try{await getRedirectResult(auth)}catch(e){
+        console.warn("[AI BOTT] Redirect Google:",e);
+        const diag=$("authDiagnostic");
+        if(diag){diag.textContent="Google/Firebase: "+(e?.code||e?.message||"errore durante il login")+". Controlla Authorized domains e provider Google in Firebase.";diag.classList.add("show");}
+        $("userPill").textContent="❌ Login Google non riuscito";
+      }
     })();
 
     // Bind once: the fallback loader below uses the same global guard.
@@ -1434,6 +1441,8 @@ border-bottom:1px solid var(--tintBorder, var(--line));
           msg="Credenziali Google non valide";
 
         $("userPill").textContent="❌ "+msg;
+        const diag=$("authDiagnostic");
+        if(diag){diag.textContent="Firebase/Google: "+msg+". Se compare 'Dominio non autorizzato', va aggiunto il dominio del sito in Firebase Authentication → Settings → Authorized domains.";diag.classList.add("show");}
         }finally{
           btn.disabled=!!auth.currentUser;
         }
@@ -1448,6 +1457,9 @@ border-bottom:1px solid var(--tintBorder, var(--line));
 
     /* ══ AGENDA + MEMO + CALENDARIO ══ */
     const SYNC={unsub:null,uid:null,docRef:null,data:{tasks:{},memos:{}},ready:false};
+    const PLANNER_CACHE_KEY="aiBott_planner_cache_v2";
+    function cachePlanner(data){try{localStorage.setItem(PLANNER_CACHE_KEY,JSON.stringify(normalizePlanner(data)))}catch{}}
+    function readPlannerCache(){try{const x=JSON.parse(localStorage.getItem(PLANNER_CACHE_KEY)||"null");return x?normalizePlanner(x):null}catch{return null}}
     function setSyncBadge(state){
       const b=$("syncBadge");
       if(state==="ok"){b.className="syncBadge ok";b.textContent="Sync: attivo"}
@@ -1516,12 +1528,12 @@ border-bottom:1px solid var(--tintBorder, var(--line));
       }
       const prev=JSON.parse(JSON.stringify(SYNC.data));
       const next=fn(JSON.parse(JSON.stringify(SYNC.data)));
-      SYNC.data=next;renderTasksAndMemos();renderWeekCalendar();
+      SYNC.data=next;cachePlanner(next);renderTasksAndMemos();renderWeekCalendar();
       try{
         await writePlanner(next);
         setSyncBadge("ok");
       }catch(e){
-        SYNC.data=prev;renderTasksAndMemos();renderWeekCalendar();
+        SYNC.data=prev;cachePlanner(prev);renderTasksAndMemos();renderWeekCalendar();
         setSyncBadge("warn");
         console.error("[AI BOTT] Salvataggio planner fallito:",e);
         alert("❌ Non riesco a salvare su Firebase.\n"+firebaseErr(e));
@@ -1686,10 +1698,20 @@ border-bottom:1px solid var(--tintBorder, var(--line));
       setSyncBadge("...");
       SYNC.unsub=onSnapshot(SYNC.docRef,async snap=>{
         try{
-          const data=snap.exists()?snap.data():{tasks:{},memos:{}};
-          SYNC.data=normalizePlanner(data);SYNC.data=cleanupOldTasks(SYNC.data);
-          renderTasksAndMemos();renderWeekCalendar();
-          if(!snap.exists()) await setDoc(SYNC.docRef,SYNC.data,{merge:false});
+          let data=snap.exists()?normalizePlanner(snap.data()):null;
+          const cached=readPlannerCache();
+          if(!snap.exists() && cached && (Object.keys(cached.tasks).length || Object.keys(cached.memos).length)){
+            data=cleanupOldTasks(cached);
+            await setDoc(SYNC.docRef,data,{merge:false});
+          }else{
+            data=cleanupOldTasks(data||{tasks:{},memos:{}});
+            // If Firebase is empty but this browser has cached data, restore it instead of losing it.
+            if(snap.exists() && !Object.keys(data.tasks).length && !Object.keys(data.memos).length && cached && (Object.keys(cached.tasks).length || Object.keys(cached.memos).length)){
+              data=cleanupOldTasks(cached);
+              await setDoc(SYNC.docRef,data,{merge:false});
+            }
+          }
+          SYNC.data=data;cachePlanner(data);renderTasksAndMemos();renderWeekCalendar();
           SYNC.ready=true;
           setSyncBadge("ok");
           renderTasksAndMemos();renderWeekCalendar();
@@ -2103,6 +2125,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
     }
 
     async function vendWrite(){
+      cacheVendite(vendState);
       if(!vendDocRef) throw new Error("Sync vendite non attivo");
       await setDoc(vendDocRef,vendState,{merge:false});
     }
@@ -2586,10 +2609,15 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       setSyncVendite("sync");
       vendUnsub=onSnapshot(vendDocRef,async snap=>{
         try{
-          if(snap.exists()){const d=snap.data();vendState={months:d.months||{},obiettivo:d.obiettivo||0}}
+          const cached=readVenditeCache();
+          if(snap.exists()){const d=snap.data();vendState={months:d.months||{},obiettivo:d.obiettivo||0};}
+          else if(cached){vendState=cached;}
           else{vendState={months:{},obiettivo:0}}
-          ensureMonth(TODAY_KEY);renderVendite();
+          // Non perdere un import locale quando Firestore è ancora vuoto.
           if(!snap.exists()) await setDoc(vendDocRef,vendState,{merge:false});
+          else if(cached && !Object.keys(vendState.months||{}).length && Object.keys(cached.months||{}).length){vendState=cached;await setDoc(vendDocRef,vendState,{merge:false});}
+          cacheVendite(vendState);
+          ensureMonth(TODAY_KEY);renderVendite();
           setSyncVendite("ok");
           renderVendite();
         }catch(e){
@@ -2789,6 +2817,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
       const userPill=$("userPill"), loginBtn=$("loginBtn"), logoutBtn=$("logoutBtn");
       if(user){
         const displayName=user.displayName||"Account Google", email=user.email||"Account Google";
+        const diag=$("authDiagnostic"); if(diag) diag.classList.remove("show");
         userPill.textContent="☁️ Sync in corso…"; userPill.classList.remove("muted"); userPill.style.borderColor="rgba(34,197,94,.35)"; userPill.style.background="rgba(34,197,94,.08)";
         accountBox.classList.add("logged"); accountState.textContent="✅ Loggato con Google"; accountEmail.textContent=email; accountEmail.title=email;
         accountAvatar.innerHTML=user.photoURL?`<img src="${escapeHtml(user.photoURL)}" alt="">`:(displayName.trim()[0]||"👤").toUpperCase();
@@ -2800,6 +2829,7 @@ ${d.punti.map(p=>"  ✔ "+p).join("\n")}`;
         try{startPostSync(user)}catch(e){console.warn("Post vendita:",e)} try{renderOggi()}catch(e){console.warn("Oggi:",e)}
         try{if(window._startObSync)window._startObSync(user)}catch(e){console.warn("Obiettivo:",e)} try{renderWeekCalendar()}catch(e){console.warn("Calendario:",e)} try{updateVendPdfButtons()}catch(e){console.warn("PDF:",e)}
       }else{
+        const diag=$("authDiagnostic"); if(diag) diag.classList.remove("show");
         userPill.textContent="🔒 Sync non attivo"; userPill.classList.add("muted"); userPill.style.borderColor=""; userPill.style.background="";
         accountBox.classList.remove("logged"); accountState.textContent="🔒 Non loggato"; accountEmail.textContent="Accedi con Google per sincronizzare i tuoi dati"; accountEmail.title=""; accountAvatar.innerHTML="👤";
         loginBtn.style.display="inline-block"; loginBtn.disabled=false; logoutBtn.style.display="none";
