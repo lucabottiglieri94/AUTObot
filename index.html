@@ -1771,7 +1771,19 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       getFirestore, doc, onSnapshot, setDoc, enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    const BACKEND_NEWS   = "/api/news";
+    // NEWS: RSS Motor1 filtrato esclusivamente per Fiat, Jeep, Mazda, Alfa Romeo e Lancia.
+    // Usiamo RSS2JSON solo come convertitore RSS -> JSON: nessuna API key richiesta.
+    const NEWS_RSS = "https://it.motor1.com/rss/articles/all/";
+    const NEWS_PROXY = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(NEWS_RSS);
+    const NEWS_BRANDS = [
+      "fiat", "jeep", "mazda", "alfa romeo", "alfa-romeo", "lancia",
+      // modelli per intercettare articoli che citano il modello ma non la marca nel titolo
+      "panda", "pandina", "grande panda", "500", "500e", "500x", "600", "tipo", "topolino", "ducato", "doblo", "scudo",
+      "avenger", "compass", "renegade", "wrangler", "gladiator", "cherokee",
+      "cx-3", "cx-30", "cx-5", "cx-60", "cx-80", "mx-5", "mazda3", "mazda6",
+      "giulia", "stelvio", "tonale", "junior", "33 stradale",
+      "ypsilon", "gamma", "delta"
+    ];
     const BACKEND_CHAT   = "https://auto-backend-three.vercel.app/api/chat";
     const BACKEND_SEARCH = "https://auto-backend-three.vercel.app/api/search";
     const BRAND_LINKS = {
@@ -1816,18 +1828,33 @@ Esempi: "Ford usate disponibili" · "Confronta Compass e Tonale" 💡</div></div
       try{await getRedirectResult(auth)}catch{}
     })();
 
+    function newsMatchesBrand(item){
+      const text = `${item.title||""} ${item.description||item.content||""}`.toLowerCase();
+      return NEWS_BRANDS.some(k=>text.includes(k));
+    }
+
     async function loadNews(){
       if(!auth.currentUser){$("newsList").innerHTML="";setStatus("🔒 Login per vedere le news.");return}
-      setStatus("⏳ Caricamento...");$("refreshBtn").disabled=true;
+      setStatus("⏳ Caricamento news Fiat · Jeep · Mazda · Alfa Romeo · Lancia...");$("refreshBtn").disabled=true;
       try{
-        const r=await fetch(BACKEND_NEWS,{method:"GET",headers:{"Cache-Control":"no-cache"},cache:"no-store"});
+        const r=await fetch(NEWS_PROXY,{method:"GET",headers:{"Accept":"application/json"},cache:"no-store"});
         if(!r.ok)throw new Error(`HTTP ${r.status}`);
         const data=await r.json();
-        if(data.items&&Array.isArray(data.items))renderItems(data.items);
-        else if(Array.isArray(data))renderItems(data);
-        else throw new Error("Formato non valido");
+        if(data.status && data.status !== "ok") throw new Error(data.message||"RSS non disponibile");
+        const raw=Array.isArray(data.items)?data.items:[];
+        const filtered=raw
+          .filter(newsMatchesBrand)
+          .sort((a,b)=>new Date(b.pubDate||b.date||0)-new Date(a.pubDate||a.date||0))
+          .slice(0,12)
+          .map(x=>({
+            ...x,
+            url:x.link||x.url||"",
+            date:x.pubDate||x.date||""
+          }));
+        renderItems(filtered);
+        if(filtered.length) setStatus(`✅ ${filtered.length} news selezionate • Fiat · Jeep · Mazda · Alfa Romeo · Lancia`);
       }catch(err){
-        $("newsList").innerHTML='<div class="muted" style="padding:20px;text-align:center">❌ Errore news</div>';
+        $("newsList").innerHTML='<div class="muted" style="padding:20px;text-align:center">❌ RSS news non disponibile</div>';
         setStatus("❌ "+(err?.message||err));
       }finally{$("refreshBtn").disabled=!auth.currentUser}
     }
